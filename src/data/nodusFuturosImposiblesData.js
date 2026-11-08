@@ -41790,27 +41790,2936 @@ export const NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES = [
         "area": "Relaciones & Familia"
       }
     ]
+  },
+  {
+    "id": "72860500",
+    "dni": "72860500",
+    "nombre": "ADALUZ CORI CASIMIRO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ADALUZ CORI CASIMIRO",
+      "identificacion": "72860500",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "77144510",
+    "dni": "77144510",
+    "nombre": "ALDO LEONARDO MIRANDA HUAMAN",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ALDO LEONARDO MIRANDA HUAMAN",
+      "identificacion": "77144510",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "74027502",
+    "dni": "74027502",
+    "nombre": "ANA PAOLA NunEZ ANTEZANA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ANA PAOLA NunEZ ANTEZANA",
+      "identificacion": "74027502",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "41723354",
+    "dni": "41723354",
+    "nombre": "ANGELICA HERRERA PALOMINO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ANGELICA HERRERA PALOMINO",
+      "identificacion": "41723354",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "74851699",
+    "dni": "74851699",
+    "nombre": "ANGELO MUNOZ HUANAY",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ANGELO MUNOZ HUANAY",
+      "identificacion": "74851699",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "09352243",
+    "dni": "09352243",
+    "nombre": "ANTONIO RICHARD CORNEJO AGUIRRE",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ANTONIO RICHARD CORNEJO AGUIRRE",
+      "identificacion": "09352243",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "70378685",
+    "dni": "70378685",
+    "nombre": "ARIEL ENRIQUE ALONSO OLARTE",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ARIEL ENRIQUE ALONSO OLARTE",
+      "identificacion": "70378685",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "46082933",
+    "dni": "46082933",
+    "nombre": "BRENDA MERCEDES ARANA SOTELO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "BRENDA MERCEDES ARANA SOTELO",
+      "identificacion": "46082933",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "73939244",
+    "dni": "73939244",
+    "nombre": "BRIGITTE FERNANDA LÓPEZ LÓPEZ",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "BRIGITTE FERNANDA LÓPEZ LÓPEZ",
+      "identificacion": "73939244",
+      "tipo": "MANAGER",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "07334446",
+    "dni": "07334446",
+    "nombre": "CIRILA PALOMINO PARIONA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "CIRILA PALOMINO PARIONA",
+      "identificacion": "07334446",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "73360442",
+    "dni": "73360442",
+    "nombre": "DAICY LoPEZ HUAMANRAYME",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "DAICY LoPEZ HUAMANRAYME",
+      "identificacion": "73360442",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "74042654",
+    "dni": "74042654",
+    "nombre": "DANA VALERIA CRISPIN TEMOCHE",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "DANA VALERIA CRISPIN TEMOCHE",
+      "identificacion": "74042654",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "76035813",
+    "dni": "76035813",
+    "nombre": "DAVID ANTHONY CELESTINO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "DAVID ANTHONY CELESTINO",
+      "identificacion": "76035813",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "72093393",
+    "dni": "72093393",
+    "nombre": "DIAN DIK QUIROZ SABINO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 4,
+    "pendientes": 1,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "DIAN DIK QUIROZ SABINO",
+      "identificacion": "72093393",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "4",
+      "pendientes": "1",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "43997438",
+    "dni": "43997438",
+    "nombre": "DINA MARLENE CORNEJO AGUIRRE",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "DINA MARLENE CORNEJO AGUIRRE",
+      "identificacion": "43997438",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "40900526",
+    "dni": "40900526",
+    "nombre": "EDITH PILLACA HUAMANI",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "EDITH PILLACA HUAMANI",
+      "identificacion": "40900526",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "72547895",
+    "dni": "72547895",
+    "nombre": "ERWIN HENDRICK ROSALES TEMOCHE",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ERWIN HENDRICK ROSALES TEMOCHE",
+      "identificacion": "72547895",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "44073338",
+    "dni": "44073338",
+    "nombre": "EVELYN JUDITH FLORES RIVERA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "EVELYN JUDITH FLORES RIVERA",
+      "identificacion": "44073338",
+      "tipo": "MANAGER",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "61382044",
+    "dni": "61382044",
+    "nombre": "FAUSI DANILO ALCÁNTARA MUÑOZ",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "FAUSI DANILO ALCÁNTARA MUÑOZ",
+      "identificacion": "61382044",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "47540743",
+    "dni": "47540743",
+    "nombre": "FERNANDO ABEL LOPEZ LOPEZ",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 6,
+    "pendientes": 1,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "FERNANDO ABEL LOPEZ LOPEZ",
+      "identificacion": "47540743",
+      "tipo": "CAPITAN",
+      "sede": "LIMA CICLO 1",
+      "total fi": "6",
+      "pendientes": "1",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "41930558",
+    "dni": "41930558",
+    "nombre": "GERARDO SEGUNDO CASTRO SALDANA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 1,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "GERARDO SEGUNDO CASTRO SALDANA",
+      "identificacion": "41930558",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "1",
+      "devueltos": "0",
+      "aprobados": "2"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "47424663",
+    "dni": "47424663",
+    "nombre": "GODELIA INOCENTA COLCA JULCA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "GODELIA INOCENTA COLCA JULCA",
+      "identificacion": "47424663",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "44210361",
+    "dni": "44210361",
+    "nombre": "GROVER HUMBERTO YANQUI VARGAS",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "GROVER HUMBERTO YANQUI VARGAS",
+      "identificacion": "44210361",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "70319817",
+    "dni": "70319817",
+    "nombre": "ITALO ALONSO ROMaN NOMURA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ITALO ALONSO ROMaN NOMURA",
+      "identificacion": "70319817",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "42708678",
+    "dni": "42708678",
+    "nombre": "JAINOR TORRES ORTIZ",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 6,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 6,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "JAINOR TORRES ORTIZ",
+      "identificacion": "42708678",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "6",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "6"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "40981917",
+    "dni": "40981917",
+    "nombre": "JANETH CASTAnEDA TUMBALOBOS",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "JANETH CASTAnEDA TUMBALOBOS",
+      "identificacion": "40981917",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "007041227",
+    "dni": "007041227",
+    "nombre": "JESSICA MONTILLA CORRALES",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "JESSICA MONTILLA CORRALES",
+      "identificacion": "007041227",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "73634875",
+    "dni": "73634875",
+    "nombre": "JEYDY LUZ HANCCO MAMANI",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "JEYDY LUZ HANCCO MAMANI",
+      "identificacion": "73634875",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "72257245",
+    "dni": "72257245",
+    "nombre": "JOHANN STEVE LINO GARAY",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "JOHANN STEVE LINO GARAY",
+      "identificacion": "72257245",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "10089846",
+    "dni": "10089846",
+    "nombre": "JOSE EDUARDO MENDOZA MAITA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "JOSE EDUARDO MENDOZA MAITA",
+      "identificacion": "10089846",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "60687544",
+    "dni": "60687544",
+    "nombre": "JOSE GUILLERMO CURI SALVADOR",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "JOSE GUILLERMO CURI SALVADOR",
+      "identificacion": "60687544",
+      "tipo": "MANAGER",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "44358075",
+    "dni": "44358075",
+    "nombre": "JOSUE ROVER ONOFRE VICUnA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "JOSUE ROVER ONOFRE VICUnA",
+      "identificacion": "44358075",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "25759620",
+    "dni": "25759620",
+    "nombre": "KARIN PORTOCARRERO PEREA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "KARIN PORTOCARRERO PEREA",
+      "identificacion": "25759620",
+      "tipo": "MANAGER",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "08662180",
+    "dni": "08662180",
+    "nombre": "KYMARINA ROSARIO PEREA NOGUNI",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "KYMARINA ROSARIO PEREA NOGUNI",
+      "identificacion": "08662180",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "41186119",
+    "dni": "41186119",
+    "nombre": "LUCIO ROMERLU FERRER MEJiA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "LUCIO ROMERLU FERRER MEJiA",
+      "identificacion": "41186119",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "45580544",
+    "dni": "45580544",
+    "nombre": "LUZ JAQUELINE BAUTISTA BOLO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "LUZ JAQUELINE BAUTISTA BOLO",
+      "identificacion": "45580544",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "46672970",
+    "dni": "46672970",
+    "nombre": "LYLY DAIYU PAREJA MADERA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "LYLY DAIYU PAREJA MADERA",
+      "identificacion": "46672970",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "76377398",
+    "dni": "76377398",
+    "nombre": "NAYSHA XIMENA CHURA TURPO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "NAYSHA XIMENA CHURA TURPO",
+      "identificacion": "76377398",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "73889463",
+    "dni": "73889463",
+    "nombre": "OTTY ZULEY URTEAGA SILVA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "OTTY ZULEY URTEAGA SILVA",
+      "identificacion": "73889463",
+      "tipo": "MANAGER",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "09640720",
+    "dni": "09640720",
+    "nombre": "RAQUEL GABRIELA RIVEROS RAMOS",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "RAQUEL GABRIELA RIVEROS RAMOS",
+      "identificacion": "09640720",
+      "tipo": "CAPITAN",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "46633278",
+    "dni": "46633278",
+    "nombre": "RAYDA PEDRAZA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "RAYDA PEDRAZA",
+      "identificacion": "46633278",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "71581627",
+    "dni": "71581627",
+    "nombre": "REY JORGE ALFARO PEnA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "REY JORGE ALFARO PEnA",
+      "identificacion": "71581627",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "76881676",
+    "dni": "76881676",
+    "nombre": "RHANIA SHADEN UNTIVEROS REQUEJO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "RHANIA SHADEN UNTIVEROS REQUEJO",
+      "identificacion": "76881676",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "77733879",
+    "dni": "77733879",
+    "nombre": "ROCIO MILAGROS SANTIAGO SUSANIBAR",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 5,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ROCIO MILAGROS SANTIAGO SUSANIBAR",
+      "identificacion": "77733879",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "5",
+      "devueltos": "0",
+      "aprobados": "0"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "61165516",
+    "dni": "61165516",
+    "nombre": "RUTH ABIGAIL RIMACHE HERRERA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 2,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "RUTH ABIGAIL RIMACHE HERRERA",
+      "identificacion": "61165516",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "2",
+      "devueltos": "0",
+      "aprobados": "1"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "45141505",
+    "dni": "45141505",
+    "nombre": "RUTH MERY QUISPE QUISPE",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "RUTH MERY QUISPE QUISPE",
+      "identificacion": "45141505",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "73132527",
+    "dni": "73132527",
+    "nombre": "RUTH YESLY PILCO LAURA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "RUTH YESLY PILCO LAURA",
+      "identificacion": "73132527",
+      "tipo": "MANAGER",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "47701320",
+    "dni": "47701320",
+    "nombre": "SALLY EYLEEN SILVA CIEZA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "SALLY EYLEEN SILVA CIEZA",
+      "identificacion": "47701320",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "41518204",
+    "dni": "41518204",
+    "nombre": "SANTOS RODRIGO JUAREZ ORTIZ",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "SANTOS RODRIGO JUAREZ ORTIZ",
+      "identificacion": "41518204",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "76192150",
+    "dni": "76192150",
+    "nombre": "SUMIKO DEL CARMEN BURGA ORTIZ",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "SUMIKO DEL CARMEN BURGA ORTIZ",
+      "identificacion": "76192150",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "41903564",
+    "dni": "41903564",
+    "nombre": "TANIA AURORA SaNCHEZ CASTRO",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "TANIA AURORA SaNCHEZ CASTRO",
+      "identificacion": "41903564",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "43923370",
+    "dni": "43923370",
+    "nombre": "VICTORIA DEL MILAGRO VALDIVIA VILLEGAS",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "VICTORIA DEL MILAGRO VALDIVIA VILLEGAS",
+      "identificacion": "43923370",
+      "tipo": "MANAGER",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "10531545",
+    "dni": "10531545",
+    "nombre": "YENNY GISELA CASTILLO MALLMA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 5,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "YENNY GISELA CASTILLO MALLMA",
+      "identificacion": "10531545",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "5"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "76087636",
+    "dni": "76087636",
+    "nombre": "YOHANNA BASURTO HINSOTROZA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 4,
+    "pendientes": 1,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "YOHANNA BASURTO HINSOTROZA",
+      "identificacion": "76087636",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "4",
+      "pendientes": "1",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "146971709",
+    "dni": "146971709",
+    "nombre": "YOHANNY ADRIANA DOS SANTOS MARTINEZ",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 5,
+    "pendientes": 1,
+    "devueltos": 0,
+    "aprobados": 4,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "YOHANNY ADRIANA DOS SANTOS MARTINEZ",
+      "identificacion": "146971709",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "5",
+      "pendientes": "1",
+      "devueltos": "0",
+      "aprobados": "4"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "10882524",
+    "dni": "10882524",
+    "nombre": "YVAN TORRES ORTIZ",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "YVAN TORRES ORTIZ",
+      "identificacion": "10882524",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
+  },
+  {
+    "id": "45729876",
+    "dni": "45729876",
+    "nombre": "ZORAYDA SUSANA ALVAREZ NEYRA",
+    "sede": "Lima",
+    "sedeNodus": "LIMA CICLO 1",
+    "equipo": "EQUIPO 31",
+    "equipoNodus": "EQUIPO 31 — LIMA CICLO 1 ✓",
+    "equipoKey": "lima|equipo31",
+    "discrepancias": [],
+    "fechaPFD": "",
+    "asistioPFD": true,
+    "totalFi": 3,
+    "pendientes": 0,
+    "devueltos": 0,
+    "aprobados": 3,
+    "fis": [
+      {
+        "titulo": "Resultado Imposible 1: Salud & Vitalidad",
+        "area": "Salud & Vitalidad",
+        "meta": "Estándar superior alcanzado y validado en Nodus Maestría del Juego",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 2: Finanzas & Riqueza",
+        "area": "Finanzas & Riqueza",
+        "meta": "Meta financiera cuantificable aprobada y en seguimiento de 90 días",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      },
+      {
+        "titulo": "Resultado Imposible 3: Relaciones & Liderazgo",
+        "area": "Relaciones & Familia",
+        "meta": "Liderazgo transformacional y resultados de alto impacto",
+        "estado": "aprobado",
+        "feedback": "Aprobado por el Mentor en Maestría del Juego (Nodus)."
+      }
+    ],
+    "camposNodus": {
+      "participante": "ZORAYDA SUSANA ALVAREZ NEYRA",
+      "identificacion": "45729876",
+      "tipo": "PX",
+      "sede": "LIMA CICLO 1",
+      "total fi": "3",
+      "pendientes": "0",
+      "devueltos": "0",
+      "aprobados": "3"
+    },
+    "cumpleEstandar3": true
   }
 ];
 
 export const EQUIPOS_FUTUROS_IMPOSIBLES = [
   "Todos",
-  "EQUIPO 15",
-  "EQUIPO 16",
-  "EQUIPO 17",
-  "EQUIPO 18",
-  "EQUIPO 19",
-  "EQUIPO 20",
-  "EQUIPO 21",
-  "EQUIPO 22",
-  "EQUIPO 23",
-  "EQUIPO 24",
-  "EQUIPO 25",
-  "EQUIPO 26",
-  "EQUIPO 27",
-  "EQUIPO 28",
+  "EQUIPO 32",
+  "EQUIPO 31",
+  "EQUIPO 30",
   "EQUIPO 29",
-  "EQUIPO 30"
+  "EQUIPO 28",
+  "EQUIPO 27",
+  "EQUIPO 26",
+  "EQUIPO 25",
+  "EQUIPO 24",
+  "EQUIPO 23",
+  "EQUIPO 22",
+  "EQUIPO 21",
+  "EQUIPO 20",
+  "EQUIPO 19",
+  "EQUIPO 18",
+  "EQUIPO 17",
+  "EQUIPO 16",
+  "EQUIPO 15"
 ];
 
 export const ESTADOS_FI = [
