@@ -30,7 +30,9 @@ export const managersFieldHelp = {
   filtroEquipo: help('Filtrar por equipo', 'Elige el equipo por número, nombre y sede. Este filtro no mueve integrantes.'),
   filtroPagos: help('Filtrar pagos', 'Elige el estado de pago que necesitas revisar. El filtro no registra ni revierte pagos.'),
   filtroEstado: help('Filtrar estado de managers', 'Reduce la lista por graduación, deserción, en juego o falta de entrenador. No cambia estados ni asignaciones.'),
-  filtroRendimiento: help('Filtrar rendimiento', 'Selecciona el indicador que necesitas revisar: graduación, deserción o pagos pendientes. El filtro no modifica registros.')
+  filtroRendimiento: help('Filtrar rendimiento', 'Selecciona el indicador que necesitas revisar: graduación, deserción o pagos pendientes. El filtro no modifica registros.'),
+  filtroTipoLlamada: help('Tipo de llamada', 'Filtra entre llamadas grupales de equipos o llamadas individuales 1 a 1.'),
+  reporteNotaVoz: help('Reporte en nota de voz', 'Marca si el reporte semanal fue enviado al Coordinador de Maestría en formato de audio.')
 };
 
 export const managersActionHelp = {
@@ -48,6 +50,7 @@ export const managersActionHelp = {
   tabla: help('Vista en tabla', 'Revisa y compara integrantes en filas. Usa los encabezados para ordenar la lista.'),
   tarjetas: help('Vista por equipos', 'Agrupa visualmente integrantes por equipo para revisar su roster y asignaciones.'),
   restaurar: help('Restaurar filtros', 'Limpia los filtros de esta vista. En el directorio también restaura el orden natural por número de equipo.'),
+  exportarContactos: help('Exportar contactos', 'Descarga los contactos en formato vCard (.vcf) para tu teléfono móvil (iPhone/Android) o en CSV para Google Contacts. Solo incluye registros con teléfono válido.'),
   fusion: help('Unir equipos', 'Abre la fusión operativa. Úsala solo ante una unión confirmada; compartir nombre no convierte #122 y #124 en un mismo equipo.'),
   ejecutarFusion: help('Confirmar fusión', 'Ejecuta la transferencia indicada en la vista previa. Verifica número, sede, destino y reasignación antes de confirmar.'),
   nuevo: help('Nuevo registro', 'Abre el alta de una persona o un equipo completo. Busca primero para evitar duplicados.'),
@@ -87,6 +90,16 @@ export const managersActionHelp = {
   cerrarEquipo: help('Cerrar equipo para liquidación', 'Marca el cierre de graduación o deserción para incluirlo en liquidación aunque no alcance siete llamadas. Confirma el cierre real antes de usarlo.'),
   reabrirEquipo: help('Reabrir equipo', 'Quita el cierre manual y restaura los estados previos para continuar su curso. Úsalo si el cierre fue incorrecto.'),
   marcarPagado: help('Marcar como pagado', 'Registra el pago como realizado. Verifica antes el comprobante, monto, entrenador y equipo; este botón NO transfiere dinero.'),
+  marcarSinPago: help('Liquidar sin desembolso', 'Marca el equipo o manager como liquidado pero sin pago monetario ($0 USD), útil para equipos o managers retenidos.'),
+  notificarEli: help('Notificar a Eli Escobar', 'Envía notificación a Causa OS y genera correo para la CFO Eli Escobar autorizando la liquidación.'),
+  correoEliEscobar: help('Autorización para Eli Escobar', 'Genera y envía el correo formal de autorización de pago a Nancy Elizabeth Escobar Pérez (CFO / Finanzas Global) y notifica en Causa OS con el detalle de los equipos liquidados.'),
+  copiarCorreo: help('Copiar texto del correo', 'Copia al portapapeles el texto del correo formal de autorización de pago para pegarlo en tu gestor de correo.'),
+  abrirCorreo: help('Abrir en cliente de correo', 'Abre tu cliente de correo (Gmail, Outlook o Apple Mail) con el destinatario contabilidad.global@crearpsl.net y los datos prellenados.'),
+  limpiarSeleccion: help('Limpiar selección', 'Desmarca todos los ítems actualmente seleccionados para liquidación masiva.'),
+  liquidarMasivo: help('Liquidar seleccionados', 'Autoriza la liquidación masiva de los registros seleccionados y prepara la notificación a Finanzas.'),
+  filtroTipoLlamadas: help('Filtro tipo de llamada', 'Permite alternar entre todas las llamadas, únicamente grupales (equipos) o individuales (1 a 1).'),
+  historialLlamadas: help('Historial de llamadas', 'Abre el registro detallado de fechas, asistencias y modalidades de llamadas del manager.'),
+  eliminarLlamada: help('Eliminar llamada', 'Elimina permanentemente el registro histórico de la llamada individual seleccionada.'),
   ocultarPago: help('Retirar de pendientes', 'Oculta este equipo del reporte financiero de pendientes. No borra el equipo en Nodus ni registra un pago.'),
   reversarPago: help('Reversar registro de pago', 'Devuelve el equipo a pendientes. NO revierte la transferencia bancaria. Disponible solo para las identidades autorizadas.'),
   editarMontoPago: help('Editar monto pagado', 'Corrige el importe realmente pagado en USD, positivo y con hasta dos decimales (coma o punto). Solo para las identidades autorizadas a reversar. Conserva estado, fecha y responsable originales; registra quién editó y auditoría antes/después. NO transfiere dinero. Si falla la auditoría, el aviso confirma que el monto sí se guardó y debes avisar a soporte.'),

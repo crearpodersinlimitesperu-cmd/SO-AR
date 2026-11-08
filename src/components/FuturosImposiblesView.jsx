@@ -3,7 +3,8 @@ import {
   Target, Sparkles, AlertCircle, CheckCircle2, Clock, 
   RefreshCw, Trophy, Search, X, ExternalLink, ChevronRight,
   Filter, ShieldAlert, Award, FileText, UserCheck, AlertTriangle,
-  Loader2, ThumbsUp, Send, Check
+  Loader2, ThumbsUp, Send, Check, Copy, BookOpen, Bot, Zap,
+  Layers, CheckCheck, Lightbulb, MessageSquare, Compass, ArrowRight
 } from 'lucide-react';
 import { addDoc, collection, doc, getDocFromServer, getDocsFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -12,6 +13,16 @@ import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
 import { canonicalSede } from '../utils/sede.js';
 import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, ROLES_FI } from '../data/nodusFuturosImposiblesData.js';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
+import { 
+  ejecutarDiagnosticoFIs, 
+  evaluarCalidadOntologicaFI, 
+  normalizarTexto,
+  PROMPT_MAESTRO_AUDITORIA_3_RI,
+  GUIA_PROPOSITO_3_CAPAS_RI,
+  generarPromptParaParticipante,
+  auditarResultadosImposiblesEMPOR,
+  generarTextoEvaluacionCompleta
+} from '../services/nodusFIAgent';
 
 const normSearch = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
 
@@ -54,11 +65,6 @@ const ESTADOS_FI = [
   { id: 'DEVUELTOS', label: 'Devueltos' },
   { id: 'APROBADOS', label: 'Aprobados' }
 ];
-import { 
-  ejecutarDiagnosticoFIs, 
-  evaluarCalidadOntologicaFI, 
-  normalizarTexto 
-} from '../services/nodusFIAgent';
 
 export default function FuturosImposiblesView({ 
   selectedSede = 'GLOBAL',
@@ -117,6 +123,33 @@ export default function FuturosImposiblesView({
   const [modalOpen, setModalOpen] = useState(false);
   const [activeAreaTab, setActiveAreaTab] = useState(0);
   const [mentorNote, setMentorNote] = useState('');
+
+  // Estados para Asistente IA, Prompt Maestro y Guía de Propósito
+  const [showPromptModal, setShowPromptModal] = useState(false);
+  const [showGuiaModal, setShowGuiaModal] = useState(false);
+  const [guiaActiveTab, setGuiaActiveTab] = useState(1);
+  const [checklistChecks, setChecklistChecks] = useState({});
+  const [iaEvaluation, setIaEvaluation] = useState(null);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+
+  const copyToClipboard = async (text, successMsg = 'Copiado al portapapeles') => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      triggerToast(successMsg, 'success');
+    } catch (err) {
+      console.warn('Error al copiar:', err);
+      triggerToast('No se pudo copiar automáticamente. Por favor selecciona el texto.', 'warning');
+    }
+  };
 
   // Lee en servidor para no presentar una caché local como una sincronización
   // oficial. Solo acepta fuentes con asistentes PFD explícitamente confirmados.
@@ -290,7 +323,42 @@ export default function FuturosImposiblesView({
     setSelectedParticipant(participant);
     setActiveAreaTab(0);
     setMentorNote(participant.fis?.[0]?.feedback || '');
+    setIaEvaluation(null);
+    setCopiedPrompt(false);
     setModalOpen(true);
+  };
+
+  const handleCopiarPromptParticipante = async () => {
+    if (!selectedParticipant) return;
+    const promptTexto = generarPromptParaParticipante(selectedParticipant);
+    await copyToClipboard(promptTexto, `¡Prompt Maestro con los 3 Resultados de ${selectedParticipant.nombre} copiado!`);
+    setCopiedPrompt(true);
+    setTimeout(() => setCopiedPrompt(false), 3000);
+  };
+
+  const handleEjecutarAuditoriaEmpor = () => {
+    if (!selectedParticipant) return;
+    const evalData = auditarResultadosImposiblesEMPOR(selectedParticipant.fis || [], selectedParticipant);
+    setIaEvaluation(evalData);
+    triggerToast('Auditoría E.M.P.O.R. generada exitosamente', 'success');
+  };
+
+  const handleAplicarARetroalimentacion = () => {
+    if (!iaEvaluation) return;
+    const textoCompleto = generarTextoEvaluacionCompleta(iaEvaluation);
+    setMentorNote(textoCompleto);
+    triggerToast('Evaluación completa aplicada al campo de retroalimentación', 'success');
+  };
+
+  const handleAplicarResultadoIndividual = (resIndex) => {
+    if (!iaEvaluation?.resultados?.[resIndex]) return;
+    const r = iaEvaluation.resultados[resIndex];
+    let nota = `[${r.estado}] ${r.reflejoAsertivo}`;
+    if (r.ajusteInmediato) {
+      nota += `\n\nAjuste Inmediato Sugerido: ${r.ajusteInmediato}`;
+    }
+    setMentorNote(nota);
+    triggerToast(`Observación del Resultado ${resIndex + 1} aplicada`, 'success');
   };
 
   const saveReview = async (estado) => {
@@ -415,6 +483,46 @@ export default function FuturosImposiblesView({
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setShowPromptModal(true)}
+            title="Abre y copia el Prompt Maestro de Auditoría para Gemini en Nodus"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              color: '#38bdf8',
+              cursor: 'pointer'
+            }}
+          >
+            <Bot size={15} /> Prompt Maestro IA
+          </button>
+
+          <button
+            onClick={() => setShowGuiaModal(true)}
+            title="Abre la Guía para Encontrar el Propósito y 'Para Qué' con las 3 Capas y Matriz E.M.P.O.R."
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: 'rgba(245, 158, 11, 0.12)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              color: '#f59e0b',
+              cursor: 'pointer'
+            }}
+          >
+            <BookOpen size={15} /> Guía del "Para Qué"
+          </button>
+
           <button
             onClick={handleReevaluate}
             disabled={isEvaluating}
@@ -1282,6 +1390,162 @@ export default function FuturosImposiblesView({
                 </div>
               </div>
 
+              {/* ASISTENTE ONTOLÓGICO IA & PROMPT MAESTRO (NODUS) */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%)',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                borderRadius: '12px',
+                padding: '1rem',
+                marginBottom: '1.25rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Sparkles size={16} color="#38bdf8" />
+                    <span style={{ fontWeight: 800, fontSize: '0.9rem', color: textDark }}>
+                      Asistente Ontológico IA &bull; Auditoría 3 Resultados Imposibles
+                    </span>
+                    <span style={{ fontSize: '0.7rem', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: 700 }}>
+                      Estándar E.M.P.O.R.
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={handleCopiarPromptParticipante}
+                      title="Copia el Prompt Maestro completo con las 3 metas de este participante inyectadas, listo para pegar en Gemini"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: copiedPrompt ? 'rgba(16, 185, 129, 0.2)' : 'rgba(56, 189, 248, 0.15)',
+                        border: `1px solid ${copiedPrompt ? '#10b981' : 'rgba(56, 189, 248, 0.4)'}`,
+                        color: copiedPrompt ? '#10b981' : '#38bdf8',
+                        padding: '0.45rem 0.8rem',
+                        borderRadius: '7px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Copy size={13} /> {copiedPrompt ? '¡Prompt Copiado!' : 'Copiar Prompt para Gemini'}
+                    </button>
+
+                    <button
+                      onClick={handleEjecutarAuditoriaEmpor}
+                      title="Audita de forma automática y asertiva las 3 metas según los 3 pilares sin palabras punitivas"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        color: '#10b981',
+                        padding: '0.45rem 0.8rem',
+                        borderRadius: '7px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Zap size={13} /> {iaEvaluation ? 'Re-auditar E.M.P.O.R.' : 'Auditar con Prompt Maestro'}
+                    </button>
+
+                    <button
+                      onClick={() => setShowGuiaModal(true)}
+                      title="Consulta la Guía del Propósito y 'Para Qué' con las 3 capas"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: 'rgba(245, 158, 11, 0.15)',
+                        border: '1px solid rgba(245, 158, 11, 0.4)',
+                        color: '#f59e0b',
+                        padding: '0.45rem 0.8rem',
+                        borderRadius: '7px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <BookOpen size={13} /> Ver Guía "Para Qué"
+                    </button>
+                  </div>
+                </div>
+
+                {iaEvaluation ? (
+                  <div style={{ background: 'rgba(0, 0, 0, 0.25)', border: `1px solid ${borderLight}`, borderRadius: '8px', padding: '0.9rem', marginTop: '0.6rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.6rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 800, color: textMuted }}>ESTADO GENERAL:</span>
+                        <span style={{
+                          background: iaEvaluation.estadoGeneral === 'APROBADO' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                          color: iaEvaluation.estadoGeneral === 'APROBADO' ? '#10b981' : '#f59e0b',
+                          border: `1px solid ${iaEvaluation.estadoGeneral === 'APROBADO' ? '#10b981' : '#f59e0b'}`,
+                          padding: '0.2rem 0.65rem',
+                          borderRadius: '12px',
+                          fontSize: '0.75rem',
+                          fontWeight: 800
+                        }}>
+                          [{iaEvaluation.estadoGeneral}]
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: textMuted }}>
+                          ({iaEvaluation.aprobadosCount}/3 Resultados con estándar superior)
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button
+                          onClick={handleAplicarARetroalimentacion}
+                          title="Copia la evaluación estructurada completa al campo de retroalimentación del mentor"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            background: '#10b981',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.35rem 0.75rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Send size={12} /> Aplicar a Retroalimentación
+                        </button>
+                        <button
+                          onClick={() => copyToClipboard(generarTextoEvaluacionCompleta(iaEvaluation), 'Evaluación completa copiada')}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            background: 'rgba(255, 255, 255, 0.08)',
+                            color: textDark,
+                            border: `1px solid ${borderLight}`,
+                            borderRadius: '6px',
+                            padding: '0.35rem 0.65rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Copy size={12} /> Copiar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'rgba(56, 189, 248, 0.08)', borderLeft: '3px solid #38bdf8', padding: '0.6rem 0.8rem', borderRadius: '4px', fontSize: '0.78rem', color: textDark }}>
+                      <div style={{ fontWeight: 800, color: '#38bdf8', marginBottom: '0.2rem' }}>PREGUNTA CUÁNTICA DE ENFOQUE:</div>
+                      <div>"{iaEvaluation.preguntaCuantica}"</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.76rem', color: textMuted, lineHeight: 1.4 }}>
+                    💡 <em>Usa el <strong>Prompt Maestro</strong> para auditar los 3 resultados según los 3 pilares (Especificidad, Nivel de Desafío y Propósito) con retroalimentación asertiva, empática y sin juicios punitivos.</em>
+                  </div>
+                )}
+              </div>
+
               {/* Selector de Resultados (Exactamente 3 Resultados Imposibles) */}
               <div style={{ 
                 display: 'flex', 
@@ -1397,6 +1661,104 @@ export default function FuturosImposiblesView({
                       )}
                     </div>
 
+                    {/* ANÁLISIS E.M.P.O.R. DEL RESULTADO ACTIVO (3 PILARES) */}
+                    {(() => {
+                      const itemEval = iaEvaluation?.resultados?.[activeAreaTab] || auditarResultadosImposiblesEMPOR(selectedParticipant.fis || [], selectedParticipant).resultados[activeAreaTab];
+                      if (!itemEval) return null;
+
+                      return (
+                        <div style={{
+                          background: 'rgba(0, 0, 0, 0.18)',
+                          border: `1px solid ${itemEval.estado === 'APROBADO' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
+                          borderRadius: '8px',
+                          padding: '0.9rem',
+                          marginBottom: '1.25rem'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <Target size={14} color={itemEval.estado === 'APROBADO' ? '#10b981' : '#f59e0b'} />
+                              <span style={{ fontSize: '0.78rem', fontWeight: 800, color: textDark }}>
+                                Auditoría de 3 Pilares &bull; {itemEval.area}
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 800,
+                              background: itemEval.estado === 'APROBADO' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                              color: itemEval.estado === 'APROBADO' ? '#10b981' : '#f59e0b',
+                              padding: '0.15rem 0.5rem',
+                              borderRadius: '10px'
+                            }}>
+                              [{itemEval.estado}]
+                            </span>
+                          </div>
+
+                          {/* 3 Pilares */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem', marginBottom: '0.65rem' }}>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.45rem 0.6rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                              <span style={{ color: textMuted }}>1. Especificidad y Medición: </span>
+                              <strong style={{ color: itemEval.pilares?.especificidadYMedicion ? '#10b981' : '#f59e0b' }}>
+                                {itemEval.pilares?.especificidadYMedicion ? 'Cumplido' : 'Precisión requerida'}
+                              </strong>
+                            </div>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.45rem 0.6rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                              <span style={{ color: textMuted }}>2. Nivel de Desafío: </span>
+                              <strong style={{ color: itemEval.pilares?.nivelDesafio ? '#10b981' : '#f59e0b' }}>
+                                {itemEval.pilares?.nivelDesafio ? 'Estiramiento' : 'Marco conciso'}
+                              </strong>
+                            </div>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.45rem 0.6rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                              <span style={{ color: textMuted }}>3. Propósito ("Para Qué"): </span>
+                              <strong style={{ color: itemEval.pilares?.conexionProposito ? '#10b981' : '#f59e0b' }}>
+                                {itemEval.pilares?.conexionProposito ? 'Conectado' : 'Profundizar'}
+                              </strong>
+                            </div>
+                          </div>
+
+                          {/* Reflejo Asertivo */}
+                          <div style={{ fontSize: '0.8rem', color: textDark, marginBottom: itemEval.ajusteInmediato ? '0.5rem' : '0', lineHeight: 1.4 }}>
+                            <strong>Reflejo Asertivo:</strong> {itemEval.reflejoAsertivo}
+                          </div>
+
+                          {/* Ajuste Inmediato Sugerido */}
+                          {itemEval.ajusteInmediato && (
+                            <div style={{
+                              background: 'rgba(245, 158, 11, 0.08)',
+                              border: '1px dashed rgba(245, 158, 11, 0.35)',
+                              borderRadius: '6px',
+                              padding: '0.5rem 0.75rem',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              gap: '0.5rem'
+                            }}>
+                              <div style={{ fontSize: '0.77rem', color: '#fcd34d', flex: 1, minWidth: '220px' }}>
+                                <strong>Ajuste Inmediato Sugerido:</strong> {itemEval.ajusteInmediato}
+                              </div>
+                              <button
+                                onClick={() => handleAplicarResultadoIndividual(activeAreaTab)}
+                                title="Copia esta observación al campo de retroalimentación"
+                                style={{
+                                  background: 'rgba(245, 158, 11, 0.2)',
+                                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                                  color: '#f59e0b',
+                                  padding: '0.25rem 0.6rem',
+                                  borderRadius: '5px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                Aplicar sugerencia a nota
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     {/* Observaciones / Feedback del Mentor */}
                     <div style={{ marginBottom: '1.25rem' }}>
                       <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: textMuted, marginBottom: '0.4rem' }}>
@@ -1494,6 +1856,511 @@ export default function FuturosImposiblesView({
               >
                 Cerrar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 8. MODAL PROMPT MAESTRO DE AUDITORÍA (GEMINI / NODUS) */}
+      {showPromptModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '1rem',
+          zIndex: 10002
+        }}>
+          <div style={{
+            background: '#0d1527',
+            border: `1px solid ${borderLight}`,
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '860px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)'
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: `1px solid ${borderLight}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.2)'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                  <span style={{
+                    background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)',
+                    color: '#38bdf8',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '12px',
+                    fontSize: '0.7rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem'
+                  }}>
+                    <Bot size={13} /> ASISTENTE GEMINI &bull; NODUS
+                  </span>
+                </div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: textDark }}>
+                  Prompt Maestro para Auditar los 3 Resultados Imposibles en Nodus
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowPromptModal(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: textMuted,
+                  cursor: 'pointer',
+                  padding: '0.4rem',
+                  borderRadius: '6px'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              {/* Instrucciones de uso */}
+              <div style={{
+                background: 'rgba(56, 189, 248, 0.08)',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                borderRadius: '10px',
+                padding: '0.9rem 1.1rem',
+                marginBottom: '1.2rem'
+              }}>
+                <div style={{ fontWeight: 800, color: '#38bdf8', fontSize: '0.85rem', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Lightbulb size={16} /> Instrucciones de uso con Gemini (Google Chrome / Nodus):
+                </div>
+                <div style={{ fontSize: '0.8rem', color: textDark, lineHeight: 1.5 }}>
+                  1. Haz clic en <strong>"Copiar Prompt Maestro"</strong>.<br />
+                  2. Pégalo en el panel de Gemini (en Google Chrome o Nodus) para configurarlo como asistente auditor de desempeño ontológico.<br />
+                  3. Pega las 3 metas del participante para recibir la retroalimentación asertiva al instante, lista para guardar en la plataforma.
+                </div>
+              </div>
+
+              {/* Bloque de Código del Prompt */}
+              <div style={{
+                background: '#060a14',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '8px',
+                padding: '1rem',
+                fontFamily: 'monospace',
+                fontSize: '0.78rem',
+                color: '#e2e8f0',
+                lineHeight: 1.5,
+                whiteSpace: 'pre-wrap',
+                maxHeight: '440px',
+                overflowY: 'auto'
+              }}>
+                {PROMPT_MAESTRO_AUDITORIA_3_RI}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderTop: `1px solid ${borderLight}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.15)',
+              flexWrap: 'wrap',
+              gap: '0.6rem'
+            }}>
+              <span style={{ fontSize: '0.75rem', color: textMuted }}>
+                Causa OS &bull; Tecnología Ontológica y Auditoría de Metas
+              </span>
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button
+                  onClick={() => copyToClipboard(PROMPT_MAESTRO_AUDITORIA_3_RI, '¡Prompt Maestro copiado al portapapeles!')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    background: 'linear-gradient(135deg, #0284c7 0%, #059669 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '7px',
+                    padding: '0.5rem 1.1rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 6px -1px rgba(2, 132, 199, 0.3)'
+                  }}
+                >
+                  <Copy size={14} /> Copiar Prompt Maestro
+                </button>
+                <button
+                  onClick={() => setShowPromptModal(false)}
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid ${borderLight}`,
+                    color: textDark,
+                    padding: '0.5rem 1rem',
+                    borderRadius: '7px',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 9. MODAL GUÍA DEL PROPÓSITO Y "PARA QUÉ" (METODOLOGÍA OFICIAL) */}
+      {showGuiaModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '1rem',
+          zIndex: 10002
+        }}>
+          <div style={{
+            background: '#0d1527',
+            border: `1px solid ${borderLight}`,
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '920px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)'
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: `1px solid ${borderLight}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.2)'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                  <span style={{
+                    background: 'rgba(245, 158, 11, 0.18)',
+                    color: '#f59e0b',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '12px',
+                    fontSize: '0.7rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem'
+                  }}>
+                    <BookOpen size={13} /> METODOLOGÍA OFICIAL &bull; CPSL
+                  </span>
+                </div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: textDark }}>
+                  {GUIA_PROPOSITO_3_CAPAS_RI.titulo}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowGuiaModal(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: textMuted,
+                  cursor: 'pointer',
+                  padding: '0.4rem',
+                  borderRadius: '6px'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              {/* Definición de Alto Impacto */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(56, 189, 248, 0.1) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                borderRadius: '10px',
+                padding: '1rem 1.25rem',
+                marginBottom: '1.25rem'
+              }}>
+                <div style={{ fontWeight: 800, color: '#f59e0b', fontSize: '0.88rem', marginBottom: '0.3rem' }}>
+                  ¿Por qué un "Resultado Imposible"?
+                </div>
+                <div style={{ fontSize: '0.85rem', color: textDark, lineHeight: 1.5, fontStyle: 'italic' }}>
+                  "{GUIA_PROPOSITO_3_CAPAS_RI.definicion}"
+                </div>
+              </div>
+
+              {/* Selector de Pasos */}
+              <div style={{
+                display: 'flex',
+                gap: '0.5rem',
+                borderBottom: `1px solid ${borderLight}`,
+                marginBottom: '1.25rem',
+                paddingBottom: '0.5rem'
+              }}>
+                <button
+                  onClick={() => setGuiaActiveTab(1)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: guiaActiveTab === 1 ? '1px solid #f59e0b' : `1px solid ${borderLight}`,
+                    background: guiaActiveTab === 1 ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
+                    color: guiaActiveTab === 1 ? '#f59e0b' : textMuted,
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <Layers size={14} /> Paso 1: Las 3 Capas del "Para Qué"
+                </button>
+
+                <button
+                  onClick={() => setGuiaActiveTab(2)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: guiaActiveTab === 2 ? '1px solid #10b981' : `1px solid ${borderLight}`,
+                    background: guiaActiveTab === 2 ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                    color: guiaActiveTab === 2 ? '#10b981' : textMuted,
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <Target size={14} /> Paso 2: Matriz E.M.P.O.R.
+                </button>
+
+                <button
+                  onClick={() => setGuiaActiveTab(3)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: guiaActiveTab === 3 ? '1px solid #38bdf8' : `1px solid ${borderLight}`,
+                    background: guiaActiveTab === 3 ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                    color: guiaActiveTab === 3 ? '#38bdf8' : textMuted,
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <CheckCheck size={14} /> Paso 3: Checklist Rápido
+                </button>
+              </div>
+
+              {/* Contenido según Paso */}
+              {guiaActiveTab === 1 && (
+                <div>
+                  <p style={{ fontSize: '0.82rem', color: textMuted, marginBottom: '1rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso1.descripcion}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1.2rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso1.capas.map((c) => (
+                      <div key={c.numero} style={{
+                        background: 'rgba(255, 255, 255, 0.025)',
+                        border: `1px solid ${borderLight}`,
+                        borderLeft: `4px solid ${c.numero === 1 ? '#38bdf8' : c.numero === 2 ? '#f59e0b' : '#10b981'}`,
+                        borderRadius: '8px',
+                        padding: '0.85rem 1rem'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                          <span style={{ fontWeight: 800, fontSize: '0.85rem', color: c.numero === 1 ? '#38bdf8' : c.numero === 2 ? '#f59e0b' : '#10b981' }}>
+                            {c.capa}
+                          </span>
+                          <span style={{ fontSize: '0.75rem', color: textMuted, fontStyle: 'italic' }}>
+                            {c.pregunta}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.82rem', color: textDark, background: 'rgba(0,0,0,0.2)', padding: '0.45rem 0.65rem', borderRadius: '6px' }}>
+                          <strong>Ejemplo:</strong> {c.ejemplo}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{
+                    background: 'rgba(245, 158, 11, 0.1)',
+                    border: '1px solid #f59e0b',
+                    borderRadius: '8px',
+                    padding: '0.85rem 1rem',
+                    fontSize: '0.82rem',
+                    color: '#fcd34d'
+                  }}>
+                    🌟 <strong>Regla de Oro:</strong> {GUIA_PROPOSITO_3_CAPAS_RI.paso1.reglaOro}
+                  </div>
+                </div>
+              )}
+
+              {guiaActiveTab === 2 && (
+                <div>
+                  <p style={{ fontSize: '0.82rem', color: textMuted, marginBottom: '1rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso2.descripcion}
+                  </p>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+                      <thead>
+                        <tr style={{ background: 'rgba(255, 255, 255, 0.04)', borderBottom: `1px solid ${borderLight}`, textAlign: 'left' }}>
+                          <th style={{ padding: '0.75rem', color: textDark, fontWeight: 700 }}>Componente</th>
+                          <th style={{ padding: '0.75rem', color: textDark, fontWeight: 700 }}>Requisito de Validación</th>
+                          <th style={{ padding: '0.75rem', color: '#ef4444', fontWeight: 700 }}>Ejemplo Incorrecto (Vago)</th>
+                          <th style={{ padding: '0.75rem', color: '#10b981', fontWeight: 700 }}>Ejemplo Correcto (Estándar Superior)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {GUIA_PROPOSITO_3_CAPAS_RI.paso2.tabla.map((fila, idx) => (
+                          <tr key={idx} style={{ borderBottom: `1px solid ${borderLight}` }}>
+                            <td style={{ padding: '0.75rem', fontWeight: 800, color: textDark, whiteSpace: 'nowrap' }}>
+                              {fila.componente}
+                            </td>
+                            <td style={{ padding: '0.75rem', color: textMuted }}>
+                              {fila.requisito}
+                            </td>
+                            <td style={{ padding: '0.75rem', color: '#fca5a5', background: 'rgba(239, 68, 68, 0.05)' }}>
+                              {fila.incorrecto}
+                            </td>
+                            <td style={{ padding: '0.75rem', color: '#86efac', background: 'rgba(16, 185, 129, 0.05)', fontWeight: 600 }}>
+                              {fila.correcto}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {guiaActiveTab === 3 && (
+                <div>
+                  <p style={{ fontSize: '0.82rem', color: textMuted, marginBottom: '1rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso3.descripcion}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso3.items.map((item, idx) => {
+                      const isChecked = Boolean(checklistChecks[idx]);
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setChecklistChecks(prev => ({ ...prev, [idx]: !prev[idx] }))}
+                          style={{
+                            background: isChecked ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.025)',
+                            border: `1px solid ${isChecked ? '#10b981' : borderLight}`,
+                            borderRadius: '8px',
+                            padding: '0.85rem 1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s'
+                          }}
+                        >
+                          <div style={{
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '5px',
+                            border: `2px solid ${isChecked ? '#10b981' : textMuted}`,
+                            background: isChecked ? '#10b981' : 'transparent',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            {isChecked && <Check size={14} color="#ffffff" />}
+                          </div>
+                          <span style={{ fontSize: '0.82rem', color: isChecked ? '#ffffff' : textDark, fontWeight: isChecked ? 700 : 500, lineHeight: 1.4 }}>
+                            {idx + 1}. {item}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderTop: `1px solid ${borderLight}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.15)',
+              flexWrap: 'wrap',
+              gap: '0.6rem'
+            }}>
+              <span style={{ fontSize: '0.75rem', color: textMuted }}>
+                Causa OS &bull; Escuela de Liderazgo y Alto Rendimiento CPSL
+              </span>
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button
+                  onClick={() => copyToClipboard(GUIA_PROPOSITO_3_CAPAS_RI.textoCompartible, '¡Guía completa copiada para WhatsApp o correo!')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    background: 'linear-gradient(135deg, #f59e0b 0%, #10b981 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '7px',
+                    padding: '0.5rem 1.1rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 6px -1px rgba(245, 158, 11, 0.3)'
+                  }}
+                >
+                  <Copy size={14} /> Copiar Guía para Participantes (WhatsApp)
+                </button>
+                <button
+                  onClick={() => setShowGuiaModal(false)}
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid ${borderLight}`,
+                    color: textDark,
+                    padding: '0.5rem 1rem',
+                    borderRadius: '7px',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         </div>

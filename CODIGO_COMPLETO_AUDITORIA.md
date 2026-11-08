@@ -79465,19 +79465,34 @@ export function ChecklistProvider({ children }) {
         let sedeCompleted = data.completed;
         let sedeStatus = data.status;
         const taskId = data.id;
+        const baseTaskDef = checklistData.find(t => t.id === taskId);
 
-        const isBaseCatalogTask = checklistData.some(task => task.id === taskId) &&
+        // REGLA DE COHERENCIA: Las tareas del catálogo heredan sus atributos estáticos 
+        // invariables desde checklistData.js, ignorando posibles corrupciones en Firestore.
+        let mergedData = data;
+        if (baseTaskDef && !data.isCustom && !taskId.startsWith('custom_')) {
+          mergedData = {
+            ...data,
+            cyclePhase: baseTaskDef.cyclePhase,
+            task: baseTaskDef.task,
+            role: baseTaskDef.role,
+            isCritical: baseTaskDef.isCritical
+          };
+        }
+
+        const isBaseCatalogTask = Boolean(baseTaskDef) &&
           !data.isCustom && !taskId.startsWith('custom_') &&
           !data.assignedToEmail &&
           !(Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0);
+
         if (isBaseCatalogTask && !isMultiTeamQuito) {
-          return applyCycleCompletion(data, {
+          return applyCycleCompletion(mergedData, {
             sede: userSede,
             cycleId: currentCycle?.id
           });
         }
 
-        return { ...data, completed: sedeCompleted, status: sedeStatus };
+        return { ...mergedData, completed: sedeCompleted, status: sedeStatus };
       });
 
       const existingIds = new Set(authorizedTasks.map(task => task.id));
@@ -86246,6 +86261,92 @@ test('existing cooldown, expired cooldown, storage errors and unrelated failures
 
 ---
 
+## Archivo: src/utils/contactsExport.test.js
+
+```js
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  formatInternationalPhone,
+  generateSingleVCard,
+  generateVCardBundle,
+  generateGoogleContactsCSV
+} from './contactsExport.js';
+
+test('formatInternationalPhone formats numbers correctly per country', () => {
+  // Peru (+51)
+  assert.equal(formatInternationalPhone('+51997213218', 'Lima'), '+51997213218');
+  assert.equal(formatInternationalPhone('997213218', 'Lima'), '+51997213218');
+
+  // Ecuador (+593)
+  assert.equal(formatInternationalPhone('0939935732', 'Guayaquil'), '+593939935732');
+  assert.equal(formatInternationalPhone('5930983807026', 'Cuenca'), '+5930983807026');
+
+  // Colombia (+57)
+  assert.equal(formatInternationalPhone('3001234567', 'Medellín'), '+573001234567');
+});
+
+test('generateSingleVCard outputs valid vCard 3.0 format', () => {
+  const manager = {
+    nombre: 'Italo Alonso Roman Nomura',
+    rol: 'Manager',
+    telefono: '+51997213218',
+    equipo: 'QUANTUM PHOENIX',
+    numEquipo: '29',
+    sede: 'Lima',
+    estado: 'Activo',
+    entrenador: 'Paul'
+  };
+
+  const vcard = generateSingleVCard(manager);
+  assert.ok(vcard.startsWith('BEGIN:VCARD'));
+  assert.ok(vcard.includes('VERSION:3.0'));
+  assert.ok(vcard.includes('FN:Italo Alonso Roman Nomura'));
+  assert.ok(vcard.includes('N:Alonso Roman Nomura;Italo;;;'));
+  assert.ok(vcard.includes('TEL;TYPE=CELL,VOICE,PREF:+51997213218'));
+  assert.ok(vcard.includes('ORG:Crear Poder Sin Límites'));
+  assert.ok(vcard.includes('TITLE:Manager · #29 QUANTUM PHOENIX · (Lima)'));
+  assert.ok(vcard.endsWith('END:VCARD'));
+});
+
+test('generateVCardBundle filters out managers without phone and bundles valid cards', () => {
+  const managers = [
+    { nombre: 'Karina Garcia', telefono: '0939935732', sede: 'Guayaquil', rol: 'Manager' },
+    { nombre: 'Sin Telefono', telefono: '', sede: 'Lima', rol: 'Manager' },
+    { nombre: 'Tania Sanchez', telefono: '+51981295423', sede: 'Lima', rol: 'Capitán' }
+  ];
+
+  const bundle = generateVCardBundle(managers);
+  assert.ok(bundle.includes('FN:Karina Garcia'));
+  assert.ok(bundle.includes('FN:Tania Sanchez'));
+  assert.ok(!bundle.includes('FN:Sin Telefono'));
+});
+
+test('generateGoogleContactsCSV produces RFC 4180 compliant CSV', () => {
+  const managers = [
+    {
+      nombre: 'JOSE PABLO SALDARRIAGA',
+      rol: 'Manager',
+      telefono: '+573001234567',
+      equipo: 'METANOIA',
+      numEquipo: '19',
+      sede: 'Medellín',
+      estado: 'Activo',
+      entrenador: 'Fer'
+    }
+  ];
+
+  const csv = generateGoogleContactsCSV(managers);
+  assert.ok(csv.startsWith('Name,Given Name,Family Name'));
+  assert.ok(csv.includes('JOSE PABLO SALDARRIAGA'));
+  assert.ok(csv.includes('+573001234567'));
+  assert.ok(csv.includes('Crear Poder Sin Límites'));
+});
+
+```
+
+---
+
 ## Archivo: src/utils/taskRoleCoherence.js
 
 ```js
@@ -86648,6 +86749,100 @@ export function auditTaskRoleCoherence({
     findings: allFindings
   };
 }
+
+```
+
+---
+
+## Archivo: src/utils/liquidacionEmailHelper.test.js
+
+```js
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  ELI_ESCOBAR_EMAIL,
+  FEE_PER_EFFECTIVE_CALL_USD,
+  groupItemsByTrainer,
+  buildLiquidacionEmailData
+} from './liquidacionEmailHelper.js';
+
+test('groupItemsByTrainer groups correctly by trainer name', () => {
+  const items = [
+    { equipo: 'AZRAK AETERNA', numEquipo: '124', sede: 'Quito', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25 },
+    { equipo: 'LOTUS IKIGAI', numEquipo: '21', sede: 'Cuenca', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25 },
+    { equipo: 'METAMORFOSIS', numEquipo: '30', sede: 'Guayaquil', entrenador: 'Erika Gavilánez', montoUSD: 25 }
+  ];
+
+  const grouped = groupItemsByTrainer(items);
+  assert.equal(grouped.size, 2);
+  assert.equal(grouped.get('Haydin Fernando Mendoza Clavijo').length, 2);
+  assert.equal(grouped.get('Erika Gavilánez').length, 1);
+});
+
+test('buildLiquidacionEmailData creates correct subject, body and amounts', () => {
+  const items = [
+    { tipo: 'grupal', equipo: 'AZRAK AETERNA', numEquipo: '124', sede: 'Quito', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25, llamadasEfectivas: 1 },
+    { tipo: 'grupal', equipo: 'LOTUS IKIGAI', numEquipo: '21', sede: 'Cuenca', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25, llamadasEfectivas: 1 }
+  ];
+
+  const emailData = buildLiquidacionEmailData({
+    trainerName: 'Haydin Fernando Mendoza Clavijo',
+    trainerEmail: 'fernandomendozaclavijo22@gmail.com',
+    items,
+    authorizerUser: { name: 'José Sánchez', email: 'comunidadcrearpsl@gmail.com', appRole: 'Director General' }
+  });
+
+  assert.equal(emailData.totalMontoUSD, 50);
+  assert.equal(emailData.itemsCount, 2);
+  assert.ok(emailData.subject.includes('Haydin Fernando Mendoza Clavijo'));
+  assert.ok(emailData.subject.includes('$50 USD'));
+  assert.ok(emailData.text.includes('Eli Escobar'));
+  assert.ok(emailData.text.includes('AZRAK AETERNA (#124)'));
+  assert.ok(emailData.text.includes('LOTUS IKIGAI (#21)'));
+  assert.ok(emailData.text.includes('Quito'));
+  assert.ok(emailData.text.includes('Cuenca'));
+  assert.ok(emailData.text.includes('José Sánchez'));
+  assert.ok(emailData.mailtoUrl.startsWith('mailto:contabilidad.global%40crearpsl.net'));
+  assert.ok(emailData.html.includes('Nancy Elizabeth Escobar Pérez'));
+  assert.ok(emailData.html.includes('$50 USD'));
+});
+
+test('dispatchLiquidacionNotifications records both notification and mail docs', async () => {
+  const docsWritten = [];
+  const fakeDb = {};
+  const fakeCollection = (_db, name) => name;
+  const fakeAddDoc = async (colName, data) => {
+    docsWritten.push({ colName, data });
+    return { id: `mock_${Date.now()}` };
+  };
+
+  const items = [
+    { tipo: 'grupal', equipo: 'AZRAK AETERNA', numEquipo: '124', sede: 'Quito', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25 },
+    { tipo: 'grupal', equipo: 'LOTUS IKIGAI', numEquipo: '21', sede: 'Cuenca', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25 }
+  ];
+
+  const res = await (await import('./liquidacionEmailHelper.js')).dispatchLiquidacionNotifications({
+    db: fakeDb,
+    addDocFn: fakeAddDoc,
+    collectionFn: fakeCollection,
+    items,
+    authorizerUser: { name: 'José Sánchez', email: 'comunidadcrearpsl@gmail.com' }
+  });
+
+  assert.equal(res.successCount, 1);
+  assert.equal(docsWritten.length, 2);
+
+  const notif = docsWritten.find(d => d.colName === 'notifications');
+  assert.ok(notif);
+  assert.equal(notif.data.userId, ELI_ESCOBAR_EMAIL);
+  assert.equal(notif.data.montoUSD, 50);
+
+  const mail = docsWritten.find(d => d.colName === 'mail');
+  assert.ok(mail);
+  assert.deepEqual(mail.data.to, [ELI_ESCOBAR_EMAIL]);
+  assert.ok(mail.data.message.subject.includes('Haydin Fernando Mendoza Clavijo'));
+});
+
 
 ```
 
@@ -87932,6 +88127,157 @@ export function formatTeamString(eq) {
 
 ---
 
+## Archivo: src/utils/contactsExport.js
+
+```js
+import { getWhatsAppUrl } from './phoneUtils.js';
+
+/**
+ * Limpia y normaliza un teléfono a formato internacional E.164 con '+' (ej. +51997213218)
+ */
+export function formatInternationalPhone(phone, sede = '') {
+  if (!phone) return '';
+  const url = getWhatsAppUrl(phone, sede);
+  if (!url) return '';
+  const digits = url.replace('https://wa.me/', '').trim();
+  return digits ? `+${digits}` : '';
+}
+
+/**
+ * Genera el contenido de una tarjeta individual vCard 3.0 compatible con iPhone, Android, Mac y Windows
+ */
+export function generateSingleVCard(m) {
+  if (!m) return '';
+  const phone = formatInternationalPhone(m.telefono, m.sede);
+  const fullName = (m.nombre || 'Sin Nombre').trim();
+  const parts = fullName.split(/\s+/);
+  const firstName = parts[0] || fullName;
+  const lastName = parts.slice(1).join(' ') || '';
+  const rol = m.rol || 'Manager';
+  const equipo = m.equipo ? String(m.equipo).replace(/\s*\(#\d+\)\s*/g, '').trim() : '';
+  const numEq = m.numEquipo ? `#${m.numEquipo}` : '';
+  const sede = m.sede || '';
+  const estado = m.estado || 'Activo';
+  const entrenador = m.entrenador || 'Sin Asignar';
+
+  const titleParts = [rol];
+  if (numEq || equipo) titleParts.push(`${numEq} ${equipo}`.trim());
+  if (sede) titleParts.push(`(${sede})`);
+  const title = titleParts.join(' · ');
+
+  const noteLines = [
+    `Rol: ${rol}`,
+    equipo ? `Equipo: ${numEq} ${equipo}`.trim() : null,
+    sede ? `Sede: ${sede}` : null,
+    `Estado: ${estado}`,
+    entrenador ? `Entrenador: ${entrenador}` : null,
+    `Organización: Crear Poder Sin Límites`
+  ].filter(Boolean).join('\\n');
+
+  return [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    `FN:${fullName}`,
+    `N:${lastName};${firstName};;;`,
+    'ORG:Crear Poder Sin Límites',
+    `TITLE:${title}`,
+    phone ? `TEL;TYPE=CELL,VOICE,PREF:${phone}` : null,
+    `NOTE:${noteLines}`,
+    `CATEGORIES:CPSL,${rol}${sede ? `,${sede}` : ''}`,
+    'END:VCARD'
+  ].filter(Boolean).join('\r\n');
+}
+
+/**
+ * Genera un archivo multi-contacto vCard 3.0 (.vcf)
+ */
+export function generateVCardBundle(managers = []) {
+  const valid = managers.filter(m => m && (m.telefono || '').trim().length > 5);
+  return valid.map(generateSingleVCard).join('\r\n\r\n');
+}
+
+/**
+ * Genera un archivo CSV estándar listo para importar en Google Contacts (contacts.google.com)
+ */
+export function generateGoogleContactsCSV(managers = []) {
+  const headers = [
+    'Name',
+    'Given Name',
+    'Family Name',
+    'Group Membership',
+    'Phone 1 - Type',
+    'Phone 1 - Value',
+    'Organization 1 - Name',
+    'Organization 1 - Title',
+    'Notes'
+  ];
+
+  const escapeCSV = (val) => {
+    const s = String(val ?? '');
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+    return s;
+  };
+
+  const rows = managers
+    .filter(m => m && (m.telefono || '').trim().length > 5)
+    .map(m => {
+      const fullName = (m.nombre || 'Sin Nombre').trim();
+      const parts = fullName.split(/\s+/);
+      const firstName = parts[0] || fullName;
+      const lastName = parts.slice(1).join(' ') || '';
+      const phone = formatInternationalPhone(m.telefono, m.sede);
+      const rol = m.rol || 'Manager';
+      const equipo = m.equipo ? String(m.equipo).replace(/\s*\(#\d+\)\s*/g, '').trim() : '';
+      const numEq = m.numEquipo ? `#${m.numEquipo}` : '';
+      const sede = m.sede || '';
+      const estado = m.estado || 'Activo';
+      const entrenador = m.entrenador || 'Sin Asignar';
+
+      const titleParts = [rol];
+      if (numEq || equipo) titleParts.push(`${numEq} ${equipo}`.trim());
+      if (sede) titleParts.push(`(${sede})`);
+      const title = titleParts.join(' · ');
+
+      const notes = `Rol: ${rol} | Equipo: ${numEq} ${equipo} | Sede: ${sede} | Estado: ${estado} | Entrenador: ${entrenador} | CPSL`;
+
+      return [
+        escapeCSV(fullName),
+        escapeCSV(firstName),
+        escapeCSV(lastName),
+        escapeCSV(`CPSL Managers ::: * myContacts`),
+        'Mobile',
+        escapeCSV(phone),
+        'Crear Poder Sin Límites',
+        escapeCSV(title),
+        escapeCSV(notes)
+      ].join(',');
+    });
+
+  return [headers.join(','), ...rows].join('\r\n');
+}
+
+/**
+ * Dispara la descarga de un archivo de texto en el navegador del cliente
+ */
+export function triggerFileDownload(content, filename, mimeType = 'text/plain') {
+  if (typeof window === 'undefined' || !window.Blob) return;
+  const blob = new Blob([content], { type: `${mimeType};charset=utf-8;` });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+```
+
+---
+
 ## Archivo: src/utils/assetLoadErrors.js
 
 ```js
@@ -88294,6 +88640,322 @@ export const deadlineTimeReference = (iso, sede) => {
 
 ---
 
+## Archivo: src/utils/liquidacionEmailHelper.js
+
+```js
+/**
+ * src/utils/liquidacionEmailHelper.js
+ * 
+ * Generador y orquestador de autorización de pagos para Elizabeth Escobar (CFO / Finanzas Global)
+ * y notificaciones en Causa OS al liquidar entrenadores de llamadas (grupales o individuales).
+ */
+
+export const ELI_ESCOBAR_EMAIL = 'contabilidad.global@crearpsl.net';
+export const FEE_PER_EFFECTIVE_CALL_USD = 25;
+export const FEE_PER_GROUP_TEAM_USD = 400;
+
+/**
+ * Agrupa los ítems de liquidación seleccionados por entrenador.
+ */
+export function groupItemsByTrainer(items = []) {
+  const groups = new Map();
+  for (const it of items) {
+    if (!it) continue;
+    const trainer = (it.entrenador || 'Sin Asignar').trim();
+    if (!groups.has(trainer)) {
+      groups.set(trainer, []);
+    }
+    groups.get(trainer).push(it);
+  }
+  return groups;
+}
+
+/**
+ * Genera el cuerpo de texto y HTML para el correo de autorización a Eli Escobar.
+ */
+export function buildLiquidacionEmailData({
+  trainerName,
+  trainerEmail = '',
+  items = [],
+  authorizerUser = {}
+}) {
+  const cleanTrainer = (trainerName || 'Entrenador de Llamadas').trim();
+  const totalMontoUSD = items.reduce((acc, it) => {
+    if (it.esPagable === false) return acc;
+    const val = it.montoUSD !== undefined ? Number(it.montoUSD) : (it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : FEE_PER_GROUP_TEAM_USD);
+    return acc + (isNaN(val) ? 0 : val);
+  }, 0);
+  const authorizerName = authorizerUser?.name || authorizerUser?.displayName || 'Dirección / Gerencia Operativa';
+  const authorizerEmail = authorizerUser?.email || 'direccion@crearpsl.net';
+  const authorizerRole = authorizerUser?.appRole || 'Coordinación Operativa';
+  const todayStr = new Date().toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  const subject = `AUTORIZACIÓN DE PAGO: Liquidación de Llamadas a Managers — ${cleanTrainer} ($${totalMontoUSD} USD)`;
+
+  const fechaISO = new Date().toISOString().split('T')[0];
+
+  // Filas en texto plano
+  const itemsText = items.map((it, idx) => {
+    const modalidad = it.tipo === 'individual' ? 'Individual (1 a 1)' : 'Grupal (Equipo)';
+    const destinatario = it.tipo === 'individual' ? (it.participanteNombre || 'Manager') : `${it.equipo || 'Equipo'}${it.numEquipo ? ` (#${it.numEquipo})` : ''}`;
+    const sede = it.sede || 'Global';
+    const entrenador = (it.entrenador || cleanTrainer);
+    const itemMonto = it.montoUSD !== undefined ? Number(it.montoUSD) : (it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : FEE_PER_GROUP_TEAM_USD);
+    const monto = it.esPagable === false ? '$0 USD (Sin desembolso)' : `$${itemMonto} USD`;
+    const autorizadoEl = it.fechaAutorizacion || it.fechaPago || fechaISO;
+    const autorizadoPor = it.autorizadoPorNombre || authorizerName;
+    return `  ${idx + 1}. [${modalidad}] Destinatario: ${destinatario} | Sede: ${sede} | Entrenador: ${entrenador} | Monto: ${monto} | Autorizado el: ${autorizadoEl} | Autorizado por: ${autorizadoPor}`;
+  }).join('\n');
+
+  // Filas en HTML
+  const itemsHtml = items.map((it, idx) => {
+    const modalidad = it.tipo === 'individual' 
+      ? '<span style="background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">👤 Individual</span>' 
+      : '<span style="background: #f3e8ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">👥 Grupal</span>';
+    const destinatario = it.tipo === 'individual' ? `<strong>${it.participanteNombre || 'Manager'}</strong>` : `<strong>${it.equipo || 'Equipo'}</strong>${it.numEquipo ? ` (#${it.numEquipo})` : ''}`;
+    const sede = it.sede || 'Global';
+    const entrenador = (it.entrenador || cleanTrainer);
+    const itemMonto = it.montoUSD !== undefined ? Number(it.montoUSD) : (it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : FEE_PER_GROUP_TEAM_USD);
+    const monto = it.esPagable === false ? '<span style="color: #64748b; font-weight: 700;">$0 USD (Sin desembolso)</span>' : `<strong style="color: #059669;">$${itemMonto} USD</strong>`;
+    const autorizadoEl = it.fechaAutorizacion || it.fechaPago || fechaISO;
+    const autorizadoPor = it.autorizadoPorNombre || authorizerName;
+    return `
+      <tr style="border-bottom: 1px solid #e2e8f0; font-size: 13px;">
+        <td style="padding: 10px 12px; text-align: center;">${modalidad}</td>
+        <td style="padding: 10px 12px; color: #1e293b;">${destinatario}</td>
+        <td style="padding: 10px 12px; color: #475569;">${sede}</td>
+        <td style="padding: 10px 12px; color: #475569;">${entrenador}</td>
+        <td style="padding: 10px 12px; text-align: right;">${monto}</td>
+        <td style="padding: 10px 12px; text-align: center; color: #64748b;">${autorizadoEl}</td>
+        <td style="padding: 10px 12px; color: #64748b;">${autorizadoPor}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const textBody = `Estimada Eli Escobar,
+Finanzas y Contabilidad Global
+Crear Poder Sin Límites (CPSL)
+
+Por medio del presente correo, se emite la AUTORIZACIÓN FORMAL DE PAGO correspondiente a la liquidación de llamadas de acompañamiento a Managers, debidamente registrada y conciliada en la plataforma Causa OS.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DATOS DEL BENEFICIARIO Y LIQUIDACIÓN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Entrenador: ${cleanTrainer}${trainerEmail ? `\n• Correo del Entrenador: ${trainerEmail}` : ''}
+• Concepto: Liquidación de Llamadas Efectivas a Equipos de Managers
+• Tarifa Aplicada: Tarifa oficial fija de Causa OS ($25 USD por llamada efectiva / equipo)
+• Total de Registros Autorizados: ${items.length}
+• MONTO TOTAL AUTORIZADO: $${totalMontoUSD} USD
+
+DESGLOSE DETALLADO DE EQUIPOS / LLAMADAS:
+${itemsText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ESTADO EN PLATAFORMA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✓ Validado en el Centro de Managers (Causa OS).
+✓ Cumplimiento de registros y acompañamiento verificado.
+✓ Notificación registrada en el sistema Causa OS para trazabilidad y auditoría.
+
+Por favor proceder con la transferencia bancaria / desembolso correspondiente y registrar el comprobante.
+
+Atentamente,
+
+${authorizerName}
+${authorizerRole} | Crear Poder Sin Límites
+Correo: ${authorizerEmail}
+Fecha: ${todayStr}
+Plataforma: Causa OS — Centro Operativo CPSL
+`;
+
+  const htmlBody = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #1e293b; }
+    .card { max-width: 650px; margin: 0 auto; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; padding: 24px; border-bottom: 3px solid #10b981; }
+    .header h2 { margin: 0 0 6px 0; font-size: 20px; color: #f8fafc; letter-spacing: -0.5px; }
+    .header p { margin: 0; font-size: 13px; color: #94a3b8; }
+    .content { padding: 24px; font-size: 14px; line-height: 1.6; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 18px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { background: #f1f5f9; padding: 8px 12px; font-size: 12px; text-transform: uppercase; color: #475569; font-weight: 700; border-bottom: 2px solid #cbd5e1; }
+    .total-row { background: #ecfdf5; font-size: 15px; font-weight: 800; color: #065f46; }
+    .footer { background: #f8fafc; padding: 18px 24px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <span class="badge">💰 AUTORIZACIÓN DE PAGO</span>
+      <h2 style="margin-top: 10px;">Liquidación de Acompañamiento a Managers</h2>
+      <p>Crear Poder Sin Límites — Plataforma Causa OS</p>
+    </div>
+    <div class="content">
+      <p>Estimada <strong>Nancy Elizabeth Escobar Pérez</strong> (Eli Escobar),<br>
+      Finanzas y Contabilidad Global CPSL,</p>
+
+      <p>Por medio del presente comunicado formal generado desde <strong>Causa OS</strong>, se autoriza el pago por concepto de llamadas de acompañamiento a Managers correspondientes a los siguientes equipos y sedes:</p>
+
+      <div class="box">
+        <table style="margin: 0; font-size: 13px;">
+          <tr>
+            <td style="padding: 4px 0; color: #64748b; width: 140px;"><strong>Entrenador:</strong></td>
+            <td style="padding: 4px 0; font-weight: 700; color: #0f172a;">${cleanTrainer}</td>
+          </tr>
+          ${trainerEmail ? `
+          <tr>
+            <td style="padding: 4px 0; color: #64748b;"><strong>Correo:</strong></td>
+            <td style="padding: 4px 0; color: #2563eb;">${trainerEmail}</td>
+          </tr>
+          ` : ''}
+          <tr>
+            <td style="padding: 4px 0; color: #64748b;"><strong>Tarifa por llamada:</strong></td>
+            <td style="padding: 4px 0;">$${FEE_PER_EFFECTIVE_CALL_USD} USD (Tarifa fija oficial)</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #64748b;"><strong>Total a desembolsar:</strong></td>
+            <td style="padding: 4px 0; font-size: 16px; font-weight: 800; color: #059669;">$${totalMontoUSD} USD</td>
+          </tr>
+        </table>
+      </div>
+
+      <h4 style="margin: 18px 0 8px 0; color: #0f172a; font-size: 14px;">Detalle de Equipos / Llamadas Liquidadas:</h4>
+      <table>
+        <thead>
+          <tr>
+            <th style="text-align: center; width: 95px;">Modalidad</th>
+            <th style="text-align: left;">Destinatario</th>
+            <th style="text-align: left;">Sede</th>
+            <th style="text-align: left;">Entrenador</th>
+            <th style="text-align: right;">Monto</th>
+            <th style="text-align: center;">Autorizado el</th>
+            <th style="text-align: left;">Autorizado por</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+          <tr class="total-row">
+            <td colspan="4" style="padding: 12px; text-align: right;">TOTAL GENERAL AUTORIZADO:</td>
+            <td style="padding: 12px; text-align: right;">$${totalMontoUSD} USD</td>
+            <td colspan="2" style="padding: 12px; font-size: 11px; text-align: center; color: #047857;">Validado Causa OS</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 20px; padding: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; font-size: 13px; color: #1e40af;">
+        ℹ️ <strong>Trazabilidad en Causa OS:</strong> Los registros han sido validados en el Centro de Managers y marcados como liquidados bajo la sesión oficial de <strong>${authorizerName}</strong> (${authorizerEmail}).
+      </div>
+    </div>
+    <div class="footer">
+      <strong>Autorizado por:</strong> ${authorizerName} (${authorizerRole})<br>
+      <strong>Fecha de emisión:</strong> ${todayStr}<br>
+      Crear Poder Sin Límites — Centro Operativo Causa OS
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+
+  const mailtoUrl = `mailto:${encodeURIComponent(ELI_ESCOBAR_EMAIL)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(textBody)}`;
+
+  return {
+    subject,
+    text: textBody,
+    html: htmlBody,
+    mailtoUrl,
+    totalMontoUSD,
+    trainerName: cleanTrainer,
+    itemsCount: items.length
+  };
+}
+
+/**
+ * Envía las notificaciones en Causa OS y encola los correos oficiales para Eli Escobar.
+ * Funciona de forma segura y no bloqueante.
+ */
+export async function dispatchLiquidacionNotifications({
+  db,
+  addDocFn,
+  collectionFn,
+  items = [],
+  authorizerUser = {}
+}) {
+  if (!db || !addDocFn || !collectionFn || !items.length) {
+    return { successCount: 0, errors: [] };
+  }
+
+  const grouped = groupItemsByTrainer(items);
+  let successCount = 0;
+  const errors = [];
+
+  for (const [trainer, trainerItems] of grouped.entries()) {
+    try {
+      const emailData = buildLiquidacionEmailData({
+        trainerName: trainer,
+        items: trainerItems,
+        authorizerUser
+      });
+
+      // 1. Notificación In-App en Causa OS para Eli Escobar
+      const sedesList = [...new Set(trainerItems.map(it => it.sede).filter(Boolean))].join(', ') || 'Global';
+      const equiposList = trainerItems.map(it => it.equipo ? `${it.equipo}${it.numEquipo ? ` (#${it.numEquipo})` : ''}` : it.participanteNombre).join(', ');
+
+      await addDocFn(collectionFn(db, 'notifications'), {
+        userId: ELI_ESCOBAR_EMAIL,
+        title: `💰 Autorización de Pago: ${trainer} ($${emailData.totalMontoUSD} USD)`,
+        message: `Se ha registrado y autorizado la liquidación de llamadas para ${trainer} por un total de $${emailData.totalMontoUSD} USD (${trainerItems.length} registro(s) en ${sedesList}): ${equiposList}. Autorizado por ${authorizerUser?.name || authorizerUser?.email || 'Dirección'}.`,
+        type: 'liquidacion_pago_autorizado',
+        entrenador: trainer,
+        montoUSD: emailData.totalMontoUSD,
+        itemsCount: trainerItems.length,
+        read: false,
+        created_at: new Date().toISOString()
+      });
+
+      // 2. Encolado de correo oficial en la colección 'mail' (para mailerDaemon / Firebase Trigger Email)
+      await addDocFn(collectionFn(db, 'mail'), {
+        to: [ELI_ESCOBAR_EMAIL],
+        type: 'liquidacion_autorizacion_pago',
+        delivery: { state: 'PENDING', attemptCount: 0 },
+        message: {
+          subject: emailData.subject,
+          html: emailData.html,
+          text: emailData.text
+        },
+        metadata: {
+          entrenador: trainer,
+          montoUSD: emailData.totalMontoUSD,
+          itemsCount: trainerItems.length,
+          authorizerEmail: authorizerUser?.email || '',
+          authorizerName: authorizerUser?.name || ''
+        },
+        created_at: new Date().toISOString()
+      });
+
+      successCount++;
+    } catch (err) {
+      console.error(`Error enviando notificación/correo para ${trainer}:`, err);
+      errors.push({ trainer, error: err.message });
+    }
+  }
+
+  return { successCount, errors };
+}
+
+
+```
+
+---
+
 ## Archivo: src/utils/liquidacionPayment.js
 
 ```js
@@ -88353,6 +89015,11 @@ export function getWhatsAppUrl(phone, sede = '') {
   if (!clean) return null;
 
   const normalizedSede = String(sede || '').toLowerCase();
+
+  // Limpieza de prefijos comunes con 0 redundante (ej. 59309... -> 5939...)
+  if (clean.startsWith('5930') && clean.length === 12) {
+    clean = '593' + clean.substring(4);
+  }
 
   // Si ya tiene código de país internacional
   if (clean.startsWith('51') && clean.length === 11) {
@@ -98329,7 +98996,8 @@ import {
   Target, Sparkles, AlertCircle, CheckCircle2, Clock, 
   RefreshCw, Trophy, Search, X, ExternalLink, ChevronRight,
   Filter, ShieldAlert, Award, FileText, UserCheck, AlertTriangle,
-  Loader2, ThumbsUp, Send, Check
+  Loader2, ThumbsUp, Send, Check, Copy, BookOpen, Bot, Zap,
+  Layers, CheckCheck, Lightbulb, MessageSquare, Compass, ArrowRight
 } from 'lucide-react';
 import { addDoc, collection, doc, getDocFromServer, getDocsFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -98338,6 +99006,16 @@ import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
 import { canonicalSede } from '../utils/sede.js';
 import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, ROLES_FI } from '../data/nodusFuturosImposiblesData.js';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
+import { 
+  ejecutarDiagnosticoFIs, 
+  evaluarCalidadOntologicaFI, 
+  normalizarTexto,
+  PROMPT_MAESTRO_AUDITORIA_3_RI,
+  GUIA_PROPOSITO_3_CAPAS_RI,
+  generarPromptParaParticipante,
+  auditarResultadosImposiblesEMPOR,
+  generarTextoEvaluacionCompleta
+} from '../services/nodusFIAgent';
 
 const normSearch = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
 
@@ -98380,11 +99058,6 @@ const ESTADOS_FI = [
   { id: 'DEVUELTOS', label: 'Devueltos' },
   { id: 'APROBADOS', label: 'Aprobados' }
 ];
-import { 
-  ejecutarDiagnosticoFIs, 
-  evaluarCalidadOntologicaFI, 
-  normalizarTexto 
-} from '../services/nodusFIAgent';
 
 export default function FuturosImposiblesView({ 
   selectedSede = 'GLOBAL',
@@ -98443,6 +99116,33 @@ export default function FuturosImposiblesView({
   const [modalOpen, setModalOpen] = useState(false);
   const [activeAreaTab, setActiveAreaTab] = useState(0);
   const [mentorNote, setMentorNote] = useState('');
+
+  // Estados para Asistente IA, Prompt Maestro y Guía de Propósito
+  const [showPromptModal, setShowPromptModal] = useState(false);
+  const [showGuiaModal, setShowGuiaModal] = useState(false);
+  const [guiaActiveTab, setGuiaActiveTab] = useState(1);
+  const [checklistChecks, setChecklistChecks] = useState({});
+  const [iaEvaluation, setIaEvaluation] = useState(null);
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
+
+  const copyToClipboard = async (text, successMsg = 'Copiado al portapapeles') => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      triggerToast(successMsg, 'success');
+    } catch (err) {
+      console.warn('Error al copiar:', err);
+      triggerToast('No se pudo copiar automáticamente. Por favor selecciona el texto.', 'warning');
+    }
+  };
 
   // Lee en servidor para no presentar una caché local como una sincronización
   // oficial. Solo acepta fuentes con asistentes PFD explícitamente confirmados.
@@ -98616,7 +99316,42 @@ export default function FuturosImposiblesView({
     setSelectedParticipant(participant);
     setActiveAreaTab(0);
     setMentorNote(participant.fis?.[0]?.feedback || '');
+    setIaEvaluation(null);
+    setCopiedPrompt(false);
     setModalOpen(true);
+  };
+
+  const handleCopiarPromptParticipante = async () => {
+    if (!selectedParticipant) return;
+    const promptTexto = generarPromptParaParticipante(selectedParticipant);
+    await copyToClipboard(promptTexto, `¡Prompt Maestro con los 3 Resultados de ${selectedParticipant.nombre} copiado!`);
+    setCopiedPrompt(true);
+    setTimeout(() => setCopiedPrompt(false), 3000);
+  };
+
+  const handleEjecutarAuditoriaEmpor = () => {
+    if (!selectedParticipant) return;
+    const evalData = auditarResultadosImposiblesEMPOR(selectedParticipant.fis || [], selectedParticipant);
+    setIaEvaluation(evalData);
+    triggerToast('Auditoría E.M.P.O.R. generada exitosamente', 'success');
+  };
+
+  const handleAplicarARetroalimentacion = () => {
+    if (!iaEvaluation) return;
+    const textoCompleto = generarTextoEvaluacionCompleta(iaEvaluation);
+    setMentorNote(textoCompleto);
+    triggerToast('Evaluación completa aplicada al campo de retroalimentación', 'success');
+  };
+
+  const handleAplicarResultadoIndividual = (resIndex) => {
+    if (!iaEvaluation?.resultados?.[resIndex]) return;
+    const r = iaEvaluation.resultados[resIndex];
+    let nota = `[${r.estado}] ${r.reflejoAsertivo}`;
+    if (r.ajusteInmediato) {
+      nota += `\n\nAjuste Inmediato Sugerido: ${r.ajusteInmediato}`;
+    }
+    setMentorNote(nota);
+    triggerToast(`Observación del Resultado ${resIndex + 1} aplicada`, 'success');
   };
 
   const saveReview = async (estado) => {
@@ -98741,6 +99476,46 @@ export default function FuturosImposiblesView({
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setShowPromptModal(true)}
+            title="Abre y copia el Prompt Maestro de Auditoría para Gemini en Nodus"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              color: '#38bdf8',
+              cursor: 'pointer'
+            }}
+          >
+            <Bot size={15} /> Prompt Maestro IA
+          </button>
+
+          <button
+            onClick={() => setShowGuiaModal(true)}
+            title="Abre la Guía para Encontrar el Propósito y 'Para Qué' con las 3 Capas y Matriz E.M.P.O.R."
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: 'rgba(245, 158, 11, 0.12)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              color: '#f59e0b',
+              cursor: 'pointer'
+            }}
+          >
+            <BookOpen size={15} /> Guía del "Para Qué"
+          </button>
+
           <button
             onClick={handleReevaluate}
             disabled={isEvaluating}
@@ -99608,6 +100383,162 @@ export default function FuturosImposiblesView({
                 </div>
               </div>
 
+              {/* ASISTENTE ONTOLÓGICO IA & PROMPT MAESTRO (NODUS) */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%)',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                borderRadius: '12px',
+                padding: '1rem',
+                marginBottom: '1.25rem'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.6rem', marginBottom: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Sparkles size={16} color="#38bdf8" />
+                    <span style={{ fontWeight: 800, fontSize: '0.9rem', color: textDark }}>
+                      Asistente Ontológico IA &bull; Auditoría 3 Resultados Imposibles
+                    </span>
+                    <span style={{ fontSize: '0.7rem', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: 700 }}>
+                      Estándar E.M.P.O.R.
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button
+                      onClick={handleCopiarPromptParticipante}
+                      title="Copia el Prompt Maestro completo con las 3 metas de este participante inyectadas, listo para pegar en Gemini"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: copiedPrompt ? 'rgba(16, 185, 129, 0.2)' : 'rgba(56, 189, 248, 0.15)',
+                        border: `1px solid ${copiedPrompt ? '#10b981' : 'rgba(56, 189, 248, 0.4)'}`,
+                        color: copiedPrompt ? '#10b981' : '#38bdf8',
+                        padding: '0.45rem 0.8rem',
+                        borderRadius: '7px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Copy size={13} /> {copiedPrompt ? '¡Prompt Copiado!' : 'Copiar Prompt para Gemini'}
+                    </button>
+
+                    <button
+                      onClick={handleEjecutarAuditoriaEmpor}
+                      title="Audita de forma automática y asertiva las 3 metas según los 3 pilares sin palabras punitivas"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        color: '#10b981',
+                        padding: '0.45rem 0.8rem',
+                        borderRadius: '7px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Zap size={13} /> {iaEvaluation ? 'Re-auditar E.M.P.O.R.' : 'Auditar con Prompt Maestro'}
+                    </button>
+
+                    <button
+                      onClick={() => setShowGuiaModal(true)}
+                      title="Consulta la Guía del Propósito y 'Para Qué' con las 3 capas"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: 'rgba(245, 158, 11, 0.15)',
+                        border: '1px solid rgba(245, 158, 11, 0.4)',
+                        color: '#f59e0b',
+                        padding: '0.45rem 0.8rem',
+                        borderRadius: '7px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <BookOpen size={13} /> Ver Guía "Para Qué"
+                    </button>
+                  </div>
+                </div>
+
+                {iaEvaluation ? (
+                  <div style={{ background: 'rgba(0, 0, 0, 0.25)', border: `1px solid ${borderLight}`, borderRadius: '8px', padding: '0.9rem', marginTop: '0.6rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.6rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        <span style={{ fontSize: '0.78rem', fontWeight: 800, color: textMuted }}>ESTADO GENERAL:</span>
+                        <span style={{
+                          background: iaEvaluation.estadoGeneral === 'APROBADO' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+                          color: iaEvaluation.estadoGeneral === 'APROBADO' ? '#10b981' : '#f59e0b',
+                          border: `1px solid ${iaEvaluation.estadoGeneral === 'APROBADO' ? '#10b981' : '#f59e0b'}`,
+                          padding: '0.2rem 0.65rem',
+                          borderRadius: '12px',
+                          fontSize: '0.75rem',
+                          fontWeight: 800
+                        }}>
+                          [{iaEvaluation.estadoGeneral}]
+                        </span>
+                        <span style={{ fontSize: '0.75rem', color: textMuted }}>
+                          ({iaEvaluation.aprobadosCount}/3 Resultados con estándar superior)
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '0.4rem' }}>
+                        <button
+                          onClick={handleAplicarARetroalimentacion}
+                          title="Copia la evaluación estructurada completa al campo de retroalimentación del mentor"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            background: '#10b981',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.35rem 0.75rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Send size={12} /> Aplicar a Retroalimentación
+                        </button>
+                        <button
+                          onClick={() => copyToClipboard(generarTextoEvaluacionCompleta(iaEvaluation), 'Evaluación completa copiada')}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                            background: 'rgba(255, 255, 255, 0.08)',
+                            color: textDark,
+                            border: `1px solid ${borderLight}`,
+                            borderRadius: '6px',
+                            padding: '0.35rem 0.65rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Copy size={12} /> Copiar
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{ background: 'rgba(56, 189, 248, 0.08)', borderLeft: '3px solid #38bdf8', padding: '0.6rem 0.8rem', borderRadius: '4px', fontSize: '0.78rem', color: textDark }}>
+                      <div style={{ fontWeight: 800, color: '#38bdf8', marginBottom: '0.2rem' }}>PREGUNTA CUÁNTICA DE ENFOQUE:</div>
+                      <div>"{iaEvaluation.preguntaCuantica}"</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '0.76rem', color: textMuted, lineHeight: 1.4 }}>
+                    💡 <em>Usa el <strong>Prompt Maestro</strong> para auditar los 3 resultados según los 3 pilares (Especificidad, Nivel de Desafío y Propósito) con retroalimentación asertiva, empática y sin juicios punitivos.</em>
+                  </div>
+                )}
+              </div>
+
               {/* Selector de Resultados (Exactamente 3 Resultados Imposibles) */}
               <div style={{ 
                 display: 'flex', 
@@ -99723,6 +100654,104 @@ export default function FuturosImposiblesView({
                       )}
                     </div>
 
+                    {/* ANÁLISIS E.M.P.O.R. DEL RESULTADO ACTIVO (3 PILARES) */}
+                    {(() => {
+                      const itemEval = iaEvaluation?.resultados?.[activeAreaTab] || auditarResultadosImposiblesEMPOR(selectedParticipant.fis || [], selectedParticipant).resultados[activeAreaTab];
+                      if (!itemEval) return null;
+
+                      return (
+                        <div style={{
+                          background: 'rgba(0, 0, 0, 0.18)',
+                          border: `1px solid ${itemEval.estado === 'APROBADO' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
+                          borderRadius: '8px',
+                          padding: '0.9rem',
+                          marginBottom: '1.25rem'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <Target size={14} color={itemEval.estado === 'APROBADO' ? '#10b981' : '#f59e0b'} />
+                              <span style={{ fontSize: '0.78rem', fontWeight: 800, color: textDark }}>
+                                Auditoría de 3 Pilares &bull; {itemEval.area}
+                              </span>
+                            </div>
+                            <span style={{
+                              fontSize: '0.72rem',
+                              fontWeight: 800,
+                              background: itemEval.estado === 'APROBADO' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                              color: itemEval.estado === 'APROBADO' ? '#10b981' : '#f59e0b',
+                              padding: '0.15rem 0.5rem',
+                              borderRadius: '10px'
+                            }}>
+                              [{itemEval.estado}]
+                            </span>
+                          </div>
+
+                          {/* 3 Pilares */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem', marginBottom: '0.65rem' }}>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.45rem 0.6rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                              <span style={{ color: textMuted }}>1. Especificidad y Medición: </span>
+                              <strong style={{ color: itemEval.pilares?.especificidadYMedicion ? '#10b981' : '#f59e0b' }}>
+                                {itemEval.pilares?.especificidadYMedicion ? 'Cumplido' : 'Precisión requerida'}
+                              </strong>
+                            </div>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.45rem 0.6rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                              <span style={{ color: textMuted }}>2. Nivel de Desafío: </span>
+                              <strong style={{ color: itemEval.pilares?.nivelDesafio ? '#10b981' : '#f59e0b' }}>
+                                {itemEval.pilares?.nivelDesafio ? 'Estiramiento' : 'Marco conciso'}
+                              </strong>
+                            </div>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '0.45rem 0.6rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                              <span style={{ color: textMuted }}>3. Propósito ("Para Qué"): </span>
+                              <strong style={{ color: itemEval.pilares?.conexionProposito ? '#10b981' : '#f59e0b' }}>
+                                {itemEval.pilares?.conexionProposito ? 'Conectado' : 'Profundizar'}
+                              </strong>
+                            </div>
+                          </div>
+
+                          {/* Reflejo Asertivo */}
+                          <div style={{ fontSize: '0.8rem', color: textDark, marginBottom: itemEval.ajusteInmediato ? '0.5rem' : '0', lineHeight: 1.4 }}>
+                            <strong>Reflejo Asertivo:</strong> {itemEval.reflejoAsertivo}
+                          </div>
+
+                          {/* Ajuste Inmediato Sugerido */}
+                          {itemEval.ajusteInmediato && (
+                            <div style={{
+                              background: 'rgba(245, 158, 11, 0.08)',
+                              border: '1px dashed rgba(245, 158, 11, 0.35)',
+                              borderRadius: '6px',
+                              padding: '0.5rem 0.75rem',
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              gap: '0.5rem'
+                            }}>
+                              <div style={{ fontSize: '0.77rem', color: '#fcd34d', flex: 1, minWidth: '220px' }}>
+                                <strong>Ajuste Inmediato Sugerido:</strong> {itemEval.ajusteInmediato}
+                              </div>
+                              <button
+                                onClick={() => handleAplicarResultadoIndividual(activeAreaTab)}
+                                title="Copia esta observación al campo de retroalimentación"
+                                style={{
+                                  background: 'rgba(245, 158, 11, 0.2)',
+                                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                                  color: '#f59e0b',
+                                  padding: '0.25rem 0.6rem',
+                                  borderRadius: '5px',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                Aplicar sugerencia a nota
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+
                     {/* Observaciones / Feedback del Mentor */}
                     <div style={{ marginBottom: '1.25rem' }}>
                       <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: textMuted, marginBottom: '0.4rem' }}>
@@ -99820,6 +100849,511 @@ export default function FuturosImposiblesView({
               >
                 Cerrar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 8. MODAL PROMPT MAESTRO DE AUDITORÍA (GEMINI / NODUS) */}
+      {showPromptModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '1rem',
+          zIndex: 10002
+        }}>
+          <div style={{
+            background: '#0d1527',
+            border: `1px solid ${borderLight}`,
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '860px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)'
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: `1px solid ${borderLight}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.2)'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                  <span style={{
+                    background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%)',
+                    color: '#38bdf8',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '12px',
+                    fontSize: '0.7rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem'
+                  }}>
+                    <Bot size={13} /> ASISTENTE GEMINI &bull; NODUS
+                  </span>
+                </div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: textDark }}>
+                  Prompt Maestro para Auditar los 3 Resultados Imposibles en Nodus
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowPromptModal(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: textMuted,
+                  cursor: 'pointer',
+                  padding: '0.4rem',
+                  borderRadius: '6px'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              {/* Instrucciones de uso */}
+              <div style={{
+                background: 'rgba(56, 189, 248, 0.08)',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                borderRadius: '10px',
+                padding: '0.9rem 1.1rem',
+                marginBottom: '1.2rem'
+              }}>
+                <div style={{ fontWeight: 800, color: '#38bdf8', fontSize: '0.85rem', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Lightbulb size={16} /> Instrucciones de uso con Gemini (Google Chrome / Nodus):
+                </div>
+                <div style={{ fontSize: '0.8rem', color: textDark, lineHeight: 1.5 }}>
+                  1. Haz clic en <strong>"Copiar Prompt Maestro"</strong>.<br />
+                  2. Pégalo en el panel de Gemini (en Google Chrome o Nodus) para configurarlo como asistente auditor de desempeño ontológico.<br />
+                  3. Pega las 3 metas del participante para recibir la retroalimentación asertiva al instante, lista para guardar en la plataforma.
+                </div>
+              </div>
+
+              {/* Bloque de Código del Prompt */}
+              <div style={{
+                background: '#060a14',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '8px',
+                padding: '1rem',
+                fontFamily: 'monospace',
+                fontSize: '0.78rem',
+                color: '#e2e8f0',
+                lineHeight: 1.5,
+                whiteSpace: 'pre-wrap',
+                maxHeight: '440px',
+                overflowY: 'auto'
+              }}>
+                {PROMPT_MAESTRO_AUDITORIA_3_RI}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderTop: `1px solid ${borderLight}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.15)',
+              flexWrap: 'wrap',
+              gap: '0.6rem'
+            }}>
+              <span style={{ fontSize: '0.75rem', color: textMuted }}>
+                Causa OS &bull; Tecnología Ontológica y Auditoría de Metas
+              </span>
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button
+                  onClick={() => copyToClipboard(PROMPT_MAESTRO_AUDITORIA_3_RI, '¡Prompt Maestro copiado al portapapeles!')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    background: 'linear-gradient(135deg, #0284c7 0%, #059669 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '7px',
+                    padding: '0.5rem 1.1rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 6px -1px rgba(2, 132, 199, 0.3)'
+                  }}
+                >
+                  <Copy size={14} /> Copiar Prompt Maestro
+                </button>
+                <button
+                  onClick={() => setShowPromptModal(false)}
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid ${borderLight}`,
+                    color: textDark,
+                    padding: '0.5rem 1rem',
+                    borderRadius: '7px',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 9. MODAL GUÍA DEL PROPÓSITO Y "PARA QUÉ" (METODOLOGÍA OFICIAL) */}
+      {showGuiaModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '1rem',
+          zIndex: 10002
+        }}>
+          <div style={{
+            background: '#0d1527',
+            border: `1px solid ${borderLight}`,
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '920px',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.6)'
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: '1.25rem 1.5rem',
+              borderBottom: `1px solid ${borderLight}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.2)'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                  <span style={{
+                    background: 'rgba(245, 158, 11, 0.18)',
+                    color: '#f59e0b',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '12px',
+                    fontSize: '0.7rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem'
+                  }}>
+                    <BookOpen size={13} /> METODOLOGÍA OFICIAL &bull; CPSL
+                  </span>
+                </div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800, color: textDark }}>
+                  {GUIA_PROPOSITO_3_CAPAS_RI.titulo}
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowGuiaModal(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: textMuted,
+                  cursor: 'pointer',
+                  padding: '0.4rem',
+                  borderRadius: '6px'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+              {/* Definición de Alto Impacto */}
+              <div style={{
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(56, 189, 248, 0.1) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                borderRadius: '10px',
+                padding: '1rem 1.25rem',
+                marginBottom: '1.25rem'
+              }}>
+                <div style={{ fontWeight: 800, color: '#f59e0b', fontSize: '0.88rem', marginBottom: '0.3rem' }}>
+                  ¿Por qué un "Resultado Imposible"?
+                </div>
+                <div style={{ fontSize: '0.85rem', color: textDark, lineHeight: 1.5, fontStyle: 'italic' }}>
+                  "{GUIA_PROPOSITO_3_CAPAS_RI.definicion}"
+                </div>
+              </div>
+
+              {/* Selector de Pasos */}
+              <div style={{
+                display: 'flex',
+                gap: '0.5rem',
+                borderBottom: `1px solid ${borderLight}`,
+                marginBottom: '1.25rem',
+                paddingBottom: '0.5rem'
+              }}>
+                <button
+                  onClick={() => setGuiaActiveTab(1)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: guiaActiveTab === 1 ? '1px solid #f59e0b' : `1px solid ${borderLight}`,
+                    background: guiaActiveTab === 1 ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
+                    color: guiaActiveTab === 1 ? '#f59e0b' : textMuted,
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <Layers size={14} /> Paso 1: Las 3 Capas del "Para Qué"
+                </button>
+
+                <button
+                  onClick={() => setGuiaActiveTab(2)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: guiaActiveTab === 2 ? '1px solid #10b981' : `1px solid ${borderLight}`,
+                    background: guiaActiveTab === 2 ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
+                    color: guiaActiveTab === 2 ? '#10b981' : textMuted,
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <Target size={14} /> Paso 2: Matriz E.M.P.O.R.
+                </button>
+
+                <button
+                  onClick={() => setGuiaActiveTab(3)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: guiaActiveTab === 3 ? '1px solid #38bdf8' : `1px solid ${borderLight}`,
+                    background: guiaActiveTab === 3 ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                    color: guiaActiveTab === 3 ? '#38bdf8' : textMuted,
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <CheckCheck size={14} /> Paso 3: Checklist Rápido
+                </button>
+              </div>
+
+              {/* Contenido según Paso */}
+              {guiaActiveTab === 1 && (
+                <div>
+                  <p style={{ fontSize: '0.82rem', color: textMuted, marginBottom: '1rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso1.descripcion}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1.2rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso1.capas.map((c) => (
+                      <div key={c.numero} style={{
+                        background: 'rgba(255, 255, 255, 0.025)',
+                        border: `1px solid ${borderLight}`,
+                        borderLeft: `4px solid ${c.numero === 1 ? '#38bdf8' : c.numero === 2 ? '#f59e0b' : '#10b981'}`,
+                        borderRadius: '8px',
+                        padding: '0.85rem 1rem'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                          <span style={{ fontWeight: 800, fontSize: '0.85rem', color: c.numero === 1 ? '#38bdf8' : c.numero === 2 ? '#f59e0b' : '#10b981' }}>
+                            {c.capa}
+                          </span>
+                          <span style={{ fontSize: '0.75rem', color: textMuted, fontStyle: 'italic' }}>
+                            {c.pregunta}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.82rem', color: textDark, background: 'rgba(0,0,0,0.2)', padding: '0.45rem 0.65rem', borderRadius: '6px' }}>
+                          <strong>Ejemplo:</strong> {c.ejemplo}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{
+                    background: 'rgba(245, 158, 11, 0.1)',
+                    border: '1px solid #f59e0b',
+                    borderRadius: '8px',
+                    padding: '0.85rem 1rem',
+                    fontSize: '0.82rem',
+                    color: '#fcd34d'
+                  }}>
+                    🌟 <strong>Regla de Oro:</strong> {GUIA_PROPOSITO_3_CAPAS_RI.paso1.reglaOro}
+                  </div>
+                </div>
+              )}
+
+              {guiaActiveTab === 2 && (
+                <div>
+                  <p style={{ fontSize: '0.82rem', color: textMuted, marginBottom: '1rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso2.descripcion}
+                  </p>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+                      <thead>
+                        <tr style={{ background: 'rgba(255, 255, 255, 0.04)', borderBottom: `1px solid ${borderLight}`, textAlign: 'left' }}>
+                          <th style={{ padding: '0.75rem', color: textDark, fontWeight: 700 }}>Componente</th>
+                          <th style={{ padding: '0.75rem', color: textDark, fontWeight: 700 }}>Requisito de Validación</th>
+                          <th style={{ padding: '0.75rem', color: '#ef4444', fontWeight: 700 }}>Ejemplo Incorrecto (Vago)</th>
+                          <th style={{ padding: '0.75rem', color: '#10b981', fontWeight: 700 }}>Ejemplo Correcto (Estándar Superior)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {GUIA_PROPOSITO_3_CAPAS_RI.paso2.tabla.map((fila, idx) => (
+                          <tr key={idx} style={{ borderBottom: `1px solid ${borderLight}` }}>
+                            <td style={{ padding: '0.75rem', fontWeight: 800, color: textDark, whiteSpace: 'nowrap' }}>
+                              {fila.componente}
+                            </td>
+                            <td style={{ padding: '0.75rem', color: textMuted }}>
+                              {fila.requisito}
+                            </td>
+                            <td style={{ padding: '0.75rem', color: '#fca5a5', background: 'rgba(239, 68, 68, 0.05)' }}>
+                              {fila.incorrecto}
+                            </td>
+                            <td style={{ padding: '0.75rem', color: '#86efac', background: 'rgba(16, 185, 129, 0.05)', fontWeight: 600 }}>
+                              {fila.correcto}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {guiaActiveTab === 3 && (
+                <div>
+                  <p style={{ fontSize: '0.82rem', color: textMuted, marginBottom: '1rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso3.descripcion}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                    {GUIA_PROPOSITO_3_CAPAS_RI.paso3.items.map((item, idx) => {
+                      const isChecked = Boolean(checklistChecks[idx]);
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setChecklistChecks(prev => ({ ...prev, [idx]: !prev[idx] }))}
+                          style={{
+                            background: isChecked ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.025)',
+                            border: `1px solid ${isChecked ? '#10b981' : borderLight}`,
+                            borderRadius: '8px',
+                            padding: '0.85rem 1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s'
+                          }}
+                        >
+                          <div style={{
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '5px',
+                            border: `2px solid ${isChecked ? '#10b981' : textMuted}`,
+                            background: isChecked ? '#10b981' : 'transparent',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            {isChecked && <Check size={14} color="#ffffff" />}
+                          </div>
+                          <span style={{ fontSize: '0.82rem', color: isChecked ? '#ffffff' : textDark, fontWeight: isChecked ? 700 : 500, lineHeight: 1.4 }}>
+                            {idx + 1}. {item}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderTop: `1px solid ${borderLight}`,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.15)',
+              flexWrap: 'wrap',
+              gap: '0.6rem'
+            }}>
+              <span style={{ fontSize: '0.75rem', color: textMuted }}>
+                Causa OS &bull; Escuela de Liderazgo y Alto Rendimiento CPSL
+              </span>
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button
+                  onClick={() => copyToClipboard(GUIA_PROPOSITO_3_CAPAS_RI.textoCompartible, '¡Guía completa copiada para WhatsApp o correo!')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    background: 'linear-gradient(135deg, #f59e0b 0%, #10b981 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '7px',
+                    padding: '0.5rem 1.1rem',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 6px -1px rgba(245, 158, 11, 0.3)'
+                  }}
+                >
+                  <Copy size={14} /> Copiar Guía para Participantes (WhatsApp)
+                </button>
+                <button
+                  onClick={() => setShowGuiaModal(false)}
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid ${borderLight}`,
+                    color: textDark,
+                    padding: '0.5rem 1rem',
+                    borderRadius: '7px',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -175623,8 +177157,20 @@ import {
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
   BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink,
-  List, LayoutGrid, CreditCard, Activity
+  List, LayoutGrid, CreditCard, Activity, Download, Mail, Copy
 } from 'lucide-react';
+import {
+  dispatchLiquidacionNotifications,
+  buildLiquidacionEmailData,
+  groupItemsByTrainer,
+  ELI_ESCOBAR_EMAIL
+} from '../utils/liquidacionEmailHelper';
+import {
+  generateSingleVCard,
+  generateVCardBundle,
+  generateGoogleContactsCSV,
+  triggerFileDownload
+} from '../utils/contactsExport';
 import { 
   MAX_TRAINER_LOAD, 
   STANDARD_CALL_CONTACT_TYPE, 
@@ -175979,6 +177525,9 @@ export default function CentroManagers() {
   const [filtroEntrenadorLiquidacion, setFiltroEntrenadorLiquidacion] = useState('todos');
   const [selectedLiquidacionKeys, setSelectedLiquidacionKeys] = useState(new Set());
   const [procesandoLiquidacionMasiva, setProcesandoLiquidacionMasiva] = useState(false);
+  const [modalEmailEliData, setModalEmailEliData] = useState(null);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportScope, setExportScope] = useState('filtrados');
 
   const canSeeInactives = canViewInactiveUsers(currentUser);
 
@@ -177385,7 +178934,8 @@ export default function CentroManagers() {
       const sede = ultimoLlamada?.sede || infoEquipo?.sede || pago?.sede || '';
       const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || pago?.entrenador || 'Sin Asignar';
 
-      const montoCalculado = pago?.montoUSD ? Number(pago.montoUSD) : Math.max(FEE_PER_EFFECTIVE_CALL_USD, llamadasEfectivas * FEE_PER_EFFECTIVE_CALL_USD);
+      // Tarifa fija de $400 USD por equipo grupal liquidado/completado
+      const montoCalculado = pago?.montoUSD !== undefined ? Number(pago.montoUSD) : 400;
 
       const item = {
         tipo: 'grupal',
@@ -177411,8 +178961,20 @@ export default function CentroManagers() {
         return;
       }
       
-      if (pago && pago.estado === 'pagado') {
-        pagados.push({ ...item, pagadoPorNombre: pago.pagadoPorNombre, pagadoPorEmail: pago.pagadoPorEmail, fechaPago: pago.fechaPago });
+      if (pago && (pago.estado === 'pagado' || pago.estado === 'autorizado')) {
+        pagados.push({
+          ...item,
+          montoUSD: pago.montoUSD !== undefined ? Number(pago.montoUSD) : item.montoUSD,
+          pagadoPorNombre: pago.pagadoPorNombre || pago.autorizadoPorNombre,
+          pagadoPorEmail: pago.pagadoPorEmail || pago.autorizadoPorEmail,
+          autorizadoPorNombre: pago.autorizadoPorNombre || pago.pagadoPorNombre || '-',
+          autorizadoPorEmail: pago.autorizadoPorEmail || pago.pagadoPorEmail || '',
+          fechaPago: pago.fechaPago || pago.fechaAutorizacion || '',
+          fechaAutorizacion: pago.fechaAutorizacion || pago.fechaPago || '',
+          notificadoEli: Boolean(pago.notificadoEli),
+          fechaNotificacionEli: pago.fechaNotificacionEli || '',
+          esPagable: pago.esPagable !== false
+        });
       } else {
         pendientes.push(item);
       }
@@ -177477,12 +179039,19 @@ export default function CentroManagers() {
           return;
         }
 
-        if (pago && pago.estado === 'pagado') {
+        if (pago && (pago.estado === 'pagado' || pago.estado === 'autorizado')) {
           pagados.push({
             ...indItem,
-            pagadoPorNombre: pago.pagadoPorNombre,
-            pagadoPorEmail: pago.pagadoPorEmail,
-            fechaPago: pago.fechaPago
+            montoUSD: pago.montoUSD !== undefined ? Number(pago.montoUSD) : indItem.montoUSD,
+            pagadoPorNombre: pago.pagadoPorNombre || pago.autorizadoPorNombre,
+            pagadoPorEmail: pago.pagadoPorEmail || pago.autorizadoPorEmail,
+            autorizadoPorNombre: pago.autorizadoPorNombre || pago.pagadoPorNombre || '-',
+            autorizadoPorEmail: pago.autorizadoPorEmail || pago.pagadoPorEmail || '',
+            fechaPago: pago.fechaPago || pago.fechaAutorizacion || '',
+            fechaAutorizacion: pago.fechaAutorizacion || pago.fechaPago || '',
+            notificadoEli: Boolean(pago.notificadoEli),
+            fechaNotificacionEli: pago.fechaNotificacionEli || '',
+            esPagable: pago.esPagable !== false
           });
         } else {
           pendientes.push(indItem);
@@ -177719,21 +179288,24 @@ export default function CentroManagers() {
   };
 
 
-  const handleMarcarPagado = async (item) => {
+  const handleMarcarPagado = async (item, sinPago = false) => {
     if (!canViewLiquidacion) return;
     try {
       const docKey = item.tipo === 'individual' 
         ? (item.liquidacionKey || `indiv__${item.managerId}`) 
         : (item.equipoKey || item.liquidacionKey);
       const pagoRef = doc(db, 'liquidaciones_pagos', docKey);
+      const today = new Date().toISOString().split('T')[0];
+      const defaultMonto = item.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400;
+      const monto = sinPago ? 0 : Number(item.montoUSD !== undefined ? item.montoUSD : defaultMonto);
+
       await runTransaction(db, async (tx) => {
         const snap = await tx.get(pagoRef);
         const prev = snap.exists() ? snap.data() : null;
-        if (prev?.estado === 'pagado') {
-          throw new Error('Esta liquidación ya fue procesada y pagada previamente.');
+        if (prev?.estado === 'pagado' || prev?.estado === 'autorizado') {
+          throw new Error('Esta liquidación ya fue autorizada previamente.');
         }
 
-        const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
         tx.set(pagoRef, {
           liquidacionKey: docKey,
           tipoLlamada: item.tipo || 'grupal',
@@ -177751,32 +179323,113 @@ export default function CentroManagers() {
           cajero_user_id: currentUser?.uid || '',
           llamadasAlPagar: item.totalLlamadas,
           llamadasEfectivas: item.llamadasEfectivas || item.totalLlamadas,
-          tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
+          tarifaPorLlamada: sinPago ? 0 : (item.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400),
           motivo: item.motivo || (item.tipo === 'individual' ? 'llamadas_individuales_efectivas' : 'llamadas_grupales_efectivas'),
-          criterio: `Liquidación fija por llamada efectiva (${item.tipo === 'individual' ? '1 a 1' : 'Grupal'}) registrada honestamente en Causa OS`,
+          criterio: sinPago 
+            ? 'Liquidación sin desembolso económico' 
+            : `Liquidación autorizada (${item.tipo === 'individual' ? 'Llamada individual 1 a 1 ($25 USD)' : 'Equipo grupal ($400 USD)'}) registrada en Causa OS`,
           fechaAlcanzo7: item.fechaAlcanzo7 || '',
           estado: 'pagado',
+          esPagable: !sinPago,
           pagadoPorEmail: currentUser?.email || '',
           pagadoPorNombre: currentUser?.name || '',
-          fechaPago: new Date().toISOString().split('T')[0],
+          autorizadoPorNombre: currentUser?.name || currentUser?.displayName || 'Dirección',
+          autorizadoPorEmail: currentUser?.email || '',
+          fechaPago: today,
+          fechaAutorizacion: today,
+          notificadoEli: true,
+          fechaNotificacionEli: new Date().toISOString(),
           updatedAt: serverTimestamp()
         }, { merge: true });
       });
 
+      // Notificación automática a Causa OS y encolado de correo oficial para Eli Escobar
+      const itemToNotify = {
+        ...item,
+        montoUSD: monto,
+        esPagable: !sinPago,
+        fechaAutorizacion: today,
+        autorizadoPorNombre: currentUser?.name || 'Dirección'
+      };
+      try {
+        await dispatchLiquidacionNotifications({
+          db,
+          addDocFn: addDoc,
+          collectionFn: collection,
+          items: [itemToNotify],
+          authorizerUser: currentUser
+        });
+      } catch (notifErr) {
+        console.warn('No se pudo despachar notificación para Eli Escobar:', notifErr);
+      }
+
       recordAuditEvent({
-        action: 'LIQUIDACION_ENTRENADOR_PAGADA',
+        action: 'LIQUIDACION_ENTRENADOR_AUTORIZADA',
         email: currentUser?.email || '',
         name: currentUser?.name || '',
         role: currentUser?.appRole || '',
         sede: item.sede,
-        details: `Liquidación atómica registrada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD - Tarifa: $${FEE_PER_EFFECTIVE_CALL_USD}/llamada efectiva (${item.tipo === 'individual' ? 'Individual 1-a-1' : 'Grupal'})`
+        details: `Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${monto} USD (${sinPago ? 'Sin desembolso' : 'Autorizado para pago'})`
       });
 
-      showToast(`Marcado como pagado: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}`, 'success');
+      showToast(`Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}. Notificado a Eli Escobar en Causa OS.`, 'success');
     } catch (e) {
       console.error(e);
-      showToast(e.message || 'Error al marcar como pagado', 'error');
+      showToast(e.message || 'Error al autorizar liquidación', 'error');
     }
+  };
+
+  // Notificar / Re-notificar individualmente a Eli Escobar
+  const handleNotificarItem = async (item) => {
+    try {
+      await dispatchLiquidacionNotifications({
+        db,
+        addDocFn: addDoc,
+        collectionFn: collection,
+        items: [item],
+        authorizerUser: currentUser
+      });
+
+      // Actualizar marca de notificación en Firestore
+      const docKey = item.pagoDocId || item.liquidacionKey || item.equipoKey;
+      if (docKey) {
+        const pagoRef = doc(db, 'liquidaciones_pagos', docKey);
+        await updateDoc(pagoRef, {
+          notificadoEli: true,
+          fechaNotificacionEli: new Date().toISOString()
+        }).catch(() => {});
+      }
+
+      const emailData = buildLiquidacionEmailData({
+        trainerName: item.entrenador,
+        items: [item],
+        authorizerUser: currentUser
+      });
+      setModalEmailEliData([emailData]);
+      showToast(`Notificación y correo encolados para Eli Escobar (${item.entrenador}).`, 'success');
+    } catch (err) {
+      console.error('Error al notificar:', err);
+      showToast('Error al notificar a Eli Escobar', 'error');
+    }
+  };
+
+  // Generador de Correo de Autorización para los ítems seleccionados
+  const handleGenerarCorreoEli = () => {
+    const itemsToEmail = filteredPendientes.filter(it => selectedLiquidacionKeys.has(it.liquidacionKey));
+    if (itemsToEmail.length === 0) {
+      showToast('Selecciona al menos un registro para generar el correo de autorización a Eli Escobar.', 'warning');
+      return;
+    }
+    const grouped = groupItemsByTrainer(itemsToEmail);
+    const emailList = [];
+    for (const [trainer, trainerItems] of grouped.entries()) {
+      emailList.push(buildLiquidacionEmailData({
+        trainerName: trainer,
+        items: trainerItems,
+        authorizerUser: currentUser
+      }));
+    }
+    setModalEmailEliData(emailList);
   };
 
   // Liquidación Masiva para ítems seleccionados
@@ -177788,15 +179441,26 @@ export default function CentroManagers() {
       return;
     }
 
-    const totalMonto = itemsToPay.reduce((acc, it) => acc + (Number(it.montoUSD) || 0), 0);
-    const confirmMsg = `¿Confirmar liquidación masiva de ${itemsToPay.length} registros seleccionados por un total de $${totalMonto.toLocaleString('en-US')} USD?\n\n` +
-      `Se procesará cada llamada efectiva a $${FEE_PER_EFFECTIVE_CALL_USD} USD mediante transacciones atómicas individuales.`;
+    const totalMonto = itemsToPay.reduce((acc, it) => {
+      const defaultMonto = it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400;
+      return acc + (it.montoUSD !== undefined ? Number(it.montoUSD) : defaultMonto);
+    }, 0);
+
+    const grupalesCount = itemsToPay.filter(it => it.tipo !== 'individual').length;
+    const indivCount = itemsToPay.filter(it => it.tipo === 'individual').length;
+    const detalleItems = [];
+    if (grupalesCount > 0) detalleItems.push(`${grupalesCount} equipo${grupalesCount > 1 ? 's' : ''} grupal${grupalesCount > 1 ? 'es' : ''} ($400 USD c/u)`);
+    if (indivCount > 0) detalleItems.push(`${indivCount} llamada${indivCount > 1 ? 's' : ''} individual${indivCount > 1 ? 'es' : ''} ($25 USD c/u)`);
+
+    const confirmMsg = `¿Confirmar autorización de liquidación de ${itemsToPay.length} registros seleccionados (${detalleItems.join(', ')}) por un total de $${totalMonto.toLocaleString('en-US')} USD?\n\n` +
+      `Se registrará la autorización en Causa OS y se preparará el correo de autorización para Eli Escobar.`;
 
     if (!window.confirm(confirmMsg)) return;
 
     setProcesandoLiquidacionMasiva(true);
     let successCount = 0;
     let errorCount = 0;
+    const today = new Date().toISOString().split('T')[0];
 
     for (const item of itemsToPay) {
       try {
@@ -177805,9 +179469,10 @@ export default function CentroManagers() {
         await runTransaction(db, async (tx) => {
           const snap = await tx.get(pagoRef);
           const prev = snap.exists() ? snap.data() : null;
-          if (prev?.estado === 'pagado') return;
+          if (prev?.estado === 'pagado' || prev?.estado === 'autorizado') return;
 
-          const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
+          const defaultMonto = item.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400;
+          const monto = Number(item.montoUSD !== undefined ? item.montoUSD : defaultMonto);
           tx.set(pagoRef, {
             liquidacionKey: docKey,
             tipoLlamada: item.tipo || 'grupal',
@@ -177825,14 +179490,20 @@ export default function CentroManagers() {
             cajero_user_id: currentUser?.uid || '',
             llamadasAlPagar: item.totalLlamadas,
             llamadasEfectivas: item.llamadasEfectivas || item.totalLlamadas,
-            tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
+            tarifaPorLlamada: item.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400,
             motivo: item.motivo,
-            criterio: `Liquidación masiva fija por llamada efectiva (${item.tipo === 'individual' ? '1 a 1' : 'Grupal'})`,
+            criterio: `Liquidación masiva autorizada (${item.tipo === 'individual' ? 'Llamada individual 1 a 1' : 'Equipo grupal'})`,
             fechaAlcanzo7: item.fechaAlcanzo7 || '',
             estado: 'pagado',
+            esPagable: true,
             pagadoPorEmail: currentUser?.email || '',
             pagadoPorNombre: currentUser?.name || '',
-            fechaPago: new Date().toISOString().split('T')[0],
+            autorizadoPorNombre: currentUser?.name || currentUser?.displayName || 'Dirección',
+            autorizadoPorEmail: currentUser?.email || '',
+            fechaPago: today,
+            fechaAutorizacion: today,
+            notificadoEli: true,
+            fechaNotificacionEli: new Date().toISOString(),
             updatedAt: serverTimestamp()
           }, { merge: true });
         });
@@ -177848,14 +179519,41 @@ export default function CentroManagers() {
       email: currentUser?.email || '',
       name: currentUser?.name || '',
       role: currentUser?.appRole || '',
-      details: `Liquidación masiva completada: ${successCount} registros pagados por $${totalMonto} USD (${errorCount} errores)`
+      details: `Liquidación masiva completada: ${successCount} registros autorizados por $${totalMonto} USD (${errorCount} errores)`
     });
+
+    // Notificación automática a Causa OS y encolado de correo oficial para Eli Escobar
+    if (successCount > 0) {
+      try {
+        await dispatchLiquidacionNotifications({
+          db,
+          addDocFn: addDoc,
+          collectionFn: collection,
+          items: itemsToPay,
+          authorizerUser: currentUser
+        });
+      } catch (notifErr) {
+        console.warn('No se pudo despachar notificación masiva para Eli Escobar:', notifErr);
+      }
+
+      // Desplegar modal con el correo oficial para Eli Escobar listo para copiar o abrir
+      const grouped = groupItemsByTrainer(itemsToPay);
+      const emailList = [];
+      for (const [trainer, trainerItems] of grouped.entries()) {
+        emailList.push(buildLiquidacionEmailData({
+          trainerName: trainer,
+          items: trainerItems,
+          authorizerUser: currentUser
+        }));
+      }
+      setModalEmailEliData(emailList);
+    }
 
     setSelectedLiquidacionKeys(new Set());
     setProcesandoLiquidacionMasiva(false);
 
     if (errorCount === 0) {
-      showToast(`¡Liquidación completada! ${successCount} registros marcados como pagados ($${totalMonto} USD).`, 'success');
+      showToast(`¡Liquidación completada! ${successCount} registros autorizados ($${totalMonto} USD). Notificado a Eli Escobar en Causa OS.`, 'success');
     } else {
       showToast(`Procesados ${successCount} pagos con éxito. ${errorCount} fallaron.`, 'warning');
     }
@@ -179403,13 +181101,13 @@ export default function CentroManagers() {
                             >
                               <UserCheck size={15} />
                             </HelpButton>
-                            <button
+                            <HelpButton helpKey="historialLlamadas"
                               onClick={() => setHistoryModal(m)}
                               title="Historial de Llamadas"
                               style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#d97706', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
                             >
                               <Clock size={15} />
-                            </button>
+                            </HelpButton>
                             {(userCanWriteNota || userCanViewAllNotas) && (
                               <HelpButton helpKey="notas"
                                 onClick={() => setNotaModal(m)}
@@ -179604,13 +181302,13 @@ export default function CentroManagers() {
                                   >
                                     <UserCheck size={13} />
                                   </HelpButton>
-                                  <button
+                                  <HelpButton helpKey="historialLlamadas"
                                     onClick={() => setHistoryModal(m)}
                                     title="Historial de Llamadas"
                                     style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#d97706', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                   >
                                     <Clock size={13} />
-                                  </button>
+                                  </HelpButton>
                             {(userCanWriteNota || userCanViewAllNotas) && (
                                     <HelpButton helpKey="notas"
                                       onClick={() => setNotaModal(m)}
@@ -181039,7 +182737,7 @@ export default function CentroManagers() {
                       <Filter size={15} color="#059669" /> Seleccionar Tipo de Llamada:
                     </span>
                     
-                    <button
+                    <HelpButton helpKey="filtroTipoLlamadas"
                       type="button"
                       onClick={() => setFiltroTipoLlamada('todas')}
                       style={{
@@ -181058,9 +182756,9 @@ export default function CentroManagers() {
                       }}
                     >
                       <Layers size={14} /> Todas las Llamadas ({liquidacionData.pendientes.length})
-                    </button>
+                    </HelpButton>
 
-                    <button
+                    <HelpButton helpKey="filtroTipoLlamadas"
                       type="button"
                       onClick={() => setFiltroTipoLlamada('grupales')}
                       style={{
@@ -181079,9 +182777,9 @@ export default function CentroManagers() {
                       }}
                     >
                       <Users size={14} /> 👥 Llamadas Grupales ({conteoGrupalesPendientes})
-                    </button>
+                    </HelpButton>
 
-                    <button
+                    <HelpButton helpKey="filtroTipoLlamadas"
                       type="button"
                       onClick={() => setFiltroTipoLlamada('individuales')}
                       style={{
@@ -181100,12 +182798,12 @@ export default function CentroManagers() {
                       }}
                     >
                       <UserCheck size={14} /> 👤 Llamadas Individuales (1 a 1) ({conteoIndividualesPendientes})
-                    </button>
+                    </HelpButton>
                   </div>
 
                   {/* FILTROS SECUNDARIOS: SEDE Y ENTRENADOR */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-                    <select
+                    <HelpSelect helpKey="filtroSede"
                       value={filtroSedeLiquidacion}
                       onChange={(e) => setFiltroSedeLiquidacion(e.target.value)}
                       style={{
@@ -181122,9 +182820,9 @@ export default function CentroManagers() {
                       {['Lima', 'Quito', 'Guayaquil', 'Medellín', 'México', 'Cuenca', 'Sede Global'].map(s => (
                         <option key={s} value={s}>{s}</option>
                       ))}
-                    </select>
+                    </HelpSelect>
 
-                    <select
+                    <HelpSelect helpKey="filtroEntrenador"
                       value={filtroEntrenadorLiquidacion}
                       onChange={(e) => setFiltroEntrenadorLiquidacion(e.target.value)}
                       style={{
@@ -181142,7 +182840,7 @@ export default function CentroManagers() {
                       {availableTrainers.map(ent => (
                         <option key={ent} value={ent}>{ent}</option>
                       ))}
-                    </select>
+                    </HelpSelect>
                   </div>
                 </div>
 
@@ -181164,7 +182862,7 @@ export default function CentroManagers() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                       <CheckSquare size={18} color="#059669" />
                       <span style={{ fontWeight: 800, color: textDark, fontSize: '0.88rem' }}>
-                        {selectedLiquidacionKeys.size} llamada{selectedLiquidacionKeys.size !== 1 ? 's' : ''} seleccionada{selectedLiquidacionKeys.size !== 1 ? 's' : ''}
+                        {selectedLiquidacionKeys.size} {selectedLiquidacionKeys.size === 1 ? 'registro seleccionado' : 'registros seleccionados'}
                       </span>
                       <span style={{ fontSize: '0.85rem', color: textMuted }}>•</span>
                       <span style={{ fontWeight: 800, color: '#059669', fontSize: '0.95rem' }}>
@@ -181172,7 +182870,7 @@ export default function CentroManagers() {
                       </span>
                     </div>
                     <div style={{ display: 'flex', gap: '0.6rem' }}>
-                      <button
+                      <HelpButton helpKey="liquidarMasivo"
                         type="button"
                         disabled={procesandoLiquidacionMasiva}
                         onClick={handleMarcarSeleccionadosPagados}
@@ -181192,9 +182890,9 @@ export default function CentroManagers() {
                         }}
                       >
                         <CreditCard size={15} />
-                        {procesandoLiquidacionMasiva ? 'Procesando pagos...' : `Liquidar Seleccionados ($${totalSeleccionadosUSD} USD)`}
-                      </button>
-                      <button
+                        {procesandoLiquidacionMasiva ? 'Procesando autorizaciones...' : `Autorizar Seleccionados ($${totalSeleccionadosUSD.toLocaleString('en-US')} USD)`}
+                      </HelpButton>
+                      <HelpButton helpKey="limpiarSeleccion"
                         type="button"
                         onClick={() => setSelectedLiquidacionKeys(new Set())}
                         style={{
@@ -181209,7 +182907,7 @@ export default function CentroManagers() {
                         }}
                       >
                         Limpiar selección
-                      </button>
+                      </HelpButton>
                     </div>
                   </div>
                 )}
@@ -181217,11 +182915,22 @@ export default function CentroManagers() {
                 {/* PENDIENTES DE PAGO */}
                 <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.9rem', flexWrap: 'wrap', gap: '0.6rem' }}>
-                    <h3 style={{ fontSize: '1rem', color: textDark, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <Clock size={16} color="#b45309" /> Pendientes de pago ({filteredPendientes.length})
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                      <h3 style={{ fontSize: '1rem', color: textDark, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Clock size={16} color="#b45309" /> Pendientes de pago ({filteredPendientes.length})
+                      </h3>
+                      <HelpButton helpKey="correoEliEscobar"
+                        onClick={() => {
+                          const selected = filteredPendientes.filter(it => selectedLiquidacionKeys.has(it.liquidacionKey));
+                          handleGenerarCorreoEli(selected.length > 0 ? selected : filteredPendientes);
+                        }}
+                        style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', border: '1px solid #8b5cf6', background: 'rgba(139,92,246,0.08)', color: '#7c3aed', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                      >
+                        <Mail size={13} /> Correo Eli Escobar
+                      </HelpButton>
+                    </div>
                     <div style={{ fontSize: '0.78rem', color: textMuted }}>
-                      Tarifa fija: <strong>${FEE_PER_EFFECTIVE_CALL_USD} USD</strong> por llamada efectiva registrada
+                      Tarifas: <strong>$400 USD</strong> por equipo grupal • <strong>${FEE_PER_EFFECTIVE_CALL_USD} USD</strong> por llamada 1 a 1
                     </div>
                   </div>
 
@@ -181235,7 +182944,7 @@ export default function CentroManagers() {
                         <thead>
                           <tr style={{ background: 'rgba(180,83,9,0.08)', textAlign: 'left' }}>
                             <th style={{ padding: '0.7rem 0.6rem', width: '36px', textAlign: 'center' }}>
-                              <input
+                              <HelpInput helpKey="asistencia"
                                 type="checkbox"
                                 checked={allVisibleSelected}
                                 onChange={toggleSelectAllVisible}
@@ -181258,7 +182967,7 @@ export default function CentroManagers() {
                             return (
                               <tr key={item.liquidacionKey || item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: isSelected ? 'rgba(16,185,129,0.08)' : idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
                                 <td style={{ padding: '0.65rem 0.6rem', textAlign: 'center' }}>
-                                  <input
+                                  <HelpInput helpKey="asistencia"
                                     type="checkbox"
                                     checked={isSelected}
                                     onChange={() => toggleSelectItem(item.liquidacionKey)}
@@ -181331,7 +183040,14 @@ export default function CentroManagers() {
                                       onClick={() => handleMarcarPagado(item)}
                                       style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                     >
-                                      <Check size={12} /> Marcar como pagado
+                                      <Check size={12} /> Autorizar pago
+                                    </HelpButton>
+                                    <HelpButton helpKey="marcarSinPago"
+                                      onClick={() => handleMarcarPagado(item, true)}
+                                      title="Liquidar sin desembolso monetario ($0 USD)"
+                                      style={{ padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #94a3b8', background: '#f8fafc', color: '#475569', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                                    >
+                                      Sin pago
                                     </HelpButton>
                                     <HelpButton helpKey="ocultarPago"
                                       onClick={() => handleEliminarLiquidacion(item)}
@@ -181406,8 +183122,9 @@ export default function CentroManagers() {
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado el</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado por</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Autorizado el</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Autorizado por</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'center' }}>Notificación Eli</th>
                             {canReversarPago && <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'right' }}>Acción</th>}
                           </tr>
                         </thead>
@@ -181439,9 +183156,29 @@ export default function CentroManagers() {
                               </td>
                               <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
-                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD} USD</td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaPago || '-'}</td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
+                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>
+                                {item.esPagable === false ? (
+                                  <span style={{ color: '#64748b', fontSize: '0.78rem' }}>$0 USD (Sin desembolso)</span>
+                                ) : (
+                                  `$${item.montoUSD} USD`
+                                )}
+                              </td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaAutorizacion || item.fechaPago || '-'}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.autorizadoPorNombre || item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
+                              <td style={{ padding: '0.65rem 0.6rem', textAlign: 'center' }}>
+                                {item.notificadoEli ? (
+                                  <span style={{ background: '#ecfdf5', color: '#047857', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <Check size={12} /> Notificado
+                                  </span>
+                                ) : (
+                                  <HelpButton helpKey="notificarEli"
+                                    onClick={() => handleNotificarItem(item)}
+                                    style={{ padding: '0.25rem 0.55rem', borderRadius: '5px', border: '1px solid #059669', background: '#ecfdf5', color: '#047857', fontWeight: 700, fontSize: '0.72rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                                  >
+                                    <Mail size={12} /> Notificar
+                                  </HelpButton>
+                                )}
+                              </td>
                               {canReversarPago && (
                                 <td style={{ padding: '0.65rem 0.6rem', textAlign: 'right' }}>
                                   <HelpButton helpKey="editarMontoPago"
@@ -182393,7 +184130,7 @@ export default function CentroManagers() {
                 </span>
               </div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: '#166534', cursor: 'pointer', marginTop: '2px' }}>
-                <input 
+                <HelpInput helpKey="reporteNotaVoz"
                   type="checkbox" 
                   checked={groupCallNotaVozEnviada} 
                   disabled={isSavingGroupCall}
@@ -182679,14 +184416,14 @@ export default function CentroManagers() {
                       <div key={call.id || idx} style={{ padding: '0.8rem', background: '#f8fafc', borderRadius: '8px', border: `1px solid ${borderLight}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         {isEditing ? (
                           <div style={{ display: 'flex', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
-                            <input type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }} />
-                            <select value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}>
+                            <HelpInput helpKey="fechaIndividual" type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }} />
+                            <HelpSelect helpKey="asistencia" value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}>
                               <option value="SI">SÍ Asistió</option>
                               <option value="NO">NO Asistió</option>
-                            </select>
+                            </HelpSelect>
                             <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.4rem' }}>
-                              <button onClick={() => { handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio); }} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Guardar</button>
-                              <button onClick={() => setEditingHistoryCall(null)} style={{ background: '#94a3b8', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Cancelar</button>
+                              <HelpButton helpKey="guardarCambios" onClick={() => { handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio); }} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Guardar</HelpButton>
+                              <HelpButton helpKey="cancelar" onClick={() => setEditingHistoryCall(null)} style={{ background: '#94a3b8', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Cancelar</HelpButton>
                             </div>
                           </div>
                         ) : (
@@ -182703,8 +184440,8 @@ export default function CentroManagers() {
                               </span>
                               {(userCanLoadCalls || isGlobalQTCoordinator(currentUser) || isMaestriaCoordinator(currentUser) || (currentUser && currentUser.isDireccion)) && (
                                 <div style={{ display: 'flex', gap: '0.6rem' }}>
-                                  <button onClick={() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio })} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</button>
-                                  <button onClick={async () => { await handleDeleteHistoryCall(m.id, call.id); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</button>
+                                  <HelpButton helpKey="editarLlamada" onClick={() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio })} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</HelpButton>
+                                  <HelpButton helpKey="eliminarLlamada" onClick={async () => { await handleDeleteHistoryCall(m.id, call.id); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</HelpButton>
                                 </div>
                               )}
                             </div>
@@ -182893,8 +184630,8 @@ export default function CentroManagers() {
                       </span>
                       {(userCanLoadCalls || isGlobalQTCoordinator(currentUser) || isMaestriaCoordinator(currentUser) || (currentUser && currentUser.isDireccion)) && (!call.tipo || call.tipo === 'individual') && (
                         <div style={{ display: 'flex', gap: '0.3rem' }}>
-                          <button onClick={() => { setManagerCardModal(null); setHistoryModal(m); setTimeout(() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio }), 100); }} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</button>
-                          <button onClick={() => { setManagerCardModal(null); setHistoryModal(m); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</button>
+                          <HelpButton helpKey="editarLlamada" onClick={() => { setManagerCardModal(null); setHistoryModal(m); setTimeout(() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio }), 100); }} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</HelpButton>
+                          <HelpButton helpKey="eliminarLlamada" onClick={() => { setManagerCardModal(null); setHistoryModal(m); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</HelpButton>
                         </div>
                       )}
                     </div>
@@ -183004,13 +184741,13 @@ export default function CentroManagers() {
                               <div key={call.id} style={{ marginTop: '0.25rem', fontSize: '0.7rem', color: textMuted, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                 {editingHistoryCall?.callId === call.id && editingHistoryCall?.managerId === m.id ? (
                                   <>
-                                    <input type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.1rem', fontSize: '0.65rem' }} />
-                                    <select value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.1rem', fontSize: '0.65rem' }}>
+                                    <HelpInput helpKey="fechaIndividual" type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.1rem', fontSize: '0.65rem' }} />
+                                    <HelpSelect helpKey="asistencia" value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.1rem', fontSize: '0.65rem' }}>
                                       <option value="SI">Asistió</option>
                                       <option value="NO">No asistió</option>
-                                    </select>
-                                    <button onClick={() => handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio)} style={{ cursor: 'pointer', background: '#10b981', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Guardar</button>
-                                    <button onClick={() => setEditingHistoryCall(null)} style={{ cursor: 'pointer', background: '#64748b', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Cancelar</button>
+                                    </HelpSelect>
+                                    <HelpButton helpKey="guardarCambios" onClick={() => handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio)} style={{ cursor: 'pointer', background: '#10b981', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Guardar</HelpButton>
+                                    <HelpButton helpKey="cancelar" onClick={() => setEditingHistoryCall(null)} style={{ cursor: 'pointer', background: '#64748b', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Cancelar</HelpButton>
                                   </>
                                 ) : (
                                   <>
@@ -193755,6 +195492,354 @@ export function auditarParticipantesEnJuego3Resultados(participantes = [], evide
   };
 }
 
+/**
+ * ============================================================================
+ * PROMPT MAESTRO DE AUDITORÍA Y GUÍA DEL PROPÓSITO ("PARA QUÉ")
+ * Estándar E.M.P.O.R. (Específico, Medible, Propósito, Organizado y Retador)
+ * Directiva de Alta Dirección - Crear Poder Sin Límites (CPSL) / Nodus
+ * ============================================================================
+ */
+
+export const PROMPT_MAESTRO_AUDITORIA_3_RI = `PROMPT MAESTRO DE AUDITORÍA: 3 RESULTADOS IMPOSIBLES (NODUS)
+
+[ROL Y CONTEXTO]
+Actúas como Entrenador Senior y Auditor de Desempeño en Crear Poder Sin Límites (CPSL) dentro de la plataforma Nodus. Tu objetivo es auditar los 3 Resultados Imposibles (RI) redactados por un participante y emitir una retroalimentación altamente asertiva, objetiva, empática y constructiva (sin ser agresiva, ni descalificadora, ni punitiva). El participante (y su partner de apoyo) debe entender la observación a la primera lectura y saber exactamente qué ajustar de inmediato sin dudas ni trabas.
+
+[CRITERIOS DE AUDITORÍA PARA CADA RESULTADO IMPOSIBLE]
+Evalúa cada uno de los 3 Resultados Imposibles según estos 3 pilares:
+1. Especificidad y Medición: ¿Tiene una meta cuantificable, fecha límite clara (en el marco de los 90 días) y un indicador de éxito verificable?
+2. Nivel de Desafío ("Imposible"): ¿Rompe la zona de confort y el historial pasado, requiriendo un estiramiento personal, o es una meta ordinaria/inercial?
+3. Conexión con el Propósito ("Para Qué"): ¿Muestra claridad en el beneficio o transformación de fondo, o es solo un deseo vago o abstracto?
+
+[ESTRUCTURA DE RESPUESTA OBLIGATORIA]
+Para los 3 Resultados Imposibles en conjunto, genera la evaluación con la siguiente estructura exacta:
+
+---
+EVALUACIÓN DE RESULTADOS IMPOSIBLES (NODUS)
+
+ESTADO GENERAL: [APROBADO] o [REQUIERE ELEVAR EL ESTÁNDAR]
+
+RESUMEN POR RESULTADO:
+
+1. Resultado Imposible 1:
+   - Estado: [APROBADO / REQUIERE ELEVAR EL ESTÁNDAR]
+   - Reflejo Asertivo: (1 a 2 frases claras observando el acierto o el punto ciego de la redacción sin emitir juicios personales).
+   - Ajuste Inmediato Sugerido (si aplica): (Instrucción concreta de redacción para corregir en Nodus al instante).
+
+2. Resultado Imposible 2:
+   - Estado: [APROBADO / REQUIERE ELEVAR EL ESTÁNDAR]
+   - Reflejo Asertivo: ...
+   - Ajuste Inmediato Sugerido (si aplica): ...
+
+3. Resultado Imposible 3:
+   - Estado: [APROBADO / REQUIERE ELEVAR EL ESTÁNDAR]
+   - Reflejo Asertivo: ...
+   - Ajuste Inmediato Sugerido (si aplica): ...
+
+PREGUNTA CUÁNTICA DE ENFOQUE:
+(Una sola pregunta poderosa dirigida a conectar al participante con su "Para Qué" y moverlo a la acción inmediata con su equipo y partner).
+---
+
+[REGLAS DE TONO Y ESTILO]
+- Mantén un lenguaje firme en el estándar pero cálido en el trato.
+- Evita palabras como "error", "malo", "fallaste" o "insuficiente". Utiliza expresiones como "oportunidad de precisión", "elevar el estándar", "definir el indicador" o "hacer tangible el resultado".
+- Si el resultado es vago (ej: "Quiero tener más paz"), no lo rechaces tajantemente; guíalo a medirlo (ej: "Para hacer medible tu paz, ¿cuántas sesiones de meditación o qué hábito concreto verificarás cada semana?").
+- Garantiza que cualquier sugerencia le tome al participante menos de 3 minutos de corregir en la plataforma.`;
+
+export const GUIA_PROPOSITO_3_CAPAS_RI = {
+  titulo: 'Guía para Encontrar el Propósito y "Para Qué" en los Resultados Imposibles',
+  subtitulo: 'Diseñada para compartir con participantes o aplicar en sesiones de alineación con managers y partners.',
+  definicion: 'Un Resultado Imposible no es una fantasía irrealizable; es una meta que tu mentalidad actual no sabe cómo lograr únicamente con tus hábitos pasados. Requiere que te transformes en la persona capaz de sostener ese resultado.',
+  paso1: {
+    titulo: 'Paso 1: La Fórmula de 3 Capas del "Para Qué" (Profundización Consciente)',
+    descripcion: 'Para que un resultado tenga tracción y no se abandone ante el primer obstáculo, aplica la prueba de las 3 preguntas descendentes:',
+    capas: [
+      {
+        numero: 1,
+        capa: 'Capa 1 (El Qué - Lo Superficial)',
+        pregunta: '¿Qué quieres lograr concretamente?',
+        ejemplo: '"Aumentar mis ingresos en S/ 10,000 al mes."'
+      },
+      {
+        numero: 2,
+        capa: 'Capa 2 (El Para Qué Personal)',
+        pregunta: '¿Para qué quieres ese logro en tu vida?',
+        ejemplo: '"Para tener tranquilidad financiera y pagar deudas pendientes."'
+      },
+      {
+        numero: 3,
+        capa: 'Capa 3 (El Para Qué Profundo / Identidad e Impacto)',
+        pregunta: '¿En quién te conviertes y a quiénes impactas cuando lo logras?',
+        ejemplo: '"Para recuperar la libertad de mi tiempo, modelar abundancia y serenidad a mis hijos, y operar desde la certeza y la palabra honrada."'
+      }
+    ],
+    reglaOro: 'El "Qué" sostiene la meta; el "Para Qué Profundo" sostiene tu compromiso cuando la motivación decae.'
+  },
+  paso2: {
+    titulo: 'Paso 2: Matriz de Estructuración de los 3 Resultados Imposibles',
+    descripcion: 'Cada uno de tus 3 Resultados Imposibles debe construirse bajo el estándar E.M.P.O.R. (Específico, Medible, Propósito, Organizado y Retador):',
+    tabla: [
+      {
+        componente: '1. Específico y Medible',
+        requisito: 'Cifras exactas, montos o unidades de verificación.',
+        incorrecto: '"Mejorar mi salud y bajar de peso."',
+        correcto: '"Reducir mi porcentaje de grasa corporal al 18% e inscribirme y correr una carrera de 10K el 15 de diciembre."'
+      },
+      {
+        componente: '2. Fecha Innegociable',
+        requisito: 'Día, mes y hora límite dentro de los 90 días.',
+        incorrecto: '"Lo haré pronto en este ciclo."',
+        correcto: '"Completado y verificado antes del viernes 18 de diciembre a las 6:00 PM."'
+      },
+      {
+        componente: '3. Propósito Declarado',
+        requisito: 'Un "para qué" conectado a tu crecimiento personal o familiar.',
+        incorrecto: '"Para ganar más dinero."',
+        correcto: '"Para consolidar mi libertad financiera y brindar estabilidad y tiempo de calidad a mi familia."'
+      }
+    ]
+  },
+  paso3: {
+    titulo: 'Paso 3: Checklist Rápido de Autocorrección Inmediata',
+    descripcion: 'Antes de guardar tus 3 Resultados Imposibles en Nodus, verifica estos 4 puntos simples:',
+    items: [
+      '¿Cualquier persona externa puede saber si lo lograste o no leyendo una sola cifra? (Si la respuesta es no, agrega la cifra o fecha exacta).',
+      '¿Tu meta depende 100% de tu gestión y liderazgo? (Si depende de terceros o suerte, reescríbela enfocado en tu entrega o indicador).',
+      '¿Te genera un cosquilleo de reto o expansión? (Si se siente fácil o inercial, eleva la cifra un 20%).',
+      '¿Lo compartiste con tu partner de equipo para validar tu compromiso? (Asegura la trazabilidad y acompañamiento).'
+    ]
+  },
+  textoCompartible: `🌟 *GUÍA PARA ENCONTRAR EL PROPÓSITO Y "PARA QUÉ" EN TUS 3 RESULTADOS IMPOSIBLES (NODUS)*
+
+¿Por qué un "Resultado Imposible"?
+Un Resultado Imposible no es una fantasía irrealizable; es una meta que tu mentalidad actual no sabe cómo lograr únicamente con tus hábitos pasados. Requiere que te transformes en la persona capaz de sostener ese resultado.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔹 *PASO 1: LA FÓRMULA DE 3 CAPAS DEL "PARA QUÉ"*
+1. *Capa 1 (El Qué - Lo Superficial):* ¿Qué quieres lograr concretamente?
+   _Ejemplo:_ "Aumentar mis ingresos en S/ 10,000 al mes."
+2. *Capa 2 (El Para Qué Personal):* ¿Para qué quieres ese logro en tu vida?
+   _Ejemplo:_ "Para tener tranquilidad financiera y pagar deudas pendientes."
+3. *Capa 3 (El Para Qué Profundo / Identidad e Impacto):* ¿En quién te conviertes y a quiénes impactas cuando lo logras?
+   _Ejemplo:_ "Para recuperar la libertad de mi tiempo, modelar abundancia y serenidad a mis hijos, y operar desde la certeza y la palabra honrada."
+
+*Regla de Oro:* El "Qué" sostiene la meta; el "Para Qué Profundo" sostiene tu compromiso cuando la motivación decae.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔹 *PASO 2: MATRIZ DE ESTRUCTURACIÓN E.M.P.O.R.*
+(Específico, Medible, Propósito, Organizado y Retador)
+
+1. *Específico y Medible:*
+   • Vago: "Mejorar mi salud y bajar de peso."
+   • Elevado al Estándar: "Reducir mi porcentaje de grasa corporal al 18% e inscribirme y correr una carrera de 10K el 15 de diciembre."
+
+2. *Fecha Innegociable:*
+   • Vago: "Lo haré pronto en este ciclo."
+   • Elevado al Estándar: "Completado y verificado antes del viernes 18 de diciembre a las 6:00 PM."
+
+3. *Propósito Declarado:*
+   • Vago: "Para ganar más dinero."
+   • Elevado al Estándar: "Para consolidar mi libertad financiera y brindar estabilidad y tiempo de calidad a mi familia."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔹 *PASO 3: CHECKLIST RÁPIDO DE AUTOCORRECCIÓN*
+1. ¿Cualquier persona externa puede saber si lo lograste o no leyendo una sola cifra?
+2. ¿Tu meta depende 100% de tu gestión y liderazgo?
+3. ¿Te genera un cosquilleo de reto o expansión?
+4. ¿Lo compartiste con tu partner de equipo para validar tu compromiso?`
+};
+
+/**
+ * Genera el Prompt Maestro listo para pegar en Gemini o cualquier LLM
+ * con los datos y metas del participante ya inyectados.
+ */
+export function generarPromptParaParticipante(participante = {}) {
+  const nombre = participante.nombre || 'Participante Nodus';
+  const dni = participante.dni || 'Sin DNI';
+  const sede = participante.sede || 'Global';
+  const equipo = participante.equipo || 'Equipo';
+
+  const rawFis = Array.isArray(participante.fis) ? participante.fis : (participante.resultadosImposibles || []);
+  const ris = rawFis.slice(0, 3);
+
+  const formatMeta = (idx) => {
+    const ri = ris[idx];
+    if (!ri || !ri.meta || !ri.meta.trim()) {
+      return `[SIN REDACTAR EN PLATAFORMA] (Área: ${ri?.area || `Resultado ${idx + 1}`})`;
+    }
+    const area = ri.area ? `[Área: ${ri.area}] ` : '';
+    const titulo = ri.titulo ? `"${ri.titulo}": ` : '';
+    return `${area}${titulo}${ri.meta.trim()}`;
+  };
+
+  const seccionParticipante = `
+[DATOS DEL PARTICIPANTE A AUDITAR]
+Nombre Completo: ${nombre}
+Documento (DNI/Cédula): ${dni}
+Sede Operativa: ${sede}
+Equipo Asignado: ${equipo}
+
+[METAS DECLARADAS POR EL PARTICIPANTE EN NODUS]
+1. Resultado Imposible 1: ${formatMeta(0)}
+2. Resultado Imposible 2: ${formatMeta(1)}
+3. Resultado Imposible 3: ${formatMeta(2)}
+
+[INSTRUCCIÓN DIRECTA]
+Por favor genera la retroalimentación de desempeño siguiendo estricta e idénticamente la ESTRUCTURA DE RESPUESTA OBLIGATORIA (Estado General, Resumen por Resultado con Reflejo Asertivo y Ajuste Inmediato Sugerido, y Pregunta Cuántica de Enfoque), aplicando las REGLAS DE TONO Y ESTILO sin juicios punitivos.`;
+
+  return `${PROMPT_MAESTRO_AUDITORIA_3_RI}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${seccionParticipante.trim()}`;
+}
+
+/**
+ * Motor algorítmico de Auditoría Asertiva E.M.P.O.R.
+ * Evalúa los 3 Resultados Imposibles según los 3 pilares definidos por Dirección
+ * produciendo retroalimentación constructiva, sin palabras punitivas.
+ */
+export function auditarResultadosImposiblesEMPOR(resultados = [], participante = {}) {
+  const items = Array.isArray(resultados) ? resultados.slice(0, 3) : [];
+  while (items.length < 3) {
+    items.push({
+      area: `Resultado ${items.length + 1}`,
+      titulo: '',
+      meta: ''
+    });
+  }
+
+  const evaluacionesResultados = items.map((ri, idx) => {
+    const meta = (ri?.meta || '').trim();
+    const area = ri?.area || `Resultado Imposible ${idx + 1}`;
+    const titulo = ri?.titulo || '';
+
+    // Pilar 1: Especificidad y Medición (cifras, %, $, unidades de verificación)
+    const tieneNumeros = /\d+/.test(meta);
+    const tieneFecha = /enero|febrero|marzo|abril|mayo|junio|julio|agosto|setiembre|septiembre|octubre|noviembre|diciembre|2026|semanas?|días?|horas?|fecha|límite|antes del/i.test(meta);
+    const tieneMetrica = tieneNumeros || /10k|kilos?|kg|%|usd|soles|s\/|dólares|pesos/i.test(meta);
+    const pilarMedicion = tieneMetrica && tieneFecha;
+
+    // Pilar 2: Nivel de Desafío ("Imposible" / Estiramiento)
+    const palabras = meta ? meta.split(/\s+/).length : 0;
+    const pilarDesafio = palabras >= 12;
+
+    // Pilar 3: Conexión con el Propósito ("Para Qué" / Identidad)
+    const tieneConectorProposito = /\b(para|con el fin de|modelar|impactar|transformar|construir|garantizar|consolidar|vivir en|operar desde)\b/i.test(meta);
+    const pilarProposito = tieneConectorProposito && palabras >= 14;
+
+    // Evaluación global de este resultado
+    let estado = 'APROBADO';
+    let reflejoAsertivo = '';
+    let ajusteInmediato = null;
+
+    if (!meta) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      reflejoAsertivo = `El ${area} aún no registra una declaración redactada en la plataforma oficial de Nodus.`;
+      ajusteInmediato = `Redacta tu meta bajo el estándar E.M.P.O.R.: Define una cifra o entregable exacto, una fecha innegociable dentro de los 90 días y el "Para Qué" profundo que sostendrá tu compromiso.`;
+    } else if (!pilarMedicion && !pilarProposito) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      reflejoAsertivo = `La meta expresa una aspiración valiosa, con una clara oportunidad de precisión en su indicador de éxito y en su propósito de fondo.`;
+      ajusteInmediato = `Agrega una cifra exacta verificable (ej: montos, porcentaje o sesiones), una fecha límite fija y añade la frase: "Para [en quién te conviertes al lograrlo]".`;
+    } else if (!pilarMedicion) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      if (!tieneMetrica) {
+        reflejoAsertivo = `El compromiso muestra dirección e intención, requiriendo definir el indicador tangible que permita a tu partner y a cualquier persona externa comprobar su cumplimiento con una sola cifra.`;
+        ajusteInmediato = `Incorpora una cifra exacta o entregable medible verificable (ej: cantidad de horas, porcentaje, monto o unidad concreta).`;
+      } else {
+        reflejoAsertivo = `La meta tiene una métrica definida, pero requiere anclar la fecha innegociable dentro de los 90 días del ciclo para detonar urgencia y foco inmediato.`;
+        ajusteInmediato = `Agrega el día, mes y hora límite exacta de cumplimiento (ej: "antes del viernes 18 de diciembre a las 6:00 PM").`;
+      }
+    } else if (!pilarProposito) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      reflejoAsertivo = `Excelente precisión en el qué y en la fecha; la oportunidad actual es conectar la meta con la Capa 3 del "Para Qué Profundo" (identidad e impacto).`;
+      ajusteInmediato = `Completa la redacción sumando el propósito de identidad: "¿En quién te conviertes y a quiénes beneficias cuando este resultado sea un hecho tangible?".`;
+    } else if (!pilarDesafio) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      reflejoAsertivo = `La redacción es muy concisa; amplía el marco de acción para asegurar que rompa tu zona de confort e invite a un estiramiento personal.`;
+      ajusteInmediato = `Eleva el indicador un 20% o detalla el estándar de calidad y entrega que lo convertirá en un verdadero Resultado Imposible.`;
+    } else {
+      estado = 'APROBADO';
+      reflejoAsertivo = `Excelente estructuración: meta específica, cuantificable, retadora, con fecha innegociable y un propósito de fondo alineado al estándar superior.`;
+      ajusteInmediato = null;
+    }
+
+    return {
+      index: idx,
+      orden: idx + 1,
+      area,
+      titulo,
+      meta,
+      estado,
+      reflejoAsertivo,
+      ajusteInmediato,
+      pilares: {
+        especificidadYMedicion: pilarMedicion,
+        nivelDesafio: pilarDesafio,
+        conexionProposito: pilarProposito
+      }
+    };
+  });
+
+  const aprobadosCount = evaluacionesResultados.filter(r => r.estado === 'APROBADO').length;
+  const estadoGeneral = aprobadosCount === 3 ? 'APROBADO' : 'REQUIERE ELEVAR EL ESTÁNDAR';
+
+  const preguntasCuanticas = [
+    'Si tuvieras la certeza absoluta de que tu palabra sostiene este resultado, ¿cuál es la primera acción innegociable que acordarás hoy mismo con tu partner y tu equipo?',
+    'Al conectar con tu "Para Qué Profundo", ¿en qué líder te comprometes a transformarte durante estos 90 días para que este resultado sea inevitable?',
+    '¿Qué conversación postergada o acuerdo valiente vas a generar en las próximas 24 horas para honrar tu compromiso al 100%?',
+    'Si tu resultado imposible impactara directamente a las personas que más amas, ¿qué estándar innegociable elegirás encarnar desde este preciso momento?'
+  ];
+  const preguntaCuantica = preguntasCuanticas[Math.abs(evaluacionesResultados.length) % preguntasCuanticas.length];
+
+  return {
+    estadoGeneral,
+    aprobadosCount,
+    totalResultados: 3,
+    cumpleEstandarSuperior: estadoGeneral === 'APROBADO',
+    resultados: evaluacionesResultados,
+    preguntaCuantica,
+    participante: {
+      nombre: participante.nombre || 'Participante',
+      sede: participante.sede || 'Global',
+      equipo: participante.equipo || 'Equipo'
+    }
+  };
+}
+
+/**
+ * Convierte el resultado estructurado de la auditoría EMPOR al texto oficial
+ * idéntico al esquema de respuesta del Prompt Maestro.
+ */
+export function generarTextoEvaluacionCompleta(evaluacion = {}) {
+  const estadoGeneral = evaluacion.estadoGeneral || 'REQUIERE ELEVAR EL ESTÁNDAR';
+  const resultados = Array.isArray(evaluacion.resultados) ? evaluacion.resultados : [];
+
+  const bloquesResultados = resultados.map((r, idx) => {
+    const lines = [
+      `${idx + 1}. ${r.area || `Resultado Imposible ${idx + 1}`}:`,
+      `   - Estado: [${r.estado}]`,
+      `   - Reflejo Asertivo: ${r.reflejoAsertivo}`
+    ];
+    if (r.ajusteInmediato) {
+      lines.push(`   - Ajuste Inmediato Sugerido (si aplica): ${r.ajusteInmediato}`);
+    }
+    return lines.join('\n');
+  }).join('\n\n');
+
+  const pregunta = evaluacion.preguntaCuantica || 'Si tuvieras la certeza absoluta de que tu palabra sostiene este resultado, ¿cuál es la primera acción innegociable que acordarás hoy mismo con tu partner y tu equipo?';
+
+  return `---
+EVALUACIÓN DE RESULTADOS IMPOSIBLES (NODUS)
+
+ESTADO GENERAL: [${estadoGeneral}]
+
+RESUMEN POR RESULTADO:
+
+${bloquesResultados}
+
+PREGUNTA CUÁNTICA DE ENFOQUE:
+${pregunta}
+---`.trim();
+}
+
+
 ```
 
 ---
@@ -196047,6 +198132,105 @@ export function findFreshNodusMetrics(snapshot, person, now = Date.now()) {
   const metrics = extractNodusMetrics(matches[0]);
   return metrics ? { ...metrics, timestamp, freshness: freshness.label } : null;
 }
+
+```
+
+---
+
+## Archivo: src/services/nodusFIAgent.test.js
+
+```js
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  PROMPT_MAESTRO_AUDITORIA_3_RI,
+  GUIA_PROPOSITO_3_CAPAS_RI,
+  generarPromptParaParticipante,
+  auditarResultadosImposiblesEMPOR,
+  generarTextoEvaluacionCompleta
+} from './nodusFIAgent.js';
+
+test('PROMPT_MAESTRO_AUDITORIA_3_RI contains the required sections and rules', () => {
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('PROMPT MAESTRO DE AUDITORÍA: 3 RESULTADOS IMPOSIBLES (NODUS)'));
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('[ROL Y CONTEXTO]'));
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('[CRITERIOS DE AUDITORÍA PARA CADA RESULTADO IMPOSIBLE]'));
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('1. Especificidad y Medición'));
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('2. Nivel de Desafío ("Imposible")'));
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('3. Conexión con el Propósito ("Para Qué")'));
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('EVALUACIÓN DE RESULTADOS IMPOSIBLES (NODUS)'));
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('PREGUNTA CUÁNTICA DE ENFOQUE:'));
+  assert.ok(PROMPT_MAESTRO_AUDITORIA_3_RI.includes('[REGLAS DE TONO Y ESTILO]'));
+});
+
+test('GUIA_PROPOSITO_3_CAPAS_RI contains the 3 layers, EMPOR matrix and 4-point checklist', () => {
+  assert.ok(GUIA_PROPOSITO_3_CAPAS_RI.titulo.includes('Propósito'));
+  assert.equal(GUIA_PROPOSITO_3_CAPAS_RI.paso1.capas.length, 3);
+  assert.equal(GUIA_PROPOSITO_3_CAPAS_RI.paso2.tabla.length, 3);
+  assert.equal(GUIA_PROPOSITO_3_CAPAS_RI.paso3.items.length, 4);
+  assert.ok(GUIA_PROPOSITO_3_CAPAS_RI.textoCompartible.includes('E.M.P.O.R.'));
+  assert.ok(GUIA_PROPOSITO_3_CAPAS_RI.textoCompartible.includes('Capa 3'));
+});
+
+test('generarPromptParaParticipante formats participant data and goals into prompt', () => {
+  const participante = {
+    nombre: 'Ana María Valdivia',
+    dni: '45892301',
+    sede: 'Lima',
+    equipo: 'EQUIPO 30',
+    fis: [
+      { area: 'Finanzas', meta: 'Aumentar mis ingresos a S/ 15,000 al mes antes del 15 de diciembre para comprar mi departamento.' },
+      { area: 'Salud', meta: 'Reducir mi porcentaje de grasa al 19% corriendo 10K el 10 de diciembre para modelar vitalidad a mis hijos.' },
+      { area: 'Relaciones', meta: 'Tener una cita semanal de calidad con mi pareja durante 12 semanas consecutivas para consolidar nuestro matrimonio.' }
+    ]
+  };
+
+  const promptGenerado = generarPromptParaParticipante(participante);
+  assert.ok(promptGenerado.includes('Ana María Valdivia'));
+  assert.ok(promptGenerado.includes('45892301'));
+  assert.ok(promptGenerado.includes('EQUIPO 30'));
+  assert.ok(promptGenerado.includes('Aumentar mis ingresos a S/ 15,000'));
+  assert.ok(promptGenerado.includes('PROMPT MAESTRO DE AUDITORÍA: 3 RESULTADOS IMPOSIBLES (NODUS)'));
+});
+
+test('auditarResultadosImposiblesEMPOR approves 3 high standard RIs and uses warm, empowering language', () => {
+  const ris = [
+    { area: 'Finanzas', meta: 'Facturar $25,000 USD netos antes del 18 de diciembre de 2026 para saldar el 100% de mis deudas y brindar tranquilidad y tiempo libre a mi familia.' },
+    { area: 'Salud', meta: 'Reducir mi grasa corporal al 16% y completar la carrera de 10K el 12 de diciembre de 2026 para operar desde la máxima energía y longevidad.' },
+    { area: 'Liderazgo', meta: 'Enrolar y graduar a 5 nuevos líderes en el programa antes del 20 de diciembre de 2026 para expandir el impacto transformacional en mi comunidad.' }
+  ];
+
+  const resultado = auditarResultadosImposiblesEMPOR(ris, { nombre: 'Carlos Ruiz' });
+  assert.equal(resultado.estadoGeneral, 'APROBADO');
+  assert.equal(resultado.resultados[0].estado, 'APROBADO');
+  assert.equal(resultado.resultados[1].estado, 'APROBADO');
+  assert.equal(resultado.resultados[2].estado, 'APROBADO');
+  assert.ok(resultado.preguntaCuantica);
+
+  const texto = generarTextoEvaluacionCompleta(resultado);
+  assert.ok(texto.includes('ESTADO GENERAL: [APROBADO]'));
+  assert.ok(texto.includes('PREGUNTA CUÁNTICA DE ENFOQUE:'));
+  // Rule: avoid negative punitive words
+  assert.doesNotMatch(texto, /\b(error|malo|fallaste|insuficiente)\b/i);
+});
+
+test('auditarResultadosImposiblesEMPOR detects opportunities for precision and guides immediate adjustment', () => {
+  const ris = [
+    { area: 'Finanzas', meta: 'Quiero tener más dinero y estar tranquilo.' }, // Vague: no numbers, no date, weak purpose
+    { area: 'Salud', meta: 'Bajar de peso pronto.' }, // Vague
+    { area: 'Paz', meta: '' } // Unpresented
+  ];
+
+  const resultado = auditarResultadosImposiblesEMPOR(ris, { nombre: 'Lucía Torres' });
+  assert.equal(resultado.estadoGeneral, 'REQUIERE ELEVAR EL ESTÁNDAR');
+  assert.equal(resultado.resultados[0].estado, 'REQUIERE ELEVAR EL ESTÁNDAR');
+  assert.equal(resultado.resultados[2].estado, 'REQUIERE ELEVAR EL ESTÁNDAR');
+
+  const texto = generarTextoEvaluacionCompleta(resultado);
+  assert.ok(texto.includes('ESTADO GENERAL: [REQUIERE ELEVAR EL ESTÁNDAR]'));
+  assert.ok(texto.includes('Ajuste Inmediato Sugerido'));
+  // Must avoid negative punitive words even when needing adjustments
+  assert.doesNotMatch(texto, /\b(error|malo|fallaste|insuficiente)\b/i);
+});
 
 ```
 

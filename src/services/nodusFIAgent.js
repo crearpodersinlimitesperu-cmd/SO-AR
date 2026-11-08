@@ -512,3 +512,351 @@ export function auditarParticipantesEnJuego3Resultados(participantes = [], evide
     participantesAuditados: auditados
   };
 }
+
+/**
+ * ============================================================================
+ * PROMPT MAESTRO DE AUDITORÍA Y GUÍA DEL PROPÓSITO ("PARA QUÉ")
+ * Estándar E.M.P.O.R. (Específico, Medible, Propósito, Organizado y Retador)
+ * Directiva de Alta Dirección - Crear Poder Sin Límites (CPSL) / Nodus
+ * ============================================================================
+ */
+
+export const PROMPT_MAESTRO_AUDITORIA_3_RI = `PROMPT MAESTRO DE AUDITORÍA: 3 RESULTADOS IMPOSIBLES (NODUS)
+
+[ROL Y CONTEXTO]
+Actúas como Entrenador Senior y Auditor de Desempeño en Crear Poder Sin Límites (CPSL) dentro de la plataforma Nodus. Tu objetivo es auditar los 3 Resultados Imposibles (RI) redactados por un participante y emitir una retroalimentación altamente asertiva, objetiva, empática y constructiva (sin ser agresiva, ni descalificadora, ni punitiva). El participante (y su partner de apoyo) debe entender la observación a la primera lectura y saber exactamente qué ajustar de inmediato sin dudas ni trabas.
+
+[CRITERIOS DE AUDITORÍA PARA CADA RESULTADO IMPOSIBLE]
+Evalúa cada uno de los 3 Resultados Imposibles según estos 3 pilares:
+1. Especificidad y Medición: ¿Tiene una meta cuantificable, fecha límite clara (en el marco de los 90 días) y un indicador de éxito verificable?
+2. Nivel de Desafío ("Imposible"): ¿Rompe la zona de confort y el historial pasado, requiriendo un estiramiento personal, o es una meta ordinaria/inercial?
+3. Conexión con el Propósito ("Para Qué"): ¿Muestra claridad en el beneficio o transformación de fondo, o es solo un deseo vago o abstracto?
+
+[ESTRUCTURA DE RESPUESTA OBLIGATORIA]
+Para los 3 Resultados Imposibles en conjunto, genera la evaluación con la siguiente estructura exacta:
+
+---
+EVALUACIÓN DE RESULTADOS IMPOSIBLES (NODUS)
+
+ESTADO GENERAL: [APROBADO] o [REQUIERE ELEVAR EL ESTÁNDAR]
+
+RESUMEN POR RESULTADO:
+
+1. Resultado Imposible 1:
+   - Estado: [APROBADO / REQUIERE ELEVAR EL ESTÁNDAR]
+   - Reflejo Asertivo: (1 a 2 frases claras observando el acierto o el punto ciego de la redacción sin emitir juicios personales).
+   - Ajuste Inmediato Sugerido (si aplica): (Instrucción concreta de redacción para corregir en Nodus al instante).
+
+2. Resultado Imposible 2:
+   - Estado: [APROBADO / REQUIERE ELEVAR EL ESTÁNDAR]
+   - Reflejo Asertivo: ...
+   - Ajuste Inmediato Sugerido (si aplica): ...
+
+3. Resultado Imposible 3:
+   - Estado: [APROBADO / REQUIERE ELEVAR EL ESTÁNDAR]
+   - Reflejo Asertivo: ...
+   - Ajuste Inmediato Sugerido (si aplica): ...
+
+PREGUNTA CUÁNTICA DE ENFOQUE:
+(Una sola pregunta poderosa dirigida a conectar al participante con su "Para Qué" y moverlo a la acción inmediata con su equipo y partner).
+---
+
+[REGLAS DE TONO Y ESTILO]
+- Mantén un lenguaje firme en el estándar pero cálido en el trato.
+- Evita palabras como "error", "malo", "fallaste" o "insuficiente". Utiliza expresiones como "oportunidad de precisión", "elevar el estándar", "definir el indicador" o "hacer tangible el resultado".
+- Si el resultado es vago (ej: "Quiero tener más paz"), no lo rechaces tajantemente; guíalo a medirlo (ej: "Para hacer medible tu paz, ¿cuántas sesiones de meditación o qué hábito concreto verificarás cada semana?").
+- Garantiza que cualquier sugerencia le tome al participante menos de 3 minutos de corregir en la plataforma.`;
+
+export const GUIA_PROPOSITO_3_CAPAS_RI = {
+  titulo: 'Guía para Encontrar el Propósito y "Para Qué" en los Resultados Imposibles',
+  subtitulo: 'Diseñada para compartir con participantes o aplicar en sesiones de alineación con managers y partners.',
+  definicion: 'Un Resultado Imposible no es una fantasía irrealizable; es una meta que tu mentalidad actual no sabe cómo lograr únicamente con tus hábitos pasados. Requiere que te transformes en la persona capaz de sostener ese resultado.',
+  paso1: {
+    titulo: 'Paso 1: La Fórmula de 3 Capas del "Para Qué" (Profundización Consciente)',
+    descripcion: 'Para que un resultado tenga tracción y no se abandone ante el primer obstáculo, aplica la prueba de las 3 preguntas descendentes:',
+    capas: [
+      {
+        numero: 1,
+        capa: 'Capa 1 (El Qué - Lo Superficial)',
+        pregunta: '¿Qué quieres lograr concretamente?',
+        ejemplo: '"Aumentar mis ingresos en S/ 10,000 al mes."'
+      },
+      {
+        numero: 2,
+        capa: 'Capa 2 (El Para Qué Personal)',
+        pregunta: '¿Para qué quieres ese logro en tu vida?',
+        ejemplo: '"Para tener tranquilidad financiera y pagar deudas pendientes."'
+      },
+      {
+        numero: 3,
+        capa: 'Capa 3 (El Para Qué Profundo / Identidad e Impacto)',
+        pregunta: '¿En quién te conviertes y a quiénes impactas cuando lo logras?',
+        ejemplo: '"Para recuperar la libertad de mi tiempo, modelar abundancia y serenidad a mis hijos, y operar desde la certeza y la palabra honrada."'
+      }
+    ],
+    reglaOro: 'El "Qué" sostiene la meta; el "Para Qué Profundo" sostiene tu compromiso cuando la motivación decae.'
+  },
+  paso2: {
+    titulo: 'Paso 2: Matriz de Estructuración de los 3 Resultados Imposibles',
+    descripcion: 'Cada uno de tus 3 Resultados Imposibles debe construirse bajo el estándar E.M.P.O.R. (Específico, Medible, Propósito, Organizado y Retador):',
+    tabla: [
+      {
+        componente: '1. Específico y Medible',
+        requisito: 'Cifras exactas, montos o unidades de verificación.',
+        incorrecto: '"Mejorar mi salud y bajar de peso."',
+        correcto: '"Reducir mi porcentaje de grasa corporal al 18% e inscribirme y correr una carrera de 10K el 15 de diciembre."'
+      },
+      {
+        componente: '2. Fecha Innegociable',
+        requisito: 'Día, mes y hora límite dentro de los 90 días.',
+        incorrecto: '"Lo haré pronto en este ciclo."',
+        correcto: '"Completado y verificado antes del viernes 18 de diciembre a las 6:00 PM."'
+      },
+      {
+        componente: '3. Propósito Declarado',
+        requisito: 'Un "para qué" conectado a tu crecimiento personal o familiar.',
+        incorrecto: '"Para ganar más dinero."',
+        correcto: '"Para consolidar mi libertad financiera y brindar estabilidad y tiempo de calidad a mi familia."'
+      }
+    ]
+  },
+  paso3: {
+    titulo: 'Paso 3: Checklist Rápido de Autocorrección Inmediata',
+    descripcion: 'Antes de guardar tus 3 Resultados Imposibles en Nodus, verifica estos 4 puntos simples:',
+    items: [
+      '¿Cualquier persona externa puede saber si lo lograste o no leyendo una sola cifra? (Si la respuesta es no, agrega la cifra o fecha exacta).',
+      '¿Tu meta depende 100% de tu gestión y liderazgo? (Si depende de terceros o suerte, reescríbela enfocado en tu entrega o indicador).',
+      '¿Te genera un cosquilleo de reto o expansión? (Si se siente fácil o inercial, eleva la cifra un 20%).',
+      '¿Lo compartiste con tu partner de equipo para validar tu compromiso? (Asegura la trazabilidad y acompañamiento).'
+    ]
+  },
+  textoCompartible: `🌟 *GUÍA PARA ENCONTRAR EL PROPÓSITO Y "PARA QUÉ" EN TUS 3 RESULTADOS IMPOSIBLES (NODUS)*
+
+¿Por qué un "Resultado Imposible"?
+Un Resultado Imposible no es una fantasía irrealizable; es una meta que tu mentalidad actual no sabe cómo lograr únicamente con tus hábitos pasados. Requiere que te transformes en la persona capaz de sostener ese resultado.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔹 *PASO 1: LA FÓRMULA DE 3 CAPAS DEL "PARA QUÉ"*
+1. *Capa 1 (El Qué - Lo Superficial):* ¿Qué quieres lograr concretamente?
+   _Ejemplo:_ "Aumentar mis ingresos en S/ 10,000 al mes."
+2. *Capa 2 (El Para Qué Personal):* ¿Para qué quieres ese logro en tu vida?
+   _Ejemplo:_ "Para tener tranquilidad financiera y pagar deudas pendientes."
+3. *Capa 3 (El Para Qué Profundo / Identidad e Impacto):* ¿En quién te conviertes y a quiénes impactas cuando lo logras?
+   _Ejemplo:_ "Para recuperar la libertad de mi tiempo, modelar abundancia y serenidad a mis hijos, y operar desde la certeza y la palabra honrada."
+
+*Regla de Oro:* El "Qué" sostiene la meta; el "Para Qué Profundo" sostiene tu compromiso cuando la motivación decae.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔹 *PASO 2: MATRIZ DE ESTRUCTURACIÓN E.M.P.O.R.*
+(Específico, Medible, Propósito, Organizado y Retador)
+
+1. *Específico y Medible:*
+   • Vago: "Mejorar mi salud y bajar de peso."
+   • Elevado al Estándar: "Reducir mi porcentaje de grasa corporal al 18% e inscribirme y correr una carrera de 10K el 15 de diciembre."
+
+2. *Fecha Innegociable:*
+   • Vago: "Lo haré pronto en este ciclo."
+   • Elevado al Estándar: "Completado y verificado antes del viernes 18 de diciembre a las 6:00 PM."
+
+3. *Propósito Declarado:*
+   • Vago: "Para ganar más dinero."
+   • Elevado al Estándar: "Para consolidar mi libertad financiera y brindar estabilidad y tiempo de calidad a mi familia."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔹 *PASO 3: CHECKLIST RÁPIDO DE AUTOCORRECCIÓN*
+1. ¿Cualquier persona externa puede saber si lo lograste o no leyendo una sola cifra?
+2. ¿Tu meta depende 100% de tu gestión y liderazgo?
+3. ¿Te genera un cosquilleo de reto o expansión?
+4. ¿Lo compartiste con tu partner de equipo para validar tu compromiso?`
+};
+
+/**
+ * Genera el Prompt Maestro listo para pegar en Gemini o cualquier LLM
+ * con los datos y metas del participante ya inyectados.
+ */
+export function generarPromptParaParticipante(participante = {}) {
+  const nombre = participante.nombre || 'Participante Nodus';
+  const dni = participante.dni || 'Sin DNI';
+  const sede = participante.sede || 'Global';
+  const equipo = participante.equipo || 'Equipo';
+
+  const rawFis = Array.isArray(participante.fis) ? participante.fis : (participante.resultadosImposibles || []);
+  const ris = rawFis.slice(0, 3);
+
+  const formatMeta = (idx) => {
+    const ri = ris[idx];
+    if (!ri || !ri.meta || !ri.meta.trim()) {
+      return `[SIN REDACTAR EN PLATAFORMA] (Área: ${ri?.area || `Resultado ${idx + 1}`})`;
+    }
+    const area = ri.area ? `[Área: ${ri.area}] ` : '';
+    const titulo = ri.titulo ? `"${ri.titulo}": ` : '';
+    return `${area}${titulo}${ri.meta.trim()}`;
+  };
+
+  const seccionParticipante = `
+[DATOS DEL PARTICIPANTE A AUDITAR]
+Nombre Completo: ${nombre}
+Documento (DNI/Cédula): ${dni}
+Sede Operativa: ${sede}
+Equipo Asignado: ${equipo}
+
+[METAS DECLARADAS POR EL PARTICIPANTE EN NODUS]
+1. Resultado Imposible 1: ${formatMeta(0)}
+2. Resultado Imposible 2: ${formatMeta(1)}
+3. Resultado Imposible 3: ${formatMeta(2)}
+
+[INSTRUCCIÓN DIRECTA]
+Por favor genera la retroalimentación de desempeño siguiendo estricta e idénticamente la ESTRUCTURA DE RESPUESTA OBLIGATORIA (Estado General, Resumen por Resultado con Reflejo Asertivo y Ajuste Inmediato Sugerido, y Pregunta Cuántica de Enfoque), aplicando las REGLAS DE TONO Y ESTILO sin juicios punitivos.`;
+
+  return `${PROMPT_MAESTRO_AUDITORIA_3_RI}\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${seccionParticipante.trim()}`;
+}
+
+/**
+ * Motor algorítmico de Auditoría Asertiva E.M.P.O.R.
+ * Evalúa los 3 Resultados Imposibles según los 3 pilares definidos por Dirección
+ * produciendo retroalimentación constructiva, sin palabras punitivas.
+ */
+export function auditarResultadosImposiblesEMPOR(resultados = [], participante = {}) {
+  const items = Array.isArray(resultados) ? resultados.slice(0, 3) : [];
+  while (items.length < 3) {
+    items.push({
+      area: `Resultado ${items.length + 1}`,
+      titulo: '',
+      meta: ''
+    });
+  }
+
+  const evaluacionesResultados = items.map((ri, idx) => {
+    const meta = (ri?.meta || '').trim();
+    const area = ri?.area || `Resultado Imposible ${idx + 1}`;
+    const titulo = ri?.titulo || '';
+
+    // Pilar 1: Especificidad y Medición (cifras, %, $, unidades de verificación)
+    const tieneNumeros = /\d+/.test(meta);
+    const tieneFecha = /enero|febrero|marzo|abril|mayo|junio|julio|agosto|setiembre|septiembre|octubre|noviembre|diciembre|2026|semanas?|días?|horas?|fecha|límite|antes del/i.test(meta);
+    const tieneMetrica = tieneNumeros || /10k|kilos?|kg|%|usd|soles|s\/|dólares|pesos/i.test(meta);
+    const pilarMedicion = tieneMetrica && tieneFecha;
+
+    // Pilar 2: Nivel de Desafío ("Imposible" / Estiramiento)
+    const palabras = meta ? meta.split(/\s+/).length : 0;
+    const pilarDesafio = palabras >= 12;
+
+    // Pilar 3: Conexión con el Propósito ("Para Qué" / Identidad)
+    const tieneConectorProposito = /\b(para|con el fin de|modelar|impactar|transformar|construir|garantizar|consolidar|vivir en|operar desde)\b/i.test(meta);
+    const pilarProposito = tieneConectorProposito && palabras >= 14;
+
+    // Evaluación global de este resultado
+    let estado = 'APROBADO';
+    let reflejoAsertivo = '';
+    let ajusteInmediato = null;
+
+    if (!meta) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      reflejoAsertivo = `El ${area} aún no registra una declaración redactada en la plataforma oficial de Nodus.`;
+      ajusteInmediato = `Redacta tu meta bajo el estándar E.M.P.O.R.: Define una cifra o entregable exacto, una fecha innegociable dentro de los 90 días y el "Para Qué" profundo que sostendrá tu compromiso.`;
+    } else if (!pilarMedicion && !pilarProposito) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      reflejoAsertivo = `La meta expresa una aspiración valiosa, con una clara oportunidad de precisión en su indicador de éxito y en su propósito de fondo.`;
+      ajusteInmediato = `Agrega una cifra exacta verificable (ej: montos, porcentaje o sesiones), una fecha límite fija y añade la frase: "Para [en quién te conviertes al lograrlo]".`;
+    } else if (!pilarMedicion) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      if (!tieneMetrica) {
+        reflejoAsertivo = `El compromiso muestra dirección e intención, requiriendo definir el indicador tangible que permita a tu partner y a cualquier persona externa comprobar su cumplimiento con una sola cifra.`;
+        ajusteInmediato = `Incorpora una cifra exacta o entregable medible verificable (ej: cantidad de horas, porcentaje, monto o unidad concreta).`;
+      } else {
+        reflejoAsertivo = `La meta tiene una métrica definida, pero requiere anclar la fecha innegociable dentro de los 90 días del ciclo para detonar urgencia y foco inmediato.`;
+        ajusteInmediato = `Agrega el día, mes y hora límite exacta de cumplimiento (ej: "antes del viernes 18 de diciembre a las 6:00 PM").`;
+      }
+    } else if (!pilarProposito) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      reflejoAsertivo = `Excelente precisión en el qué y en la fecha; la oportunidad actual es conectar la meta con la Capa 3 del "Para Qué Profundo" (identidad e impacto).`;
+      ajusteInmediato = `Completa la redacción sumando el propósito de identidad: "¿En quién te conviertes y a quiénes beneficias cuando este resultado sea un hecho tangible?".`;
+    } else if (!pilarDesafio) {
+      estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
+      reflejoAsertivo = `La redacción es muy concisa; amplía el marco de acción para asegurar que rompa tu zona de confort e invite a un estiramiento personal.`;
+      ajusteInmediato = `Eleva el indicador un 20% o detalla el estándar de calidad y entrega que lo convertirá en un verdadero Resultado Imposible.`;
+    } else {
+      estado = 'APROBADO';
+      reflejoAsertivo = `Excelente estructuración: meta específica, cuantificable, retadora, con fecha innegociable y un propósito de fondo alineado al estándar superior.`;
+      ajusteInmediato = null;
+    }
+
+    return {
+      index: idx,
+      orden: idx + 1,
+      area,
+      titulo,
+      meta,
+      estado,
+      reflejoAsertivo,
+      ajusteInmediato,
+      pilares: {
+        especificidadYMedicion: pilarMedicion,
+        nivelDesafio: pilarDesafio,
+        conexionProposito: pilarProposito
+      }
+    };
+  });
+
+  const aprobadosCount = evaluacionesResultados.filter(r => r.estado === 'APROBADO').length;
+  const estadoGeneral = aprobadosCount === 3 ? 'APROBADO' : 'REQUIERE ELEVAR EL ESTÁNDAR';
+
+  const preguntasCuanticas = [
+    'Si tuvieras la certeza absoluta de que tu palabra sostiene este resultado, ¿cuál es la primera acción innegociable que acordarás hoy mismo con tu partner y tu equipo?',
+    'Al conectar con tu "Para Qué Profundo", ¿en qué líder te comprometes a transformarte durante estos 90 días para que este resultado sea inevitable?',
+    '¿Qué conversación postergada o acuerdo valiente vas a generar en las próximas 24 horas para honrar tu compromiso al 100%?',
+    'Si tu resultado imposible impactara directamente a las personas que más amas, ¿qué estándar innegociable elegirás encarnar desde este preciso momento?'
+  ];
+  const preguntaCuantica = preguntasCuanticas[Math.abs(evaluacionesResultados.length) % preguntasCuanticas.length];
+
+  return {
+    estadoGeneral,
+    aprobadosCount,
+    totalResultados: 3,
+    cumpleEstandarSuperior: estadoGeneral === 'APROBADO',
+    resultados: evaluacionesResultados,
+    preguntaCuantica,
+    participante: {
+      nombre: participante.nombre || 'Participante',
+      sede: participante.sede || 'Global',
+      equipo: participante.equipo || 'Equipo'
+    }
+  };
+}
+
+/**
+ * Convierte el resultado estructurado de la auditoría EMPOR al texto oficial
+ * idéntico al esquema de respuesta del Prompt Maestro.
+ */
+export function generarTextoEvaluacionCompleta(evaluacion = {}) {
+  const estadoGeneral = evaluacion.estadoGeneral || 'REQUIERE ELEVAR EL ESTÁNDAR';
+  const resultados = Array.isArray(evaluacion.resultados) ? evaluacion.resultados : [];
+
+  const bloquesResultados = resultados.map((r, idx) => {
+    const lines = [
+      `${idx + 1}. ${r.area || `Resultado Imposible ${idx + 1}`}:`,
+      `   - Estado: [${r.estado}]`,
+      `   - Reflejo Asertivo: ${r.reflejoAsertivo}`
+    ];
+    if (r.ajusteInmediato) {
+      lines.push(`   - Ajuste Inmediato Sugerido (si aplica): ${r.ajusteInmediato}`);
+    }
+    return lines.join('\n');
+  }).join('\n\n');
+
+  const pregunta = evaluacion.preguntaCuantica || 'Si tuvieras la certeza absoluta de que tu palabra sostiene este resultado, ¿cuál es la primera acción innegociable que acordarás hoy mismo con tu partner y tu equipo?';
+
+  return `---
+EVALUACIÓN DE RESULTADOS IMPOSIBLES (NODUS)
+
+ESTADO GENERAL: [${estadoGeneral}]
+
+RESUMEN POR RESULTADO:
+
+${bloquesResultados}
+
+PREGUNTA CUÁNTICA DE ENFOQUE:
+${pregunta}
+---`.trim();
+}
+

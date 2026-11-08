@@ -9,6 +9,11 @@ export function getWhatsAppUrl(phone, sede = '') {
 
   const normalizedSede = String(sede || '').toLowerCase();
 
+  // Limpieza de prefijos comunes con 0 redundante (ej. 59309... -> 5939...)
+  if (clean.startsWith('5930') && clean.length === 12) {
+    clean = '593' + clean.substring(4);
+  }
+
   // Si ya tiene código de país internacional
   if (clean.startsWith('51') && clean.length === 11) {
     return `https://wa.me/${clean}`;

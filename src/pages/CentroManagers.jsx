@@ -51,8 +51,20 @@ import {
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
   BarChart3, GitMerge, ArrowRight, FileSpreadsheet, ExternalLink,
-  List, LayoutGrid, CreditCard, Activity
+  List, LayoutGrid, CreditCard, Activity, Download, Mail, Copy
 } from 'lucide-react';
+import {
+  dispatchLiquidacionNotifications,
+  buildLiquidacionEmailData,
+  groupItemsByTrainer,
+  ELI_ESCOBAR_EMAIL
+} from '../utils/liquidacionEmailHelper';
+import {
+  generateSingleVCard,
+  generateVCardBundle,
+  generateGoogleContactsCSV,
+  triggerFileDownload
+} from '../utils/contactsExport';
 import { 
   MAX_TRAINER_LOAD, 
   STANDARD_CALL_CONTACT_TYPE, 
@@ -407,6 +419,9 @@ export default function CentroManagers() {
   const [filtroEntrenadorLiquidacion, setFiltroEntrenadorLiquidacion] = useState('todos');
   const [selectedLiquidacionKeys, setSelectedLiquidacionKeys] = useState(new Set());
   const [procesandoLiquidacionMasiva, setProcesandoLiquidacionMasiva] = useState(false);
+  const [modalEmailEliData, setModalEmailEliData] = useState(null);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportScope, setExportScope] = useState('filtrados');
 
   const canSeeInactives = canViewInactiveUsers(currentUser);
 
@@ -1813,7 +1828,8 @@ export default function CentroManagers() {
       const sede = ultimoLlamada?.sede || infoEquipo?.sede || pago?.sede || '';
       const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || pago?.entrenador || 'Sin Asignar';
 
-      const montoCalculado = pago?.montoUSD ? Number(pago.montoUSD) : Math.max(FEE_PER_EFFECTIVE_CALL_USD, llamadasEfectivas * FEE_PER_EFFECTIVE_CALL_USD);
+      // Tarifa fija de $400 USD por equipo grupal liquidado/completado
+      const montoCalculado = pago?.montoUSD !== undefined ? Number(pago.montoUSD) : 400;
 
       const item = {
         tipo: 'grupal',
@@ -1839,8 +1855,20 @@ export default function CentroManagers() {
         return;
       }
       
-      if (pago && pago.estado === 'pagado') {
-        pagados.push({ ...item, pagadoPorNombre: pago.pagadoPorNombre, pagadoPorEmail: pago.pagadoPorEmail, fechaPago: pago.fechaPago });
+      if (pago && (pago.estado === 'pagado' || pago.estado === 'autorizado')) {
+        pagados.push({
+          ...item,
+          montoUSD: pago.montoUSD !== undefined ? Number(pago.montoUSD) : item.montoUSD,
+          pagadoPorNombre: pago.pagadoPorNombre || pago.autorizadoPorNombre,
+          pagadoPorEmail: pago.pagadoPorEmail || pago.autorizadoPorEmail,
+          autorizadoPorNombre: pago.autorizadoPorNombre || pago.pagadoPorNombre || '-',
+          autorizadoPorEmail: pago.autorizadoPorEmail || pago.pagadoPorEmail || '',
+          fechaPago: pago.fechaPago || pago.fechaAutorizacion || '',
+          fechaAutorizacion: pago.fechaAutorizacion || pago.fechaPago || '',
+          notificadoEli: Boolean(pago.notificadoEli),
+          fechaNotificacionEli: pago.fechaNotificacionEli || '',
+          esPagable: pago.esPagable !== false
+        });
       } else {
         pendientes.push(item);
       }
@@ -1905,12 +1933,19 @@ export default function CentroManagers() {
           return;
         }
 
-        if (pago && pago.estado === 'pagado') {
+        if (pago && (pago.estado === 'pagado' || pago.estado === 'autorizado')) {
           pagados.push({
             ...indItem,
-            pagadoPorNombre: pago.pagadoPorNombre,
-            pagadoPorEmail: pago.pagadoPorEmail,
-            fechaPago: pago.fechaPago
+            montoUSD: pago.montoUSD !== undefined ? Number(pago.montoUSD) : indItem.montoUSD,
+            pagadoPorNombre: pago.pagadoPorNombre || pago.autorizadoPorNombre,
+            pagadoPorEmail: pago.pagadoPorEmail || pago.autorizadoPorEmail,
+            autorizadoPorNombre: pago.autorizadoPorNombre || pago.pagadoPorNombre || '-',
+            autorizadoPorEmail: pago.autorizadoPorEmail || pago.pagadoPorEmail || '',
+            fechaPago: pago.fechaPago || pago.fechaAutorizacion || '',
+            fechaAutorizacion: pago.fechaAutorizacion || pago.fechaPago || '',
+            notificadoEli: Boolean(pago.notificadoEli),
+            fechaNotificacionEli: pago.fechaNotificacionEli || '',
+            esPagable: pago.esPagable !== false
           });
         } else {
           pendientes.push(indItem);
@@ -2147,21 +2182,24 @@ export default function CentroManagers() {
   };
 
 
-  const handleMarcarPagado = async (item) => {
+  const handleMarcarPagado = async (item, sinPago = false) => {
     if (!canViewLiquidacion) return;
     try {
       const docKey = item.tipo === 'individual' 
         ? (item.liquidacionKey || `indiv__${item.managerId}`) 
         : (item.equipoKey || item.liquidacionKey);
       const pagoRef = doc(db, 'liquidaciones_pagos', docKey);
+      const today = new Date().toISOString().split('T')[0];
+      const defaultMonto = item.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400;
+      const monto = sinPago ? 0 : Number(item.montoUSD !== undefined ? item.montoUSD : defaultMonto);
+
       await runTransaction(db, async (tx) => {
         const snap = await tx.get(pagoRef);
         const prev = snap.exists() ? snap.data() : null;
-        if (prev?.estado === 'pagado') {
-          throw new Error('Esta liquidación ya fue procesada y pagada previamente.');
+        if (prev?.estado === 'pagado' || prev?.estado === 'autorizado') {
+          throw new Error('Esta liquidación ya fue autorizada previamente.');
         }
 
-        const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
         tx.set(pagoRef, {
           liquidacionKey: docKey,
           tipoLlamada: item.tipo || 'grupal',
@@ -2179,32 +2217,113 @@ export default function CentroManagers() {
           cajero_user_id: currentUser?.uid || '',
           llamadasAlPagar: item.totalLlamadas,
           llamadasEfectivas: item.llamadasEfectivas || item.totalLlamadas,
-          tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
+          tarifaPorLlamada: sinPago ? 0 : (item.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400),
           motivo: item.motivo || (item.tipo === 'individual' ? 'llamadas_individuales_efectivas' : 'llamadas_grupales_efectivas'),
-          criterio: `Liquidación fija por llamada efectiva (${item.tipo === 'individual' ? '1 a 1' : 'Grupal'}) registrada honestamente en Causa OS`,
+          criterio: sinPago 
+            ? 'Liquidación sin desembolso económico' 
+            : `Liquidación autorizada (${item.tipo === 'individual' ? 'Llamada individual 1 a 1 ($25 USD)' : 'Equipo grupal ($400 USD)'}) registrada en Causa OS`,
           fechaAlcanzo7: item.fechaAlcanzo7 || '',
           estado: 'pagado',
+          esPagable: !sinPago,
           pagadoPorEmail: currentUser?.email || '',
           pagadoPorNombre: currentUser?.name || '',
-          fechaPago: new Date().toISOString().split('T')[0],
+          autorizadoPorNombre: currentUser?.name || currentUser?.displayName || 'Dirección',
+          autorizadoPorEmail: currentUser?.email || '',
+          fechaPago: today,
+          fechaAutorizacion: today,
+          notificadoEli: true,
+          fechaNotificacionEli: new Date().toISOString(),
           updatedAt: serverTimestamp()
         }, { merge: true });
       });
 
+      // Notificación automática a Causa OS y encolado de correo oficial para Eli Escobar
+      const itemToNotify = {
+        ...item,
+        montoUSD: monto,
+        esPagable: !sinPago,
+        fechaAutorizacion: today,
+        autorizadoPorNombre: currentUser?.name || 'Dirección'
+      };
+      try {
+        await dispatchLiquidacionNotifications({
+          db,
+          addDocFn: addDoc,
+          collectionFn: collection,
+          items: [itemToNotify],
+          authorizerUser: currentUser
+        });
+      } catch (notifErr) {
+        console.warn('No se pudo despachar notificación para Eli Escobar:', notifErr);
+      }
+
       recordAuditEvent({
-        action: 'LIQUIDACION_ENTRENADOR_PAGADA',
+        action: 'LIQUIDACION_ENTRENADOR_AUTORIZADA',
         email: currentUser?.email || '',
         name: currentUser?.name || '',
         role: currentUser?.appRole || '',
         sede: item.sede,
-        details: `Liquidación atómica registrada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD - Tarifa: $${FEE_PER_EFFECTIVE_CALL_USD}/llamada efectiva (${item.tipo === 'individual' ? 'Individual 1-a-1' : 'Grupal'})`
+        details: `Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${monto} USD (${sinPago ? 'Sin desembolso' : 'Autorizado para pago'})`
       });
 
-      showToast(`Marcado como pagado: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}`, 'success');
+      showToast(`Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}. Notificado a Eli Escobar en Causa OS.`, 'success');
     } catch (e) {
       console.error(e);
-      showToast(e.message || 'Error al marcar como pagado', 'error');
+      showToast(e.message || 'Error al autorizar liquidación', 'error');
     }
+  };
+
+  // Notificar / Re-notificar individualmente a Eli Escobar
+  const handleNotificarItem = async (item) => {
+    try {
+      await dispatchLiquidacionNotifications({
+        db,
+        addDocFn: addDoc,
+        collectionFn: collection,
+        items: [item],
+        authorizerUser: currentUser
+      });
+
+      // Actualizar marca de notificación en Firestore
+      const docKey = item.pagoDocId || item.liquidacionKey || item.equipoKey;
+      if (docKey) {
+        const pagoRef = doc(db, 'liquidaciones_pagos', docKey);
+        await updateDoc(pagoRef, {
+          notificadoEli: true,
+          fechaNotificacionEli: new Date().toISOString()
+        }).catch(() => {});
+      }
+
+      const emailData = buildLiquidacionEmailData({
+        trainerName: item.entrenador,
+        items: [item],
+        authorizerUser: currentUser
+      });
+      setModalEmailEliData([emailData]);
+      showToast(`Notificación y correo encolados para Eli Escobar (${item.entrenador}).`, 'success');
+    } catch (err) {
+      console.error('Error al notificar:', err);
+      showToast('Error al notificar a Eli Escobar', 'error');
+    }
+  };
+
+  // Generador de Correo de Autorización para los ítems seleccionados
+  const handleGenerarCorreoEli = () => {
+    const itemsToEmail = filteredPendientes.filter(it => selectedLiquidacionKeys.has(it.liquidacionKey));
+    if (itemsToEmail.length === 0) {
+      showToast('Selecciona al menos un registro para generar el correo de autorización a Eli Escobar.', 'warning');
+      return;
+    }
+    const grouped = groupItemsByTrainer(itemsToEmail);
+    const emailList = [];
+    for (const [trainer, trainerItems] of grouped.entries()) {
+      emailList.push(buildLiquidacionEmailData({
+        trainerName: trainer,
+        items: trainerItems,
+        authorizerUser: currentUser
+      }));
+    }
+    setModalEmailEliData(emailList);
   };
 
   // Liquidación Masiva para ítems seleccionados
@@ -2216,15 +2335,26 @@ export default function CentroManagers() {
       return;
     }
 
-    const totalMonto = itemsToPay.reduce((acc, it) => acc + (Number(it.montoUSD) || 0), 0);
-    const confirmMsg = `¿Confirmar liquidación masiva de ${itemsToPay.length} registros seleccionados por un total de $${totalMonto.toLocaleString('en-US')} USD?\n\n` +
-      `Se procesará cada llamada efectiva a $${FEE_PER_EFFECTIVE_CALL_USD} USD mediante transacciones atómicas individuales.`;
+    const totalMonto = itemsToPay.reduce((acc, it) => {
+      const defaultMonto = it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400;
+      return acc + (it.montoUSD !== undefined ? Number(it.montoUSD) : defaultMonto);
+    }, 0);
+
+    const grupalesCount = itemsToPay.filter(it => it.tipo !== 'individual').length;
+    const indivCount = itemsToPay.filter(it => it.tipo === 'individual').length;
+    const detalleItems = [];
+    if (grupalesCount > 0) detalleItems.push(`${grupalesCount} equipo${grupalesCount > 1 ? 's' : ''} grupal${grupalesCount > 1 ? 'es' : ''} ($400 USD c/u)`);
+    if (indivCount > 0) detalleItems.push(`${indivCount} llamada${indivCount > 1 ? 's' : ''} individual${indivCount > 1 ? 'es' : ''} ($25 USD c/u)`);
+
+    const confirmMsg = `¿Confirmar autorización de liquidación de ${itemsToPay.length} registros seleccionados (${detalleItems.join(', ')}) por un total de $${totalMonto.toLocaleString('en-US')} USD?\n\n` +
+      `Se registrará la autorización en Causa OS y se preparará el correo de autorización para Eli Escobar.`;
 
     if (!window.confirm(confirmMsg)) return;
 
     setProcesandoLiquidacionMasiva(true);
     let successCount = 0;
     let errorCount = 0;
+    const today = new Date().toISOString().split('T')[0];
 
     for (const item of itemsToPay) {
       try {
@@ -2233,9 +2363,10 @@ export default function CentroManagers() {
         await runTransaction(db, async (tx) => {
           const snap = await tx.get(pagoRef);
           const prev = snap.exists() ? snap.data() : null;
-          if (prev?.estado === 'pagado') return;
+          if (prev?.estado === 'pagado' || prev?.estado === 'autorizado') return;
 
-          const monto = Number(item.montoUSD || (item.llamadasEfectivas || item.totalLlamadas || 1) * FEE_PER_EFFECTIVE_CALL_USD);
+          const defaultMonto = item.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400;
+          const monto = Number(item.montoUSD !== undefined ? item.montoUSD : defaultMonto);
           tx.set(pagoRef, {
             liquidacionKey: docKey,
             tipoLlamada: item.tipo || 'grupal',
@@ -2253,14 +2384,20 @@ export default function CentroManagers() {
             cajero_user_id: currentUser?.uid || '',
             llamadasAlPagar: item.totalLlamadas,
             llamadasEfectivas: item.llamadasEfectivas || item.totalLlamadas,
-            tarifaPorLlamada: FEE_PER_EFFECTIVE_CALL_USD,
+            tarifaPorLlamada: item.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : 400,
             motivo: item.motivo,
-            criterio: `Liquidación masiva fija por llamada efectiva (${item.tipo === 'individual' ? '1 a 1' : 'Grupal'})`,
+            criterio: `Liquidación masiva autorizada (${item.tipo === 'individual' ? 'Llamada individual 1 a 1' : 'Equipo grupal'})`,
             fechaAlcanzo7: item.fechaAlcanzo7 || '',
             estado: 'pagado',
+            esPagable: true,
             pagadoPorEmail: currentUser?.email || '',
             pagadoPorNombre: currentUser?.name || '',
-            fechaPago: new Date().toISOString().split('T')[0],
+            autorizadoPorNombre: currentUser?.name || currentUser?.displayName || 'Dirección',
+            autorizadoPorEmail: currentUser?.email || '',
+            fechaPago: today,
+            fechaAutorizacion: today,
+            notificadoEli: true,
+            fechaNotificacionEli: new Date().toISOString(),
             updatedAt: serverTimestamp()
           }, { merge: true });
         });
@@ -2276,14 +2413,41 @@ export default function CentroManagers() {
       email: currentUser?.email || '',
       name: currentUser?.name || '',
       role: currentUser?.appRole || '',
-      details: `Liquidación masiva completada: ${successCount} registros pagados por $${totalMonto} USD (${errorCount} errores)`
+      details: `Liquidación masiva completada: ${successCount} registros autorizados por $${totalMonto} USD (${errorCount} errores)`
     });
+
+    // Notificación automática a Causa OS y encolado de correo oficial para Eli Escobar
+    if (successCount > 0) {
+      try {
+        await dispatchLiquidacionNotifications({
+          db,
+          addDocFn: addDoc,
+          collectionFn: collection,
+          items: itemsToPay,
+          authorizerUser: currentUser
+        });
+      } catch (notifErr) {
+        console.warn('No se pudo despachar notificación masiva para Eli Escobar:', notifErr);
+      }
+
+      // Desplegar modal con el correo oficial para Eli Escobar listo para copiar o abrir
+      const grouped = groupItemsByTrainer(itemsToPay);
+      const emailList = [];
+      for (const [trainer, trainerItems] of grouped.entries()) {
+        emailList.push(buildLiquidacionEmailData({
+          trainerName: trainer,
+          items: trainerItems,
+          authorizerUser: currentUser
+        }));
+      }
+      setModalEmailEliData(emailList);
+    }
 
     setSelectedLiquidacionKeys(new Set());
     setProcesandoLiquidacionMasiva(false);
 
     if (errorCount === 0) {
-      showToast(`¡Liquidación completada! ${successCount} registros marcados como pagados ($${totalMonto} USD).`, 'success');
+      showToast(`¡Liquidación completada! ${successCount} registros autorizados ($${totalMonto} USD). Notificado a Eli Escobar en Causa OS.`, 'success');
     } else {
       showToast(`Procesados ${successCount} pagos con éxito. ${errorCount} fallaron.`, 'warning');
     }
@@ -3831,13 +3995,13 @@ export default function CentroManagers() {
                             >
                               <UserCheck size={15} />
                             </HelpButton>
-                            <button
+                            <HelpButton helpKey="historialLlamadas"
                               onClick={() => setHistoryModal(m)}
                               title="Historial de Llamadas"
                               style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#d97706', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
                             >
                               <Clock size={15} />
-                            </button>
+                            </HelpButton>
                             {(userCanWriteNota || userCanViewAllNotas) && (
                               <HelpButton helpKey="notas"
                                 onClick={() => setNotaModal(m)}
@@ -4032,13 +4196,13 @@ export default function CentroManagers() {
                                   >
                                     <UserCheck size={13} />
                                   </HelpButton>
-                                  <button
+                                  <HelpButton helpKey="historialLlamadas"
                                     onClick={() => setHistoryModal(m)}
                                     title="Historial de Llamadas"
                                     style={{ background: '#fef3c7', border: '1px solid #fde68a', color: '#d97706', padding: '0.3rem', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                   >
                                     <Clock size={13} />
-                                  </button>
+                                  </HelpButton>
                             {(userCanWriteNota || userCanViewAllNotas) && (
                                     <HelpButton helpKey="notas"
                                       onClick={() => setNotaModal(m)}
@@ -5467,7 +5631,7 @@ export default function CentroManagers() {
                       <Filter size={15} color="#059669" /> Seleccionar Tipo de Llamada:
                     </span>
                     
-                    <button
+                    <HelpButton helpKey="filtroTipoLlamadas"
                       type="button"
                       onClick={() => setFiltroTipoLlamada('todas')}
                       style={{
@@ -5486,9 +5650,9 @@ export default function CentroManagers() {
                       }}
                     >
                       <Layers size={14} /> Todas las Llamadas ({liquidacionData.pendientes.length})
-                    </button>
+                    </HelpButton>
 
-                    <button
+                    <HelpButton helpKey="filtroTipoLlamadas"
                       type="button"
                       onClick={() => setFiltroTipoLlamada('grupales')}
                       style={{
@@ -5507,9 +5671,9 @@ export default function CentroManagers() {
                       }}
                     >
                       <Users size={14} /> 👥 Llamadas Grupales ({conteoGrupalesPendientes})
-                    </button>
+                    </HelpButton>
 
-                    <button
+                    <HelpButton helpKey="filtroTipoLlamadas"
                       type="button"
                       onClick={() => setFiltroTipoLlamada('individuales')}
                       style={{
@@ -5528,12 +5692,12 @@ export default function CentroManagers() {
                       }}
                     >
                       <UserCheck size={14} /> 👤 Llamadas Individuales (1 a 1) ({conteoIndividualesPendientes})
-                    </button>
+                    </HelpButton>
                   </div>
 
                   {/* FILTROS SECUNDARIOS: SEDE Y ENTRENADOR */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-                    <select
+                    <HelpSelect helpKey="filtroSede"
                       value={filtroSedeLiquidacion}
                       onChange={(e) => setFiltroSedeLiquidacion(e.target.value)}
                       style={{
@@ -5550,9 +5714,9 @@ export default function CentroManagers() {
                       {['Lima', 'Quito', 'Guayaquil', 'Medellín', 'México', 'Cuenca', 'Sede Global'].map(s => (
                         <option key={s} value={s}>{s}</option>
                       ))}
-                    </select>
+                    </HelpSelect>
 
-                    <select
+                    <HelpSelect helpKey="filtroEntrenador"
                       value={filtroEntrenadorLiquidacion}
                       onChange={(e) => setFiltroEntrenadorLiquidacion(e.target.value)}
                       style={{
@@ -5570,7 +5734,7 @@ export default function CentroManagers() {
                       {availableTrainers.map(ent => (
                         <option key={ent} value={ent}>{ent}</option>
                       ))}
-                    </select>
+                    </HelpSelect>
                   </div>
                 </div>
 
@@ -5592,7 +5756,7 @@ export default function CentroManagers() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                       <CheckSquare size={18} color="#059669" />
                       <span style={{ fontWeight: 800, color: textDark, fontSize: '0.88rem' }}>
-                        {selectedLiquidacionKeys.size} llamada{selectedLiquidacionKeys.size !== 1 ? 's' : ''} seleccionada{selectedLiquidacionKeys.size !== 1 ? 's' : ''}
+                        {selectedLiquidacionKeys.size} {selectedLiquidacionKeys.size === 1 ? 'registro seleccionado' : 'registros seleccionados'}
                       </span>
                       <span style={{ fontSize: '0.85rem', color: textMuted }}>•</span>
                       <span style={{ fontWeight: 800, color: '#059669', fontSize: '0.95rem' }}>
@@ -5600,7 +5764,7 @@ export default function CentroManagers() {
                       </span>
                     </div>
                     <div style={{ display: 'flex', gap: '0.6rem' }}>
-                      <button
+                      <HelpButton helpKey="liquidarMasivo"
                         type="button"
                         disabled={procesandoLiquidacionMasiva}
                         onClick={handleMarcarSeleccionadosPagados}
@@ -5620,9 +5784,9 @@ export default function CentroManagers() {
                         }}
                       >
                         <CreditCard size={15} />
-                        {procesandoLiquidacionMasiva ? 'Procesando pagos...' : `Liquidar Seleccionados ($${totalSeleccionadosUSD} USD)`}
-                      </button>
-                      <button
+                        {procesandoLiquidacionMasiva ? 'Procesando autorizaciones...' : `Autorizar Seleccionados ($${totalSeleccionadosUSD.toLocaleString('en-US')} USD)`}
+                      </HelpButton>
+                      <HelpButton helpKey="limpiarSeleccion"
                         type="button"
                         onClick={() => setSelectedLiquidacionKeys(new Set())}
                         style={{
@@ -5637,7 +5801,7 @@ export default function CentroManagers() {
                         }}
                       >
                         Limpiar selección
-                      </button>
+                      </HelpButton>
                     </div>
                   </div>
                 )}
@@ -5645,11 +5809,22 @@ export default function CentroManagers() {
                 {/* PENDIENTES DE PAGO */}
                 <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.9rem', flexWrap: 'wrap', gap: '0.6rem' }}>
-                    <h3 style={{ fontSize: '1rem', color: textDark, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <Clock size={16} color="#b45309" /> Pendientes de pago ({filteredPendientes.length})
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+                      <h3 style={{ fontSize: '1rem', color: textDark, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Clock size={16} color="#b45309" /> Pendientes de pago ({filteredPendientes.length})
+                      </h3>
+                      <HelpButton helpKey="correoEliEscobar"
+                        onClick={() => {
+                          const selected = filteredPendientes.filter(it => selectedLiquidacionKeys.has(it.liquidacionKey));
+                          handleGenerarCorreoEli(selected.length > 0 ? selected : filteredPendientes);
+                        }}
+                        style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', border: '1px solid #8b5cf6', background: 'rgba(139,92,246,0.08)', color: '#7c3aed', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}
+                      >
+                        <Mail size={13} /> Correo Eli Escobar
+                      </HelpButton>
+                    </div>
                     <div style={{ fontSize: '0.78rem', color: textMuted }}>
-                      Tarifa fija: <strong>${FEE_PER_EFFECTIVE_CALL_USD} USD</strong> por llamada efectiva registrada
+                      Tarifas: <strong>$400 USD</strong> por equipo grupal • <strong>${FEE_PER_EFFECTIVE_CALL_USD} USD</strong> por llamada 1 a 1
                     </div>
                   </div>
 
@@ -5663,7 +5838,7 @@ export default function CentroManagers() {
                         <thead>
                           <tr style={{ background: 'rgba(180,83,9,0.08)', textAlign: 'left' }}>
                             <th style={{ padding: '0.7rem 0.6rem', width: '36px', textAlign: 'center' }}>
-                              <input
+                              <HelpInput helpKey="asistencia"
                                 type="checkbox"
                                 checked={allVisibleSelected}
                                 onChange={toggleSelectAllVisible}
@@ -5686,7 +5861,7 @@ export default function CentroManagers() {
                             return (
                               <tr key={item.liquidacionKey || item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: isSelected ? 'rgba(16,185,129,0.08)' : idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
                                 <td style={{ padding: '0.65rem 0.6rem', textAlign: 'center' }}>
-                                  <input
+                                  <HelpInput helpKey="asistencia"
                                     type="checkbox"
                                     checked={isSelected}
                                     onChange={() => toggleSelectItem(item.liquidacionKey)}
@@ -5759,7 +5934,14 @@ export default function CentroManagers() {
                                       onClick={() => handleMarcarPagado(item)}
                                       style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                     >
-                                      <Check size={12} /> Marcar como pagado
+                                      <Check size={12} /> Autorizar pago
+                                    </HelpButton>
+                                    <HelpButton helpKey="marcarSinPago"
+                                      onClick={() => handleMarcarPagado(item, true)}
+                                      title="Liquidar sin desembolso monetario ($0 USD)"
+                                      style={{ padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid #94a3b8', background: '#f8fafc', color: '#475569', fontWeight: 700, cursor: 'pointer', fontSize: '0.78rem', whiteSpace: 'nowrap' }}
+                                    >
+                                      Sin pago
                                     </HelpButton>
                                     <HelpButton helpKey="ocultarPago"
                                       onClick={() => handleEliminarLiquidacion(item)}
@@ -5834,8 +6016,9 @@ export default function CentroManagers() {
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
                             <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado el</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado por</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Autorizado el</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Autorizado por</th>
+                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'center' }}>Notificación Eli</th>
                             {canReversarPago && <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'right' }}>Acción</th>}
                           </tr>
                         </thead>
@@ -5867,9 +6050,29 @@ export default function CentroManagers() {
                               </td>
                               <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
-                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD} USD</td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaPago || '-'}</td>
-                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
+                              <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>
+                                {item.esPagable === false ? (
+                                  <span style={{ color: '#64748b', fontSize: '0.78rem' }}>$0 USD (Sin desembolso)</span>
+                                ) : (
+                                  `$${item.montoUSD} USD`
+                                )}
+                              </td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaAutorizacion || item.fechaPago || '-'}</td>
+                              <td style={{ padding: '0.65rem 0.6rem' }}>{item.autorizadoPorNombre || item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
+                              <td style={{ padding: '0.65rem 0.6rem', textAlign: 'center' }}>
+                                {item.notificadoEli ? (
+                                  <span style={{ background: '#ecfdf5', color: '#047857', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                    <Check size={12} /> Notificado
+                                  </span>
+                                ) : (
+                                  <HelpButton helpKey="notificarEli"
+                                    onClick={() => handleNotificarItem(item)}
+                                    style={{ padding: '0.25rem 0.55rem', borderRadius: '5px', border: '1px solid #059669', background: '#ecfdf5', color: '#047857', fontWeight: 700, fontSize: '0.72rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                                  >
+                                    <Mail size={12} /> Notificar
+                                  </HelpButton>
+                                )}
+                              </td>
                               {canReversarPago && (
                                 <td style={{ padding: '0.65rem 0.6rem', textAlign: 'right' }}>
                                   <HelpButton helpKey="editarMontoPago"
@@ -6821,7 +7024,7 @@ export default function CentroManagers() {
                 </span>
               </div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: '#166534', cursor: 'pointer', marginTop: '2px' }}>
-                <input 
+                <HelpInput helpKey="reporteNotaVoz"
                   type="checkbox" 
                   checked={groupCallNotaVozEnviada} 
                   disabled={isSavingGroupCall}
@@ -7107,14 +7310,14 @@ export default function CentroManagers() {
                       <div key={call.id || idx} style={{ padding: '0.8rem', background: '#f8fafc', borderRadius: '8px', border: `1px solid ${borderLight}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         {isEditing ? (
                           <div style={{ display: 'flex', gap: '0.5rem', width: '100%', alignItems: 'center' }}>
-                            <input type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }} />
-                            <select value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}>
+                            <HelpInput helpKey="fechaIndividual" type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }} />
+                            <HelpSelect helpKey="asistencia" value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}>
                               <option value="SI">SÍ Asistió</option>
                               <option value="NO">NO Asistió</option>
-                            </select>
+                            </HelpSelect>
                             <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.4rem' }}>
-                              <button onClick={() => { handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio); }} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Guardar</button>
-                              <button onClick={() => setEditingHistoryCall(null)} style={{ background: '#94a3b8', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Cancelar</button>
+                              <HelpButton helpKey="guardarCambios" onClick={() => { handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio); }} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Guardar</HelpButton>
+                              <HelpButton helpKey="cancelar" onClick={() => setEditingHistoryCall(null)} style={{ background: '#94a3b8', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.4rem 0.8rem', fontWeight: 700, cursor: 'pointer' }}>Cancelar</HelpButton>
                             </div>
                           </div>
                         ) : (
@@ -7131,8 +7334,8 @@ export default function CentroManagers() {
                               </span>
                               {(userCanLoadCalls || isGlobalQTCoordinator(currentUser) || isMaestriaCoordinator(currentUser) || (currentUser && currentUser.isDireccion)) && (
                                 <div style={{ display: 'flex', gap: '0.6rem' }}>
-                                  <button onClick={() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio })} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</button>
-                                  <button onClick={async () => { await handleDeleteHistoryCall(m.id, call.id); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</button>
+                                  <HelpButton helpKey="editarLlamada" onClick={() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio })} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</HelpButton>
+                                  <HelpButton helpKey="eliminarLlamada" onClick={async () => { await handleDeleteHistoryCall(m.id, call.id); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</HelpButton>
                                 </div>
                               )}
                             </div>
@@ -7321,8 +7524,8 @@ export default function CentroManagers() {
                       </span>
                       {(userCanLoadCalls || isGlobalQTCoordinator(currentUser) || isMaestriaCoordinator(currentUser) || (currentUser && currentUser.isDireccion)) && (!call.tipo || call.tipo === 'individual') && (
                         <div style={{ display: 'flex', gap: '0.3rem' }}>
-                          <button onClick={() => { setManagerCardModal(null); setHistoryModal(m); setTimeout(() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio }), 100); }} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</button>
-                          <button onClick={() => { setManagerCardModal(null); setHistoryModal(m); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</button>
+                          <HelpButton helpKey="editarLlamada" onClick={() => { setManagerCardModal(null); setHistoryModal(m); setTimeout(() => setEditingHistoryCall({ managerId: m.id, callId: call.id, fecha: call.fecha || '', asistio: call.asistio }), 100); }} style={{ background: 'transparent', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.2rem' }} title="Editar">✏️</HelpButton>
+                          <HelpButton helpKey="eliminarLlamada" onClick={() => { setManagerCardModal(null); setHistoryModal(m); }} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.2rem' }} title="Eliminar">🗑️</HelpButton>
                         </div>
                       )}
                     </div>
@@ -7432,13 +7635,13 @@ export default function CentroManagers() {
                               <div key={call.id} style={{ marginTop: '0.25rem', fontSize: '0.7rem', color: textMuted, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                                 {editingHistoryCall?.callId === call.id && editingHistoryCall?.managerId === m.id ? (
                                   <>
-                                    <input type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.1rem', fontSize: '0.65rem' }} />
-                                    <select value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.1rem', fontSize: '0.65rem' }}>
+                                    <HelpInput helpKey="fechaIndividual" type="date" value={editingHistoryCall.fecha} onChange={e => setEditingHistoryCall({...editingHistoryCall, fecha: e.target.value})} style={{ padding: '0.1rem', fontSize: '0.65rem' }} />
+                                    <HelpSelect helpKey="asistencia" value={editingHistoryCall.asistio ? 'SI' : 'NO'} onChange={e => setEditingHistoryCall({...editingHistoryCall, asistio: e.target.value === 'SI'})} style={{ padding: '0.1rem', fontSize: '0.65rem' }}>
                                       <option value="SI">Asistió</option>
                                       <option value="NO">No asistió</option>
-                                    </select>
-                                    <button onClick={() => handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio)} style={{ cursor: 'pointer', background: '#10b981', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Guardar</button>
-                                    <button onClick={() => setEditingHistoryCall(null)} style={{ cursor: 'pointer', background: '#64748b', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Cancelar</button>
+                                    </HelpSelect>
+                                    <HelpButton helpKey="guardarCambios" onClick={() => handleEditHistoryCall(m.id, call.id, editingHistoryCall.fecha, editingHistoryCall.asistio)} style={{ cursor: 'pointer', background: '#10b981', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Guardar</HelpButton>
+                                    <HelpButton helpKey="cancelar" onClick={() => setEditingHistoryCall(null)} style={{ cursor: 'pointer', background: '#64748b', color: 'white', border: 'none', borderRadius: '3px', padding: '0.1rem 0.3rem' }}>Cancelar</HelpButton>
                                   </>
                                 ) : (
                                   <>

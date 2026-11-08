@@ -553,19 +553,34 @@ export function ChecklistProvider({ children }) {
         let sedeCompleted = data.completed;
         let sedeStatus = data.status;
         const taskId = data.id;
+        const baseTaskDef = checklistData.find(t => t.id === taskId);
 
-        const isBaseCatalogTask = checklistData.some(task => task.id === taskId) &&
+        // REGLA DE COHERENCIA: Las tareas del catálogo heredan sus atributos estáticos 
+        // invariables desde checklistData.js, ignorando posibles corrupciones en Firestore.
+        let mergedData = data;
+        if (baseTaskDef && !data.isCustom && !taskId.startsWith('custom_')) {
+          mergedData = {
+            ...data,
+            cyclePhase: baseTaskDef.cyclePhase,
+            task: baseTaskDef.task,
+            role: baseTaskDef.role,
+            isCritical: baseTaskDef.isCritical
+          };
+        }
+
+        const isBaseCatalogTask = Boolean(baseTaskDef) &&
           !data.isCustom && !taskId.startsWith('custom_') &&
           !data.assignedToEmail &&
           !(Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0);
+
         if (isBaseCatalogTask && !isMultiTeamQuito) {
-          return applyCycleCompletion(data, {
+          return applyCycleCompletion(mergedData, {
             sede: userSede,
             cycleId: currentCycle?.id
           });
         }
 
-        return { ...data, completed: sedeCompleted, status: sedeStatus };
+        return { ...mergedData, completed: sedeCompleted, status: sedeStatus };
       });
 
       const existingIds = new Set(authorizedTasks.map(task => task.id));
