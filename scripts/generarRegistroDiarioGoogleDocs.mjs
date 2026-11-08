@@ -102,6 +102,18 @@ ${gitLog || 'Sin nuevos commits en esta fecha.'}
   const outputPath = path.resolve(process.cwd(), `docs/CAUSA_OS_REGISTRO_DIARIO_${hoy}.md`);
   fs.writeFileSync(outputPath, markdownContent, 'utf8');
   console.log(`[Causa OS] Registro Diario generado exitosamente en: ${outputPath}`);
+
+  // 4. Publicar automáticamente a Google Docs en la carpeta de Drive
+  try {
+    const FOLDER_ID = '1hYpg2iqQgNIBycksrA8u8n9lFVm7IEJi';
+    const docTitle = `Causa OS - Registro Diario - ${hoy}`;
+    console.log(`[Causa OS] Publicando Google Doc en carpeta ${FOLDER_ID}...`);
+    const gdocsOutput = execSync(`gdocs mutate import-md "${outputPath}" --title "${docTitle}" --folder "${FOLDER_ID}"`, { encoding: 'utf8' });
+    console.log(`[Causa OS] Google Doc publicado con éxito:\n${gdocsOutput}`);
+  } catch (err) {
+    console.warn(`[Causa OS] Publicación en Google Drive omitida o pendiente de auth: ${err.message}`);
+  }
+
   return { outputPath, markdownContent };
 }
 
