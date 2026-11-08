@@ -18,6 +18,7 @@ export const REPORTES_VISIBLE = (u) => Boolean(
 
 export const MODULE_REGISTRY = [
   { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
+  { id: 'resultados-imposibles', label: 'Resultados Imposibles (IA)', emoji: '🎯', route: '/resultados-imposibles', roles: [...EXEC_ROLES, ...KPI_ROLES, 'entrenador', 'entrenador_llamadas'] },
   { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
   { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
   { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
@@ -65,7 +66,7 @@ export const isModuleVisible = (mod, currentUser) => {
   if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
   // Respaldo nominal únicamente para el acceso de revisión FI de Andrés Gómez.
   // No convierte su cuenta en superadmin ni altera otros módulos.
-  if (mod.id === 'portafolio' && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;
+  if ((mod.id === 'portafolio' || mod.id === 'resultados-imposibles') && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;
   if (currentUser?.appRole === 'consolidado') {
     return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   }

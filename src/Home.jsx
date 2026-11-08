@@ -395,6 +395,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
+    id: 'opt-resultados-imposibles',
+    title: 'Resultados Imposibles (IA)',
+    category: 'Gobernanza',
+    badge: 'Auditor IA',
+    emoji: '🎯',
+    desc: 'Auditor de 3 Resultados Imposibles vs HAR, cohorte NODUS post-PFD, rezago crítico y certificación Armando',
+    keywords: ['resultados imposibles', 'futuros imposibles', 'ia', 'auditor', 'metas', 'nodus', 'armando', 'har'],
+    route: '/resultados-imposibles',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']
+  },
+  {
     id: 'opt-portafolio',
     title: 'Portafolio PMO (Planview)',
     category: 'Proyectos',
@@ -568,6 +579,7 @@ const CAUSA_OPTIONS_REGISTRY = [
 
 const MODULE_REGISTRY = [
   { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
+  { id: 'resultados-imposibles', label: 'Resultados Imposibles (IA)', emoji: '🎯', route: '/resultados-imposibles', roles: [...EXEC_ROLES, 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas'] },
   { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
   { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
   { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
@@ -1619,6 +1631,9 @@ export default function Home() {
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
                     </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/resultados-imposibles'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.12)', fontWeight: 'bold' }}>
+                      🎯 Resultados Imposibles (IA)
+                    </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/portafolio'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
                       📈 Portafolio PMO (Planview)
                     </button>
@@ -1786,6 +1801,11 @@ export default function Home() {
           ) : (
             <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 Mi Dashboard
+            </button>
+          )}
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']) && (
+            <button onClick={() => navigate('/resultados-imposibles')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #059669, #047857)', color: 'white', border: 'none', fontWeight: 'bold' }}>
+              🎯 Resultados Imposibles (IA)
             </button>
           )}
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (

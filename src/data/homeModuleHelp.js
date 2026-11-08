@@ -2,6 +2,7 @@ export const homeModuleHelp = {
   horarios: 'Consulta los horarios oficiales de entrenamiento y el código de vestimenta.',
   gerencial: 'Revisa el seguimiento operativo, tareas y resultados de tu sede.',
   checklist: 'Consulta y completa el checklist operativo de tu rol.',
+  resultadosImposibles: 'Auditor de 3 Resultados Imposibles (IA), cohorte NODUS post-PFD, trazabilidad HAR y certificación Armando.',
   portafolio: 'Consulta el portafolio de proyectos y su seguimiento operativo.',
   estrategia: 'Consulta objetivos, resultados clave y planes de acción.',
   auditoria: 'Revisa indicadores y diagnósticos operativos por sede y coordinación.',

@@ -73947,6 +73947,14 @@ function App() {
           <Route path="/portfolio" element={<Navigate to="/portafolio" replace />} />
           <Route path="/pmo" element={<Navigate to="/portafolio" replace />} />
 
+          {/* Acceso Directo Oficial: Auditor de Resultados Imposibles (IA) */}
+          <Route path="/resultados-imposibles" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']} allowedEmails={PORTFOLIO_FI_REVIEW_EMAILS} requireSuperAdmin={false}>
+              <PortfolioBoard initialTab="futuros_imposibles" />
+            </RoleRoute>
+          } />
+          <Route path="/futuros-imposibles" element={<Navigate to="/resultados-imposibles" replace />} />
+
           <Route path="/estrategia" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <StrategyBoard />
@@ -74621,6 +74629,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
+    id: 'opt-resultados-imposibles',
+    title: 'Resultados Imposibles (IA)',
+    category: 'Gobernanza',
+    badge: 'Auditor IA',
+    emoji: '🎯',
+    desc: 'Auditor de 3 Resultados Imposibles vs HAR, cohorte NODUS post-PFD, rezago crítico y certificación Armando',
+    keywords: ['resultados imposibles', 'futuros imposibles', 'ia', 'auditor', 'metas', 'nodus', 'armando', 'har'],
+    route: '/resultados-imposibles',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']
+  },
+  {
     id: 'opt-portafolio',
     title: 'Portafolio PMO (Planview)',
     category: 'Proyectos',
@@ -74794,6 +74813,7 @@ const CAUSA_OPTIONS_REGISTRY = [
 
 const MODULE_REGISTRY = [
   { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
+  { id: 'resultados-imposibles', label: 'Resultados Imposibles (IA)', emoji: '🎯', route: '/resultados-imposibles', roles: [...EXEC_ROLES, 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas'] },
   { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
   { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
   { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
@@ -75845,6 +75865,9 @@ export default function Home() {
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
                     </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/resultados-imposibles'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.12)', fontWeight: 'bold' }}>
+                      🎯 Resultados Imposibles (IA)
+                    </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/portafolio'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
                       📈 Portafolio PMO (Planview)
                     </button>
@@ -76012,6 +76035,11 @@ export default function Home() {
           ) : (
             <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 Mi Dashboard
+            </button>
+          )}
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']) && (
+            <button onClick={() => navigate('/resultados-imposibles')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #059669, #047857)', color: 'white', border: 'none', fontWeight: 'bold' }}>
+              🎯 Resultados Imposibles (IA)
             </button>
           )}
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
@@ -81744,6 +81772,7 @@ export const REPORTES_VISIBLE = (u) => Boolean(
 
 export const MODULE_REGISTRY = [
   { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
+  { id: 'resultados-imposibles', label: 'Resultados Imposibles (IA)', emoji: '🎯', route: '/resultados-imposibles', roles: [...EXEC_ROLES, ...KPI_ROLES, 'entrenador', 'entrenador_llamadas'] },
   { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
   { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
   { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
@@ -81791,7 +81820,7 @@ export const isModuleVisible = (mod, currentUser) => {
   if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
   // Respaldo nominal únicamente para el acceso de revisión FI de Andrés Gómez.
   // No convierte su cuenta en superadmin ni altera otros módulos.
-  if (mod.id === 'portafolio' && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;
+  if ((mod.id === 'portafolio' || mod.id === 'resultados-imposibles') && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;
   if (currentUser?.appRole === 'consolidado') {
     return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   }
@@ -127432,7 +127461,7 @@ import '../pages/HomeModules.css';
 
 const categories = [
   { id: 'operacion', label: 'Operación y seguimiento', keys: ['horarios', 'gerencial', 'checklist', 'kpis', 'hubQT', 'vuelos', 'imos', 'asignador', 'rezagadosC1', 'baseNodusRezagados'] },
-  { id: 'direccion', label: 'Dirección y gestión', keys: ['portafolio', 'estrategia', 'auditoria', 'mando', 'cfo', 'finanzas', 'talento', 'legal', 'auditoriaLegal'] },
+  { id: 'direccion', label: 'Dirección y gestión', keys: ['resultadosImposibles', 'portafolio', 'estrategia', 'auditoria', 'mando', 'cfo', 'finanzas', 'talento', 'legal', 'auditoriaLegal'] },
   { id: 'personas', label: 'Personas y equipos', keys: ['directorioQT', 'llamadas', 'managers', 'crm'] },
   { id: 'formacion', label: 'Formación y recursos', keys: ['manualQT', 'manualNodus', 'maestria', 'entrenador', 'campus', 'flyers'] },
   { id: 'calendarios', label: 'Calendarios', keys: ['calendarioGlobal', 'calendarioMJ'] },
@@ -133591,7 +133620,7 @@ import {
   Award, CheckSquare, Plus, ExternalLink, Send, X, Trophy, Filter, ArrowUpDown,
   Search, UserCheck, Zap
 } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { doc, collection, writeBatch } from 'firebase/firestore';
 import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES, normalizeSede, usersData, normalizeRole } from '../data/usersData';
@@ -133711,12 +133740,15 @@ function getTaskRecipients(coordinator) {
   );
 }
 
-export default function PortfolioBoard() {
+export default function PortfolioBoard({ initialTab = null }) {
   const { currentUser } = useAuth();
   const { events } = useCycles();
   const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
-  const tabParam = searchParams.get('tab');
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isDirectRI = location.pathname.includes('/resultados-imposibles') || location.pathname.includes('/futuros-imposibles');
+  const effectiveInitial = initialTab || (isDirectRI ? 'futuros_imposibles' : null);
+  const tabParam = searchParams.get('tab') || effectiveInitial;
   const isAuthorizedForPredictor = ['jose.sanchez@crearpsl.net', 'fer.aragon@crearpsl.net', 'fer.aragon@crearpsl.com', 'fer.arango@crearpsl.net', 'paul.sosa@crearpsl.net'].includes((currentUser?.email || '').toLowerCase());
   const canViewNodusUserAccess = NODUS_REPORT_ADMIN_EMAILS.includes((currentUser?.email || '').trim().toLowerCase());
 
@@ -133750,15 +133782,20 @@ export default function PortfolioBoard() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles', 'nodus_users', 'nodus_live_modules'].includes(tabParam)) {
-      setViewMode(resolveTab(tabParam));
+    const currentTab = searchParams.get('tab') || effectiveInitial;
+    if (currentTab && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles', 'nodus_users', 'nodus_live_modules'].includes(currentTab)) {
+      setViewMode(resolveTab(currentTab));
     }
-  }, [tabParam, isAuthorizedForPredictor, canViewNodusUserAccess]);
+  }, [tabParam, effectiveInitial, isAuthorizedForPredictor, canViewNodusUserAccess]);
 
   const handleTabChange = (mode) => {
     const safeMode = resolveTab(mode);
     setViewMode(safeMode);
-    setSearchParams({ tab: safeMode });
+    if (isDirectRI && safeMode !== 'futuros_imposibles') {
+      navigate(`/portafolio?tab=${safeMode}`);
+    } else {
+      setSearchParams({ tab: safeMode });
+    }
   };
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState([]);
@@ -134160,10 +134197,13 @@ export default function PortfolioBoard() {
               <ArrowLeft size={16} /> Inicio
             </button>
             <div>
-              <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Briefcase size={24} /> Portafolio PMO &bull; Predictor Inteligente
+              <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: (viewMode === 'futuros_imposibles' || isDirectRI) ? '#10b981' : '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {(viewMode === 'futuros_imposibles' || isDirectRI) ? <Target size={24} /> : <Briefcase size={24} />}
+                {(viewMode === 'futuros_imposibles' || isDirectRI) ? 'Auditor de Resultados Imposibles (IA)' : 'Portafolio PMO • Predictor Inteligente'}
               </h1>
-              <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0 }}>Gobernanza Predictiva, Auditoría Nodus y Modelos de Data Science</p>
+              <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0 }}>
+                {(viewMode === 'futuros_imposibles' || isDirectRI) ? 'Gobernanza de 3 RIs vs HAR, Cohorte Nodus y Certificación Armando' : 'Gobernanza Predictiva, Auditoría Nodus y Modelos de Data Science'}
+              </p>
             </div>
           </div>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -172253,7 +172293,8 @@ import {
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
-  canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar
+  canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar,
+  PORTFOLIO_FI_REVIEW_EMAILS
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -172724,6 +172765,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     keywords: ['estrategia', 'okrs', 'cascade', 'objetivos', 'iniciativas'],
     route: '/estrategia',
     roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-resultados-imposibles',
+    title: 'Resultados Imposibles (IA)',
+    category: 'Gobernanza',
+    badge: 'Auditor IA',
+    emoji: '🎯',
+    desc: 'Auditor de 3 Resultados Imposibles vs HAR, cohorte NODUS post-PFD, rezago crítico y certificación Armando',
+    keywords: ['resultados imposibles', 'futuros imposibles', 'ia', 'auditor', 'metas', 'nodus', 'armando', 'har'],
+    route: '/resultados-imposibles',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']
   },
   {
     id: 'opt-portafolio',
@@ -174532,6 +174584,9 @@ export default function Home() {
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
                     </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/resultados-imposibles'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.12)', fontWeight: 'bold' }}>
+                      🎯 Resultados Imposibles (IA)
+                    </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/portafolio'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
                       📈 Portafolio PMO (Planview)
                     </button>
@@ -174774,6 +174829,11 @@ export default function Home() {
           ) : (
             <ModuleHelpButton helpKey="checklist" onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="home-module-card">
               💼 Mi Dashboard
+            </ModuleHelpButton>
+          )}
+          {(hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coord_jr', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']) || PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) && (
+            <ModuleHelpButton helpKey="resultadosImposibles" onClick={() => navigate('/resultados-imposibles')} className="home-module-card" style={{ borderColor: 'rgba(16, 185, 129, 0.45)', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(6, 78, 59, 0.22) 100%)' }} title="Auditor de 3 Resultados Imposibles (IA), cohorte NODUS post-PFD, trazabilidad HAR y certificación Armando">
+              🎯 Resultados Imposibles (IA)
             </ModuleHelpButton>
           )}
           {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (

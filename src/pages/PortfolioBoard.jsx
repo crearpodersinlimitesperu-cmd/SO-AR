@@ -8,7 +8,7 @@ import {
   Award, CheckSquare, Plus, ExternalLink, Send, X, Trophy, Filter, ArrowUpDown,
   Search, UserCheck, Zap
 } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { doc, collection, writeBatch } from 'firebase/firestore';
 import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES, normalizeSede, usersData, normalizeRole } from '../data/usersData';
@@ -128,12 +128,15 @@ function getTaskRecipients(coordinator) {
   );
 }
 
-export default function PortfolioBoard() {
+export default function PortfolioBoard({ initialTab = null }) {
   const { currentUser } = useAuth();
   const { events } = useCycles();
   const navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
-  const tabParam = searchParams.get('tab');
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isDirectRI = location.pathname.includes('/resultados-imposibles') || location.pathname.includes('/futuros-imposibles');
+  const effectiveInitial = initialTab || (isDirectRI ? 'futuros_imposibles' : null);
+  const tabParam = searchParams.get('tab') || effectiveInitial;
   const isAuthorizedForPredictor = ['jose.sanchez@crearpsl.net', 'fer.aragon@crearpsl.net', 'fer.aragon@crearpsl.com', 'fer.arango@crearpsl.net', 'paul.sosa@crearpsl.net'].includes((currentUser?.email || '').toLowerCase());
   const canViewNodusUserAccess = NODUS_REPORT_ADMIN_EMAILS.includes((currentUser?.email || '').trim().toLowerCase());
 
@@ -167,15 +170,20 @@ export default function PortfolioBoard() {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    if (tabParam && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles', 'nodus_users', 'nodus_live_modules'].includes(tabParam)) {
-      setViewMode(resolveTab(tabParam));
+    const currentTab = searchParams.get('tab') || effectiveInitial;
+    if (currentTab && ['predictor', 'active', 'resources', 'rrhh_sentinel', 'futuros_imposibles', 'nodus_users', 'nodus_live_modules'].includes(currentTab)) {
+      setViewMode(resolveTab(currentTab));
     }
-  }, [tabParam, isAuthorizedForPredictor, canViewNodusUserAccess]);
+  }, [tabParam, effectiveInitial, isAuthorizedForPredictor, canViewNodusUserAccess]);
 
   const handleTabChange = (mode) => {
     const safeMode = resolveTab(mode);
     setViewMode(safeMode);
-    setSearchParams({ tab: safeMode });
+    if (isDirectRI && safeMode !== 'futuros_imposibles') {
+      navigate(`/portafolio?tab=${safeMode}`);
+    } else {
+      setSearchParams({ tab: safeMode });
+    }
   };
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState([]);
@@ -577,10 +585,13 @@ export default function PortfolioBoard() {
               <ArrowLeft size={16} /> Inicio
             </button>
             <div>
-              <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Briefcase size={24} /> Portafolio PMO &bull; Predictor Inteligente
+              <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: (viewMode === 'futuros_imposibles' || isDirectRI) ? '#10b981' : '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {(viewMode === 'futuros_imposibles' || isDirectRI) ? <Target size={24} /> : <Briefcase size={24} />}
+                {(viewMode === 'futuros_imposibles' || isDirectRI) ? 'Auditor de Resultados Imposibles (IA)' : 'Portafolio PMO • Predictor Inteligente'}
               </h1>
-              <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0 }}>Gobernanza Predictiva, Auditoría Nodus y Modelos de Data Science</p>
+              <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0 }}>
+                {(viewMode === 'futuros_imposibles' || isDirectRI) ? 'Gobernanza de 3 RIs vs HAR, Cohorte Nodus y Certificación Armando' : 'Gobernanza Predictiva, Auditoría Nodus y Modelos de Data Science'}
+              </p>
             </div>
           </div>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>

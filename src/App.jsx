@@ -509,6 +509,14 @@ function App() {
           <Route path="/portfolio" element={<Navigate to="/portafolio" replace />} />
           <Route path="/pmo" element={<Navigate to="/portafolio" replace />} />
 
+          {/* Acceso Directo Oficial: Auditor de Resultados Imposibles (IA) */}
+          <Route path="/resultados-imposibles" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']} allowedEmails={PORTFOLIO_FI_REVIEW_EMAILS} requireSuperAdmin={false}>
+              <PortfolioBoard initialTab="futuros_imposibles" />
+            </RoleRoute>
+          } />
+          <Route path="/futuros-imposibles" element={<Navigate to="/resultados-imposibles" replace />} />
+
           <Route path="/estrategia" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <StrategyBoard />
