@@ -60,6 +60,7 @@ import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal
 import { INITIAL_MANAGERS, normalizeTrainer } from '../data/managersData';
 import { formatTrainerDisplayName, nombreLegalEntrenador, normalizarIdentidadEntrenador } from '../data/trainerAliases';
 import { resumenSugerenciaCronograma } from '../utils/trainerAssignments';
+import { splitConcatenatedTeamNumbers } from '../utils/formatTeam';
 
 const getEventTeamLabels = (event = {}) => {
   const rawValues = [
@@ -90,14 +91,8 @@ const getEventTeamLabels = (event = {}) => {
     if (!text) return;
     const teamPattern = /^(?:(?:equipo|equipos|eq\.?|team|teams)\s*:?\s*)?#?\d+(?:(?:\s*[,/&•-]\s*|\s+y\s+)(?:(?:equipo|equipos|eq\.?|team|teams)\s*:?\s*)?#?\d+)*$/i;
     if (!teamPattern.test(text)) return;
-    const numbers = text.match(/\d+/g) || [];
-    if (numbers.length === 1 && [4, 6].includes(numbers[0].length)) {
-      for (let i = 0; i < numbers[0].length; i += 2) {
-        labels.add(`#${numbers[0].slice(i, i + 2)}`);
-      }
-    } else {
-      numbers.forEach((number) => labels.add(`#${number}`));
-    }
+    const numbers = splitConcatenatedTeamNumbers(text);
+    numbers.forEach((number) => labels.add(`#${number}`));
   };
   rawValues.forEach(addValue);
 

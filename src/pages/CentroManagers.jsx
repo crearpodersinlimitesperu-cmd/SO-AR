@@ -1,4 +1,5 @@
 import { getWhatsAppUrl } from '../utils/phoneUtils';
+import { splitConcatenatedTeamNumbers } from '../utils/formatTeam';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -173,18 +174,23 @@ export const getTeamNumericValue = (item) => {
   return 999999;
 };
 
-// Formatea el nombre de equipo anteponiendo el número de equipo de forma destacada (ej: "#91 · HAMSA TADAKATSU")
+// Formatea el nombre de equipo anteponiendo el número de equipo de forma destacada (ej: "#91 · HAMSA TADAKATSU" o "Equipos #9 · #8 · #7")
 export const formatTeamDisplay = (equipo, numEquipo) => {
   const num = numEquipo !== undefined && numEquipo !== null && String(numEquipo).trim() !== ''
     ? String(numEquipo).trim()
     : (String(equipo || '').match(/\d+/)?.[0] || '');
   const cleanName = String(equipo || '').replace(/\s*\(#\d+\)\s*/g, '').trim();
 
-  if (num && cleanName && !cleanName.startsWith('#')) {
-    return `#${num} · ${cleanName}`;
+  const parts = num ? splitConcatenatedTeamNumbers(num) : [];
+  const teamLabel = parts.length > 1
+    ? `Equipos ${parts.map(p => `#${p}`).join(' · ')}`
+    : num ? `#${num}` : '';
+
+  if (teamLabel && cleanName && !cleanName.startsWith('#')) {
+    return `${teamLabel} · ${cleanName}`;
   }
-  if (num && !cleanName) {
-    return `Equipo #${num}`;
+  if (teamLabel && !cleanName) {
+    return parts.length > 1 ? teamLabel : `Equipo ${teamLabel}`;
   }
   return cleanName || 'Sin Equipo';
 };
