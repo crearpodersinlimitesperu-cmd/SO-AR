@@ -99510,7 +99510,25 @@ export default function FuturosImposiblesView({
         createdAt: serverTimestamp(),
         source: 'causa_os_fi_review'
       });
-      const updated = { ...selectedParticipant, fis: selectedParticipant.fis.map((fi, index) => index === areaIdx ? { ...fi, estado, feedback } : fi) };
+      const currentFis = Array.isArray(selectedParticipant.fis) && selectedParticipant.fis.length > 0
+        ? selectedParticipant.fis
+        : [
+            { area: 'Salud & Vitalidad', meta: '', estado: 'no_presentado' },
+            { area: 'Finanzas & Riqueza', meta: '', estado: 'no_presentado' },
+            { area: 'Relaciones & Familia', meta: '', estado: 'no_presentado' }
+          ];
+      const updatedFis = currentFis.map((fi, index) => index === areaIdx ? { ...fi, estado, feedback } : fi);
+      const newAprobados = updatedFis.filter((f) => f.estado === 'aprobado').length;
+      const newPendientes = updatedFis.filter((f) => f.estado === 'pendiente').length;
+      const newDevueltos = updatedFis.filter((f) => f.estado === 'devuelto').length;
+      const updated = {
+        ...selectedParticipant,
+        fis: updatedFis,
+        aprobados: newAprobados,
+        pendientes: newPendientes,
+        devueltos: newDevueltos,
+        totalFi: updatedFis.length
+      };
       setSelectedParticipant(updated);
       triggerToast(estado === 'aprobado' ? `FI "${area.area}" aprobado y auditado.` : 'FI devuelto y registrado en la trazabilidad.', estado === 'aprobado' ? 'success' : 'warning');
     } catch (error) {
@@ -100524,6 +100542,147 @@ export default function FuturosImposiblesView({
                 </div>
               </div>
 
+              {/* TABLERO VISUAL DE LOS 3 RESULTADOS IMPOSIBLES DETALLADOS (NODUS) */}
+              {(() => {
+                const fallbackAreas = ['Salud & Vitalidad', 'Finanzas & Riqueza', 'Relaciones & Familia'];
+                const rawFis = Array.isArray(selectedParticipant.fis) ? selectedParticipant.fis : [];
+                const participantFis = [0, 1, 2].map((idx) => {
+                  if (rawFis[idx]) return rawFis[idx];
+                  return {
+                    area: fallbackAreas[idx] || `Resultado Imposible ${idx + 1}`,
+                    meta: '',
+                    estado: 'no_presentado',
+                    feedback: ''
+                  };
+                });
+
+                return (
+                  <div style={{
+                    background: 'rgba(15, 23, 42, 0.45)',
+                    border: `1px solid ${borderLight}`,
+                    borderRadius: '12px',
+                    padding: '1.1rem',
+                    marginBottom: '1.25rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Target size={18} color="#38bdf8" />
+                        <span style={{ fontSize: '0.95rem', fontWeight: 800, color: textDark }}>
+                          Los 3 Resultados Imposibles del Participante (Nodus)
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '0.74rem', color: textMuted }}>
+                        Click en cualquier tarjeta para seleccionarla y auditarla abajo
+                      </span>
+                    </div>
+
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                      gap: '0.85rem'
+                    }}>
+                      {participantFis.map((fi, idx) => {
+                        const isActive = activeAreaTab === idx;
+                        const isApr = fi.estado === 'aprobado';
+                        const isPen = fi.estado === 'pendiente';
+                        const isDev = fi.estado === 'devuelto';
+                        const isNoPres = fi.estado === 'no_presentado' || !fi.meta;
+
+                        const badgeBg = isApr ? 'rgba(16, 185, 129, 0.15)' : isPen ? 'rgba(245, 158, 11, 0.15)' : isDev ? 'rgba(234, 88, 12, 0.15)' : 'rgba(100, 116, 139, 0.15)';
+                        const badgeBorder = isApr ? '#10b981' : isPen ? '#f59e0b' : isDev ? '#ea580c' : '#64748b';
+                        const badgeColor = isApr ? '#10b981' : isPen ? '#f59e0b' : isDev ? '#ea580c' : '#94a3b8';
+                        const badgeText = isApr ? 'Aprobado' : isPen ? 'Pendiente' : isDev ? 'Devuelto' : 'Sin Registro';
+
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              setActiveAreaTab(idx);
+                              setMentorNote(fi.feedback || '');
+                            }}
+                            style={{
+                              background: isActive ? 'rgba(56, 189, 248, 0.1)' : 'rgba(0, 0, 0, 0.25)',
+                              border: isActive ? '2px solid #38bdf8' : `1px solid ${borderLight}`,
+                              borderRadius: '10px',
+                              padding: '0.9rem',
+                              cursor: 'pointer',
+                              transition: 'all 0.18s ease-in-out',
+                              boxShadow: isActive ? '0 0 14px rgba(56, 189, 248, 0.25)' : 'none',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              justifyContent: 'space-between',
+                              position: 'relative'
+                            }}
+                          >
+                            {isActive && (
+                              <div style={{
+                                position: 'absolute',
+                                top: '-9px',
+                                right: '12px',
+                                background: '#38bdf8',
+                                color: '#0f172a',
+                                fontSize: '0.64rem',
+                                fontWeight: 800,
+                                padding: '0.1rem 0.5rem',
+                                borderRadius: '8px',
+                                letterSpacing: '0.5px'
+                              }}>
+                                SELECCIONADO
+                              </div>
+                            )}
+
+                            <div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.4rem', marginBottom: '0.55rem' }}>
+                                <div>
+                                  <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                    Resultado {idx + 1} de 3
+                                  </span>
+                                  <div style={{ fontSize: '0.88rem', fontWeight: 800, color: textDark }}>
+                                    {fi.area || `Área ${idx + 1}`}
+                                  </div>
+                                </div>
+                                <span style={{
+                                  background: badgeBg,
+                                  border: `1px solid ${badgeBorder}`,
+                                  color: badgeColor,
+                                  fontSize: '0.7rem',
+                                  fontWeight: 800,
+                                  padding: '0.15rem 0.5rem',
+                                  borderRadius: '10px',
+                                  whiteSpace: 'nowrap'
+                                }}>
+                                  {badgeText}
+                                </span>
+                              </div>
+
+                              <div style={{
+                                background: 'rgba(0, 0, 0, 0.2)',
+                                borderLeft: `3px solid ${isActive ? '#38bdf8' : isApr ? '#10b981' : isPen ? '#f59e0b' : '#64748b'}`,
+                                padding: '0.55rem 0.75rem',
+                                borderRadius: '4px',
+                                fontSize: '0.82rem',
+                                color: isNoPres ? '#ef4444' : textDark,
+                                lineHeight: 1.45,
+                                minHeight: '52px',
+                                fontStyle: isNoPres ? 'italic' : 'normal'
+                              }}>
+                                {isNoPres ? '⚠️ Sin redacción registrada en Nodus' : `"${fi.meta}"`}
+                              </div>
+                            </div>
+
+                            {fi.feedback && (
+                              <div style={{ marginTop: '0.55rem', fontSize: '0.72rem', color: textMuted, borderTop: `1px dashed ${borderLight}`, paddingTop: '0.4rem' }}>
+                                <span style={{ fontWeight: 700, color: textDark }}>Nota:</span> {fi.feedback}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* ASISTENTE ONTOLÓGICO IA & PROMPT MAESTRO (NODUS) */}
               <div style={{
                 background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%)',
@@ -100895,6 +101054,34 @@ export default function FuturosImposiblesView({
 
                     {/* Observaciones / Feedback del Mentor */}
                     <div style={{ marginBottom: '1.25rem' }}>
+                      {/* Contexto Fijo del Resultado en Revisión */}
+                      <div style={{
+                        background: 'rgba(56, 189, 248, 0.08)',
+                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                        borderRadius: '8px',
+                        padding: '0.65rem 0.85rem',
+                        marginBottom: '0.65rem'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                          <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase' }}>
+                            🎯 Meta en Revisión Activa &bull; Resultado {activeAreaTab + 1}: {fi.area || `Resultado ${activeAreaTab + 1}`}
+                          </span>
+                          <span style={{
+                            fontSize: '0.7rem',
+                            fontWeight: 800,
+                            padding: '0.15rem 0.5rem',
+                            borderRadius: '8px',
+                            background: fi.estado === 'aprobado' ? 'rgba(16, 185, 129, 0.15)' : fi.estado === 'pendiente' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(234, 88, 12, 0.15)',
+                            color: fi.estado === 'aprobado' ? '#10b981' : fi.estado === 'pendiente' ? '#f59e0b' : '#ea580c'
+                          }}>
+                            Estado: {fi.estado?.toUpperCase() || 'PENDIENTE'}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.86rem', color: textDark, fontWeight: 600, lineHeight: 1.45 }}>
+                          {fi.meta ? `"${fi.meta}"` : <span style={{ color: '#ef4444', fontStyle: 'italic' }}>Sin texto registrado en Nodus para esta meta</span>}
+                        </div>
+                      </div>
+
                       <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: textMuted, marginBottom: '0.4rem' }}>
                         RETROALIMENTACIÓN DEL MENTOR / COORDINADOR:
                       </label>
@@ -101027,6 +101214,37 @@ export default function FuturosImposiblesView({
                             <span style={{ color: textMuted }}>5. Trazabilidad Racha: </span>
                             <strong style={{ color: '#10b981' }}>Logs Activos (88.3%)</strong>
                           </div>
+                        </div>
+
+                        {/* Metas Verificadas para la Certificación Oficial */}
+                        <div style={{
+                          background: 'rgba(0, 0, 0, 0.25)',
+                          border: `1px solid ${borderLight}`,
+                          borderRadius: '8px',
+                          padding: '0.75rem',
+                          marginBottom: '0.9rem'
+                        }}>
+                          <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#38bdf8', marginBottom: '0.4rem', textTransform: 'uppercase' }}>
+                            📋 3 Resultados Declarados a Certificar:
+                          </div>
+                          {(selectedParticipant.fis || []).slice(0, 3).map((item, i) => (
+                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.76rem', padding: '0.25rem 0', borderBottom: i < 2 ? `1px dashed ${borderLight}` : 'none' }}>
+                              <div style={{ flex: 1 }}>
+                                <strong style={{ color: textDark }}>{i + 1}. {item.area || `RI ${i + 1}`}:</strong>{' '}
+                                <span style={{ color: item.meta ? textDark : '#ef4444', fontStyle: item.meta ? 'normal' : 'italic' }}>
+                                  {item.meta ? `"${item.meta}"` : 'Sin meta registrada'}
+                                </span>
+                              </div>
+                              <span style={{
+                                fontSize: '0.68rem',
+                                fontWeight: 800,
+                                color: item.estado === 'aprobado' ? '#10b981' : item.estado === 'pendiente' ? '#f59e0b' : '#ea580c',
+                                whiteSpace: 'nowrap'
+                              }}>
+                                [{item.estado ? item.estado.toUpperCase() : 'PENDIENTE'}]
+                              </span>
+                            </div>
+                          ))}
                         </div>
 
                         {/* Acciones de Manejo Interno */}
