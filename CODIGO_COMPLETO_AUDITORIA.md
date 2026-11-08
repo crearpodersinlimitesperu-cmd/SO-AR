@@ -99180,7 +99180,6 @@ export default function FuturosImposiblesView({
   const [showArmandoModal, setShowArmandoModal] = useState(false);
   const [activeArmandoTab, setActiveArmandoTab] = useState('especificaciones');
   const [armandoChecklistState, setArmandoChecklistState] = useState({ 1: true, 2: true, 3: true, 4: true, 5: true });
-  const [isCertifyingArmando, setIsCertifyingArmando] = useState(false);
 
   const copyToClipboard = async (text, successMsg = 'Copiado al portapapeles') => {
     try {
@@ -99440,37 +99439,6 @@ export default function FuturosImposiblesView({
     }
     setMentorNote(nota);
     triggerToast(`Observación del Resultado ${resIndex + 1} aplicada`, 'success');
-  };
-
-  const handleCertificarArmando = async () => {
-    if (!selectedParticipant) return;
-    setIsCertifyingArmando(true);
-    try {
-      const esquema = generarEsquemaCausoOSArmando(selectedParticipant, {
-        fechaAuditoria: new Date().toISOString().split('T')[0],
-        checklist: {
-          limite_ris_cumplido: (selectedParticipant.fis || []).length <= 3,
-          separacion_ri_har_correcta: true,
-          partner_asignado_verificado: true
-        }
-      });
-
-      const docRef = doc(db, 'nodus_causo_os_auditoria', String(selectedParticipant.id));
-      await setDoc(docRef, {
-        ...esquema,
-        certifiedAt: serverTimestamp(),
-        certifiedBy: currentUser?.email || 'armando@cpslglobal.com',
-        auditor: 'Armando',
-        estado: 'CERTIFICADO'
-      }, { merge: true });
-
-      triggerToast(`Auditoría CAUSO OS certificada por Armando para ${selectedParticipant.nombre}`, 'success');
-    } catch (err) {
-      console.warn('Persistencia en Firestore diferida (modo tolerante):', err?.message);
-      triggerToast(`Auditoría CAUSO OS certificada localmente para ${selectedParticipant.nombre}`, 'info');
-    } finally {
-      setIsCertifyingArmando(false);
-    }
   };
 
   const saveReview = async (estado) => {
@@ -101145,155 +101113,6 @@ export default function FuturosImposiblesView({
                         <Check size={16} /> Aprobar Futuro Imposible
                       </button>
                     </div>
-
-                    {/* AUDITORÍA Y CERTIFICACIÓN CAUSO OS (MANEJO INTERNO ARMANDO & DIRECCIÓN) */}
-                    {isInternalUser && (
-                      <div style={{
-                        marginTop: '1.5rem',
-                        background: 'rgba(16, 185, 129, 0.05)',
-                        borderRadius: '10px',
-                        padding: '1rem',
-                        border: '1px solid rgba(16, 185, 129, 0.25)'
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <ShieldAlert size={18} color="#34d399" />
-                            <div>
-                              <div style={{ fontSize: '0.88rem', fontWeight: 800, color: textDark, display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                                Auditoría de Desempeño CAUSO OS &bull; Control Armando
-                                <span style={{
-                                  fontSize: '0.66rem',
-                                  background: 'rgba(56, 189, 248, 0.18)',
-                                  color: '#38bdf8',
-                                  padding: '0.12rem 0.5rem',
-                                  borderRadius: '4px',
-                                  fontWeight: 800,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '0.25rem'
-                                }}>
-                                  <Lock size={10} /> Manejo Interno
-                                </span>
-                              </div>
-                              <div style={{ fontSize: '0.74rem', color: textMuted }}>
-                                Límite de 3 RIs, trazabilidad HAR y rol Partner verificado
-                              </div>
-                            </div>
-                          </div>
-                          <span style={{
-                            background: 'rgba(16, 185, 129, 0.15)',
-                            color: '#34d399',
-                            padding: '0.2rem 0.6rem',
-                            borderRadius: '12px',
-                            fontSize: '0.72rem',
-                            fontWeight: 800
-                          }}>
-                            Auditor Oficial: Armando
-                          </span>
-                        </div>
-
-                        {/* 5 Criterios de Control de la Especificación */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.5rem', marginBottom: '0.9rem' }}>
-                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                            <span style={{ color: textMuted }}>1. Límite de RIs: </span>
-                            <strong style={{ color: '#10b981' }}>Máx. 3 activos ({Math.min(3, (selectedParticipant.fis || []).length)}/3)</strong>
-                          </div>
-                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                            <span style={{ color: textMuted }}>2. Estructura HAR-RI: </span>
-                            <strong style={{ color: '#38bdf8' }}>Orientado al Proceso</strong>
-                          </div>
-                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                            <span style={{ color: textMuted }}>3. Rol de Apoyo: </span>
-                            <strong style={{ color: '#a855f7' }}>Partner (No sombra)</strong>
-                          </div>
-                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                            <span style={{ color: textMuted }}>4. Evidencia de Métricas: </span>
-                            <strong style={{ color: '#f59e0b' }}>Indicador Cuantificable</strong>
-                          </div>
-                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                            <span style={{ color: textMuted }}>5. Trazabilidad Racha: </span>
-                            <strong style={{ color: '#10b981' }}>Logs Activos (88.3%)</strong>
-                          </div>
-                        </div>
-
-                        {/* Metas Verificadas para la Certificación Oficial */}
-                        <div style={{
-                          background: 'rgba(0, 0, 0, 0.25)',
-                          border: `1px solid ${borderLight}`,
-                          borderRadius: '8px',
-                          padding: '0.75rem',
-                          marginBottom: '0.9rem'
-                        }}>
-                          <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#38bdf8', marginBottom: '0.4rem', textTransform: 'uppercase' }}>
-                            📋 3 Resultados Declarados a Certificar:
-                          </div>
-                          {(selectedParticipant.fis || []).slice(0, 3).map((item, i) => (
-                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', fontSize: '0.76rem', padding: '0.25rem 0', borderBottom: i < 2 ? `1px dashed ${borderLight}` : 'none' }}>
-                              <div style={{ flex: 1 }}>
-                                <strong style={{ color: textDark }}>{i + 1}. {item.area || `RI ${i + 1}`}:</strong>{' '}
-                                <span style={{ color: item.meta ? textDark : '#ef4444', fontStyle: item.meta ? 'normal' : 'italic' }}>
-                                  {item.meta ? `"${item.meta}"` : 'Sin meta registrada'}
-                                </span>
-                              </div>
-                              <span style={{
-                                fontSize: '0.68rem',
-                                fontWeight: 800,
-                                color: item.estado === 'aprobado' ? '#10b981' : item.estado === 'pendiente' ? '#f59e0b' : '#ea580c',
-                                whiteSpace: 'nowrap'
-                              }}>
-                                [{item.estado ? item.estado.toUpperCase() : 'PENDIENTE'}]
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Acciones de Manejo Interno */}
-                        <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                          <button
-                            onClick={() => {
-                              const esquema = generarEsquemaCausoOSArmando(selectedParticipant);
-                              copyToClipboard(JSON.stringify(esquema, null, 2), '¡Esquema JSON CAUSO OS (Armando) copiado al portapapeles!');
-                            }}
-                            title="Uso Interno: Copia el JSON oficial estructurado según la especificación de Armando"
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.35rem',
-                              background: 'rgba(56, 189, 248, 0.15)',
-                              border: '1px solid rgba(56, 189, 248, 0.4)',
-                              color: '#38bdf8',
-                              padding: '0.45rem 0.85rem',
-                              borderRadius: '6px',
-                              fontSize: '0.78rem',
-                              fontWeight: 700,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            <Lock size={12} /> <Copy size={13} /> Copiar JSON Estructurado (Manejo Interno)
-                          </button>
-
-                          <button
-                            onClick={handleCertificarArmando}
-                            disabled={isCertifyingArmando}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.35rem',
-                              background: 'linear-gradient(135deg, #059669 0%, #0284c7 100%)',
-                              border: 'none',
-                              color: '#ffffff',
-                              padding: '0.45rem 0.95rem',
-                              borderRadius: '6px',
-                              fontSize: '0.78rem',
-                              fontWeight: 800,
-                              cursor: isCertifyingArmando ? 'not-allowed' : 'pointer'
-                            }}
-                          >
-                            <CheckCheck size={14} /> {isCertifyingArmando ? 'Certificando...' : 'Certificar Auditoría Armando (CAUSO OS)'}
-                          </button>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 );
               })()}
