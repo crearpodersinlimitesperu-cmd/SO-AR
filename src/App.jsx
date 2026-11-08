@@ -511,7 +511,7 @@ function App() {
 
           {/* Acceso Directo Oficial: Auditor de Resultados Imposibles (IA) */}
           <Route path="/resultados-imposibles" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']} allowedEmails={PORTFOLIO_FI_REVIEW_EMAILS} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas', 'qt', 'capitan']} allowedEmails={PORTFOLIO_FI_REVIEW_EMAILS} requireSuperAdmin={false}>
               <PortfolioBoard initialTab="futuros_imposibles" />
             </RoleRoute>
           } />

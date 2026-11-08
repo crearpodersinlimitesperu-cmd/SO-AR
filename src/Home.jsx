@@ -401,9 +401,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     badge: 'Auditor IA',
     emoji: '🎯',
     desc: 'Auditor de 3 Resultados Imposibles vs HAR, cohorte NODUS post-PFD, rezago crítico y certificación Armando',
-    keywords: ['resultados imposibles', 'futuros imposibles', 'ia', 'auditor', 'metas', 'nodus', 'armando', 'har'],
+    keywords: ['resultados', 'resultados imposibles', 'futuros', 'futuros imposibles', 'ri', 'fi', 'ia', 'auditor', 'metas', 'nodus', 'armando', 'har'],
     route: '/resultados-imposibles',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas', 'qt', 'capitan']
   },
   {
     id: 'opt-portafolio',
