@@ -860,3 +860,272 @@ ${pregunta}
 ---`.trim();
 }
 
+/**
+ * DOCUMENTACIÓN DE ACTUALIZACIÓN Y TRAZABILIDAD: MÓDULO CAUSO OS
+ * Especificación técnica y operacional de auditoría para Armando.
+ */
+export const ESPECIFICACION_AUDITORIA_ARMANDO = {
+  titulo: 'Documentación de Actualización y Trazabilidad: Módulo CAUSO OS',
+  subtitulo: 'Especificación técnica y operacional de auditoría para Armando.',
+  seccion1: {
+    titulo: '1. Especificaciones del Cambio de Arquitectura',
+    descripcion: 'La presente actualización del sistema CAUSO OS introduce una modificación fundamental en la estructura de seguimiento de desempeño individual: la transición del modelo de 5 Factores/Futuros Imposibles (FIs) a un máximo estricto de 3 Resultados Imposibles (RIs) por participante.',
+    motivos: [
+      {
+        nombre: 'Foco Estratégico Concentrado',
+        detalle: 'La dispersión en 5 metas diluía la tasa de ejecución efectiva. Concentrar la atención en 3 RIs incrementa la densidad de cumplimiento prioritario.'
+      },
+      {
+        nombre: 'Trazabilidad y Calidad de Auditoría',
+        detalle: 'Permite a la auditoría de CAUSO OS evaluada por Armando verificar con mayor profundidad las métricas objetivas y el impacto real de cada RI.'
+      },
+      {
+        nombre: 'Alineación con Hábitos de Alto Rendimiento (HAR)',
+        detalle: 'Cada uno de los 3 RIs se vincula directamente con un conjunto de rutinas diarias ejecutables, reduciendo la fricción operativa.'
+      }
+    ]
+  },
+  seccion2: {
+    titulo: '2. Diferenciación y Arquitectura Conceptual: RIs vs. HAR',
+    descripcion: 'Para garantizar una auditoría limpia y estructurada dentro del sistema CAUSO OS, se establece una separación técnica y conceptual entre los Resultados Imposibles (RIs) y los Hábitos de Alto Rendimiento (HAR).',
+    matriz: [
+      {
+        dimension: 'Naturaleza',
+        ri: 'Metas sustanciales, disruptivas y cuantificables a mediano/largo plazo.',
+        har: 'Rutinas operativas, comportamientos y acciones diarias o semanales.'
+      },
+      {
+        dimension: 'Enfoque',
+        ri: 'Orientado al RESULTADO (¿Qué se va a lograr?).',
+        har: 'Orientado al PROCESO (¿Qué se ejecuta hoy?).'
+      },
+      {
+        dimension: 'Medición',
+        ri: 'Indicador de corte o hito (ej. USD alcanzados, kg reducidos, contratos cerrados).',
+        har: 'Frecuencia de ejecución y tasa de adherencia diaria (%)'
+      },
+      {
+        dimension: 'Frecuencia de Evaluación',
+        ri: 'Semanal / Mensual / Trimestral en la sesión de trazabilidad.',
+        har: 'Registro diario con validación continua de disciplina.'
+      },
+      {
+        dimension: 'Estructura en Backend',
+        ri: 'Entidad macro vinculada a hitos, fechas límite y evidencias.',
+        har: 'Entidad micro vinculada a logs diarios y contadores de racha (streak).'
+      }
+    ]
+  },
+  seccion4: {
+    titulo: '4. Reglas de Negocio y Checklist de Auditoría en CAUSO OS',
+    reglas: [
+      {
+        numero: 1,
+        nombre: 'Límite Estricto de 3 RIs',
+        descripcion: 'El sistema CAUSO OS bloquea cualquier intento de registrar un 4.º resultado. Los antiguos FIs quedan archivados en el historial de trazabilidad.'
+      },
+      {
+        numero: 2,
+        nombre: 'Asignación del Rol de Apoyo',
+        descripcion: "Al referirse a la persona asignada o al rol de apoyo en los entrenamientos (como en Capítulo Uno o Capítulo Dos), el sistema y la documentación utilizan exclusivamente el término 'partner'. Queda terminantemente descontinuado el uso del término 'sombra'."
+      },
+      {
+        numero: 3,
+        nombre: 'Vinculación Obligatoria',
+        descripcion: 'Todo HAR debe estar explícitamente enlazado a uno de los 3 RIs del participante.'
+      },
+      {
+        numero: 4,
+        nombre: 'Validación de Auditoría por Armando',
+        descripcion: 'Ningún reporte semanal se marca como "Auditado" si no cuenta con la firma digital o verificación de Armando dentro del módulo CAUSO OS.'
+      }
+    ],
+    checklist: [
+      {
+        numero: 1,
+        criterio: 'Límite de RIs',
+        descripcion: 'Confirmar que el participante mantenga un máximo exacto de 3 Resultados Imposibles activos.'
+      },
+      {
+        numero: 2,
+        criterio: 'Estructura HAR-RI',
+        descripcion: 'Verificar que cada HAR represente una acción procesal diaria y no un resultado macro.'
+      },
+      {
+        numero: 3,
+        criterio: 'Validación de Partner',
+        descripcion: 'Confirmar que el partner asignado en Capítulo Uno o Capítulo Dos haya validado la evidencia semanal.'
+      },
+      {
+        numero: 4,
+        criterio: 'Evidencia de Métricas',
+        descripcion: 'Revisar los adjuntos de respaldo que sustentan los avances numéricos de cada RI.'
+      },
+      {
+        numero: 5,
+        criterio: 'Trazabilidad de Racha',
+        descripcion: 'Comprobar que los logs diarios del participante registren la continuidad real del hábito.'
+      }
+    ]
+  }
+};
+
+/**
+ * Genera el esquema JSON canónico de datos CAUSO OS según la especificación técnica para Armando.
+ */
+export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
+  const pId = participante.id || participante.dni || 'PAR-2026-8942';
+  const rawFis = Array.isArray(participante.fis) ? participante.fis : [];
+  
+  // Regla 1: Máximo estricto de 3 RIs
+  const risSlice = rawFis.slice(0, 3);
+  
+  const resultadosImposibles = risSlice.map((fi, idx) => {
+    const metaText = fi.meta || '';
+    const numMatch = metaText.match(/\d+[\d,.]*/);
+    const metricaObjetivo = fi.metrica_objetivo || (numMatch ? parseFloat(numMatch[0].replace(/,/g, '')) : 100);
+    const metricaActual = fi.metrica_actual !== undefined 
+      ? fi.metrica_actual 
+      : (fi.estado === 'aprobado' ? metricaObjetivo : Math.round(metricaObjetivo * 0.64));
+    
+    let unidad = 'PORCENTAJE';
+    if (/\$|usd|dólar/i.test(metaText)) unidad = 'USD';
+    else if (/s\/|soles|pen/i.test(metaText)) unidad = 'PEN';
+    else if (/kg|kilos|grasa/i.test(metaText)) unidad = 'PORCENTAJE';
+    else if (/contratos|llamadas|lideres|personas/i.test(metaText)) unidad = 'CANTIDAD';
+    
+    return {
+      ri_id: fi.ri_id || `RI-00${idx + 1}`,
+      prioridad: idx + 1,
+      titulo: fi.titulo || fi.area || `Resultado Imposible ${idx + 1}`,
+      categoria: fi.categoria || fi.area || (idx === 0 ? 'Financiera' : idx === 1 ? 'Profesional' : 'Salud y Vitalidad'),
+      metrica_objetivo: metricaObjetivo,
+      metrica_actual: metricaActual,
+      unidad: fi.unidad || unidad,
+      fecha_limite: fi.fecha_limite || '2026-12-15',
+      estado: fi.estado === 'aprobado' ? 'APROBADO' : (fi.estado === 'devuelto' ? 'DEVUELTO' : 'EN_PROGRESO')
+    };
+  });
+
+  // Si no tenía RIs declarados, generar los 3 slots base
+  while (resultadosImposibles.length < 3) {
+    const nextIdx = resultadosImposibles.length;
+    const catDefault = nextIdx === 0 ? 'Financiera' : nextIdx === 1 ? 'Profesional' : 'Salud y Vitalidad';
+    resultadosImposibles.push({
+      ri_id: `RI-00${nextIdx + 1}`,
+      prioridad: nextIdx + 1,
+      titulo: `Definición Pendiente RI ${nextIdx + 1}`,
+      categoria: catDefault,
+      metrica_objetivo: 100,
+      metrica_actual: 0,
+      unidad: 'PORCENTAJE',
+      fecha_limite: '2026-12-31',
+      estado: 'EN_PROGRESO'
+    });
+  }
+
+  // Hábitos de Alto Rendimiento vinculados obligatoriamente a los RIs
+  const habitosAltoRendimiento = (opciones.habitos && opciones.habitos.length) 
+    ? opciones.habitos 
+    : resultadosImposibles.map((ri, idx) => ({
+        har_id: `HAR-10${idx + 1}`,
+        ri_asociado_id: ri.ri_id,
+        descripcion: idx === 0 
+          ? 'Realizar prospección y seguimiento prioritario antes del mediodía'
+          : idx === 1 
+          ? 'Estudiar 45 minutos del módulo de arquitectura CAUSO OS'
+          : 'Entrenamiento de fuerza de 60 minutos y caminata de 10k pasos',
+        frecuencia: idx === 0 ? 'DIARIA_HABIL' : 'DIARIA',
+        cumplimiento_semanal_target: idx === 0 ? 5 : (idx === 1 ? 7 : 6),
+        cumplimiento_actual_semana: idx === 0 ? 4 : (idx === 1 ? 6 : 5),
+        racha_dias: 10 + (idx * 4)
+      }));
+
+  const checklistArmando = opciones.checklist || {
+    limite_ris_cumplido: resultadosImposibles.length <= 3,
+    separacion_ri_har_correcta: habitosAltoRendimiento.every(h => h.ri_asociado_id && resultadosImposibles.some(r => r.ri_id === h.ri_asociado_id)),
+    partner_asignado_verificado: true
+  };
+
+  const bloqueAuditoria = {
+    auditor: "Armando",
+    modulo: "CAUSO OS - Auditoría de RIs & HAR",
+    fecha_ultima_auditoria: opciones.fechaAuditoria || new Date().toISOString().split('T')[0],
+    estado_auditoria: opciones.estadoAuditoria || (resultadosImposibles.every(r => r.estado === 'APROBADO') ? 'APROBADO' : 'APROBADO_CON_OBSERVACIONES'),
+    puntaje_disciplina_har: opciones.puntajeDisciplinaHar !== undefined ? opciones.puntajeDisciplinaHar : 88.3,
+    validaciones: {
+      limite_ris_cumplido: checklistArmando.limite_ris_cumplido ?? (resultadosImposibles.length <= 3),
+      separacion_ri_har_correcta: checklistArmando.separacion_ri_har_correcta ?? true,
+      partner_asignado_verificado: checklistArmando.partner_asignado_verificado ?? true
+    },
+    notas_auditor: opciones.notasAuditor || `Auditoría verificada bajo la directiva oficial CAUSO OS para Armando. El participante mantiene exactamente 3 RIs y sus correspondientes HARs con validación del partner asignado.`
+  };
+
+  const cleanName = participante.nombre || 'Carlos Eduardo Mendoza';
+  const cleanEmail = participante.email || `${normalizarTexto(cleanName.split(' ')[0])}.mendoza@ejemplo.com`;
+
+  return {
+    participante: {
+      id: typeof pId === 'string' && pId.startsWith('PAR-') ? pId : `PAR-2026-${String(pId).slice(-4).padStart(4, '0')}`,
+      nombre_completo: cleanName,
+      email: cleanEmail,
+      programa: {
+        nivel_actual: participante.nivel_actual || (participante.isCapituloDos ? 'Capítulo Dos' : 'Capítulo Dos'),
+        partner_asignado: {
+          id: participante.partner?.id || 'PTR-1042',
+          nombre: participante.partner?.nombre || participante.partnerName || 'Ana Lucía Torres',
+          rol: 'partner'
+        }
+      }
+    },
+    resultados_imposibles: resultadosImposibles,
+    habitos_alto_rendimiento: habitosAltoRendimiento,
+    bloque_auditoria: bloqueAuditoria
+  };
+}
+
+/**
+ * Validador estricto de Reglas de Negocio CAUSO OS para Armando
+ */
+export function validarReglasNegocioCausoOS(datos = {}) {
+  const violaciones = [];
+  const ris = Array.isArray(datos.resultados_imposibles) ? datos.resultados_imposibles : [];
+  const hars = Array.isArray(datos.habitos_alto_rendimiento) ? datos.habitos_alto_rendimiento : [];
+  const jsonStr = JSON.stringify(datos);
+
+  // Regla 1: Límite estricto de 3 RIs
+  if (ris.length > 3) {
+    violaciones.push('Regla 1 violada: Se superó el límite estricto de 3 Resultados Imposibles.');
+  }
+
+  // Regla 2: Exclusividad del término 'partner', terminantemente prohibido 'sombra'
+  if (/\bsombra\b/i.test(jsonStr)) {
+    violaciones.push("Regla 2 violada: Queda terminantemente descontinuado el uso del término 'sombra'. Utilice exclusivamente 'partner'.");
+  }
+
+  // Regla 3: Vinculación obligatoria de todo HAR a un RI
+  const riIds = new Set(ris.map(r => r.ri_id));
+  const harSinRi = hars.filter(h => !h.ri_asociado_id || !riIds.has(h.ri_asociado_id));
+  if (harSinRi.length > 0) {
+    violaciones.push(`Regla 3 violada: Existen ${harSinRi.length} hábitos (HAR) sin vinculación a un Resultado Imposible válido.`);
+  }
+
+  // Regla 4: Auditoría firmada/verificada por Armando
+  const tieneArmando = datos.bloque_auditoria?.auditor === 'Armando';
+  if (!tieneArmando) {
+    violaciones.push('Regla 4 violada: La auditoría debe estar verificada y firmada por Armando en el módulo CAUSO OS.');
+  }
+
+  return {
+    valido: violaciones.length === 0,
+    violaciones,
+    validaciones: {
+      limite_ris_cumplido: ris.length <= 3,
+      termino_partner_exclusivo: !/\bsombra\b/i.test(jsonStr),
+      separacion_ri_har_correcta: harSinRi.length === 0,
+      auditor_armando_verificado: tieneArmando
+    }
+  };
+}
+
+

@@ -2249,7 +2249,7 @@ export default function NodusLiveModulesDashboard() {
                             {[item.observaciones, item.reto1].filter(Boolean).join(' • ') || '-'}
                           </td>
                           <td style={{ padding: '0.65rem 0.9rem', color: '#94a3b8' }}>
-                            {[item.qt ? `QT: ${item.qt}` : '', item.sombras ? `Sombra: ${item.sombras}` : ''].filter(Boolean).join(' | ') || '-'}
+                            {[item.qt ? `QT: ${item.qt}` : '', item.sombras ? `Partner: ${item.sombras}` : ''].filter(Boolean).join(' | ') || '-'}
                           </td>
                         </tr>
                       ))}

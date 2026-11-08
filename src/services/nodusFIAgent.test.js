@@ -5,7 +5,10 @@ import {
   GUIA_PROPOSITO_3_CAPAS_RI,
   generarPromptParaParticipante,
   auditarResultadosImposiblesEMPOR,
-  generarTextoEvaluacionCompleta
+  generarTextoEvaluacionCompleta,
+  ESPECIFICACION_AUDITORIA_ARMANDO,
+  generarEsquemaCausoOSArmando,
+  validarReglasNegocioCausoOS
 } from './nodusFIAgent.js';
 
 test('PROMPT_MAESTRO_AUDITORIA_3_RI contains the required sections and rules', () => {
@@ -89,3 +92,96 @@ test('auditarResultadosImposiblesEMPOR detects opportunities for precision and g
   // Must avoid negative punitive words even when needing adjustments
   assert.doesNotMatch(texto, /\b(error|malo|fallaste|insuficiente)\b/i);
 });
+
+test('ESPECIFICACION_AUDITORIA_ARMANDO contains architecture changes, 3 RIs vs HAR, rules and 5 checklist points', () => {
+  assert.ok(ESPECIFICACION_AUDITORIA_ARMANDO.titulo.includes('Módulo CAUSO OS'));
+  assert.ok(ESPECIFICACION_AUDITORIA_ARMANDO.subtitulo.includes('Armando'));
+  assert.equal(ESPECIFICACION_AUDITORIA_ARMANDO.seccion1.motivos.length, 3);
+  assert.equal(ESPECIFICACION_AUDITORIA_ARMANDO.seccion2.matriz.length, 5);
+  assert.equal(ESPECIFICACION_AUDITORIA_ARMANDO.seccion4.reglas.length, 4);
+  assert.equal(ESPECIFICACION_AUDITORIA_ARMANDO.seccion4.checklist.length, 5);
+  
+  // Rule 2 checks that 'partner' is exclusive and 'sombra' is deprecated
+  const reglaApoyo = ESPECIFICACION_AUDITORIA_ARMANDO.seccion4.reglas.find(r => r.numero === 2);
+  assert.ok(reglaApoyo.descripcion.includes('partner'));
+  assert.ok(reglaApoyo.descripcion.includes('descontinuado'));
+});
+
+test('generarEsquemaCausoOSArmando creates canonical JSON matching specification for Armando', () => {
+  const participante = {
+    id: 'PAR-2026-8942',
+    nombre: 'Carlos Eduardo Mendoza',
+    email: 'carlos.mendoza@ejemplo.com',
+    nivel_actual: 'Capítulo Dos',
+    partner: {
+      id: 'PTR-1042',
+      nombre: 'Ana Lucía Torres',
+      rol: 'partner'
+    },
+    fis: [
+      { ri_id: 'RI-001', titulo: 'Incrementar facturación mensual a S/ 50,000', categoria: 'Financiera', metrica_objetivo: 50000, metrica_actual: 32000, unidad: 'PEN', fecha_limite: '2026-12-15', estado: 'EN_PROGRESO' },
+      { ri_id: 'RI-002', titulo: 'Completar la certificación técnica de infraestructura CAUSO', categoria: 'Profesional', metrica_objetivo: 100, metrica_actual: 65, unidad: 'PORCENTAJE', fecha_limite: '2026-11-30', estado: 'EN_PROGRESO' },
+      { ri_id: 'RI-003', titulo: 'Reducir el porcentaje de grasa corporal al 14%', categoria: 'Salud y Vitalidad', metrica_objetivo: 14, metrica_actual: 17.5, unidad: 'PORCENTAJE', fecha_limite: '2026-12-31', estado: 'EN_PROGRESO' }
+    ]
+  };
+
+  const schema = generarEsquemaCausoOSArmando(participante);
+  assert.equal(schema.participante.nombre_completo, 'Carlos Eduardo Mendoza');
+  assert.equal(schema.participante.programa.nivel_actual, 'Capítulo Dos');
+  assert.equal(schema.participante.programa.partner_asignado.rol, 'partner');
+  assert.equal(schema.resultados_imposibles.length, 3);
+  assert.equal(schema.habitos_alto_rendimiento.length, 3);
+  assert.equal(schema.bloque_auditoria.auditor, 'Armando');
+  assert.equal(schema.bloque_auditoria.validaciones.limite_ris_cumplido, true);
+  assert.equal(schema.bloque_auditoria.validaciones.partner_asignado_verificado, true);
+
+  // Validate business rules
+  const val = validarReglasNegocioCausoOS(schema);
+  assert.equal(val.valido, true);
+  assert.equal(val.violaciones.length, 0);
+});
+
+test('validarReglasNegocioCausoOS flags violations of the 4 strict business rules', () => {
+  // Test violation: 4 RIs (Rule 1)
+  const schemaCon4RIs = {
+    resultados_imposibles: [
+      { ri_id: 'RI-1' }, { ri_id: 'RI-2' }, { ri_id: 'RI-3' }, { ri_id: 'RI-4' }
+    ],
+    habitos_alto_rendimiento: [],
+    bloque_auditoria: { auditor: 'Armando' }
+  };
+  const res1 = validarReglasNegocioCausoOS(schemaCon4RIs);
+  assert.equal(res1.valido, false);
+  assert.ok(res1.violaciones.some(v => v.includes('Regla 1')));
+
+  // Test violation: deprecated term 'sombra' (Rule 2)
+  const schemaConSombra = {
+    resultados_imposibles: [{ ri_id: 'RI-1' }],
+    habitos_alto_rendimiento: [{ ri_asociado_id: 'RI-1', rol: 'sombra' }],
+    bloque_auditoria: { auditor: 'Armando' }
+  };
+  const res2 = validarReglasNegocioCausoOS(schemaConSombra);
+  assert.equal(res2.valido, false);
+  assert.ok(res2.violaciones.some(v => v.includes('Regla 2')));
+
+  // Test violation: HAR not linked to RI (Rule 3)
+  const schemaHarHuerfano = {
+    resultados_imposibles: [{ ri_id: 'RI-1' }],
+    habitos_alto_rendimiento: [{ ri_asociado_id: 'RI-999' }],
+    bloque_auditoria: { auditor: 'Armando' }
+  };
+  const res3 = validarReglasNegocioCausoOS(schemaHarHuerfano);
+  assert.equal(res3.valido, false);
+  assert.ok(res3.violaciones.some(v => v.includes('Regla 3')));
+
+  // Test violation: Missing Armando auditor verification (Rule 4)
+  const schemaSinArmando = {
+    resultados_imposibles: [{ ri_id: 'RI-1' }],
+    habitos_alto_rendimiento: [{ ri_asociado_id: 'RI-1' }],
+    bloque_auditoria: { auditor: 'Otro Auditor' }
+  };
+  const res4 = validarReglasNegocioCausoOS(schemaSinArmando);
+  assert.equal(res4.valido, false);
+  assert.ok(res4.violaciones.some(v => v.includes('Regla 4')));
+});
+
