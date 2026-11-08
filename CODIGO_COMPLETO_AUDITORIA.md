@@ -99026,7 +99026,8 @@ import {
   RefreshCw, Trophy, Search, X, ExternalLink, ChevronRight,
   Filter, ShieldAlert, Award, FileText, UserCheck, AlertTriangle,
   Loader2, ThumbsUp, Send, Check, Copy, BookOpen, Bot, Zap,
-  Layers, CheckCheck, Lightbulb, MessageSquare, Compass, ArrowRight
+  Layers, CheckCheck, Lightbulb, MessageSquare, Compass, ArrowRight,
+  Lock
 } from 'lucide-react';
 import { addDoc, collection, doc, getDocFromServer, getDocsFromServer, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -99128,6 +99129,20 @@ export default function FuturosImposiblesView({
   };
 
   const { currentUser } = useAuth();
+
+  // Control de Acceso: Manejo Interno (Dirección, Superadmin y Auditoría Armando)
+  const isInternalUser = useMemo(() => {
+    if (!currentUser) return false;
+    if (currentUser.isSuperAdmin) return true;
+    const role = currentUser.appRole || '';
+    const roles = Array.isArray(currentUser.roles) ? currentUser.roles : [];
+    const allRoles = [role, ...roles];
+    if (allRoles.some(r => ['direccion', 'superadmin', 'ceo', 'cfo', 'director_maestria'].includes(r))) return true;
+    const email = (currentUser.email || '').trim().toLowerCase();
+    if (email.includes('armando') || email.includes('jose.sanchez') || email.includes('andres.gomez') || email.includes('fer.aragon') || email.includes('paul.sosa')) return true;
+    return false;
+  }, [currentUser]);
+
   // Estados de filtrado y búsqueda
   const [equipoFilter, setEquipoFilter] = useState('Todos');
   const [estadoFilter, setEstadoFilter] = useState('TODOS');
@@ -99620,25 +99635,27 @@ export default function FuturosImposiblesView({
             <BookOpen size={15} /> Guía del "Para Qué"
           </button>
 
-          <button
-            onClick={() => setShowArmandoModal(true)}
-            title="Especificación técnica y operacional de auditoría para Armando (CAUSO OS)"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(56, 189, 248, 0.15) 100%)',
-              border: '1px solid rgba(16, 185, 129, 0.4)',
-              padding: '0.55rem 1rem',
-              borderRadius: '8px',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              color: '#34d399',
-              cursor: 'pointer'
-            }}
-          >
-            <ShieldAlert size={15} /> Auditoría Armando (CAUSO OS)
-          </button>
+          {isInternalUser && (
+            <button
+              onClick={() => setShowArmandoModal(true)}
+              title="Especificación técnica y operacional de auditoría para Armando (Manejo Interno CAUSO OS)"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(56, 189, 248, 0.15) 100%)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                padding: '0.55rem 1rem',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                color: '#34d399',
+                cursor: 'pointer'
+              }}
+            >
+              <Lock size={13} /> <ShieldAlert size={15} /> Auditoría Armando (Manejo Interno)
+            </button>
+          )}
 
           <button
             onClick={handleReevaluate}
@@ -100942,108 +100959,123 @@ export default function FuturosImposiblesView({
                       </button>
                     </div>
 
-                    {/* AUDITORÍA Y CERTIFICACIÓN CAUSO OS (ARMANDO) */}
-                    <div style={{
-                      marginTop: '1.5rem',
-                      background: 'rgba(16, 185, 129, 0.05)',
-                      borderRadius: '10px',
-                      padding: '1rem',
-                      border: '1px solid rgba(16, 185, 129, 0.25)'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <ShieldAlert size={18} color="#34d399" />
-                          <div>
-                            <div style={{ fontSize: '0.88rem', fontWeight: 800, color: textDark }}>
-                              Auditoría de Desempeño CAUSO OS &bull; Control Armando
-                            </div>
-                            <div style={{ fontSize: '0.74rem', color: textMuted }}>
-                              Límite de 3 RIs, trazabilidad HAR y rol Partner verificado
+                    {/* AUDITORÍA Y CERTIFICACIÓN CAUSO OS (MANEJO INTERNO ARMANDO & DIRECCIÓN) */}
+                    {isInternalUser && (
+                      <div style={{
+                        marginTop: '1.5rem',
+                        background: 'rgba(16, 185, 129, 0.05)',
+                        borderRadius: '10px',
+                        padding: '1rem',
+                        border: '1px solid rgba(16, 185, 129, 0.25)'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <ShieldAlert size={18} color="#34d399" />
+                            <div>
+                              <div style={{ fontSize: '0.88rem', fontWeight: 800, color: textDark, display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                Auditoría de Desempeño CAUSO OS &bull; Control Armando
+                                <span style={{
+                                  fontSize: '0.66rem',
+                                  background: 'rgba(56, 189, 248, 0.18)',
+                                  color: '#38bdf8',
+                                  padding: '0.12rem 0.5rem',
+                                  borderRadius: '4px',
+                                  fontWeight: 800,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.25rem'
+                                }}>
+                                  <Lock size={10} /> Manejo Interno
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '0.74rem', color: textMuted }}>
+                                Límite de 3 RIs, trazabilidad HAR y rol Partner verificado
+                              </div>
                             </div>
                           </div>
+                          <span style={{
+                            background: 'rgba(16, 185, 129, 0.15)',
+                            color: '#34d399',
+                            padding: '0.2rem 0.6rem',
+                            borderRadius: '12px',
+                            fontSize: '0.72rem',
+                            fontWeight: 800
+                          }}>
+                            Auditor Oficial: Armando
+                          </span>
                         </div>
-                        <span style={{
-                          background: 'rgba(16, 185, 129, 0.15)',
-                          color: '#34d399',
-                          padding: '0.2rem 0.6rem',
-                          borderRadius: '12px',
-                          fontSize: '0.72rem',
-                          fontWeight: 800
-                        }}>
-                          Auditor Oficial: Armando
-                        </span>
-                      </div>
 
-                      {/* 5 Criterios de Control de la Especificación */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.5rem', marginBottom: '0.9rem' }}>
-                        <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                          <span style={{ color: textMuted }}>1. Límite de RIs: </span>
-                          <strong style={{ color: '#10b981' }}>Máx. 3 activos ({Math.min(3, (selectedParticipant.fis || []).length)}/3)</strong>
+                        {/* 5 Criterios de Control de la Especificación */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.5rem', marginBottom: '0.9rem' }}>
+                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                            <span style={{ color: textMuted }}>1. Límite de RIs: </span>
+                            <strong style={{ color: '#10b981' }}>Máx. 3 activos ({Math.min(3, (selectedParticipant.fis || []).length)}/3)</strong>
+                          </div>
+                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                            <span style={{ color: textMuted }}>2. Estructura HAR-RI: </span>
+                            <strong style={{ color: '#38bdf8' }}>Orientado al Proceso</strong>
+                          </div>
+                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                            <span style={{ color: textMuted }}>3. Rol de Apoyo: </span>
+                            <strong style={{ color: '#a855f7' }}>Partner (No sombra)</strong>
+                          </div>
+                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                            <span style={{ color: textMuted }}>4. Evidencia de Métricas: </span>
+                            <strong style={{ color: '#f59e0b' }}>Indicador Cuantificable</strong>
+                          </div>
+                          <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
+                            <span style={{ color: textMuted }}>5. Trazabilidad Racha: </span>
+                            <strong style={{ color: '#10b981' }}>Logs Activos (88.3%)</strong>
+                          </div>
                         </div>
-                        <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                          <span style={{ color: textMuted }}>2. Estructura HAR-RI: </span>
-                          <strong style={{ color: '#38bdf8' }}>Orientado al Proceso</strong>
-                        </div>
-                        <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                          <span style={{ color: textMuted }}>3. Rol de Apoyo: </span>
-                          <strong style={{ color: '#a855f7' }}>Partner (No sombra)</strong>
-                        </div>
-                        <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                          <span style={{ color: textMuted }}>4. Evidencia de Métricas: </span>
-                          <strong style={{ color: '#f59e0b' }}>Indicador Cuantificable</strong>
-                        </div>
-                        <div style={{ background: 'rgba(0,0,0,0.25)', padding: '0.5rem 0.65rem', borderRadius: '6px', fontSize: '0.74rem' }}>
-                          <span style={{ color: textMuted }}>5. Trazabilidad Racha: </span>
-                          <strong style={{ color: '#10b981' }}>Logs Activos (88.3%)</strong>
+
+                        {/* Acciones de Manejo Interno */}
+                        <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() => {
+                              const esquema = generarEsquemaCausoOSArmando(selectedParticipant);
+                              copyToClipboard(JSON.stringify(esquema, null, 2), '¡Esquema JSON CAUSO OS (Armando) copiado al portapapeles!');
+                            }}
+                            title="Uso Interno: Copia el JSON oficial estructurado según la especificación de Armando"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              background: 'rgba(56, 189, 248, 0.15)',
+                              border: '1px solid rgba(56, 189, 248, 0.4)',
+                              color: '#38bdf8',
+                              padding: '0.45rem 0.85rem',
+                              borderRadius: '6px',
+                              fontSize: '0.78rem',
+                              fontWeight: 700,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <Lock size={12} /> <Copy size={13} /> Copiar JSON Estructurado (Manejo Interno)
+                          </button>
+
+                          <button
+                            onClick={handleCertificarArmando}
+                            disabled={isCertifyingArmando}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              background: 'linear-gradient(135deg, #059669 0%, #0284c7 100%)',
+                              border: 'none',
+                              color: '#ffffff',
+                              padding: '0.45rem 0.95rem',
+                              borderRadius: '6px',
+                              fontSize: '0.78rem',
+                              fontWeight: 800,
+                              cursor: isCertifyingArmando ? 'not-allowed' : 'pointer'
+                            }}
+                          >
+                            <CheckCheck size={14} /> {isCertifyingArmando ? 'Certificando...' : 'Certificar Auditoría Armando (CAUSO OS)'}
+                          </button>
                         </div>
                       </div>
-
-                      {/* Acciones */}
-                      <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                        <button
-                          onClick={() => {
-                            const esquema = generarEsquemaCausoOSArmando(selectedParticipant);
-                            copyToClipboard(JSON.stringify(esquema, null, 2), '¡Esquema JSON CAUSO OS (Armando) copiado al portapapeles!');
-                          }}
-                          title="Copia el JSON oficial estructurado según la especificación de Armando"
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.35rem',
-                            background: 'rgba(56, 189, 248, 0.15)',
-                            border: '1px solid rgba(56, 189, 248, 0.4)',
-                            color: '#38bdf8',
-                            padding: '0.45rem 0.85rem',
-                            borderRadius: '6px',
-                            fontSize: '0.78rem',
-                            fontWeight: 700,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          <Copy size={13} /> Copiar JSON Estructurado (Armando)
-                        </button>
-
-                        <button
-                          onClick={handleCertificarArmando}
-                          disabled={isCertifyingArmando}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.35rem',
-                            background: 'linear-gradient(135deg, #059669 0%, #0284c7 100%)',
-                            border: 'none',
-                            color: '#ffffff',
-                            padding: '0.45rem 0.95rem',
-                            borderRadius: '6px',
-                            fontSize: '0.78rem',
-                            fontWeight: 800,
-                            cursor: isCertifyingArmando ? 'not-allowed' : 'pointer'
-                          }}
-                        >
-                          <CheckCheck size={14} /> {isCertifyingArmando ? 'Certificando...' : 'Certificar Auditoría Armando (CAUSO OS)'}
-                        </button>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 );
               })()}
