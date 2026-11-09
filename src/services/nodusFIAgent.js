@@ -101,15 +101,17 @@ export function ejecutarDiagnosticoFIs(
     equiposMap[eqKey].aprobados += apr;
   });
 
-  // Orden jerárquico canónico por Sede institucional
+  // Orden jerárquico canónico por Sede institucional (alineado con OPERATIONAL_SEDES)
   const SEDE_ORDER = {
-    'lima': 1,
-    'quito': 2,
-    'guayaquil': 3,
-    'cuenca': 4,
+    'quito': 1,
+    'guayaquil': 2,
+    'cuenca': 3,
+    'lima': 4,
     'medellin': 5,
     'medellín': 5,
-    'cdmx': 6
+    'cdmx': 6,
+    'mexico': 6,
+    'méxico': 6
   };
 
   // Calcular semáforo de equipos de la sede

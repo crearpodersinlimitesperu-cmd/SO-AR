@@ -12,6 +12,8 @@ import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import { opcionesEquipo, resolveFISource } from '../services/nodusFISnapshot';
 import { canonicalSede } from '../utils/sede.js';
+import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
+import { PORTFOLIO_FI_REVIEW_EMAILS } from '../config/permissions';
 import { NODUS_FUTUROS_IMPOSIBLES_PARTICIPANTES, ROLES_FI } from '../data/nodusFuturosImposiblesData.js';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
 import { 
@@ -110,18 +112,44 @@ export default function FuturosImposiblesView({
 
   const { currentUser } = useAuth();
 
-  // Control de Acceso: Manejo Interno (Dirección, Superadmin y Auditoría Armando)
-  const isInternalUser = useMemo(() => {
+  // Control de Acceso: Manejo Interno (Dirección, Superadmin, Auditoría Armando y Roles Globales)
+  const isGlobalUser = useMemo(() => {
     if (!currentUser) return false;
     if (currentUser.isSuperAdmin) return true;
-    const role = currentUser.appRole || '';
-    const roles = Array.isArray(currentUser.roles) ? currentUser.roles : [];
-    const allRoles = [role, ...roles];
-    if (allRoles.some(r => ['direccion', 'superadmin', 'ceo', 'cfo', 'director_maestria'].includes(r))) return true;
+    const exec = ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin'];
+    const currentRoles = [currentUser.appRole, currentUser.role, ...(Array.isArray(currentUser.roles) ? currentUser.roles : [])]
+      .filter(Boolean).map(r => String(r).toLowerCase().trim());
+    if (currentRoles.some(r => exec.includes(r))) return true;
     const email = (currentUser.email || '').trim().toLowerCase();
+    if (PORTFOLIO_FI_REVIEW_EMAILS?.some(e => e.toLowerCase() === email)) return true;
     if (email.includes('armando') || email.includes('jose.sanchez') || email.includes('andres.gomez') || email.includes('fer.aragon') || email.includes('paul.sosa')) return true;
     return false;
   }, [currentUser]);
+
+  const isInternalUser = isGlobalUser;
+
+  // Sede permitida según rol institucional del usuario
+  const userAllowedSede = useMemo(() => {
+    if (isGlobalUser) return 'GLOBAL';
+    return normalizeSede(currentUser?.sede) || 'Lima';
+  }, [isGlobalUser, currentUser]);
+
+  // Estado reactivo de Sede activa en la vista
+  const [activeSede, setActiveSede] = useState(() => {
+    if (!isGlobalUser && currentUser?.sede) {
+      return normalizeSede(currentUser.sede);
+    }
+    return selectedSede || 'GLOBAL';
+  });
+
+  // Sincronizar si cambia selectedSede desde PortfolioBoard (respetando restricciones de rol)
+  useEffect(() => {
+    if (!isGlobalUser && currentUser?.sede) {
+      setActiveSede(normalizeSede(currentUser.sede));
+    } else if (selectedSede) {
+      setActiveSede(selectedSede);
+    }
+  }, [selectedSede, isGlobalUser, currentUser?.sede]);
 
   // Estados de filtrado y búsqueda
   const [equipoFilter, setEquipoFilter] = useState('Todos');
@@ -323,23 +351,45 @@ export default function FuturosImposiblesView({
     return Number.isNaN(date.getTime()) ? 'fecha no verificable' : date.toLocaleString('es-EC');
   };
 
-  // Cálculo dinámico de equipos disponibles según la sede seleccionada
-  const esGlobalSede = ['', 'global', 'sede global', 'todas', 'todos', 'all'].includes((selectedSede || '').toLowerCase().trim());
+  // Cálculo dinámico de equipos y conteos según la sede seleccionada
+  const esGlobalSede = ['', 'global', 'sede global', 'todas', 'todos', 'all'].includes((activeSede || '').toLowerCase().trim());
+  
+  // Conteo reactivo de participantes confirmados PFD por Sede institucional
+  const conteoPorSede = useMemo(() => {
+    const counts = { GLOBAL: 0 };
+    OPERATIONAL_SEDES.forEach(s => { counts[s] = 0; });
+    
+    participantesConRevision.forEach(p => {
+      if (p?.asistioPFD === true) {
+        counts.GLOBAL++;
+        const pSedeNorm = normalizarTexto(p.sede);
+        const pCanon = canonicalSede(p.sede);
+        for (const opSede of OPERATIONAL_SEDES) {
+          if (normalizarTexto(opSede) === pSedeNorm || pCanon === canonicalSede(opSede) || pSedeNorm.includes(normalizarTexto(opSede))) {
+            counts[opSede] = (counts[opSede] || 0) + 1;
+            break;
+          }
+        }
+      }
+    });
+    return counts;
+  }, [participantesConRevision]);
+
   const totalPfdEnSede = useMemo(() => {
     if (esGlobalSede) {
       return participantesConRevision.filter((p) => p?.asistioPFD === true).length;
     }
-    const targetCanon = canonicalSede(selectedSede);
-    const sedeNorm = normalizarTexto(selectedSede);
+    const targetCanon = canonicalSede(activeSede);
+    const sedeNorm = normalizarTexto(activeSede);
     return participantesConRevision.filter((p) => {
       if (p?.asistioPFD !== true) return false;
       return canonicalSede(p.sede) === targetCanon || normalizarTexto(p.sede).includes(sedeNorm);
     }).length;
-  }, [participantesConRevision, selectedSede, esGlobalSede]);
+  }, [participantesConRevision, activeSede, esGlobalSede]);
 
   const equiposDeSede = useMemo(
-    () => opcionesEquipo(participantesConRevision, selectedSede),
-    [participantesConRevision, selectedSede]
+    () => opcionesEquipo(participantesConRevision, activeSede),
+    [participantesConRevision, activeSede]
   );
 
   // Si cambia la sede y el equipo seleccionado no pertenece a esa sede, resetear a 'Todos'
@@ -347,19 +397,19 @@ export default function FuturosImposiblesView({
     if (equipoFilter !== 'Todos' && !equiposDeSede.some((o) => o.value === equipoFilter)) {
       setEquipoFilter('Todos');
     }
-  }, [selectedSede, equiposDeSede, equipoFilter]);
+  }, [activeSede, equiposDeSede, equipoFilter]);
 
   // Ejecución reactiva del diagnóstico del Agente IA
   const diagnostic = useMemo(() => {
     return ejecutarDiagnosticoFIs(
       participantesConRevision,
-      selectedSede,
+      activeSede,
       equipoFilter,
       estadoFilter,
       searchQuery,
       rolFilter
     );
-  }, [participantesConRevision, selectedSede, equipoFilter, estadoFilter, searchQuery, rolFilter]);
+  }, [participantesConRevision, activeSede, equipoFilter, estadoFilter, searchQuery, rolFilter]);
 
   const handleReevaluate = async () => {
     setIsEvaluating(true);
@@ -880,6 +930,78 @@ export default function FuturosImposiblesView({
         padding: '1.25rem', 
         marginBottom: '1.5rem' 
       }}>
+        {/* BARRA DE FILTRO POR SEDE MULTISEDE PARITARIA */}
+        {isGlobalUser ? (
+          <div style={{ 
+            marginBottom: '1rem', 
+            paddingBottom: '0.85rem', 
+            borderBottom: `1px solid ${borderLight}`,
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            flexWrap: 'wrap' 
+          }}>
+            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: textMuted, display: 'flex', alignItems: 'center', gap: '0.35rem', marginRight: '0.25rem' }}>
+              <Compass size={14} color="#38bdf8" /> SEDE:
+            </span>
+            <button
+              type="button"
+              onClick={() => { setActiveSede('GLOBAL'); setEquipoFilter('Todos'); }}
+              style={{
+                padding: '0.35rem 0.8rem',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                border: esGlobalSede ? '2px solid #38bdf8' : `1px solid ${borderLight}`,
+                background: esGlobalSede ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.03)',
+                color: esGlobalSede ? '#38bdf8' : textMuted,
+                transition: 'all 0.15s ease'
+              }}
+            >
+              🌐 Todas ({conteoPorSede.GLOBAL || 0})
+            </button>
+            {OPERATIONAL_SEDES.map(s => {
+              const isSelected = !esGlobalSede && normalizarTexto(activeSede) === normalizarTexto(s);
+              const flag = s === 'Lima' ? '🇵🇪' : s === 'Medellín' ? '🇨🇴' : s === 'México' ? '🇲🇽' : '🇪🇨';
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => { setActiveSede(s); setEquipoFilter('Todos'); }}
+                  style={{
+                    padding: '0.35rem 0.8rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: isSelected ? '2px solid #10b981' : `1px solid ${borderLight}`,
+                    background: isSelected ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.03)',
+                    color: isSelected ? '#10b981' : textDark,
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {flag} {s} ({conteoPorSede[s] || 0})
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div style={{ 
+            marginBottom: '1rem', 
+            paddingBottom: '0.65rem', 
+            borderBottom: `1px solid ${borderLight}`,
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            fontSize: '0.78rem',
+            color: '#38bdf8'
+          }}>
+            <Lock size={13} />
+            <span>Sede Restringida por Rol Operativo: <strong>{activeSede}</strong> ({conteoPorSede[activeSede] || totalPfdEnSede} asistentes PFD)</span>
+          </div>
+        )}
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <Filter size={15} color="#38bdf8" /> SEMÁFORO DE CUMPLIMIENTO POR EQUIPO (Click para filtrar)
@@ -1007,6 +1129,55 @@ export default function FuturosImposiblesView({
 
         {/* Filtros Dropdowns */}
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Selector de Sede */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ fontSize: '0.78rem', color: textMuted }}>Sede:</span>
+            {isGlobalUser ? (
+              <select
+                value={activeSede}
+                onChange={(e) => {
+                  setActiveSede(e.target.value);
+                  setEquipoFilter('Todos');
+                }}
+                style={{
+                  padding: '0.55rem 0.85rem',
+                  borderRadius: '8px',
+                  border: `1px solid ${borderLight}`,
+                  background: 'rgba(0, 0, 0, 0.25)',
+                  color: textDark,
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  outline: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value="GLOBAL" style={{ background: '#0f172a', color: '#f8fafc' }}>
+                  🌐 Todas ({conteoPorSede.GLOBAL || 0})
+                </option>
+                {OPERATIONAL_SEDES.map(s => (
+                  <option key={s} value={s} style={{ background: '#0f172a', color: '#f8fafc' }}>
+                    {s} ({conteoPorSede[s] || 0})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span style={{ 
+                padding: '0.45rem 0.75rem', 
+                borderRadius: '8px', 
+                background: 'rgba(255,255,255,0.05)', 
+                border: `1px solid ${borderLight}`, 
+                fontSize: '0.82rem', 
+                fontWeight: 600, 
+                color: textDark,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}>
+                <Lock size={12} color="#38bdf8" /> {activeSede}
+              </span>
+            )}
+          </div>
+
           {/* Selector de Equipo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <span style={{ fontSize: '0.78rem', color: textMuted }}>Equipo:</span>
@@ -1086,7 +1257,7 @@ export default function FuturosImposiblesView({
           </div>
 
           <div style={{ fontSize: '0.8rem', color: textMuted, marginLeft: '0.5rem' }}>
-            Mostrando <strong>{participantes.length}</strong> de {totalPfdEnSede} asistentes PFD verificables {esGlobalSede ? '(Global)' : `en ${selectedSede}`}
+            Mostrando <strong>{participantes.length}</strong> de {totalPfdEnSede} asistentes PFD verificables {esGlobalSede ? '(Global)' : `en ${activeSede}`}
           </div>
         </div>
       </div>
