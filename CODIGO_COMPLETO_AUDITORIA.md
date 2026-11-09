@@ -135108,7 +135108,13 @@ export default function PortfolioBoard({ initialTab = null }) {
               const mergedList = rawList.map((c, idx) => {
                 const userMeta = resolveCausaUser(c.nombre, c.sede);
                 const metrics = getCoordinatorMetrics(c);
-                const diagnosis = classifyCoordinatorPerformance(c);
+                const diagnosis = coordinatorSnapshotIsFresh
+                  ? classifyCoordinatorPerformance(c)
+                  : {
+                      nivelRiesgo: 'INDETERMINADO',
+                      motivo: 'Corte histórico/vencido. La evaluación disciplinaria y de riesgo está pausada para evitar desinformar a la Dirección.',
+                      coachingFeedback: 'Auditoría en pausa. Se requiere telemetría en vivo menor a 24 horas para emitir evaluaciones.'
+                    };
 
                 return {
                   id: `coord_${idx}_${c.nombre}`,
@@ -135217,54 +135223,83 @@ ${coord.coachingFeedback}`;
 
               return (
                 <div>
-                  {/* 4 CARDS DE AUDITORÍA Y SALUD OPERATIVA */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
-                    <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>{isGlobalCentinela ? 'Salud Operativa Global' : `Salud Operativa - ${selectedSede}`}</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 900, color: saludPct === null ? '#94a3b8' : saludPct >= 70 ? '#10b981' : '#f59e0b', margin: '0.2rem 0' }}>
-                        {saludPct === null ? '—' : `${saludPct}%`}
-                      </div>
-                      <div style={{ fontSize: '0.8rem', color: textMuted }}>
-                        {saludPct === null
-                          ? `Sin personas con base y métricas evaluables para ${isGlobalCentinela ? 'operación global' : selectedSede}.`
-                          : `${optimosList.length} de ${totalEvaluables} evaluables con cobertura registrada ≥60%; no certifica metas de confirmación.`}
+                  {/* ALERTA DE TRANSPARENCIA ANTI-ALUCINACIÓN CUANDO EL CORTE NO ESTÁ VIGENTE */}
+                  {!coordinatorSnapshotIsFresh ? (
+                    <div style={{
+                      background: 'rgba(245, 158, 11, 0.08)',
+                      border: '1px solid rgba(245, 158, 11, 0.35)',
+                      borderRadius: '12px',
+                      padding: '1.5rem',
+                      marginBottom: '1.5rem',
+                      display: 'flex',
+                      gap: '1rem',
+                      alignItems: 'flex-start'
+                    }}>
+                      <ShieldAlert size={32} color="#f59e0b" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
+                      <div>
+                        <h4 style={{ margin: '0 0 0.35rem 0', color: '#f59e0b', fontSize: '1.1rem', fontWeight: 800 }}>
+                          🛡️ Evaluación Disciplinaria y de Riesgo en Pausa (Principio de Fidelidad Absoluta)
+                        </h4>
+                        <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', color: textDark, lineHeight: 1.5 }}>
+                          No se dispone de un corte de llamadas/gestiones de Nodus fechado y menor a 24 horas. Para proteger la veracidad y <strong>no desinformar a la Dirección Corporativa</strong> con diagnósticos infundados sobre los coordinadores:
+                        </p>
+                        <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.82rem', color: textMuted, lineHeight: 1.6 }}>
+                          <li>Se <strong>suspenden todas las etiquetas de riesgo ("Crítico" o "Rezago")</strong> para evitar señalamientos falsos.</li>
+                          <li>No se calcula porcentaje de "Salud Operativa" sobre datos históricos caducados.</li>
+                          <li>La creación de tareas disciplinarias o coaching correctivo está <strong>deshabilitada</strong> hasta contar con una telemetría oficial en tiempo real.</li>
+                        </ul>
                       </div>
                     </div>
+                  ) : (
+                    /* 4 CARDS DE AUDITORÍA Y SALUD OPERATIVA (SOLO CON DATOS EN VIVO) */
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '1.5rem' }}>
+                      <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>{isGlobalCentinela ? 'Salud Operativa Global' : `Salud Operativa - ${selectedSede}`}</div>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, color: saludPct === null ? '#94a3b8' : saludPct >= 70 ? '#10b981' : '#f59e0b', margin: '0.2rem 0' }}>
+                          {saludPct === null ? '—' : `${saludPct}%`}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: textMuted }}>
+                          {saludPct === null
+                            ? `Sin personas con base y métricas evaluables para ${isGlobalCentinela ? 'operación global' : selectedSede}.`
+                            : `${optimosList.length} de ${totalEvaluables} evaluables con cobertura registrada ≥60%; no certifica metas de confirmación.`}
+                        </div>
+                      </div>
 
-                    <div style={{ background: bgCard, border: '1px solid #fecaca', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(239,68,68,0.05)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#dc2626', textTransform: 'uppercase' }}>🚨 Riesgo crítico</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 900, color: '#dc2626', margin: '0.2rem 0' }}>
-                        {criticosList.length}
+                      <div style={{ background: bgCard, border: '1px solid #fecaca', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(239,68,68,0.05)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#dc2626', textTransform: 'uppercase' }}>🚨 Riesgo crítico</div>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, color: '#dc2626', margin: '0.2rem 0' }}>
+                          {criticosList.length}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#b91c1c' }}>Umbral de cobertura crítico; validar el corte con la persona.</div>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#b91c1c' }}>Umbral de cobertura crítico; validar el corte con la persona.</div>
-                    </div>
 
-                    <div style={{ background: bgCard, border: '1px solid #fed7aa', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(245,158,11,0.05)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#d97706', textTransform: 'uppercase' }}>⚠️ Alerta de Rezago</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 900, color: '#d97706', margin: '0.2rem 0' }}>
-                        {rezagosList.length}
+                      <div style={{ background: bgCard, border: '1px solid #fed7aa', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(245,158,11,0.05)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#d97706', textTransform: 'uppercase' }}>⚠️ Alerta de Rezago</div>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, color: '#d97706', margin: '0.2rem 0' }}>
+                          {rezagosList.length}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#b45309' }}>Umbral de cobertura o contactabilidad; requiere revisión.</div>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#b45309' }}>Umbral de cobertura o contactabilidad; requiere revisión.</div>
-                    </div>
 
-                    <div style={{ background: bgCard, border: '1px solid #bbf7d0', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(16,185,129,0.05)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase' }}>🟢 Desempeño Óptimo</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 900, color: '#16a34a', margin: '0.2rem 0' }}>
-                        {optimosList.length}
+                      <div style={{ background: bgCard, border: '1px solid #bbf7d0', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(16,185,129,0.05)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase' }}>🟢 Desempeño Óptimo</div>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, color: '#16a34a', margin: '0.2rem 0' }}>
+                          {optimosList.length}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#15803d' }}>Cobertura sobre el umbral; no valida metas de confirmación.</div>
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#15803d' }}>Cobertura sobre el umbral; no valida metas de confirmación.</div>
-                    </div>
 
-                    <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Sin diagnóstico evaluable</div>
-                      <div style={{ fontSize: '2rem', fontWeight: 900, color: textMuted, margin: '0.2rem 0' }}>
-                        {sinBaseList.length + indeterminadosList.length}
-                      </div>
-                      <div style={{ fontSize: '0.8rem', color: textMuted }}>
-                        {sinBaseList.length} sin base · {indeterminadosList.length} con datos incompletos
+                      <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Sin diagnóstico evaluable</div>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, color: textMuted, margin: '0.2rem 0' }}>
+                          {sinBaseList.length + indeterminadosList.length}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: textMuted }}>
+                          {sinBaseList.length} sin base · {indeterminadosList.length} con datos incompletos
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* BARRA DE CONTROL DE RANKING Y FILTROS */}
                   <div style={{ 
@@ -135551,15 +135586,21 @@ ${coord.coachingFeedback}`;
                                   {/* ESTADO OPERATIVO */}
                                   <td style={{ padding: '1rem 0.8rem' }}>
                                     <span style={{
-                                      background: isCrit ? 'rgba(239, 68, 68, 0.18)' : isMed ? 'rgba(245, 158, 11, 0.18)' : isUnassessed ? 'rgba(148, 163, 184, 0.18)' : 'rgba(16, 185, 129, 0.18)',
-                                      color: isCrit ? '#ef4444' : isMed ? '#fbbf24' : isUnassessed ? '#cbd5e1' : '#34d399',
+                                      background: !coordinatorSnapshotIsFresh 
+                                        ? 'rgba(148, 163, 184, 0.15)' 
+                                        : isCrit ? 'rgba(239, 68, 68, 0.18)' : isMed ? 'rgba(245, 158, 11, 0.18)' : isUnassessed ? 'rgba(148, 163, 184, 0.18)' : 'rgba(16, 185, 129, 0.18)',
+                                      color: !coordinatorSnapshotIsFresh 
+                                        ? '#94a3b8' 
+                                        : isCrit ? '#ef4444' : isMed ? '#fbbf24' : isUnassessed ? '#cbd5e1' : '#34d399',
                                       padding: '0.25rem 0.6rem',
                                       borderRadius: '4px',
                                       fontSize: '0.72rem',
                                       fontWeight: 800,
                                       display: 'inline-block'
                                     }}>
-                                      {isCrit ? '🚨 CRÍTICO' : isMed ? '⚠️ REZAGO' : item.nivelRiesgo === 'SIN_BASE' ? 'SIN BASE' : item.nivelRiesgo === 'INDETERMINADO' ? 'SIN DATOS' : '🟢 ÓPTIMO'}
+                                      {!coordinatorSnapshotIsFresh 
+                                        ? '⏸️ EN PAUSA (HISTÓRICO)' 
+                                        : isCrit ? '🚨 CRÍTICO' : isMed ? '⚠️ REZAGO' : item.nivelRiesgo === 'SIN_BASE' ? 'SIN BASE' : item.nivelRiesgo === 'INDETERMINADO' ? 'SIN DATOS' : '🟢 ÓPTIMO'}
                                     </span>
                                   </td>
 
@@ -135570,7 +135611,7 @@ ${coord.coachingFeedback}`;
                                         {item.motivo}
                                       </div>
                                       <div style={{ 
-                                        color: isCrit ? '#f87171' : isMed ? '#fbbf24' : isUnassessed ? textMuted : '#38bdf8',
+                                        color: !coordinatorSnapshotIsFresh ? textMuted : isCrit ? '#f87171' : isMed ? '#fbbf24' : isUnassessed ? textMuted : '#38bdf8',
                                         background: 'rgba(255, 255, 255, 0.04)', 
                                         padding: '0.4rem 0.6rem', 
                                         borderRadius: '6px', 
@@ -135586,29 +135627,31 @@ ${coord.coachingFeedback}`;
                                     <button
                                       onClick={() => handleOpenTask(item)}
                                       disabled={!coordinatorSnapshotIsFresh}
-                                      title={coordinatorSnapshotIsFresh ? 'Crear tarea usando este corte de Nodus' : 'Requiere un snapshot Nodus fechado y menor de 24 horas'}
+                                      title={coordinatorSnapshotIsFresh ? 'Crear tarea usando este corte de Nodus' : 'Auditoría en pausa: se requiere un corte Nodus vigente (< 24 hrs)'}
                                       style={{
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '0.35rem',
-                                        background: isCrit 
-                                          ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' 
-                                          : isMed 
-                                            ? 'linear-gradient(135deg, #d97706 0%, #b45309 100%)' 
-                                            : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                                        color: '#fff',
+                                        background: !coordinatorSnapshotIsFresh
+                                          ? 'rgba(148, 163, 184, 0.15)'
+                                          : isCrit 
+                                            ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' 
+                                            : isMed 
+                                              ? 'linear-gradient(135deg, #d97706 0%, #b45309 100%)' 
+                                              : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                                        color: !coordinatorSnapshotIsFresh ? '#94a3b8' : '#fff',
                                         padding: '0.45rem 0.8rem',
                                         borderRadius: '6px',
                                         fontSize: '0.75rem',
                                         fontWeight: 800,
                                         border: 'none',
                                         cursor: coordinatorSnapshotIsFresh ? 'pointer' : 'not-allowed',
-                                        opacity: coordinatorSnapshotIsFresh ? 1 : 0.5,
-                                        boxShadow: isCrit ? '0 2px 6px rgba(220, 38, 38, 0.4)' : '0 2px 4px rgba(0,0,0,0.2)',
+                                        opacity: coordinatorSnapshotIsFresh ? 1 : 0.6,
+                                        boxShadow: coordinatorSnapshotIsFresh && isCrit ? '0 2px 6px rgba(220, 38, 38, 0.4)' : 'none',
                                         whiteSpace: 'nowrap'
                                       }}
                                     >
-                                      <Send size={12} /> ⚡ Tarea
+                                      {coordinatorSnapshotIsFresh ? <><Send size={12} /> ⚡ Tarea</> : '🔒 Auditoría Pausada'}
                                     </button>
                                   </td>
                                 </tr>
