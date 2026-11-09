@@ -121976,8 +121976,16 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
             <Users size={18} color="#ffc107" />
             <span>Coordinadores Activos C1 & C2</span>
             {hasActiveFilters && (
-              <span style={{ fontSize: '0.68rem', padding: '0.2rem 0.6rem', borderRadius: '12px', background: 'rgba(255,193,7,0.18)', color: '#ffc107', fontWeight: 700, border: '1px solid rgba(255,193,7,0.3)' }}>
-                Filtros Activos ({filteredCoordinadores.length} encontrados)
+              <span style={{ fontSize: '0.68rem', padding: '0.2rem 0.6rem', borderRadius: '12px', background: 'rgba(255,193,7,0.18)', color: '#ffc107', fontWeight: 700, border: '1px solid rgba(255,193,7,0.3)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <span>Filtros Activos ({filteredCoordinadores.length} encontrados)</span>
+                <button
+                  type="button"
+                  onClick={clearAllFilters}
+                  style={{ background: 'transparent', border: 'none', color: '#ffc107', cursor: 'pointer', textDecoration: 'underline', padding: 0, fontWeight: 700, fontSize: '0.68rem' }}
+                  title="Restablecer filtros y ver todas las sedes y coordinadores"
+                >
+                  ✕ Ver Todo Global
+                </button>
               </span>
             )}
           </div>
