@@ -14,6 +14,8 @@ export const TRAINER_DICTIONARY = {
 
 export const normalizeTrainerName = (rawName) => {
   if (!rawName) return "";
-  const cleanName = rawName.toUpperCase().trim();
+  // Eliminar prefijos de talleres/roles (ej. "CREACIÓN: ANDRÉS IDROBO" -> "ANDRÉS IDROBO", "RELACIÓN: ANDRÉS GÓMEZ" -> "ANDRÉS GÓMEZ")
+  const stripped = rawName.replace(/^(?:CREACI[OÓ]N|RELACI[OÓ]N|IMPACTO(?:\s+RELACI[OÓ]N)?|CAP[IÍ]TULO\s+(?:UNO|DOS|TRES|CUATRO|[0-9]+)|MAESTR[IÍ]A(?:\s+DEL\s+JUEGO)?|COACH(?:ING)?|ENTRENADOR(?:A)?|FACILITADOR(?:A)?|L[IÍ]DER|STAFF|COORDINACI[OÓ]N)\s*:\s*/i, '').trim();
+  const cleanName = stripped.toUpperCase().trim();
   return TRAINER_DICTIONARY[cleanName] || cleanName;
 };

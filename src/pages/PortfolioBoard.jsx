@@ -19,6 +19,7 @@ import ResourceCapacityView from '../components/ResourceCapacityView';
 import FuturosImposiblesView from '../components/FuturosImposiblesView';
 import NodusUserAccessReport from '../components/NodusUserAccessReport';
 import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
+import { getLiveNodusEquipos } from '../services/nodusLiveApiService.js';
 import { NODUS_REPORT_ADMIN_EMAILS, PORTFOLIO_FI_REVIEW_EMAILS } from '../config/permissions';
 import {
   classifyCoordinatorPerformance,
@@ -263,76 +264,58 @@ export default function PortfolioBoard({ initialTab = null }) {
         setCoordinadoresRaw(coordinatorSource.coordinadores);
         setCoordinatorSnapshot({ source: coordinatorSource.source, timestamp: coordinatorSource.timestamp });
 
-        let totalEnrolados = 0;
-        let totalBajasReales = 0;
-        let totalEnGestion = 0;
-        let totalParticipantes = 0;
-        let totalSinContactar = 0;
-
         const isGlobalSelected = !selectedSede || selectedSede === 'GLOBAL' || selectedSede === 'Global' || selectedSede === 'Sede Global' || selectedSede === 'Todas' || selectedSede === 'TODAS';
 
-        if (isGlobalSelected) {
-          if (data && data.totales) {
-            totalEnrolados = data.totales.totalConfirmados || 0;
-            totalBajasReales = data.totales.totalNoInteresa || 0;
-            totalEnGestion = (data.totales.totalNoContesta || 0) + (data.totales.totalPorConfirmar || 0);
-            totalParticipantes = data.totales.totalAsignados || 0;
-            totalSinContactar = Math.max(0, totalParticipantes - (data.totales.totalGestiones || 0));
-          } else {
-            const list = (data && Array.isArray(data.coordinadores)) ? data.coordinadores : [];
-            totalEnrolados = list.reduce((acc, c) => acc + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
-            totalBajasReales = list.reduce((acc, c) => acc + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
-            totalEnGestion = list.reduce((acc, c) => acc + Number((c.estados?.noContesta || 0) + (c.estados?.porConfirmar || 0)), 0);
-            totalParticipantes = list.reduce((acc, c) => acc + Number(c.asignados || 0), 0);
-            const gest = list.reduce((acc, c) => acc + Number(c.estados?.llamadas || c.gestiones || 0), 0);
-            totalSinContactar = Math.max(0, totalParticipantes - gest);
+        // 1.1 Obtener equipos reales de Nodus en vivo (FIDELIDAD TOTAL: SIN DATOS SINTÉTICOS)
+        let liveEquipos = [];
+        try {
+          const liveRes = await getLiveNodusEquipos();
+          if (liveRes.ok && Array.isArray(liveRes.data)) {
+            liveEquipos = liveRes.data;
           }
-        } else {
-          if (data && data.sedes) {
-            const sedeData = data.sedes.find(s => normalizeSede(s.sede) === normalizeSede(selectedSede));
-            if (sedeData) {
-              totalEnrolados = sedeData.confirmadosTotal || 0;
-              totalBajasReales = sedeData.noInteresaTotal || 0;
-              totalEnGestion = (sedeData.noContestaTotal || 0) + (sedeData.porConfirmarTotal || 0);
-              totalParticipantes = sedeData.asignadosTotal || 0;
-              totalSinContactar = Math.max(0, totalParticipantes - (sedeData.gestionesTotal || 0));
-            }
-          }
-          if (!totalEnrolados && !totalParticipantes) {
-            const list = ((data && Array.isArray(data.coordinadores)) ? data.coordinadores : []).filter(c => normalizeSede(c.sede) === normalizeSede(selectedSede));
-            totalEnrolados = list.reduce((acc, c) => acc + Number(c.estados?.confirmado ?? c.confirmados ?? ((c.confirmadosC1 || 0) + (c.confirmadosC2 || 0)) ?? 0), 0);
-            totalBajasReales = list.reduce((acc, c) => acc + Number(c.estados?.noInteresa ?? c.noInteresa ?? 0), 0);
-            totalEnGestion = list.reduce((acc, c) => acc + Number((c.estados?.noContesta || 0) + (c.estados?.porConfirmar || 0)), 0);
-            totalParticipantes = list.reduce((acc, c) => acc + Number(c.asignados || 0), 0);
-            const gest = list.reduce((acc, c) => acc + Number(c.estados?.llamadas || c.gestiones || 0), 0);
-            totalSinContactar = Math.max(0, totalParticipantes - gest);
-          }
+        } catch (liveErr) {
+          console.warn("Aviso al consultar equipos en vivo de Nodus:", liveErr);
         }
 
-        const bajaRate = totalParticipantes > 0 ? (totalBajasReales / totalParticipantes) * 100 : 0;
-        let health = 'good';
-        if (totalSinContactar > (totalParticipantes * 0.5)) health = 'warning';
-        if (bajaRate > 25) health = 'critical';
+        const filteredEquipos = liveEquipos.filter(eq => {
+          if (isGlobalSelected) return true;
+          return normalizeSede(eq.sede) === normalizeSede(selectedSede);
+        });
 
-        const progress = totalParticipantes > 0 ? Math.min(100, Math.round((totalEnrolados / totalParticipantes) * 100)) : 0;
+        let ciclosReales = filteredEquipos.map(eq => {
+          const sedeNorm = normalizeSede(eq.sede);
+          const participantes = Number(eq.participantes) || 0;
+          const etapa = eq.etapa_vigente || 'En Convocatoria';
+          const inicio = eq.fecha_inicio || '';
+          const fin = eq.fecha_fin || '';
+          const isEnActividad = eq.en_actividad !== false;
 
-        let ciclosReales = [
-          { 
-            id: 1, 
-            name: `${selectedSede} - Convocatoria C1 (Base Asignada Nodus)`, 
-            progress: progress || 0, 
-            health: health, 
-            date: new Date().toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' }), 
-            action: totalSinContactar > 50 ? 'Acelerar Llamadas' : 'Ver Desglose',
+          return {
+            id: eq.id,
+            name: `${sedeNorm} - ${eq.nombre}`,
+            equipoNombre: eq.nombre,
+            sede: sedeNorm,
+            participantes: participantes,
+            etapa: etapa,
+            fechaInicio: inicio,
+            fechaFin: fin,
+            dateRange: inicio && fin ? `${inicio} al ${fin}` : (inicio || 'Fechas en programación'),
+            enActividad: isEnActividad,
+            health: isEnActividad ? 'good' : 'warning',
+            progress: etapa === 'TFD' ? 100 : etapa === 'SFD' ? 66 : etapa === 'PFD' ? 33 : 15,
+            action: 'Ver Detalle',
             details: {
-              totalEnrolados: totalEnrolados,
-              totalBajas: totalBajasReales,
-              totalEnGestion: totalEnGestion,
-              totalSinContactar: totalSinContactar,
-              totalParticipantes: totalParticipantes
+              id: eq.id,
+              nombre: eq.nombre,
+              sede: sedeNorm,
+              participantes: participantes,
+              etapa: etapa,
+              fechaInicio: inicio,
+              fechaFin: fin,
+              endpoint: `https://imo.crearpslglobal.com/api/participantes/${eq.id}`
             }
-          }
-        ];
+          };
+        });
 
         setPortfolio(ciclosReales);
         setStats({
@@ -1039,85 +1022,109 @@ export default function PortfolioBoard({ initialTab = null }) {
           </div>
         ) : viewMode === 'active' ? (
           /* =========================================================================
-             VISTA 2: CICLOS ACTIVOS (EXISTENTE)
+             VISTA 2: CICLOS ACTIVOS (EQUIPOS OFICIALES EN VIVO DE NODUS)
              ========================================================================= */
           <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <h2 style={{ fontSize: '1.2rem', color: textDark, fontWeight: 800, margin: '0 0 1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <Box color="#d97706" /> Detalle de Portafolio Sincronizado
-            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h2 style={{ fontSize: '1.2rem', color: textDark, fontWeight: 800, margin: 0, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Box color="#d97706" /> Detalle de Portafolio Sincronizado (Nodus Live)
+                </h2>
+                <p style={{ fontSize: '0.75rem', color: textMuted, margin: '0.35rem 0 0 0' }}>
+                  Equipos y ciclos activos obtenidos en tiempo real de la base oficial Nodus ({portfolio.length} equipos para {selectedSede || 'GLOBAL'})
+                </p>
+              </div>
+            </div>
 
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ borderBottom: `2px solid ${borderLight}`, color: textMuted, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                    <th style={{ padding: '1rem', fontWeight: 700 }}>Proyecto / Ciclo</th>
-                    <th style={{ padding: '1rem', fontWeight: 700 }}>Progreso (Enrolamiento)</th>
-                    <th style={{ padding: '1rem', fontWeight: 700 }}>Salud</th>
-                    <th style={{ padding: '1rem', fontWeight: 700 }}>Estado</th>
-                    <th style={{ padding: '1rem', fontWeight: 700, textAlign: 'right' }}>Acción Requerida</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {portfolio.map(p => (
-                    <React.Fragment key={p.id}>
-                      <tr style={{ borderBottom: expandedId === p.id ? 'none' : `1px solid ${borderLight}` }}>
-                        <td style={{ padding: '1.25rem 1rem', color: textDark, fontWeight: 600 }}>{p.name}</td>
-                        <td style={{ padding: '1.25rem 1rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                            <span style={{ fontSize: '0.85rem', color: textDark, fontWeight: 600, width: '35px' }}>{p.progress}%</span>
-                            <div style={{ flex: 1, height: '8px', background: borderLight, borderRadius: '10px', overflow: 'hidden', minWidth: '100px' }}>
-                              <div style={{ width: `${p.progress}%`, height: '100%', background: p.health === 'good' ? '#10b981' : p.health === 'warning' ? '#f59e0b' : '#ef4444', borderRadius: '10px' }}></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td style={{ padding: '1.25rem 1rem' }}>
-                          <span style={{
-                            padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
-                            background: p.health === 'good' ? '#ecfdf5' : p.health === 'warning' ? '#fffbeb' : '#fef2f2',
-                            color: p.health === 'good' ? '#059669' : p.health === 'warning' ? '#d97706' : '#dc2626',
-                          }}>
-                            {p.health === 'good' ? 'En Tiempo' : p.health === 'warning' ? 'Riesgo' : 'Crítico'}
-                          </span>
-                        </td>
-                        <td style={{ padding: '1.25rem 1rem', color: textMuted, fontSize: '0.9rem' }}>{p.date}</td>
-                        <td style={{ padding: '1.25rem 1rem', textAlign: 'right' }}>
-                          <button 
-                            onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
-                            style={{ background: 'transparent', border: `1px solid ${borderLight}`, color: textDark, padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-                          >
-                            {p.action} <ChevronRight size={14} style={{ transform: expandedId === p.id ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
-                          </button>
-                        </td>
-                      </tr>
-                      {expandedId === p.id && p.details && (
-                        <tr style={{ background: bgLight, borderBottom: `1px solid ${borderLight}` }}>
-                          <td colSpan="5" style={{ padding: '1.5rem', borderLeft: `4px solid ${p.health === 'good' ? '#10b981' : p.health === 'warning' ? '#f59e0b' : '#ef4444'}` }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Cartera Asignada</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: textDark }}>{p.details.totalParticipantes} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>prospectos</span></div>
-                              </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Confirmados a Sala</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>{p.details.totalEnrolados} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>enrolados</span></div>
-                              </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>En Gestión Telefónica</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3b82f6' }}>{p.details.totalEnGestion} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>contactos</span></div>
-                              </div>
-                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                                <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Pendientes por Llamar</div>
-                                <div style={{ fontSize: '1.2rem', fontWeight: 800, color: p.details.totalSinContactar > 0 ? '#f59e0b' : '#10b981' }}>{p.details.totalSinContactar} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>base virgen</span></div>
-                              </div>
-                            </div>
+            {portfolio.length === 0 ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: textMuted }}>
+                No se encontraron ciclos ni equipos activos en Nodus para la sede seleccionada ({selectedSede}).
+              </div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${borderLight}`, color: textMuted, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                      <th style={{ padding: '1rem', fontWeight: 700 }}>Equipo / Ciclo Nodus</th>
+                      <th style={{ padding: '1rem', fontWeight: 700 }}>Sede Oficial</th>
+                      <th style={{ padding: '1rem', fontWeight: 700 }}>Participantes Registrados</th>
+                      <th style={{ padding: '1rem', fontWeight: 700 }}>Etapa Vigente</th>
+                      <th style={{ padding: '1rem', fontWeight: 700 }}>Fechas Oficiales</th>
+                      <th style={{ padding: '1rem', fontWeight: 700, textAlign: 'right' }}>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {portfolio.map(p => (
+                      <React.Fragment key={p.id}>
+                        <tr style={{ borderBottom: expandedId === p.id ? 'none' : `1px solid ${borderLight}` }}>
+                          <td style={{ padding: '1.25rem 1rem', color: textDark, fontWeight: 700 }}>
+                            {p.name}
+                          </td>
+                          <td style={{ padding: '1.25rem 1rem', color: textMuted, fontWeight: 600 }}>
+                            {p.sede}
+                          </td>
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <span style={{ fontSize: '0.95rem', fontWeight: 800, color: '#10b981' }}>
+                              {p.participantes.toLocaleString('en-US')}
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: textMuted, marginLeft: '0.35rem' }}>participantes</span>
+                          </td>
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <span style={{
+                              padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
+                              background: p.etapa === 'PFD' ? '#ecfdf5' : p.etapa === 'SFD' ? '#eff6ff' : p.etapa === 'TFD' ? '#f5f3ff' : '#fffbeb',
+                              color: p.etapa === 'PFD' ? '#059669' : p.etapa === 'SFD' ? '#2563eb' : p.etapa === 'TFD' ? '#7c3aed' : '#d97706',
+                            }}>
+                              {p.etapa}
+                            </span>
+                          </td>
+                          <td style={{ padding: '1.25rem 1rem', color: textMuted, fontSize: '0.85rem' }}>
+                            {p.dateRange}
+                          </td>
+                          <td style={{ padding: '1.25rem 1rem', textAlign: 'right' }}>
+                            <button 
+                              onClick={() => setExpandedId(expandedId === p.id ? null : p.id)}
+                              style={{ background: 'transparent', border: `1px solid ${borderLight}`, color: textDark, padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                            >
+                              {expandedId === p.id ? 'Ocultar' : p.action} <ChevronRight size={14} style={{ transform: expandedId === p.id ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+                            </button>
                           </td>
                         </tr>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                        {expandedId === p.id && p.details && (
+                          <tr style={{ background: bgLight, borderBottom: `1px solid ${borderLight}` }}>
+                            <td colSpan="6" style={{ padding: '1.5rem', borderLeft: '4px solid #10b981' }}>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                                <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                  <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Equipo ID</div>
+                                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: textDark }}>{p.details.id}</div>
+                                  <div style={{ fontSize: '0.75rem', color: textMuted }}>Identificador en Nodus IMO</div>
+                                </div>
+                                <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                  <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Participantes Registrados</div>
+                                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>{p.details.participantes} <span style={{ fontSize: '0.75rem', fontWeight: 500, color: textMuted }}>en Nodus</span></div>
+                                  <div style={{ fontSize: '0.75rem', color: textMuted }}>Base empírica auditada</div>
+                                </div>
+                                <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                  <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Etapa Nodus</div>
+                                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#2563eb' }}>{p.details.etapa}</div>
+                                  <div style={{ fontSize: '0.75rem', color: textMuted }}>Vigente en sistema IMO</div>
+                                </div>
+                                <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                  <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Endpoint Nodus Verificado</div>
+                                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: textMuted, wordBreak: 'break-all', marginTop: '0.25rem' }}>
+                                    /api/participantes/{p.details.id}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         ) : viewMode === 'rrhh_sentinel' ? (
           /* =========================================================================
