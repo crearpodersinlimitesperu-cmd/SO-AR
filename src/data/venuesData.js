@@ -8,7 +8,7 @@ export const defaultVenues = {
     c2_venue: 'CREAR PODER SIN LIMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)',
     mj_venue: 'CREAR PODER SIN LIMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)',
     viaje_venue: 'Quito (El Viaje)',
-    caminata_venue: 'Quito, Ecuador',
+    caminata_venue: 'Fortaleza Cuántica CREAR (De los Naranjos, 170124 Quito, Ecuador)',
     address: 'De los Naranjos, 170124 Quito, Ecuador',
     city: 'Quito',
     country: 'Ecuador'
@@ -19,7 +19,7 @@ export const defaultVenues = {
     c2_venue: 'Guayaquil',
     mj_venue: 'Guayaquil',
     viaje_venue: 'Guayaquil (El Viaje)',
-    caminata_venue: 'Guayaquil, Ecuador',
+    caminata_venue: 'Sede de Campo Guayaquil (Av. Francisco de Orellana, Guayaquil, Ecuador)',
     address: 'Guayaquil, Ecuador',
     city: 'Guayaquil',
     country: 'Ecuador'
@@ -30,7 +30,7 @@ export const defaultVenues = {
     c2_venue: 'Cuenca',
     mj_venue: 'Cuenca',
     viaje_venue: 'Cuenca (El Viaje)',
-    caminata_venue: 'Cuenca, Ecuador',
+    caminata_venue: 'Campo Abierto Cuenca (Cuenca, Azuay, Ecuador)',
     address: 'Cuenca, Ecuador',
     city: 'Cuenca',
     country: 'Ecuador'
@@ -52,7 +52,7 @@ export const defaultVenues = {
     c2_venue: 'Medellín',
     mj_venue: 'Medellín',
     viaje_venue: 'Medellín (El Viaje)',
-    caminata_venue: 'Medellín, Colombia',
+    caminata_venue: 'Espacio Abierto de Transformación Medellín (Llanogrande / Medellín, Colombia)',
     address: 'Medellín, Colombia',
     city: 'Medellín',
     country: 'Colombia'
@@ -63,7 +63,7 @@ export const defaultVenues = {
     c2_venue: 'Ciudad de México',
     mj_venue: 'Ciudad de México',
     viaje_venue: 'México (El Viaje)',
-    caminata_venue: 'Ciudad de México, México',
+    caminata_venue: 'Centro de Transformación al Aire Libre CDMX (Ciudad de México, México)',
     address: 'Ciudad de México, México',
     city: 'Ciudad de México',
     country: 'México'

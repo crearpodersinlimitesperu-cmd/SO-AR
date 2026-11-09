@@ -89570,11 +89570,75 @@ import { formatFlyerC1Dates, localCalendarDay, parseCalendarDay } from './flyerD
 import { explicitTeamFromText } from '../services/goalsTimeline.js';
 
 export const FLYER_PROGRAMS = [
-  { id: 'C1', label: 'Capítulo Uno', outline: 'UNO' },
-  { id: 'C2', label: 'Capítulo Dos', outline: 'DOS' },
-  { id: 'CREACION', label: 'Creación', outline: 'CREACIÓN' },
-  { id: 'RELACION', label: 'Relación', outline: 'RELACIÓN' },
-  { id: 'GRATITUD', label: 'Gratitud', outline: 'GRATITUD' }
+  { id: 'C1', label: 'Capítulo Uno', outline: 'UNO', eyebrow: 'FECHAS' },
+  { id: 'C2', label: 'Capítulo Dos', outline: 'DOS', eyebrow: 'FECHAS' },
+  { id: 'CREACION', label: 'Creación', outline: 'CREACIÓN', eyebrow: 'FECHAS' },
+  { id: 'RELACION', label: 'Relación', outline: 'RELACIÓN', eyebrow: 'FECHAS' },
+  { id: 'GRATITUD', label: 'Gratitud', outline: 'GRATITUD', eyebrow: 'FECHAS' },
+  { id: 'CAMINATA_FUEGO', label: 'Caminata sobre Fuego', outline: 'FUEGO', eyebrow: 'ALIADOS' }
+];
+
+export const SEDES_CAMINATA_FUEGO = [
+  {
+    id: 'lim',
+    ciudad: 'Lima',
+    fechas: 'Jueves 12 de noviembre de 2026 / 18:00',
+    lugar: 'Casona Blanca',
+    direccion: 'C. Las Perdices 1126, Lima 15457.',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'uio',
+    ciudad: 'Quito',
+    fechas: 'Jueves 19 de noviembre de 2026 / 18:00',
+    lugar: 'Fortaleza Cuántica CREAR',
+    direccion: 'De los Naranjos, 170124 Quito, Ecuador',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'gye',
+    ciudad: 'Guayaquil',
+    fechas: 'Jueves 26 de noviembre de 2026 / 18:00',
+    lugar: 'Sede de Campo Guayaquil',
+    direccion: 'Av. Francisco de Orellana, Guayaquil, Ecuador',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'cue',
+    ciudad: 'Cuenca',
+    fechas: 'Jueves 3 de diciembre de 2026 / 18:00',
+    lugar: 'Campo Abierto Cuenca',
+    direccion: 'Cuenca, Azuay, Ecuador',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'med',
+    ciudad: 'Medellín',
+    fechas: 'Jueves 10 de diciembre de 2026 / 18:00',
+    lugar: 'Espacio Abierto de Transformación Medellín',
+    direccion: 'Llanogrande / Medellín, Colombia',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'mex',
+    ciudad: 'México',
+    fechas: 'Jueves 17 de diciembre de 2026 / 18:00',
+    lugar: 'Centro de Transformación al Aire Libre CDMX',
+    direccion: 'Ciudad de México, México',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  }
 ];
 
 export const FLYER_VENUES = [
@@ -89603,7 +89667,8 @@ export function flyerEventType(event = {}) {
     ['C2', '(?:CAPITULO\\s*(?:DOS|2)|C2)'],
     ['CREACION', '(?:(?:MJ|MAESTRIA(?: DEL JUEGO)?|PRIMER FDS)\\s*[-:·]?\\s*)?CREACION'],
     ['RELACION', '(?:(?:MJ|MAESTRIA(?: DEL JUEGO)?|SEGUNDO FDS)\\s*[-:·]?\\s*)?RELACION'],
-    ['GRATITUD', '(?:(?:MJ|MAESTRIA(?: DEL JUEGO)?|TERCER FDS)\\s*[-:·]?\\s*)?GRATITUD']
+    ['GRATITUD', '(?:(?:MJ|MAESTRIA(?: DEL JUEGO)?|TERCER FDS)\\s*[-:·]?\\s*)?GRATITUD'],
+    ['CAMINATA_FUEGO', '(?:(?:ALIADOS|AL)\\s*[-:·]?\\s*)?(?:CAMINATA(?:\\s*SOBRE)?\\s*FUEGO|FUEGO)']
   ].filter(([, heading]) => new RegExp(`^${heading}${suffix}\\.?$`).test(name));
   return matches.length === 1 ? matches[0][0] : null;
 }
@@ -89635,13 +89700,19 @@ export function flyerCalendarEvents(events, type, venue, today = localCalendarDa
 
 export function flyerCalendarRow(venue, event, type) {
   const label = FLYER_PROGRAMS.find(program => program.id === type)?.label || type;
+  const isFuego = type === 'CAMINATA_FUEGO';
+  const defaultFuego = isFuego ? SEDES_CAMINATA_FUEGO.find(s => s.id === venue.id) : null;
   return {
     id: venue.id, ciudad: venue.ciudad, programType: type,
-    fechas: event ? flyerEventDates(event, type) : '',
-    equipo: event ? flyerEventTeam(event) : '',
+    fechas: event ? flyerEventDates(event, type) : (defaultFuego?.fechas || ''),
+    lugar: defaultFuego?.lugar || '',
+    direccion: defaultFuego?.direccion || '',
+    vestimenta: defaultFuego?.vestimenta || (isFuego ? 'Vestimenta Negra' : ''),
+    equipo: event ? flyerEventTeam(event) : (isFuego ? 'Aliados' : ''),
     eventKey: event ? flyerEventKey(event) : '',
-    activo: Boolean(event), source: event ? 'calendario' : 'sin-fechas',
-    notice: event ? '' : `Sin fechas de ${label} en el calendario`
+    activo: Boolean(event || isFuego),
+    source: event ? 'calendario' : (isFuego ? 'preset-fuego' : 'sin-fechas'),
+    notice: event ? '' : (isFuego ? 'Plantilla oficial de Caminata sobre Fuego' : `Sin fechas de ${label} en el calendario`)
   };
 }
 
@@ -89839,7 +89910,11 @@ test('explicit programs support accents, spacing, numeral and team variants', ()
     ['C2', 'C2'], ['CREACIO\u0301N', 'CREACION'], ['MJ · Creación', 'CREACION'],
     ['PRIMER  FDS:  CREACIÓN.', 'CREACION'], ['Maestría del Juego: Relación', 'RELACION'],
     ['SEGUNDO FDS: RELACIÓN', 'RELACION'], ['TERCER FDS: GRATITUD', 'GRATITUD'],
-    ['Gratitud Equipo 9', 'GRATITUD']
+    ['Gratitud Equipo 9', 'GRATITUD'],
+    ['CAMINATA SOBRE FUEGO', 'CAMINATA_FUEGO'],
+    ['Aliados - Caminata sobre Fuego', 'CAMINATA_FUEGO'],
+    ['FUEGO', 'CAMINATA_FUEGO'],
+    ['Caminata Fuego Equipo 31', 'CAMINATA_FUEGO']
   ]) {
     assert.equal(flyerEventType({ nombre: name }), type, name);
     assert.equal(flyerEventType({ name }), type, name);
@@ -89922,6 +89997,25 @@ test('manual empty dates and more than six venues block export to preserve 9:16'
   const rows = Array.from({ length: 7 }, (_, id) => ({ ...row, id, fechas: '10 de octubre' }));
   assert.match(selectFlyerSedes(rows, FLYER_MODE_ALL).error, /hasta seis sedes/);
   assert.equal(selectFlyerSedes(rows, FLYER_MODE_SINGLE, 0).error, null);
+});
+
+test('CAMINATA_FUEGO initializes official presets for all sedes with venue and dress code', () => {
+  const rows = synchronizeFlyerRows([], 'CAMINATA_FUEGO', today);
+  assert.equal(rows.length, 6);
+  const lima = rows.find(r => r.id === 'lim');
+  assert.ok(lima);
+  assert.equal(lima.ciudad, 'Lima');
+  assert.match(lima.fechas, /12 de noviembre/);
+  assert.equal(lima.lugar, 'Casona Blanca');
+  assert.match(lima.direccion, /Las Perdices/);
+  assert.equal(lima.vestimenta, 'Vestimenta Negra');
+  assert.ok(lima.activo);
+
+  for (const row of rows) {
+    assert.ok(row.fechas.length > 0);
+    assert.ok(row.lugar.length > 0);
+    assert.equal(row.vestimenta, 'Vestimenta Negra');
+  }
 });
 
 ```
@@ -130511,7 +130605,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
-import { FLYER_PROGRAMS, FLYER_VENUES, flyerCalendarEvents, flyerCalendarRow, flyerEventDates, flyerEventKey, flyerEventTeam, synchronizeFlyerRows } from '../utils/flyerPrograms';
+import { FLYER_PROGRAMS, FLYER_VENUES, SEDES_CAMINATA_FUEGO, flyerCalendarEvents, flyerCalendarRow, flyerEventDates, flyerEventKey, flyerEventTeam, synchronizeFlyerRows } from '../utils/flyerPrograms';
 import { FLYER_MODE_ALL, FLYER_MODE_SINGLE, flyerFileName, selectFlyerSedes } from '../utils/flyerSedes';
 import { flyerTeamsForVenue, flyerTeamLabel, selectTeamFlyer, teamFlyerPages } from '../utils/flyerTeams';
 import ModuleQuickGuide from '../components/ModuleQuickGuide';
@@ -130634,6 +130728,7 @@ export default function GeneradorFlyer() {
   const sinFechas = calendarRows.every(row => row.source === 'sin-fechas');
 
   useEffect(() => {
+    if (tipoPrograma === 'CAMINATA_FUEGO') return;
     const rows = synchronizeFlyerRows(events, tipoPrograma);
     setSedes(previous => {
       const sameType = previous.every(row => row.programType === tipoPrograma);
@@ -130673,10 +130768,22 @@ export default function GeneradorFlyer() {
   const handleProgramaChange = (id) => {
     const program = FLYER_PROGRAMS.find(item => item.id === id);
     setTipoPrograma(id);
-    setPrograma(program.label.toUpperCase());
-    setOutline(program.outline);
-    setPresetActivo('calendario');
-    setSedes(synchronizeFlyerRows(events, id));
+    if (id === 'CAMINATA_FUEGO') {
+      setPrograma('CAMINATA SOBRE FUEGO');
+      setOutline('FUEGO');
+      setEyebrow('ALIADOS');
+      setHashtag('#SOYCREADOR');
+      setModoFlyer(FLYER_MODE_SINGLE);
+      setPresetActivo('fuego');
+      setSedes(SEDES_CAMINATA_FUEGO.map(s => ({ ...s, programType: 'CAMINATA_FUEGO', source: 'manual' })));
+      showToast?.('Plantilla oficial de Caminata sobre Fuego activada (ALIADOS)', 'success');
+    } else {
+      setPrograma(program.label.toUpperCase());
+      setOutline(program.outline);
+      setEyebrow(program.eyebrow || 'FECHAS');
+      setPresetActivo('calendario');
+      setSedes(synchronizeFlyerRows(events, id));
+    }
   };
 
   const toggleSedeActiva = (id) => {
@@ -130725,8 +130832,9 @@ export default function GeneradorFlyer() {
       canvas.height = 1920;
       const ctx = canvas.getContext('2d');
 
+      const bgUrl = tipoPrograma === 'CAMINATA_FUEGO' ? '/flyer_fuego_bg_1080.jpg' : '/flyer_earth_bg_1080.png';
       const [bgImg, logoImg, flagsImg] = await Promise.all([
-        loadImage('/flyer_earth_bg_1080.png'),
+        loadImage(bgUrl),
         loadImage('/logo_crear_blanco.png'),
         loadImage('/flags_badges_hd.png')
       ]);
@@ -130734,115 +130842,230 @@ export default function GeneradorFlyer() {
       await document.fonts.ready;
 
       for (const [pageIndex, sedesFlyer] of pages.entries()) {
-      // 1. Fondo cósmico
-      ctx.clearRect(0, 0, 1080, 1920);
-      ctx.drawImage(bgImg, 0, 0, 1080, 1920);
+        ctx.clearRect(0, 0, 1080, 1920);
+        ctx.drawImage(bgImg, 0, 0, 1080, 1920);
 
-      // 2. Logo oficial blanco centrado
-      const logoW = 190;
-      const logoH = (logoImg.height / logoImg.width) * logoW;
-      ctx.drawImage(logoImg, 540 - logoW / 2, 90, logoW, logoH);
+        if (tipoPrograma === 'CAMINATA_FUEGO') {
+          // Degradado oscuro para asegurar contraste y legibilidad absoluta sobre las brasas
+          const grad = ctx.createLinearGradient(0, 750, 0, 1920);
+          grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+          grad.addColorStop(0.2, 'rgba(3, 4, 8, 0.78)');
+          grad.addColorStop(0.42, 'rgba(2, 3, 6, 0.95)');
+          grad.addColorStop(1, '#000000');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 750, 1080, 1170);
 
-      // 3. Eyebrow FECHAS
-      ctx.save();
-      ctx.font = '300 22px "Montserrat", sans-serif';
-      if ('letterSpacing' in ctx) ctx.letterSpacing = '9px';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
-      ctx.shadowBlur = 10;
-      ctx.fillText(eyebrow, 540, 440);
-      ctx.restore();
+          // 1. Logo oficial blanco centrado
+          const logoW = 210;
+          const logoH = (logoImg.height / logoImg.width) * logoW;
+          ctx.drawImage(logoImg, 540 - logoW / 2, 85, logoW, logoH);
 
-      // 4. Marca de agua en contorno (Fondo)
-      ctx.save();
-      ctx.font = '800 168px "Montserrat", sans-serif';
-      if ('letterSpacing' in ctx) ctx.letterSpacing = '28px';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-      ctx.lineWidth = 1.2;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.strokeText(outlineFlyer, 540, 565, 960);
-      ctx.restore();
-
-      // 5. Título Principal con resplandor dorado (Primer Plano)
-      ctx.save();
-      ctx.font = '800 49px "Montserrat", sans-serif';
-      if ('letterSpacing' in ctx) ctx.letterSpacing = '10px';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      // Glow suave amarillo/dorado
-      ctx.shadowColor = 'rgba(245, 180, 70, 0.4)';
-      ctx.shadowBlur = 32;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText(tituloFlyer, 540, 565, 960);
-
-      // Glow intenso central
-      ctx.shadowColor = 'rgba(255, 240, 200, 0.85)';
-      ctx.shadowBlur = 15;
-      ctx.fillText(tituloFlyer, 540, 565, 960);
-
-      // Texto sólido frontal
-      ctx.shadowBlur = 0;
-      ctx.fillText(tituloFlyer, 540, 565, 960);
-      ctx.restore();
-
-      // 6. Lista flotante de Sedes y Fechas
-      const totalSedes = sedesFlyer.length;
-      const startY = esIndividual ? 900 : 726;
-      const step = totalSedes > 5 ? 122 : 140;
-
-      sedesFlyer.forEach((s, idx) => {
-        const y = startY + idx * step;
-
-        // Nombre de la Ciudad (dorado/ámbar)
-        ctx.save();
-        ctx.font = esIndividual ? '700 64px "Montserrat", sans-serif' : '700 41px "Montserrat", sans-serif';
-        if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
-        ctx.fillStyle = '#f29e2e';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(242, 164, 59, 0.45)';
-        ctx.shadowBlur = 16;
-        ctx.fillText(s.ciudad, 540, y, 940);
-        ctx.restore();
-
-        // Fechas (blanco elegante)
-        ctx.save();
-        ctx.font = esIndividual ? '300 40px "Montserrat", sans-serif' : '300 30px "Montserrat", sans-serif';
-        if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.35)';
-        ctx.shadowBlur = 12;
-        ctx.fillText(s.fechas, 540, y + (esIndividual ? 70 : 46), 940);
-        ctx.restore();
-        if (s.equipo) {
+          // 2. Eyebrow ALIADOS
           ctx.save();
-          ctx.font = esIndividual ? '500 32px "Montserrat", sans-serif' : '500 24px "Montserrat", sans-serif';
+          ctx.font = '800 34px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '14px';
           ctx.fillStyle = '#ffffff';
           ctx.textAlign = 'center';
-          ctx.fillText(s.equipo, 540, y + (esIndividual ? 122 : 82), 940);
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+          ctx.shadowBlur = 12;
+          ctx.fillText(eyebrow || 'ALIADOS', 540, 1030);
+          ctx.restore();
+
+          // 3. Marca de agua en contorno FUEGO
+          ctx.save();
+          ctx.font = '900 178px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '24px';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.82)';
+          ctx.lineWidth = 2.5;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.strokeText(outlineFlyer || 'FUEGO', 540, 1260, 980);
+          ctx.restore();
+
+          // 4. Título Principal: CAMINATA SOBRE
+          ctx.save();
+          ctx.font = '900 76px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '14px';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+          ctx.shadowBlur = 18;
+          ctx.fillText('CAMINATA', 540, 1125, 960);
+          ctx.fillText('SOBRE', 540, 1195, 960);
+          ctx.restore();
+
+          // 5. Detalles de Sede (Fecha/Hora, Lugar, Dirección, Vestimenta)
+          const s = sedesFlyer[0] || {};
+          // Fecha y Hora
+          ctx.save();
+          ctx.font = '700 34px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '1px';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+          ctx.shadowBlur = 10;
+          ctx.fillText(s.fechas || 'Jueves 12 de noviembre de 2026 / 18:00', 540, 1400, 980);
+          ctx.restore();
+
+          // Lugar (Ámbar oficial)
+          if (s.lugar || s.ciudad) {
+            ctx.save();
+            ctx.font = '700 32px "Montserrat", sans-serif';
+            ctx.fillStyle = '#f29e2e';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(242, 164, 59, 0.4)';
+            ctx.shadowBlur = 10;
+            ctx.fillText(s.lugar || s.ciudad, 540, 1460, 980);
+            ctx.restore();
+          }
+
+          // Dirección (Ámbar oficial)
+          if (s.direccion) {
+            ctx.save();
+            ctx.font = '500 27px "Montserrat", sans-serif';
+            ctx.fillStyle = '#f29e2e';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(s.direccion, 540, 1505, 980);
+            ctx.restore();
+          }
+
+          // Requisito / Vestimenta Negra
+          ctx.save();
+          ctx.font = '800 38px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.35)';
+          ctx.shadowBlur = 12;
+          ctx.fillText(s.vestimenta || 'Vestimenta Negra', 540, 1600, 980);
+          ctx.restore();
+
+          // 6. Hashtag oficial #SOYCREADOR
+          ctx.save();
+          ctx.font = '500 24px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '9px';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(hashtag || '#SOYCREADOR', 540, 1735);
+          ctx.restore();
+
+        } else {
+          // 2. Logo oficial blanco centrado
+          const logoW = 190;
+          const logoH = (logoImg.height / logoImg.width) * logoW;
+          ctx.drawImage(logoImg, 540 - logoW / 2, 90, logoW, logoH);
+
+          // 3. Eyebrow FECHAS
+          ctx.save();
+          ctx.font = '300 22px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '9px';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+          ctx.shadowBlur = 10;
+          ctx.fillText(eyebrow, 540, 440);
+          ctx.restore();
+
+          // 4. Marca de agua en contorno (Fondo)
+          ctx.save();
+          ctx.font = '800 168px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '28px';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+          ctx.lineWidth = 1.2;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.strokeText(outlineFlyer, 540, 565, 960);
+          ctx.restore();
+
+          // 5. Título Principal con resplandor dorado (Primer Plano)
+          ctx.save();
+          ctx.font = '800 49px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '10px';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // Glow suave amarillo/dorado
+          ctx.shadowColor = 'rgba(245, 180, 70, 0.4)';
+          ctx.shadowBlur = 32;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(tituloFlyer, 540, 565, 960);
+
+          // Glow intenso central
+          ctx.shadowColor = 'rgba(255, 240, 200, 0.85)';
+          ctx.shadowBlur = 15;
+          ctx.fillText(tituloFlyer, 540, 565, 960);
+
+          // Texto sólido frontal
+          ctx.shadowBlur = 0;
+          ctx.fillText(tituloFlyer, 540, 565, 960);
+          ctx.restore();
+
+          // 6. Lista flotante de Sedes y Fechas
+          const totalSedes = sedesFlyer.length;
+          const startY = esIndividual ? 900 : 726;
+          const step = totalSedes > 5 ? 122 : 140;
+
+          sedesFlyer.forEach((s, idx) => {
+            const y = startY + idx * step;
+
+            // Nombre de la Ciudad (dorado/ámbar)
+            ctx.save();
+            ctx.font = esIndividual ? '700 64px "Montserrat", sans-serif' : '700 41px "Montserrat", sans-serif';
+            if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
+            ctx.fillStyle = '#f29e2e';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(242, 164, 59, 0.45)';
+            ctx.shadowBlur = 16;
+            ctx.fillText(s.ciudad, 540, y, 940);
+            ctx.restore();
+
+            // Fechas (blanco elegante)
+            ctx.save();
+            ctx.font = esIndividual ? '300 40px "Montserrat", sans-serif' : '300 30px "Montserrat", sans-serif';
+            if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.35)';
+            ctx.shadowBlur = 12;
+            ctx.fillText(s.fechas, 540, y + (esIndividual ? 70 : 46), 940);
+            ctx.restore();
+            if (s.equipo) {
+              ctx.save();
+              ctx.font = esIndividual ? '500 32px "Montserrat", sans-serif' : '500 24px "Montserrat", sans-serif';
+              ctx.fillStyle = '#ffffff';
+              ctx.textAlign = 'center';
+              ctx.fillText(s.equipo, 540, y + (esIndividual ? 122 : 82), 940);
+              ctx.restore();
+            }
+          });
+
+          // 7. Banderas Metálicas Circulares Oficiales
+          const flagsW = 445;
+          const flagsH = (flagsImg.height / flagsImg.width) * flagsW;
+          ctx.drawImage(flagsImg, 540 - flagsW / 2, 1685, flagsW, flagsH);
+
+          // 8. Hashtag oficial #SOYCREADOR
+          ctx.save();
+          ctx.font = '400 21px "Montserrat", sans-serif';
+          if ('letterSpacing' in ctx) ctx.letterSpacing = '8px';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(255, 255, 255, 0.45)';
+          ctx.shadowBlur = 15;
+          ctx.fillText(hashtag, 540, 1800);
           ctx.restore();
         }
-      });
-
-      // 7. Banderas Metálicas Circulares Oficiales
-      const flagsW = 445;
-      const flagsH = (flagsImg.height / flagsImg.width) * flagsW;
-      ctx.drawImage(flagsImg, 540 - flagsW / 2, 1685, flagsW, flagsH);
-
-      // 8. Hashtag oficial #SOYCREADOR
-      ctx.save();
-      ctx.font = '400 21px "Montserrat", sans-serif';
-      if ('letterSpacing' in ctx) ctx.letterSpacing = '8px';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(255, 255, 255, 0.45)';
       ctx.shadowBlur = 15;
       ctx.fillText(hashtag, 540, 1800);
       ctx.restore();
@@ -131105,6 +131328,42 @@ export default function GeneradorFlyer() {
               Preset manual: Septiembre 2026
             </button>
           </div>}
+
+          {tipoPrograma === 'CAMINATA_FUEGO' && <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.78rem', color: '#f59e0b', fontWeight: 800, alignSelf: 'center', marginRight: '0.2rem' }}>SEDES OFICIALES:</span>
+            {SEDES_CAMINATA_FUEGO.map(s => {
+              const esActivo = modoFlyer === FLYER_MODE_SINGLE && sedeIndividualId === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => {
+                    setSedeIndividualId(s.id);
+                    setModoFlyer(FLYER_MODE_SINGLE);
+                    showToast?.(`Plantilla oficial cargada para ${s.ciudad} (${s.lugar})`, 'info');
+                  }}
+                  style={{
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: '10px',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    transition: 'all 0.2s',
+                    background: esActivo ? 'linear-gradient(135deg, #FFC107 0%, #d97706 100%)' : (isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.06)'),
+                    color: esActivo ? '#000000' : themeStyles.textTitle,
+                    border: esActivo ? 'none' : `1px solid ${themeStyles.rowBorder}`,
+                    boxShadow: esActivo ? '0 0 14px rgba(255, 193, 7, 0.4)' : 'none'
+                  }}
+                >
+                  <span>{getCountryFlag(s.ciudad)}</span>
+                  {s.ciudad}
+                </button>
+              );
+            })}
+          </div>}
         </div>
         <p role="status" style={{ margin: 0, color: themeStyles.textMuted }}>
           {sinFechas ? `Sin fechas de ${selectedProgram.label} en el calendario. ` : ''}
@@ -131328,58 +131587,123 @@ export default function GeneradorFlyer() {
                         </div>
                       </div>
 
-                      {/* Campo Fechas de Capítulo */}
-                      <div style={{ flex: 1, position: 'relative' }}>
-                        <div style={{ fontSize: '0.72rem', color: themeStyles.textMuted, marginBottom: '0.35rem' }}>
-                          {s.notice || (s.source === 'manual' ? 'Manual — no sincronizado' : 'Sincronizado del calendario')}
+                      {/* Campo Fechas de Capítulo o Campos de Caminata sobre Fuego */}
+                      {tipoPrograma === 'CAMINATA_FUEGO' ? (
+                        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem' }}>
+                          <div>
+                            <label style={{ fontSize: '0.68rem', color: themeStyles.textMuted, fontWeight: 700, display: 'block', marginBottom: '2px' }}>FECHA Y HORA</label>
+                            <input
+                              type="text"
+                              value={s.fechas || ''}
+                              disabled={!s.activo}
+                              onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
+                              placeholder="Ej: Jueves 12 de noviembre de 2026 / 18:00"
+                              style={{
+                                width: '100%', boxSizing: 'border-box', background: themeStyles.inputBg,
+                                border: `1px solid ${themeStyles.inputBorder}`, borderRadius: '8px',
+                                padding: '0.45rem 0.65rem', color: themeStyles.inputColor, fontSize: '0.8rem', fontWeight: 600
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '0.68rem', color: '#f59e0b', fontWeight: 700, display: 'block', marginBottom: '2px' }}>LUGAR / SALÓN</label>
+                            <input
+                              type="text"
+                              value={s.lugar || ''}
+                              disabled={!s.activo}
+                              onChange={(e) => updateSede(s.id, 'lugar', e.target.value)}
+                              placeholder="Ej: Casona Blanca"
+                              style={{
+                                width: '100%', boxSizing: 'border-box', background: themeStyles.inputBg,
+                                border: `1px solid ${themeStyles.inputBorder}`, borderRadius: '8px',
+                                padding: '0.45rem 0.65rem', color: '#f59e0b', fontSize: '0.8rem', fontWeight: 700
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '0.68rem', color: '#f59e0b', fontWeight: 700, display: 'block', marginBottom: '2px' }}>DIRECCIÓN</label>
+                            <input
+                              type="text"
+                              value={s.direccion || ''}
+                              disabled={!s.activo}
+                              onChange={(e) => updateSede(s.id, 'direccion', e.target.value)}
+                              placeholder="Ej: C. Las Perdices 1126, Lima 15457."
+                              style={{
+                                width: '100%', boxSizing: 'border-box', background: themeStyles.inputBg,
+                                border: `1px solid ${themeStyles.inputBorder}`, borderRadius: '8px',
+                                padding: '0.45rem 0.65rem', color: '#f59e0b', fontSize: '0.8rem', fontWeight: 500
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '0.68rem', color: themeStyles.textMuted, fontWeight: 700, display: 'block', marginBottom: '2px' }}>VESTIMENTA</label>
+                            <input
+                              type="text"
+                              value={s.vestimenta || 'Vestimenta Negra'}
+                              disabled={!s.activo}
+                              onChange={(e) => updateSede(s.id, 'vestimenta', e.target.value)}
+                              placeholder="Ej: Vestimenta Negra"
+                              style={{
+                                width: '100%', boxSizing: 'border-box', background: themeStyles.inputBg,
+                                border: `1px solid ${themeStyles.inputBorder}`, borderRadius: '8px',
+                                padding: '0.45rem 0.65rem', color: '#ffffff', fontSize: '0.8rem', fontWeight: 800
+                              }}
+                            />
+                          </div>
                         </div>
-                        {FLYER_VENUES.some(venue => venue.id === s.id) && (
-                          <select aria-label={`Evento de ${s.ciudad}`} value=""
-                            onChange={e => {
-                              if (!e.target.value) return;
-                              const venue = FLYER_VENUES.find(item => item.id === s.id);
-                              const options = flyerCalendarEvents(events, tipoPrograma, venue);
-                              const row = flyerCalendarRow(venue, options[Number(e.target.value) - 1], tipoPrograma);
-                              setSedes(previous => previous.map(item => item.id === s.id ? row : item));
+                      ) : (
+                        <div style={{ flex: 1, position: 'relative' }}>
+                          <div style={{ fontSize: '0.72rem', color: themeStyles.textMuted, marginBottom: '0.35rem' }}>
+                            {s.notice || (s.source === 'manual' ? 'Manual — no sincronizado' : 'Sincronizado del calendario')}
+                          </div>
+                          {FLYER_VENUES.some(venue => venue.id === s.id) && (
+                            <select aria-label={`Evento de ${s.ciudad}`} value=""
+                              onChange={e => {
+                                if (!e.target.value) return;
+                                const venue = FLYER_VENUES.find(item => item.id === s.id);
+                                const options = flyerCalendarEvents(events, tipoPrograma, venue);
+                                const row = flyerCalendarRow(venue, options[Number(e.target.value) - 1], tipoPrograma);
+                                setSedes(previous => previous.map(item => item.id === s.id ? row : item));
+                              }}
+                              style={{ width: '100%', background: themeStyles.inputBg, color: themeStyles.inputColor, marginBottom: '0.35rem' }}>
+                              <option value="">Elegir otra fecha/equipo del calendario</option>
+                              {flyerCalendarEvents(events, tipoPrograma, FLYER_VENUES.find(venue => venue.id === s.id)).map((event, index) =>
+                                <option key={index} value={index + 1}>{flyerEventDates(event, tipoPrograma)}{flyerEventTeam(event) ? ` — ${flyerEventTeam(event)}` : ''}</option>)}
+                            </select>
+                          )}
+                          <div style={{
+                            position: 'absolute',
+                            left: '12px',
+                            bottom: '12px',
+                            color: '#f59e0b',
+                            pointerEvents: 'none',
+                            display: 'flex',
+                            alignItems: 'center'
+                          }}>
+                            <Calendar size={14} />
+                          </div>
+                          <input
+                            type="text"
+                            value={s.fechas}
+                            disabled={!s.activo && s.source !== 'sin-fechas'}
+                            onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
+                            placeholder="Escribe una fecha manual y activa la sede"
+                            style={{
+                              width: '100%',
+                              boxSizing: 'border-box',
+                              background: themeStyles.inputBg,
+                              border: `1px solid ${themeStyles.inputBorder}`,
+                              borderRadius: '10px',
+                              padding: '0.6rem 0.85rem 0.6rem 2.2rem',
+                              color: themeStyles.inputColor,
+                              fontWeight: 600,
+                              fontSize: '0.82rem',
+                              outline: 'none',
+                              transition: 'border-color 0.2s'
                             }}
-                            style={{ width: '100%', background: themeStyles.inputBg, color: themeStyles.inputColor, marginBottom: '0.35rem' }}>
-                            <option value="">Elegir otra fecha/equipo del calendario</option>
-                            {flyerCalendarEvents(events, tipoPrograma, FLYER_VENUES.find(venue => venue.id === s.id)).map((event, index) =>
-                              <option key={index} value={index + 1}>{flyerEventDates(event, tipoPrograma)}{flyerEventTeam(event) ? ` — ${flyerEventTeam(event)}` : ''}</option>)}
-                          </select>
-                        )}
-                        <div style={{
-                          position: 'absolute',
-                          left: '12px',
-                          bottom: '12px',
-                          color: '#f59e0b',
-                          pointerEvents: 'none',
-                          display: 'flex',
-                          alignItems: 'center'
-                        }}>
-                          <Calendar size={14} />
+                          />
                         </div>
-                        <input
-                          type="text"
-                          value={s.fechas}
-                          disabled={!s.activo && s.source !== 'sin-fechas'}
-                          onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
-                          placeholder="Escribe una fecha manual y activa la sede"
-                          style={{
-                            width: '100%',
-                            boxSizing: 'border-box',
-                            background: themeStyles.inputBg,
-                            border: `1px solid ${themeStyles.inputBorder}`,
-                            borderRadius: '10px',
-                            padding: '0.6rem 0.85rem 0.6rem 2.2rem',
-                            color: themeStyles.inputColor,
-                            fontWeight: 600,
-                            fontSize: '0.82rem',
-                            outline: 'none',
-                            transition: 'border-color 0.2s'
-                          }}
-                        />
-                      </div>
+                      )}
 
                       {/* Botón Eliminar */}
                       <button
@@ -131616,155 +131940,345 @@ export default function GeneradorFlyer() {
               </div>
 
               {/* Pantalla Interna del Flyer (Aspecto 9:16) */}
-              <div style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: '26px',
-                overflow: 'hidden',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                backgroundImage: "url('/flyer_earth_bg_1080.png')",
-                backgroundSize: '100% 100%',
-                backgroundPosition: 'center bottom',
-                backgroundColor: '#010308',
-                fontFamily: "'Montserrat', sans-serif",
-                userSelect: 'none'
-              }}>
-                
-                {/* 1. TOP LOGO OFICIAL CREAR */}
-                <div style={{ paddingTop: '2.5rem', display: 'flex', justifyContent: 'center' }}>
-                  <img
-                    src="/logo_crear_blanco.png"
-                    alt="CREAR Poder sin límites"
-                    style={{ width: '68px', height: 'auto', objectFit: 'contain' }}
-                  />
-                </div>
+              {tipoPrograma === 'CAMINATA_FUEGO' ? (
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '26px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  backgroundImage: "url('/flyer_fuego_bg_1080.jpg')",
+                  backgroundSize: '100% 100%',
+                  backgroundPosition: 'center',
+                  backgroundColor: '#010308',
+                  fontFamily: "'Montserrat', sans-serif",
+                  userSelect: 'none'
+                }}>
+                  {/* Degradado oscuro inferior para máxima legibilidad sobre las brasas */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: '64%',
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(2,3,6,0.82) 25%, rgba(0,0,0,0.98) 60%, #000000 100%)',
+                    pointerEvents: 'none'
+                  }} />
 
-                {/* 2. EYEBROW & MAIN TITLE */}
-                <div style={{ textAlign: 'center', position: 'relative', marginTop: '-0.5rem' }}>
-                  <p style={{
-                    fontSize: '9px',
-                    fontWeight: 300,
-                    letterSpacing: '0.42em',
-                    paddingLeft: '0.42em',
-                    color: 'rgba(255, 255, 255, 0.85)',
-                    textTransform: 'uppercase',
-                    margin: '0 0 4px 0',
-                    textShadow: '0 1px 4px rgba(0,0,0,0.8)'
-                  }}>
-                    {eyebrow}
-                  </p>
-                  
-                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {/* Outline Watermark (Fondo) */}
-                    <span style={{
-                      position: 'absolute',
-                      fontWeight: 900,
-                      letterSpacing: '0.18em',
-                      paddingLeft: '0.18em',
-                      color: 'transparent',
-                      userSelect: 'none',
-                      pointerEvents: 'none',
-                      fontSize: outlineFlyer.length > 4 ? '34px' : '58px',
-                      WebkitTextStroke: '1px rgba(255, 255, 255, 0.15)'
-                    }}>
-                      {outlineFlyer}
-                    </span>
+                  {/* 1. TOP LOGO OFICIAL CREAR */}
+                  <div style={{ paddingTop: '2.2rem', display: 'flex', justifyContent: 'center', position: 'relative', zIndex: 10 }}>
+                    <img
+                      src="/logo_crear_blanco.png"
+                      alt="CREAR Poder sin límites"
+                      style={{ width: '68px', height: 'auto', objectFit: 'contain' }}
+                    />
+                  </div>
 
-                    {/* Título Principal con Halo Luminous */}
-                    <h2 style={{
-                      position: 'relative',
-                      zIndex: 10,
-                      fontSize: tituloFlyer.length > 14 ? '14px' : '17px',
-                      fontWeight: 900,
-                      letterSpacing: '0.20em',
-                      paddingLeft: '0.20em',
+                  {/* 2. EYEBROW & TITULO PRINCIPAL */}
+                  <div style={{ textAlign: 'center', position: 'relative', zIndex: 10, marginTop: 'auto', marginBottom: '0.8rem' }}>
+                    <p style={{
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      letterSpacing: '0.45em',
+                      paddingLeft: '0.45em',
                       color: '#ffffff',
                       textTransform: 'uppercase',
-                      whiteSpace: 'nowrap',
-                      margin: 0,
-                      textShadow: '0 0 10px rgba(255, 240, 200, 0.95), 0 0 20px rgba(245, 180, 70, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
+                      margin: '0 0 6px 0',
+                      textShadow: '0 0 8px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.9)'
                     }}>
-                      {tituloFlyer}
-                    </h2>
+                      {eyebrow || 'ALIADOS'}
+                    </p>
+
+                    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                      {/* Outline FUEGO */}
+                      <span style={{
+                        position: 'absolute',
+                        top: '12px',
+                        fontWeight: 900,
+                        letterSpacing: '0.22em',
+                        paddingLeft: '0.22em',
+                        color: 'transparent',
+                        userSelect: 'none',
+                        pointerEvents: 'none',
+                        fontSize: '52px',
+                        WebkitTextStroke: '1.2px rgba(255, 255, 255, 0.85)'
+                      }}>
+                        {outlineFlyer || 'FUEGO'}
+                      </span>
+
+                      {/* CAMINATA */}
+                      <h2 style={{
+                        position: 'relative',
+                        zIndex: 10,
+                        fontSize: '20px',
+                        fontWeight: 900,
+                        letterSpacing: '0.22em',
+                        paddingLeft: '0.22em',
+                        color: '#ffffff',
+                        textTransform: 'uppercase',
+                        margin: 0,
+                        lineHeight: 1.15,
+                        textShadow: '0 2px 6px rgba(0,0,0,0.95)'
+                      }}>
+                        CAMINATA
+                      </h2>
+                      {/* SOBRE */}
+                      <h2 style={{
+                        position: 'relative',
+                        zIndex: 10,
+                        fontSize: '20px',
+                        fontWeight: 900,
+                        letterSpacing: '0.22em',
+                        paddingLeft: '0.22em',
+                        color: '#ffffff',
+                        textTransform: 'uppercase',
+                        margin: 0,
+                        lineHeight: 1.15,
+                        textShadow: '0 2px 6px rgba(0,0,0,0.95)'
+                      }}>
+                        SOBRE
+                      </h2>
+                    </div>
+                  </div>
+
+                  {/* 3. LUGAR, FECHA, DIRECCIÓN Y VESTIMENTA */}
+                  <div style={{
+                    position: 'relative',
+                    zIndex: 10,
+                    textAlign: 'center',
+                    padding: '0 1.25rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                    marginBottom: '1rem'
+                  }}>
+                    {(() => {
+                      const s = activeSedesList[0] || {};
+                      return (
+                        <>
+                          <p style={{
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            color: '#ffffff',
+                            margin: 0,
+                            textShadow: '0 1px 4px rgba(0,0,0,0.9)'
+                          }}>
+                            {s.fechas || 'Jueves 12 de noviembre de 2026 / 18:00'}
+                          </p>
+
+                          {(s.lugar || s.ciudad) && (
+                            <p style={{
+                              fontSize: '10.5px',
+                              fontWeight: 700,
+                              color: '#f29e2e',
+                              margin: 0,
+                              textShadow: '0 0 8px rgba(242, 164, 59, 0.5)'
+                            }}>
+                              {s.lugar || s.ciudad}
+                            </p>
+                          )}
+
+                          {s.direccion && (
+                            <p style={{
+                              fontSize: '9px',
+                              fontWeight: 500,
+                              color: '#f29e2e',
+                              margin: 0,
+                              textShadow: '0 1px 4px rgba(0,0,0,0.9)'
+                            }}>
+                              {s.direccion}
+                            </p>
+                          )}
+
+                          <p style={{
+                            fontSize: '12.5px',
+                            fontWeight: 900,
+                            color: '#ffffff',
+                            margin: '6px 0 0 0',
+                            letterSpacing: '0.05em',
+                            textShadow: '0 0 10px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.95)'
+                          }}>
+                            {s.vestimenta || 'Vestimenta Negra'}
+                          </p>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* 4. HASHTAG OFICIAL #SOYCREADOR */}
+                  <div style={{
+                    position: 'relative',
+                    zIndex: 10,
+                    paddingBottom: '1.4rem',
+                    textAlign: 'center'
+                  }}>
+                    <p style={{
+                      fontSize: '8.5px',
+                      fontWeight: 500,
+                      letterSpacing: '0.4em',
+                      paddingLeft: '0.4em',
+                      color: 'rgba(255, 255, 255, 0.95)',
+                      margin: 0,
+                      textShadow: '0 1px 4px rgba(0,0,0,0.9)'
+                    }}>
+                      {hashtag}
+                    </p>
                   </div>
                 </div>
-
-                {/* 3. LISTA FLOTANTE DE CIUDADES Y FECHAS (ESTILO ORIGINAL FIEL) */}
+              ) : (
                 <div style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '26px',
+                  overflow: 'hidden',
+                  position: 'relative',
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: activeSedesList.length > 5 ? '0.65rem' : '0.95rem',
-                  margin: 'auto 0',
-                  padding: '0 1.5rem'
+                  justifyContent: 'space-between',
+                  backgroundImage: "url('/flyer_earth_bg_1080.png')",
+                  backgroundSize: '100% 100%',
+                  backgroundPosition: 'center bottom',
+                  backgroundColor: '#010308',
+                  fontFamily: "'Montserrat', sans-serif",
+                  userSelect: 'none'
                 }}>
-                  {activeSedesList.map(s => (
-                    <div key={s.id} style={{ textAlign: 'center', width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                      <p style={{
-                        fontSize: esFlyerIndividual ? '22px' : (activeSedesList.length > 5 ? '13px' : '14.5px'),
-                        fontWeight: 700,
-                        color: '#f29e2e',
-                        lineHeight: 1.15,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        margin: 0,
-                        textShadow: '0 0 10px rgba(242, 164, 59, 0.45), 0 1px 4px rgba(0,0,0,0.8)'
+                  
+                  {/* 1. TOP LOGO OFICIAL CREAR */}
+                  <div style={{ paddingTop: '2.5rem', display: 'flex', justifyContent: 'center' }}>
+                    <img
+                      src="/logo_crear_blanco.png"
+                      alt="CREAR Poder sin límites"
+                      style={{ width: '68px', height: 'auto', objectFit: 'contain' }}
+                    />
+                  </div>
+
+                  {/* 2. EYEBROW & MAIN TITLE */}
+                  <div style={{ textAlign: 'center', position: 'relative', marginTop: '-0.5rem' }}>
+                    <p style={{
+                      fontSize: '9px',
+                      fontWeight: 300,
+                      letterSpacing: '0.42em',
+                      paddingLeft: '0.42em',
+                      color: 'rgba(255, 255, 255, 0.85)',
+                      textTransform: 'uppercase',
+                      margin: '0 0 4px 0',
+                      textShadow: '0 1px 4px rgba(0,0,0,0.8)'
+                    }}>
+                      {eyebrow}
+                    </p>
+                    
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {/* Outline Watermark (Fondo) */}
+                      <span style={{
+                        position: 'absolute',
+                        fontWeight: 900,
+                        letterSpacing: '0.18em',
+                        paddingLeft: '0.18em',
+                        color: 'transparent',
+                        userSelect: 'none',
+                        pointerEvents: 'none',
+                        fontSize: outlineFlyer.length > 4 ? '34px' : '58px',
+                        WebkitTextStroke: '1px rgba(255, 255, 255, 0.15)'
                       }}>
-                        {s.ciudad}
-                      </p>
-                      <p style={{
-                        fontSize: esFlyerIndividual ? '14px' : (activeSedesList.length > 5 ? '9.5px' : '10.5px'),
-                        fontWeight: 300,
+                        {outlineFlyer}
+                      </span>
+
+                      {/* Título Principal con Halo Luminous */}
+                      <h2 style={{
+                        position: 'relative',
+                        zIndex: 10,
+                        fontSize: tituloFlyer.length > 14 ? '14px' : '17px',
+                        fontWeight: 900,
+                        letterSpacing: '0.20em',
+                        paddingLeft: '0.20em',
                         color: '#ffffff',
-                        letterSpacing: '0.3px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        margin: '2px 0 0 0',
-                        textShadow: '0 0 8px rgba(255, 255, 255, 0.35), 0 1px 4px rgba(0,0,0,0.9)'
+                        textTransform: 'uppercase',
+                        whiteSpace: 'nowrap',
+                        margin: 0,
+                        textShadow: '0 0 10px rgba(255, 240, 200, 0.95), 0 0 20px rgba(245, 180, 70, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9)'
                       }}>
-                        {s.fechas}
-                      </p>
-                      {s.equipo && <p style={{ fontSize: esFlyerIndividual ? '12px' : '8.5px', color: '#ffffff', margin: '3px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.equipo}</p>}
+                        {tituloFlyer}
+                      </h2>
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                {/* 4. BANDERAS METÁLICAS Y HASHTAG (FONDO INFERIOR) */}
-                <div style={{
-                  paddingBottom: '1.75rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}>
-                  <img
-                    src="/flags_badges_hd.png"
-                    alt="Banderas Oficiales"
-                    style={{
-                      width: '155px',
-                      height: 'auto',
-                      objectFit: 'contain',
-                      filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.9))'
-                    }}
-                  />
-                  <p style={{
-                    fontSize: '8px',
-                    fontWeight: 400,
-                    letterSpacing: '0.38em',
-                    paddingLeft: '0.38em',
-                    color: 'rgba(255, 255, 255, 0.95)',
-                    margin: 0,
-                    textShadow: '0 1px 4px rgba(0,0,0,0.9)'
+                  {/* 3. LISTA FLOTANTE DE CIUDADES Y FECHAS (ESTILO ORIGINAL FIEL) */}
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: activeSedesList.length > 5 ? '0.65rem' : '0.95rem',
+                    margin: 'auto 0',
+                    padding: '0 1.5rem'
                   }}>
-                    {hashtag}
-                  </p>
-                </div>
+                    {activeSedesList.map(s => (
+                      <div key={s.id} style={{ textAlign: 'center', width: '100%', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                        <p style={{
+                          fontSize: esFlyerIndividual ? '22px' : (activeSedesList.length > 5 ? '13px' : '14.5px'),
+                          fontWeight: 700,
+                          color: '#f29e2e',
+                          lineHeight: 1.15,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          margin: 0,
+                          textShadow: '0 0 10px rgba(242, 164, 59, 0.45), 0 1px 4px rgba(0,0,0,0.8)'
+                        }}>
+                          {s.ciudad}
+                        </p>
+                        <p style={{
+                          fontSize: esFlyerIndividual ? '14px' : (activeSedesList.length > 5 ? '9.5px' : '10.5px'),
+                          fontWeight: 300,
+                          color: '#ffffff',
+                          letterSpacing: '0.3px',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          margin: '2px 0 0 0',
+                          textShadow: '0 0 8px rgba(255, 255, 255, 0.35), 0 1px 4px rgba(0,0,0,0.9)'
+                        }}>
+                          {s.fechas}
+                        </p>
+                        {s.equipo && <p style={{ fontSize: esFlyerIndividual ? '12px' : '8.5px', color: '#ffffff', margin: '3px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.equipo}</p>}
+                      </div>
+                    ))}
+                  </div>
 
-              </div>
+                  {/* 4. BANDERAS METÁLICAS Y HASHTAG (FONDO INFERIOR) */}
+                  <div style={{
+                    paddingBottom: '1.75rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}>
+                    <img
+                      src="/flags_badges_hd.png"
+                      alt="Banderas Oficiales"
+                      style={{
+                        width: '155px',
+                        height: 'auto',
+                        objectFit: 'contain',
+                        filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.9))'
+                      }}
+                    />
+                    <p style={{
+                      fontSize: '8px',
+                      fontWeight: 400,
+                      letterSpacing: '0.38em',
+                      paddingLeft: '0.38em',
+                      color: 'rgba(255, 255, 255, 0.95)',
+                      margin: 0,
+                      textShadow: '0 1px 4px rgba(0,0,0,0.9)'
+                    }}>
+                      {hashtag}
+                    </p>
+                  </div>
+
+                </div>
+              )}
             </div>
 
             {/* BOTÓN DE DESCARGA EJECUTIVO */}

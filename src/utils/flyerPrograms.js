@@ -2,11 +2,75 @@ import { formatFlyerC1Dates, localCalendarDay, parseCalendarDay } from './flyerD
 import { explicitTeamFromText } from '../services/goalsTimeline.js';
 
 export const FLYER_PROGRAMS = [
-  { id: 'C1', label: 'Capítulo Uno', outline: 'UNO' },
-  { id: 'C2', label: 'Capítulo Dos', outline: 'DOS' },
-  { id: 'CREACION', label: 'Creación', outline: 'CREACIÓN' },
-  { id: 'RELACION', label: 'Relación', outline: 'RELACIÓN' },
-  { id: 'GRATITUD', label: 'Gratitud', outline: 'GRATITUD' }
+  { id: 'C1', label: 'Capítulo Uno', outline: 'UNO', eyebrow: 'FECHAS' },
+  { id: 'C2', label: 'Capítulo Dos', outline: 'DOS', eyebrow: 'FECHAS' },
+  { id: 'CREACION', label: 'Creación', outline: 'CREACIÓN', eyebrow: 'FECHAS' },
+  { id: 'RELACION', label: 'Relación', outline: 'RELACIÓN', eyebrow: 'FECHAS' },
+  { id: 'GRATITUD', label: 'Gratitud', outline: 'GRATITUD', eyebrow: 'FECHAS' },
+  { id: 'CAMINATA_FUEGO', label: 'Caminata sobre Fuego', outline: 'FUEGO', eyebrow: 'ALIADOS' }
+];
+
+export const SEDES_CAMINATA_FUEGO = [
+  {
+    id: 'lim',
+    ciudad: 'Lima',
+    fechas: 'Jueves 12 de noviembre de 2026 / 18:00',
+    lugar: 'Casona Blanca',
+    direccion: 'C. Las Perdices 1126, Lima 15457.',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'uio',
+    ciudad: 'Quito',
+    fechas: 'Jueves 19 de noviembre de 2026 / 18:00',
+    lugar: 'Fortaleza Cuántica CREAR',
+    direccion: 'De los Naranjos, 170124 Quito, Ecuador',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'gye',
+    ciudad: 'Guayaquil',
+    fechas: 'Jueves 26 de noviembre de 2026 / 18:00',
+    lugar: 'Sede de Campo Guayaquil',
+    direccion: 'Av. Francisco de Orellana, Guayaquil, Ecuador',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'cue',
+    ciudad: 'Cuenca',
+    fechas: 'Jueves 3 de diciembre de 2026 / 18:00',
+    lugar: 'Campo Abierto Cuenca',
+    direccion: 'Cuenca, Azuay, Ecuador',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'med',
+    ciudad: 'Medellín',
+    fechas: 'Jueves 10 de diciembre de 2026 / 18:00',
+    lugar: 'Espacio Abierto de Transformación Medellín',
+    direccion: 'Llanogrande / Medellín, Colombia',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  },
+  {
+    id: 'mex',
+    ciudad: 'México',
+    fechas: 'Jueves 17 de diciembre de 2026 / 18:00',
+    lugar: 'Centro de Transformación al Aire Libre CDMX',
+    direccion: 'Ciudad de México, México',
+    vestimenta: 'Vestimenta Negra',
+    activo: true,
+    equipo: 'Aliados'
+  }
 ];
 
 export const FLYER_VENUES = [
@@ -35,7 +99,8 @@ export function flyerEventType(event = {}) {
     ['C2', '(?:CAPITULO\\s*(?:DOS|2)|C2)'],
     ['CREACION', '(?:(?:MJ|MAESTRIA(?: DEL JUEGO)?|PRIMER FDS)\\s*[-:·]?\\s*)?CREACION'],
     ['RELACION', '(?:(?:MJ|MAESTRIA(?: DEL JUEGO)?|SEGUNDO FDS)\\s*[-:·]?\\s*)?RELACION'],
-    ['GRATITUD', '(?:(?:MJ|MAESTRIA(?: DEL JUEGO)?|TERCER FDS)\\s*[-:·]?\\s*)?GRATITUD']
+    ['GRATITUD', '(?:(?:MJ|MAESTRIA(?: DEL JUEGO)?|TERCER FDS)\\s*[-:·]?\\s*)?GRATITUD'],
+    ['CAMINATA_FUEGO', '(?:(?:ALIADOS|AL)\\s*[-:·]?\\s*)?(?:CAMINATA(?:\\s*SOBRE)?\\s*FUEGO|FUEGO)']
   ].filter(([, heading]) => new RegExp(`^${heading}${suffix}\\.?$`).test(name));
   return matches.length === 1 ? matches[0][0] : null;
 }
@@ -67,13 +132,19 @@ export function flyerCalendarEvents(events, type, venue, today = localCalendarDa
 
 export function flyerCalendarRow(venue, event, type) {
   const label = FLYER_PROGRAMS.find(program => program.id === type)?.label || type;
+  const isFuego = type === 'CAMINATA_FUEGO';
+  const defaultFuego = isFuego ? SEDES_CAMINATA_FUEGO.find(s => s.id === venue.id) : null;
   return {
     id: venue.id, ciudad: venue.ciudad, programType: type,
-    fechas: event ? flyerEventDates(event, type) : '',
-    equipo: event ? flyerEventTeam(event) : '',
+    fechas: event ? flyerEventDates(event, type) : (defaultFuego?.fechas || ''),
+    lugar: defaultFuego?.lugar || '',
+    direccion: defaultFuego?.direccion || '',
+    vestimenta: defaultFuego?.vestimenta || (isFuego ? 'Vestimenta Negra' : ''),
+    equipo: event ? flyerEventTeam(event) : (isFuego ? 'Aliados' : ''),
     eventKey: event ? flyerEventKey(event) : '',
-    activo: Boolean(event), source: event ? 'calendario' : 'sin-fechas',
-    notice: event ? '' : `Sin fechas de ${label} en el calendario`
+    activo: Boolean(event || isFuego),
+    source: event ? 'calendario' : (isFuego ? 'preset-fuego' : 'sin-fechas'),
+    notice: event ? '' : (isFuego ? 'Plantilla oficial de Caminata sobre Fuego' : `Sin fechas de ${label} en el calendario`)
   };
 }
 

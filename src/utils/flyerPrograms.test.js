@@ -15,7 +15,11 @@ test('explicit programs support accents, spacing, numeral and team variants', ()
     ['C2', 'C2'], ['CREACIO\u0301N', 'CREACION'], ['MJ · Creación', 'CREACION'],
     ['PRIMER  FDS:  CREACIÓN.', 'CREACION'], ['Maestría del Juego: Relación', 'RELACION'],
     ['SEGUNDO FDS: RELACIÓN', 'RELACION'], ['TERCER FDS: GRATITUD', 'GRATITUD'],
-    ['Gratitud Equipo 9', 'GRATITUD']
+    ['Gratitud Equipo 9', 'GRATITUD'],
+    ['CAMINATA SOBRE FUEGO', 'CAMINATA_FUEGO'],
+    ['Aliados - Caminata sobre Fuego', 'CAMINATA_FUEGO'],
+    ['FUEGO', 'CAMINATA_FUEGO'],
+    ['Caminata Fuego Equipo 31', 'CAMINATA_FUEGO']
   ]) {
     assert.equal(flyerEventType({ nombre: name }), type, name);
     assert.equal(flyerEventType({ name }), type, name);
@@ -98,4 +102,23 @@ test('manual empty dates and more than six venues block export to preserve 9:16'
   const rows = Array.from({ length: 7 }, (_, id) => ({ ...row, id, fechas: '10 de octubre' }));
   assert.match(selectFlyerSedes(rows, FLYER_MODE_ALL).error, /hasta seis sedes/);
   assert.equal(selectFlyerSedes(rows, FLYER_MODE_SINGLE, 0).error, null);
+});
+
+test('CAMINATA_FUEGO initializes official presets for all sedes with venue and dress code', () => {
+  const rows = synchronizeFlyerRows([], 'CAMINATA_FUEGO', today);
+  assert.equal(rows.length, 6);
+  const lima = rows.find(r => r.id === 'lim');
+  assert.ok(lima);
+  assert.equal(lima.ciudad, 'Lima');
+  assert.match(lima.fechas, /12 de noviembre/);
+  assert.equal(lima.lugar, 'Casona Blanca');
+  assert.match(lima.direccion, /Las Perdices/);
+  assert.equal(lima.vestimenta, 'Vestimenta Negra');
+  assert.ok(lima.activo);
+
+  for (const row of rows) {
+    assert.ok(row.fechas.length > 0);
+    assert.ok(row.lugar.length > 0);
+    assert.equal(row.vestimenta, 'Vestimenta Negra');
+  }
 });
