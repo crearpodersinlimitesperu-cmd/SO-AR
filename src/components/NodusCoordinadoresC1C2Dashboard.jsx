@@ -721,10 +721,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         const hasExplicitC1 = matchingEquipos.some(e => e.sentadosC1 !== undefined || recordedPhase(e, c) === 'C1');
         const hasExplicitC2 = matchingEquipos.some(e => e.sentadosC2 !== undefined || recordedPhase(e, c) === 'C2');
 
-        dispSentadosC1 = matchingEquipos.reduce((s, e) => s + (e.sentadosC1 ?? (recordedPhase(e, c) === 'C1' ? e.asistieron : 0) || 0), 0);
-        dispSentadosC2 = matchingEquipos.reduce((s, e) => s + (e.sentadosC2 ?? (recordedPhase(e, c) === 'C2' ? e.asistieron : 0) || 0), 0);
-        dispGestionesC1 = matchingEquipos.reduce((s, e) => s + (e.llamadasC1 ?? (recordedPhase(e, c) === 'C1' ? e.llamadas : 0) || 0), 0);
-        dispGestionesC2 = matchingEquipos.reduce((s, e) => s + (e.llamadasC2 ?? (recordedPhase(e, c) === 'C2' ? e.llamadas : 0) || 0), 0);
+        dispSentadosC1 = matchingEquipos.reduce((s, e) => s + (e.sentadosC1 !== undefined ? (e.sentadosC1 || 0) : ((recordedPhase(e, c) === 'C1' ? e.asistieron : 0) || 0)), 0);
+        dispSentadosC2 = matchingEquipos.reduce((s, e) => s + (e.sentadosC2 !== undefined ? (e.sentadosC2 || 0) : ((recordedPhase(e, c) === 'C2' ? e.asistieron : 0) || 0)), 0);
+        dispGestionesC1 = matchingEquipos.reduce((s, e) => s + (e.llamadasC1 !== undefined ? (e.llamadasC1 || 0) : ((recordedPhase(e, c) === 'C1' ? e.llamadas : 0) || 0)), 0);
+        dispGestionesC2 = matchingEquipos.reduce((s, e) => s + (e.llamadasC2 !== undefined ? (e.llamadasC2 || 0) : ((recordedPhase(e, c) === 'C2' ? e.llamadas : 0) || 0)), 0);
 
         if (dispSentadosC2 === 0 && (c.sentadosC2 || 0) > 0) {
           dispSentadosC2 = c.sentadosC2;
