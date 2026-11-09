@@ -23,11 +23,160 @@ import {
   CHECKLISTS_POR_PUESTO
 } from '../data/nodusIntegratedKnowledge';
 
+export const GUIAS_INTERACTIVAS = [
+  {
+    id: 'auditar_ris',
+    titulo: 'Auditar y Certificar los 3 Resultados Imposibles (IA)',
+    plataforma: 'Causa OS',
+    plataformaBadgeColor: '#10b981',
+    ruta: 'Menú Superior > Resultados Imposibles (IA) o /resultados-imposibles',
+    internalRoute: '/resultados-imposibles',
+    roles: ['Dirección', 'Coordinador', 'Gerente', 'QT', 'Capitán'],
+    descripcion: 'Supervisión del semáforo de cumplimiento por equipo y aprobación/devolución individual con contexto fijado.',
+    pasos: [
+      'Ingresa a Causa OS y selecciona la sede en la esquina superior izquierda.',
+      'Haz clic en el botón verde "Resultados Imposibles (IA)" en la barra superior o en el acceso del Dashboard.',
+      'Filtra por tu equipo (ej. EQUIPO 31) o escribe el DNI/Nombre en el buscador.',
+      'Haz clic en el icono del ojo 👁️ para abrir el expediente del participante.',
+      'Revisa los 3 Resultados Imposibles individuales y su coherencia contra Hábitos de Alto Rendimiento (HAR).',
+      'Usa el ribbon fijado sobre la caja de retroalimentación para escribir observaciones con los datos siempre a la vista.',
+      'Haz clic en "✓ Aprobar Futuro Imposible" si cumple el estándar superior o "Devolver con Observación" si requiere corrección.'
+    ],
+    bestPractice: 'Nunca apruebes metas ambiguas como "ser más disciplinado". Exige cifras numéricas verificables, fecha límite y la fórmula: "Para [en quién me convierto al lograrlo]".'
+  },
+  {
+    id: 'crear_ris_nodus',
+    titulo: 'Crear y Asentar Resultados Imposibles en Nodus',
+    plataforma: 'Nodus',
+    plataformaBadgeColor: '#38bdf8',
+    ruta: 'Nodus IMO > Iniciar Sesión > Maestría del Juego > Equipo > Participantes',
+    externalLink: 'https://imo.crearpslglobal.com/maestria',
+    roles: ['Coordinador MJ', 'Mentor de Juego'],
+    descripcion: 'Registro inicial de los 3 Resultados Imposibles durante el fin de semana de Maestría del Juego.',
+    pasos: [
+      'Accede al portal oficial de Nodus (imo.crearpslglobal.com).',
+      'En el menú lateral, dirígete a "Maestría del Juego".',
+      'Selecciona el equipo activo y haz clic en la lista de participantes.',
+      'Abre la ficha del participante e ingresa las 3 metas aprobadas en sala.',
+      'Guarda los cambios para que el Spider de Causa OS lo sincronice en el próximo ciclo.'
+    ],
+    bestPractice: 'Nodus es el libro contable de la verdad. No ingreses datos aproximados; registra únicamente lo que el participante firmó formalmente en sala.'
+  },
+  {
+    id: 'llamadas_managers',
+    titulo: 'Registrar Llamadas y Enviar WhatsApp a Participantes',
+    plataforma: 'Causa OS',
+    plataformaBadgeColor: '#10b981',
+    ruta: 'Menú Superior > Centro de Managers o /centro-managers',
+    internalRoute: '/centro-managers',
+    roles: ['Manager de Equipo', 'Coordinador', 'Gerente'],
+    descripcion: 'Registro de la cadencia de llamadas telefónicas y contacto dinámico por WhatsApp.',
+    pasos: [
+      'Ve a Centro de Managers (/centro-managers).',
+      'Selecciona la pestaña de tu equipo asignado.',
+      'Haz clic en la píldora verde "📱 WA" para abrir directamente el chat con el participante.',
+      'Haz clic en "📝 Notas" para registrar el estado de la llamada (Contactado, No Contesta, Compromiso, Riesgo).',
+      'Verifica que el semáforo del equipo alcance el 100% de cumplimiento antes del jueves a medianoche.'
+    ],
+    bestPractice: 'Si el participante no atiende tras 3 intentos, no lo marques como desertor. Registra "No Contesta" y eleva el reporte al Capitán de Sede.'
+  },
+  {
+    id: 'monitoreo_vuelos',
+    titulo: 'Monitorear Vuelos y Descargar Cartas de Invitación',
+    plataforma: 'Causa OS',
+    plataformaBadgeColor: '#10b981',
+    ruta: 'Menú Superior > Monitor de Vuelos o /vuelos',
+    internalRoute: '/vuelos',
+    roles: ['Entrenador', 'Logística', 'Gerente', 'Dirección'],
+    descripcion: 'Rastreo en tiempo real de itinerarios aéreos y descarga de cartas consulares y migratorias.',
+    pasos: [
+      'Accede a Monitor de Vuelos (/vuelos).',
+      'Ubica tu nombre o el del entrenador en el listado de traslados.',
+      'Verifica el estado del vuelo (Confirmado, Pendiente, Descalce).',
+      'Haz clic en "Descargar Carta de Invitación (PDF)" para obtener el oficio oficial con membrete.'
+    ],
+    bestPractice: 'Los vuelos se sincronizan automáticamente 7 veces al día desde las carpetas oficiales de Google Drive de CPSL.'
+  },
+  {
+    id: 'generador_flyers',
+    titulo: 'Generar Flyers Oficiales de Graduación (1080x1920 y 1080x1080)',
+    plataforma: 'Causa OS',
+    plataformaBadgeColor: '#10b981',
+    ruta: 'Menú Superior > Generador de Flyers o /generador-flyer',
+    internalRoute: '/generador-flyer',
+    roles: ['Coordinador', 'QT', 'Prensa', 'Aliado'],
+    descripcion: 'Diseño y exportación en alta calidad de piezas de graduación para historias de WhatsApp y redes sociales.',
+    pasos: [
+      'Entra a Generador de Flyers (/generador-flyer).',
+      'Elige el formato: Story vertical (1080x1920) o Feed cuadrado (1080x1080).',
+      'Escribe el nombre del graduado, sede y número de equipo.',
+      'Carga la fotografía; la herramienta la recortará automáticamente con la máscara circular.',
+      'Haz clic en "Descargar Flyer (PNG)" para guardar el arte en 300 DPI listo para difundir.'
+    ],
+    bestPractice: 'Asegúrate de que la foto tenga buena iluminación frontal y fondo despejado para que el recorte circular institucional destaque al máximo.'
+  },
+  {
+    id: 'asistencia_sala_nodus',
+    titulo: 'Tomar Asistencia Física en Sala (PFD, SFD, TFD) y Deserciones',
+    plataforma: 'Nodus',
+    plataformaBadgeColor: '#38bdf8',
+    ruta: 'Nodus IMO > Iniciar Sesión > Capítulo Uno / Dos > Etapa > tbodyPx',
+    externalLink: 'https://imo.crearpslglobal.com/',
+    roles: ['Mesa de Registro', 'Coordinador de Sala', 'Gerente de Sede'],
+    descripcion: 'Control nominal de personas sentadas en sala durante el fin de semana de entrenamiento.',
+    pasos: [
+      'Ingresa a Nodus (imo.crearpslglobal.com).',
+      'Selecciona el Capítulo activo y el número de equipo.',
+      'Haz clic en la etapa actual (PFD, SFD o TFD).',
+      'En la tabla tbodyPx, marca únicamente a las personas que estén sentadas físicamente en su silla.',
+      'Si una persona abandona definitivamente la sala, muévela a tbodyDesertores indicando la causa.'
+    ],
+    bestPractice: 'El conteo en Nodus debe cuadrar al 100% con el recuento físico de cabezas realizado en sala a las 11:30 a.m. (Viernes Inicio).'
+  },
+  {
+    id: 'asignador_entrenadores',
+    titulo: 'Asignar Entrenadores y Resolver Solapamientos Geográficos',
+    plataforma: 'Causa OS',
+    plataformaBadgeColor: '#10b981',
+    ruta: 'Menú Superior > Asignador de Entrenadores o /asignador-entrenadores',
+    internalRoute: '/asignador-entrenadores',
+    roles: ['Dirección General', 'SuperAdmin'],
+    descripcion: 'Distribución de entrenadores certificados en el calendario corporativo anual.',
+    pasos: [
+      'Accede a Asignador de Entrenadores (/asignador-entrenadores).',
+      'Revisa la matriz de eventos por fecha y ciudad.',
+      'Selecciona un entrenador del desplegable certificado para el nivel correspondiente (C1, C2, MJ).',
+      'El sistema alertará si existe un descalce geográfico (mismo entrenador en dos países el mismo fin de semana).',
+      'Guarda la asignación para que impacte en tiempo real en el Dashboard y la app.'
+    ],
+    bestPractice: 'Verifica siempre que el entrenador cuente con póliza de seguro de vida y accidentes vigente registrada en el sistema antes de asignarlo.'
+  },
+  {
+    id: 'predictor_pmo',
+    titulo: 'Consultar el Predictor Inteligente PMO y Gobernanza de Ciclos',
+    plataforma: 'Causa OS',
+    plataformaBadgeColor: '#10b981',
+    ruta: 'Menú Superior > Portafolio PMO o /portafolio',
+    internalRoute: '/portafolio',
+    roles: ['Dirección General', 'Gerentes de Sede', 'Coordinadores'],
+    descripcion: 'Modelos de ciencia de datos, tasa de retención probabilística y capacidad de recursos.',
+    pasos: [
+      'Abre Portafolio PMO (/portafolio).',
+      'Navega por las pestañas: "Predictor Data Science", "Ciclos Activos", "Capacidad de Recursos" o "Centinela RRHH".',
+      'Evalúa la curva de retención esperada de tu equipo y detecta caídas tempranas de compromiso.',
+      'Revisa la capacidad instalada de salones y disponibilidad de staff para el fin de semana.'
+    ],
+    bestPractice: 'Utiliza las métricas de predicción para anticipar llamadas de refuerzo en los equipos que muestren probabilidad de deserción superior al 15%.'
+  }
+];
+
 export default function ManualNodus() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   
-  const [activeTab, setActiveTab] = useState('gobernanza');
+  const [activeTab, setActiveTab] = useState('guia_interactiva');
+  const [platformFilter, setPlatformFilter] = useState('todas');
+  const [roleFilter, setRoleFilter] = useState('todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPuesto, setSelectedPuesto] = useState('Mesa de Registro');
   const [copiedId, setCopiedId] = useState(null);
@@ -52,6 +201,20 @@ export default function ManualNodus() {
       cap.tags.some(t => t.toLowerCase().includes(normalizedSearch))
     );
   }, [normalizedSearch]);
+
+  // Búsqueda en Guías Interactivas
+  const filteredGuias = useMemo(() => {
+    return GUIAS_INTERACTIVAS.filter(item => {
+      const matchText = !normalizedSearch ||
+        item.titulo.toLowerCase().includes(normalizedSearch) ||
+        item.descripcion.toLowerCase().includes(normalizedSearch) ||
+        item.ruta.toLowerCase().includes(normalizedSearch) ||
+        item.pasos.some(p => p.toLowerCase().includes(normalizedSearch));
+      const matchPlat = platformFilter === 'todas' || item.plataforma.toLowerCase() === platformFilter.toLowerCase();
+      const matchRole = roleFilter === 'todos' || item.roles.some(r => r.toLowerCase().includes(roleFilter.toLowerCase()));
+      return matchText && matchPlat && matchRole;
+    });
+  }, [normalizedSearch, platformFilter, roleFilter]);
 
   // Búsqueda en KPIs
   const filteredKPIs = useMemo(() => {
@@ -192,6 +355,7 @@ export default function ManualNodus() {
       {/* PESTAÑAS PRINCIPALES */}
       <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
         {[
+          { id: 'guia_interactiva', label: '🧭 Guía Interactiva (¿Dónde y Cómo?)', desc: 'Rutas exactas y paso a paso' },
           { id: 'gobernanza', label: '🏛️ Gobernanza & Manifiesto', desc: 'Principios y Filosofía' },
           { id: 'estructura', label: '👥 9 Niveles & Vestimenta 2026', desc: 'Jerarquía y Dress Code' },
           { id: 'sop', label: '⏱️ SOP Semanal & El Viaje', desc: 'Cronograma y Sala' },
@@ -224,6 +388,201 @@ export default function ManualNodus() {
       </div>
 
       {/* CONTENIDO DE CADA PESTAÑA */}
+
+      {/* TAB 0: GUÍA INTERACTIVA (¿DÓNDE ESTÁ Y CÓMO SE HACE?) */}
+      {activeTab === 'guia_interactiva' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Barra de Filtros por Plataforma y Rol */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: '1rem 1.4rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Plataforma:</span>
+              {['todas', 'Causa OS', 'Nodus'].map(plat => (
+                <button
+                  key={plat}
+                  onClick={() => setPlatformFilter(plat)}
+                  style={{
+                    padding: '0.35rem 0.8rem',
+                    borderRadius: '8px',
+                    border: platformFilter === plat ? '1px solid var(--crear-gold)' : '1px solid rgba(255,255,255,0.1)',
+                    background: platformFilter === plat ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                    color: platformFilter === plat ? 'var(--crear-gold)' : '#fff',
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    fontWeight: platformFilter === plat ? 700 : 500
+                  }}
+                >
+                  {plat === 'todas' ? '🌐 Todas' : plat}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: 'auto' }}>
+              <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>Rol:</span>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                style={{
+                  background: '#0d1527',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '8px',
+                  padding: '0.35rem 0.8rem',
+                  fontSize: '0.82rem',
+                  outline: 'none'
+                }}
+              >
+                <option value="todos">Todos los Roles</option>
+                <option value="Dirección">Dirección General</option>
+                <option value="Gerente">Gerentes de Sede</option>
+                <option value="Coordinador">Coordinadores (C1/C2/MJ)</option>
+                <option value="Manager">Managers de Equipo</option>
+                <option value="Entrenador">Entrenadores / Coaches</option>
+                <option value="QT">Quantum Team / Capitán</option>
+                <option value="Aliado">Aliados C2 / Mesa</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Listado Interactivo de Guías */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            {filteredGuias.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(255,255,255,0.6)', background: 'rgba(0,0,0,0.2)', borderRadius: '12px' }}>
+                No se encontraron guías operativas que coincidan con los filtros aplicados.
+              </div>
+            ) : (
+              filteredGuias.map((guia) => (
+                <div 
+                  key={guia.id}
+                  className="glass-panel"
+                  style={{
+                    padding: '1.5rem 1.8rem',
+                    borderRadius: '14px',
+                    borderLeft: `4px solid ${guia.plataformaBadgeColor}`,
+                    background: 'rgba(15, 23, 42, 0.65)'
+                  }}
+                >
+                  {/* Encabezado de la Guía */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
+                        <span style={{
+                          background: guia.plataformaBadgeColor,
+                          color: '#000',
+                          padding: '0.15rem 0.6rem',
+                          borderRadius: '6px',
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          letterSpacing: '0.04em'
+                        }}>
+                          {guia.plataforma.toUpperCase()}
+                        </span>
+                        <h3 style={{ margin: 0, color: '#fff', fontSize: '1.25rem', fontWeight: 700 }}>
+                          {guia.titulo}
+                        </h3>
+                      </div>
+                      <p style={{ margin: 0, color: 'rgba(255,255,255,0.75)', fontSize: '0.9rem' }}>
+                        {guia.descripcion}
+                      </p>
+                    </div>
+
+                    {/* Botón de Acción Directa */}
+                    {guia.internalRoute ? (
+                      <button
+                        onClick={() => navigate(guia.internalRoute)}
+                        className="btn-primary"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          padding: '0.45rem 1rem',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          border: 'none',
+                          color: '#fff'
+                        }}
+                      >
+                        <Zap size={14} /> Ir al Módulo en Causa OS
+                      </button>
+                    ) : guia.externalLink ? (
+                      <a
+                        href={guia.externalLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn-primary"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          padding: '0.45rem 1rem',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          borderRadius: '8px',
+                          textDecoration: 'none',
+                          background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                          color: '#fff'
+                        }}
+                      >
+                        <ExternalLink size={14} /> Abrir en Nodus IMO
+                      </a>
+                    ) : null}
+                  </div>
+
+                  {/* Ruta Exacta */}
+                  <div style={{
+                    background: 'rgba(0,0,0,0.35)',
+                    padding: '0.55rem 0.9rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '0.84rem',
+                    color: 'var(--crear-cyan)',
+                    marginBottom: '1rem'
+                  }}>
+                    <strong style={{ color: 'rgba(255,255,255,0.7)' }}>🧭 Ruta Exacta:</strong> {guia.ruta}
+                  </div>
+
+                  {/* Paso a Paso */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <h4 style={{ margin: '0 0 0.5rem 0', color: 'rgba(255,255,255,0.9)', fontSize: '0.92rem', fontWeight: 700 }}>
+                      📋 Procedimiento Paso a Paso:
+                    </h4>
+                    <ol style={{ margin: 0, paddingLeft: '1.3rem', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      {guia.pasos.map((paso, pIdx) => (
+                        <li key={pIdx} style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.86rem', lineHeight: 1.5 }}>
+                          {paso}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {/* Consejo de Optimización */}
+                  <div style={{
+                    background: 'rgba(212, 175, 55, 0.08)',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    borderLeft: '3px solid var(--crear-gold)',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.6rem'
+                  }}>
+                    <Sparkles size={16} style={{ color: 'var(--crear-gold)', flexShrink: 0, marginTop: '0.15rem' }} />
+                    <div style={{ fontSize: '0.84rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.45 }}>
+                      <strong style={{ color: 'var(--crear-gold)' }}>Consejo de Optimización (Best Practice): </strong>
+                      {guia.bestPractice}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* TAB 1: GOBERNANZA & MANIFIESTO */}
       {activeTab === 'gobernanza' && (
