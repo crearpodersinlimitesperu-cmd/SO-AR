@@ -37,7 +37,9 @@
     "sync:kpis": "node scripts/syncKpisLlamadas.mjs",
     "audit:polizas": "node scripts/trainerPolicyAuditAgent.mjs",
     "import:reunion-madrid": "node scripts/importReunionMadridTasks.mjs",
-    "audit:identidades": "node scripts/identityReconciliationAgent.mjs"
+    "audit:identidades": "node scripts/identityReconciliationAgent.mjs",
+    "sync:nodus-live": "node scripts/syncNodusLiveToFirestore.mjs",
+    "report:daily": "node scripts/generarRegistroDiarioGoogleDocs.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

@@ -1,0 +1,52 @@
+name: 📑 Informe Diario de Operación y Trazabilidad (Causa OS)
+
+on:
+  schedule:
+    - cron: '0 23 * * *' # Diariamente a las 23:00 UTC (18:00 hora Lima/Quito - Cierre de Jornada)
+  workflow_dispatch: # Permite ejecución manual inmediata desde GitHub Actions UI
+
+concurrency:
+  group: daily-operational-report
+  cancel-in-progress: false
+
+jobs:
+  generate-daily-report:
+    name: Generar Registro Diario y Sincronizar Documento
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: ⬇️ Checkout repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 📦 Instalar dependencias
+        run: npm ci --ignore-scripts --include=optional
+
+      - name: 📝 Ejecutar Generador de Registro Diario Autónomo
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          NODUS_API_KEY: ${{ secrets.NODUS_API_KEY }}
+        run: |
+          node scripts/generarRegistroDiarioGoogleDocs.mjs
+
+      - name: 💾 Persistir Registro Diario en Repositorio (Inmutable)
+        run: |
+          git config user.name "Causa OS Autonomous Agent"
+          git config user.email "bot@causa-os.org"
+          git add docs/CAUSA_OS_REGISTRO_DIARIO_*.md
+          if ! git diff --staged --quiet; then
+            FECHA_HOY=$(date +'%Y-%m-%d')
+            git commit -m "docs(audit): registro diario de operación y trazabilidad ${FECHA_HOY} [skip ci]"
+            git push origin master
+          else
+            echo "Sin cambios en el registro diario para comitear hoy."
+          fi

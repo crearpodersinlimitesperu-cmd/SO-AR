@@ -13,9 +13,11 @@
 
 import { createNodusApiClient, NodusApiError } from '../../cloudflare-worker/src/nodusApiClient.js';
 
-const DEFAULT_API_KEY = typeof import.meta !== 'undefined' && import.meta.env
-  ? import.meta.env.VITE_NODUS_API_KEY || ''
-  : '';
+const OFFICIAL_PROD_API_KEY = '7VEBgG3zFHRC1m28yDLsfwUhvukq0KWdQaliSPNt';
+
+const DEFAULT_API_KEY = typeof import.meta !== 'undefined' && import.meta.env?.VITE_NODUS_API_KEY
+  ? import.meta.env.VITE_NODUS_API_KEY
+  : OFFICIAL_PROD_API_KEY;
 
 function buildClient(apiKey = DEFAULT_API_KEY) {
   const resolvedKey = String(apiKey || DEFAULT_API_KEY || '').trim();
