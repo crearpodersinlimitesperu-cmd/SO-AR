@@ -162717,7 +162717,7 @@ export default function CfoDashboard() {
 ## Archivo: src/pages/SuperAdminPanel.jsx
 
 ```javascript
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
