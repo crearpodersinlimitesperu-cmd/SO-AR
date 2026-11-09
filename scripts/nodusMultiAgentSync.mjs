@@ -438,8 +438,68 @@ class NodusExtractorAgent {
           sinMarcar,
           rezagados,
           confirmadosLlamada,
+          fase: 'C1',
+          capitulo: 'C1',
+          ciclo: 'Ciclo 1',
           participantes: participantes
         });
+
+        // Extracción robusta de Capítulo 2 (Tab 2) si el equipo cuenta con cohorte C2 en Nodus
+        const c2Info = await this.page.evaluate(() => {
+          const tableC2 = document.querySelector('#tblReporteC2');
+          let c2Asistieron = 0;
+          let c2Confirmados = 0;
+          let c2Desertores = 0;
+          let c2Total = 0;
+
+          if (tableC2 && window.jQuery?.fn?.dataTable?.isDataTable(tableC2)) {
+            const dt = window.jQuery(tableC2).DataTable();
+            const rows = dt.rows().nodes().toArray();
+            c2Total = rows.length;
+            const headers = Array.from(tableC2.querySelectorAll('thead th')).map(h => (h.textContent || '').trim().toUpperCase());
+            const colAsist = headers.indexOf('ASISTENCIA');
+            const colDes = headers.indexOf('DESERTOR');
+            for (const r of rows) {
+              if (colAsist >= 0 && r.cells[colAsist]) {
+                const chk = r.cells[colAsist].querySelector('input[type="checkbox"]');
+                if (chk?.checked || (r.cells[colAsist].textContent || '').toUpperCase().includes('ASISTI')) c2Asistieron++;
+              }
+              if (colDes >= 0 && r.cells[colDes]) {
+                const chk = r.cells[colDes].querySelector('input[type="checkbox"]');
+                if (chk?.checked || (r.cells[colDes].textContent || '').toUpperCase().includes('SI')) c2Desertores++;
+              }
+            }
+          }
+
+          // Fallback a tarjetas superiores visibles si el DataTable estuviese virtualizado
+          const cardNodes = Array.from(document.querySelectorAll('.card, .info-box, [class*="kpi"]'));
+          for (const card of cardNodes) {
+            const text = (card.innerText || '').toUpperCase();
+            if (text.includes('ASISTIERON') && text.includes('CAPÍTULO 2')) {
+              const m = text.match(/(\d+)\s*ASISTIERON/);
+              if (m) c2Asistieron = parseInt(m[1], 10);
+            }
+          }
+
+          return { c2Total, c2Asistieron, c2Confirmados, c2Desertores };
+        });
+
+        if (c2Info && (c2Info.c2Total > 0 || c2Info.c2Asistieron > 0)) {
+          const baseName = (eq.nombre || '').replace(/CICLO 1.*/i, '').replace(/✓/g, '').trim();
+          equiposData.push({
+            equipoId: `${eq.id}_c2`,
+            equipoNombre: `${baseName} — CAPÍTULO 2 ✓`,
+            totalParticipantes: c2Info.c2Total,
+            asistieron: c2Info.c2Asistieron,
+            desertores: c2Info.c2Desertores,
+            sinMarcar: Math.max(0, c2Info.c2Total - c2Info.c2Asistieron - c2Info.c2Desertores),
+            rezagados: 0,
+            confirmadosLlamada: c2Info.c2Confirmados || c2Info.c2Asistieron,
+            fase: 'C2',
+            capitulo: 'C2',
+            ciclo: 'Ciclo 2'
+          });
+        }
       } catch (err) {
         throw new Error(`C1 source extraction failed for team ${eq.id}; publication stopped`, { cause: err });
       }

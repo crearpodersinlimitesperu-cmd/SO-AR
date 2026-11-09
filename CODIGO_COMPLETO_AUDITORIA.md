@@ -121144,27 +121144,32 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         const contactosGestionados = dispConfirmados + dispNoContesta + dispPorConfirmar + dispSiguiente + dispNoInteresa;
         dispAsignados = teamRoomPx > 0 ? teamRoomPx : (c.asignados || dispGestiones);
 
-        dispSentadosC1 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C1').reduce((s, e) => s + (e.asistieron || 0), 0);
-        dispSentadosC2 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C2').reduce((s, e) => s + (e.asistieron || 0), 0);
-        dispGestionesC1 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C1').reduce((s, e) => s + (e.llamadas || 0), 0);
-        dispGestionesC2 = matchingEquipos.filter(e => recordedPhase(e, c) === 'C2').reduce((s, e) => s + (e.llamadas || 0), 0);
-        if (dispSentadosC1 + dispSentadosC2 === 0 && dispAsistieron > 0) {
-          if (recordedPhase(null, c) === 'C2') {
-            dispSentadosC2 = dispAsistieron;
-          } else {
-            dispSentadosC1 = dispAsistieron;
-          }
+        // Lectura de sentados respetando datos reales de Capítulo 1 y Capítulo 2 en Nodus
+        const hasExplicitC1 = matchingEquipos.some(e => e.sentadosC1 !== undefined || recordedPhase(e, c) === 'C1');
+        const hasExplicitC2 = matchingEquipos.some(e => e.sentadosC2 !== undefined || recordedPhase(e, c) === 'C2');
+
+        dispSentadosC1 = matchingEquipos.reduce((s, e) => s + (e.sentadosC1 ?? (recordedPhase(e, c) === 'C1' ? e.asistieron : 0) || 0), 0);
+        dispSentadosC2 = matchingEquipos.reduce((s, e) => s + (e.sentadosC2 ?? (recordedPhase(e, c) === 'C2' ? e.asistieron : 0) || 0), 0);
+        dispGestionesC1 = matchingEquipos.reduce((s, e) => s + (e.llamadasC1 ?? (recordedPhase(e, c) === 'C1' ? e.llamadas : 0) || 0), 0);
+        dispGestionesC2 = matchingEquipos.reduce((s, e) => s + (e.llamadasC2 ?? (recordedPhase(e, c) === 'C2' ? e.llamadas : 0) || 0), 0);
+
+        if (dispSentadosC2 === 0 && (c.sentadosC2 || 0) > 0) {
+          dispSentadosC2 = c.sentadosC2;
         }
-        // Si el equipo no tiene etiqueta de fase explícita pero el coordinador tiene gestiones verificadas en C2:
-        if (dispSentadosC2 === 0 && (c.sentadosC2 > 0 || Number(c.c2 || c.gestionesC2 || 0) > 0) && dispAsistieron > 0) {
-          const coordTotalG = (Number(c.gestionesC1 || c.c1 || 0)) + (Number(c.gestionesC2 || c.c2 || 0));
-          if (coordTotalG > 0 && Number(c.c2 || c.gestionesC2 || 0) > 0) {
-            const ratioC2 = Number(c.c2 || c.gestionesC2 || 0) / coordTotalG;
-            dispSentadosC2 = Math.round(dispAsistieron * ratioC2);
-            dispSentadosC1 = dispAsistieron - dispSentadosC2;
-            dispGestionesC2 = Math.round(dispGestiones * ratioC2);
-            dispGestionesC1 = dispGestiones - dispGestionesC2;
-          }
+        if (dispSentadosC1 === 0 && (c.sentadosC1 || 0) > 0) {
+          dispSentadosC1 = c.sentadosC1;
+        }
+
+        if (selectedEntrenamiento === 'C1') {
+          dispAsistieron = dispSentadosC1;
+          dispSentadosC2 = 0;
+          dispGestionesC2 = 0;
+        } else if (selectedEntrenamiento === 'C2') {
+          dispAsistieron = dispSentadosC2;
+          dispSentadosC1 = 0;
+          dispGestionesC1 = 0;
+        } else {
+          dispAsistieron = (dispSentadosC1 + dispSentadosC2) > 0 ? (dispSentadosC1 + dispSentadosC2) : dispAsistieron;
         }
       } else if (selectedEntrenamiento === 'C1') {
         dispGestiones = c.gestionesC1;
