@@ -961,7 +961,7 @@ class NodusNormalizerAgent {
     });
 
     // Filtrar estrictamente solo coordinadores de C1 y C2 (excluir departamentos, contabilidad, entrenadores, finanzas o cuentas sin C1/C2)
-    const coordinadores = rawCoordinadoresList.filter(c => {
+    const validCoordinadores = rawCoordinadoresList.filter(c => {
       const name = (c.nombre || '').toLowerCase().trim();
       const email = (c.email || '').toLowerCase().trim();
       if (name.includes('contab') || email.includes('contab')) return false;
@@ -976,6 +976,47 @@ class NodusNormalizerAgent {
       const requiredMetricsMissing = !c.metricasDisponibles.asignados || !c.metricasDisponibles.gestiones;
       return hasEquipos && (hasActivity || explicitlyNoBase || requiredMetricsMissing);
     });
+
+    // Deduplicación estricta innegociable: asegurar que cada coordinador y sede sea único (cero duplicación de KPIs)
+    const seenCoordKeys = new Set();
+    const coordinadores = [];
+    for (const c of validCoordinadores) {
+      const cleanName = (c.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      const cleanSede = (c.sede || '').toLowerCase().trim();
+      const cleanCiclo = (c.ciclo || '').toLowerCase().trim();
+      const coordKey = `${cleanName}_${cleanSede}_${cleanCiclo}`;
+      if (!seenCoordKeys.has(coordKey)) {
+        seenCoordKeys.add(coordKey);
+        coordinadores.push(c);
+      } else {
+        console.warn(`⚠️ [Normalizer Nodus] Coordinador duplicado detectado y omitido para no inflar métricas: ${c.nombre} (${c.sede})`);
+      }
+    }
+
+    // Deduplicación de equipos y participantes en equiposReporte
+    const seenEquipos = new Set();
+    const dedupedEquiposReporte = [];
+    for (const eq of (rawEquiposReporte || [])) {
+      const eqKey = (eq.equipoId || eq.equipoNombre || '').toLowerCase().trim();
+      if (eqKey && !seenEquipos.has(eqKey)) {
+        seenEquipos.add(eqKey);
+        // Deduplicar participantes dentro del equipo
+        if (Array.isArray(eq.participantes)) {
+          const seenParticipants = new Set();
+          eq.participantes = eq.participantes.filter(p => {
+            const pKey = `${p.documento || ''}_${p.nombres || ''}_${p.apellidos || ''}`.toLowerCase().trim();
+            if (pKey && seenParticipants.has(pKey)) return false;
+            if (pKey) seenParticipants.add(pKey);
+            return true;
+          });
+        }
+        dedupedEquiposReporte.push(eq);
+      } else if (!eqKey) {
+        dedupedEquiposReporte.push(eq);
+      } else {
+        console.warn(`⚠️ [Normalizer Nodus] Equipo duplicado detectado y omitido: ${eq.equipoNombre}`);
+      }
+    }
 
     // Consolidado por Sedes
     const sedesSummary = {};
@@ -1033,7 +1074,7 @@ class NodusNormalizerAgent {
       coordinadores,
       sedesSummary: Object.values(sedesSummary),
       totales,
-      equiposReporte: rawEquiposReporte || [],
+      equiposReporte: dedupedEquiposReporte,
       dashboardRaw: rawDashboard || {}
     };
   }
