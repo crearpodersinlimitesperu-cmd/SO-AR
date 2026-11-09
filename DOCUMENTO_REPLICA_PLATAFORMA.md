@@ -178755,6 +178755,9 @@ export default function CentroManagers() {
   const [filtroTipoLlamada, setFiltroTipoLlamada] = useState('todas'); // 'todas' | 'grupales' | 'individuales'
   const [filtroSedeLiquidacion, setFiltroSedeLiquidacion] = useState('todas');
   const [filtroEntrenadorLiquidacion, setFiltroEntrenadorLiquidacion] = useState('todos');
+  const [filtroDestinatarioLiquidacion, setFiltroDestinatarioLiquidacion] = useState('');
+  const [ordenMontoLiquidacion, setOrdenMontoLiquidacion] = useState('ninguno'); // 'ninguno' | 'desc' | 'asc'
+  const [ordenLlamadasLiquidacion, setOrdenLlamadasLiquidacion] = useState('ninguno'); // 'ninguno' | 'desc' | 'asc'
   const [selectedLiquidacionKeys, setSelectedLiquidacionKeys] = useState(new Set());
   const [procesandoLiquidacionMasiva, setProcesandoLiquidacionMasiva] = useState(false);
   const [modalEmailEliData, setModalEmailEliData] = useState(null);
@@ -180301,26 +180304,82 @@ export default function CentroManagers() {
     return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
   }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion, managers]);
 
-  // Filtrado reactivo de pendientes y pagados según tipo de llamada, sede y entrenador
+  // Filtrado reactivo de pendientes y pagados según tipo de llamada, sede, entrenador y destinatario
   const filteredPendientes = useMemo(() => {
-    return liquidacionData.pendientes.filter(item => {
+    let result = liquidacionData.pendientes.filter(item => {
       if (filtroTipoLlamada === 'grupales' && item.tipo !== 'grupal') return false;
       if (filtroTipoLlamada === 'individuales' && item.tipo !== 'individual') return false;
       if (filtroSedeLiquidacion !== 'todas' && item.sede?.toLowerCase() !== filtroSedeLiquidacion.toLowerCase()) return false;
       if (filtroEntrenadorLiquidacion !== 'todos' && !isTrainerMatch(item.entrenador, filtroEntrenadorLiquidacion)) return false;
+      if (filtroDestinatarioLiquidacion && filtroDestinatarioLiquidacion.trim()) {
+        const query = filtroDestinatarioLiquidacion.trim().toLowerCase();
+        const nombre = (item.participanteNombre || '').toLowerCase();
+        const equipo = (item.equipo || '').toLowerCase();
+        const numEquipo = String(item.numEquipo || '').toLowerCase();
+        if (!nombre.includes(query) && !equipo.includes(query) && !numEquipo.includes(query)) {
+          return false;
+        }
+      }
       return true;
     });
-  }, [liquidacionData.pendientes, filtroTipoLlamada, filtroSedeLiquidacion, filtroEntrenadorLiquidacion]);
+
+    if (ordenMontoLiquidacion === 'desc') {
+      result.sort((a, b) => (Number(b.montoUSD) || 0) - (Number(a.montoUSD) || 0));
+    } else if (ordenMontoLiquidacion === 'asc') {
+      result.sort((a, b) => (Number(a.montoUSD) || 0) - (Number(b.montoUSD) || 0));
+    } else if (ordenLlamadasLiquidacion === 'desc') {
+      result.sort((a, b) => (Number(b.totalLlamadas ?? b.llamadasEfectivas) || 0) - (Number(a.totalLlamadas ?? a.llamadasEfectivas) || 0));
+    } else if (ordenLlamadasLiquidacion === 'asc') {
+      result.sort((a, b) => (Number(a.totalLlamadas ?? a.llamadasEfectivas) || 0) - (Number(b.totalLlamadas ?? b.llamadasEfectivas) || 0));
+    }
+
+    return result;
+  }, [liquidacionData.pendientes, filtroTipoLlamada, filtroSedeLiquidacion, filtroEntrenadorLiquidacion, filtroDestinatarioLiquidacion, ordenMontoLiquidacion, ordenLlamadasLiquidacion]);
 
   const filteredPagados = useMemo(() => {
-    return liquidacionData.pagados.filter(item => {
+    let result = liquidacionData.pagados.filter(item => {
       if (filtroTipoLlamada === 'grupales' && item.tipo !== 'grupal') return false;
       if (filtroTipoLlamada === 'individuales' && item.tipo !== 'individual') return false;
       if (filtroSedeLiquidacion !== 'todas' && item.sede?.toLowerCase() !== filtroSedeLiquidacion.toLowerCase()) return false;
       if (filtroEntrenadorLiquidacion !== 'todos' && !isTrainerMatch(item.entrenador, filtroEntrenadorLiquidacion)) return false;
+      if (filtroDestinatarioLiquidacion && filtroDestinatarioLiquidacion.trim()) {
+        const query = filtroDestinatarioLiquidacion.trim().toLowerCase();
+        const nombre = (item.participanteNombre || '').toLowerCase();
+        const equipo = (item.equipo || '').toLowerCase();
+        const numEquipo = String(item.numEquipo || '').toLowerCase();
+        if (!nombre.includes(query) && !equipo.includes(query) && !numEquipo.includes(query)) {
+          return false;
+        }
+      }
       return true;
     });
-  }, [liquidacionData.pagados, filtroTipoLlamada, filtroSedeLiquidacion, filtroEntrenadorLiquidacion]);
+
+    if (ordenMontoLiquidacion === 'desc') {
+      result.sort((a, b) => (Number(b.montoUSD) || 0) - (Number(a.montoUSD) || 0));
+    } else if (ordenMontoLiquidacion === 'asc') {
+      result.sort((a, b) => (Number(a.montoUSD) || 0) - (Number(b.montoUSD) || 0));
+    }
+
+    return result;
+  }, [liquidacionData.pagados, filtroTipoLlamada, filtroSedeLiquidacion, filtroEntrenadorLiquidacion, filtroDestinatarioLiquidacion, ordenMontoLiquidacion]);
+
+  const hayFiltrosActivosLiquidacion = Boolean(
+    filtroTipoLlamada !== 'todas' || 
+    filtroSedeLiquidacion !== 'todas' || 
+    filtroEntrenadorLiquidacion !== 'todos' || 
+    (filtroDestinatarioLiquidacion && filtroDestinatarioLiquidacion.trim() !== '') ||
+    ordenMontoLiquidacion !== 'ninguno' ||
+    ordenLlamadasLiquidacion !== 'ninguno'
+  );
+
+  const handleResetFiltrosLiquidacion = () => {
+    setFiltroTipoLlamada('todas');
+    setFiltroSedeLiquidacion('todas');
+    setFiltroEntrenadorLiquidacion('todos');
+    setFiltroDestinatarioLiquidacion('');
+    setOrdenMontoLiquidacion('ninguno');
+    setOrdenLlamadasLiquidacion('ninguno');
+  };
 
   const conteoGrupalesPendientes = useMemo(() => {
     return liquidacionData.pendientes.filter(i => i.tipo === 'grupal').length;
@@ -184166,35 +184225,264 @@ export default function CentroManagers() {
                     </div>
                   </div>
 
-                  {filteredPendientes.length === 0 ? (
-                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>
-                      No hay registros pendientes para los filtros seleccionados ({filtroTipoLlamada === 'todas' ? 'Todas las llamadas' : filtroTipoLlamada === 'grupales' ? 'Llamadas grupales' : 'Llamadas individuales'}).
-                    </p>
-                  ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                        <thead>
-                          <tr style={{ background: 'rgba(180,83,9,0.08)', textAlign: 'left' }}>
-                            <th style={{ padding: '0.7rem 0.6rem', width: '36px', textAlign: 'center' }}>
-                              <HelpInput helpKey="asistencia"
-                                type="checkbox"
-                                checked={allVisibleSelected}
-                                onChange={toggleSelectAllVisible}
-                                title={allVisibleSelected ? "Deseleccionar todos" : "Seleccionar todos los visibles"}
-                                style={{ cursor: 'pointer', width: '15px', height: '15px' }}
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr style={{ background: 'rgba(180,83,9,0.08)', textAlign: 'left' }}>
+                          <th style={{ padding: '0.7rem 0.6rem', width: '36px', textAlign: 'center' }}>
+                            <HelpInput helpKey="asistencia"
+                              type="checkbox"
+                              checked={allVisibleSelected}
+                              onChange={toggleSelectAllVisible}
+                              title={allVisibleSelected ? "Deseleccionar todos" : "Seleccionar todos los visibles"}
+                              style={{ cursor: 'pointer', width: '15px', height: '15px' }}
+                            />
+                          </th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Modalidad</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Destinatario</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llamadas Efectivas</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
+                          <th style={{ padding: '0.7rem 0.6rem', textAlign: 'right' }}>Acciones</th>
+                        </tr>
+
+                        {/* FILA DE FILTROS POR COLUMNA DIRECTA EN LA CABECERA ("opción de filtro aquí") */}
+                        <tr style={{ background: 'rgba(245,245,247,0.92)', borderBottom: `2px solid ${borderLight}` }}>
+                          <th style={{ padding: '0.4rem 0.3rem', textAlign: 'center' }}>
+                            <HelpButton helpKey="restaurar"
+                              type="button"
+                              onClick={handleResetFiltrosLiquidacion}
+                              title={hayFiltrosActivosLiquidacion ? "Limpiar todos los filtros" : "Sin filtros aplicados"}
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: hayFiltrosActivosLiquidacion ? 'pointer' : 'default',
+                                padding: '0.2rem',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: hayFiltrosActivosLiquidacion ? '#dc2626' : textMuted,
+                                opacity: hayFiltrosActivosLiquidacion ? 1 : 0.4
+                              }}
+                            >
+                              <Filter size={13} />
+                            </HelpButton>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpSelect helpKey="filtroTipoLlamada"
+                              value={filtroTipoLlamada}
+                              onChange={(e) => setFiltroTipoLlamada(e.target.value)}
+                              style={{
+                                width: '100%',
+                                minWidth: '110px',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${filtroTipoLlamada !== 'todas' ? '#8b5cf6' : borderLight}`,
+                                background: filtroTipoLlamada !== 'todas' ? 'rgba(139,92,246,0.1)' : bgCard,
+                                fontSize: '0.75rem',
+                                color: textDark,
+                                fontWeight: filtroTipoLlamada !== 'todas' ? 700 : 500
+                              }}
+                            >
+                              <option value="todas">Todas</option>
+                              <option value="grupales">👥 Grupales ({conteoGrupalesPendientes})</option>
+                              <option value="individuales">👤 Individuales ({conteoIndividualesPendientes})</option>
+                            </HelpSelect>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', minWidth: '150px' }}>
+                              <Search size={12} style={{ position: 'absolute', left: '7px', color: textMuted, pointerEvents: 'none' }} />
+                              <HelpInput helpKey="filtroDestinatario"
+                                type="text"
+                                value={filtroDestinatarioLiquidacion}
+                                onChange={(e) => setFiltroDestinatarioLiquidacion(e.target.value)}
+                                placeholder="Buscar destinatario o equipo..."
+                                style={{
+                                  width: '100%',
+                                  padding: '0.35rem 1.4rem 0.35rem 1.55rem',
+                                  borderRadius: '6px',
+                                  border: `1px solid ${filtroDestinatarioLiquidacion ? '#10b981' : borderLight}`,
+                                  background: filtroDestinatarioLiquidacion ? 'rgba(16,185,129,0.08)' : bgCard,
+                                  fontSize: '0.75rem',
+                                  color: textDark
+                                }}
                               />
-                            </th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Modalidad</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Destinatario</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llamadas Efectivas</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
-                            <th style={{ padding: '0.7rem 0.6rem', textAlign: 'right' }}>Acciones</th>
+                              {filtroDestinatarioLiquidacion && (
+                                <X
+                                  size={12}
+                                  style={{ position: 'absolute', right: '6px', color: textMuted, cursor: 'pointer' }}
+                                  onClick={() => setFiltroDestinatarioLiquidacion('')}
+                                  title="Borrar texto"
+                                />
+                              )}
+                            </div>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpSelect helpKey="filtroSede"
+                              value={filtroSedeLiquidacion}
+                              onChange={(e) => setFiltroSedeLiquidacion(e.target.value)}
+                              style={{
+                                width: '100%',
+                                minWidth: '110px',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${filtroSedeLiquidacion !== 'todas' ? '#10b981' : borderLight}`,
+                                background: filtroSedeLiquidacion !== 'todas' ? 'rgba(16,185,129,0.1)' : bgCard,
+                                fontSize: '0.75rem',
+                                color: textDark,
+                                fontWeight: filtroSedeLiquidacion !== 'todas' ? 700 : 500
+                              }}
+                            >
+                              <option value="todas">Todas las sedes</option>
+                              {['Lima', 'Quito', 'Guayaquil', 'Medellín', 'México', 'Cuenca', 'Monterrey', 'Sede Global'].map(s => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </HelpSelect>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpSelect helpKey="filtroEntrenador"
+                              value={filtroEntrenadorLiquidacion}
+                              onChange={(e) => setFiltroEntrenadorLiquidacion(e.target.value)}
+                              style={{
+                                width: '100%',
+                                minWidth: '120px',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${filtroEntrenadorLiquidacion !== 'todos' ? '#3b82f6' : borderLight}`,
+                                background: filtroEntrenadorLiquidacion !== 'todos' ? 'rgba(59,130,246,0.1)' : bgCard,
+                                fontSize: '0.75rem',
+                                color: textDark,
+                                fontWeight: filtroEntrenadorLiquidacion !== 'todos' ? 700 : 500
+                              }}
+                            >
+                              <option value="todos">Todos los entrenadores</option>
+                              {availableTrainers.map(ent => (
+                                <option key={ent} value={ent}>{ent}</option>
+                              ))}
+                            </HelpSelect>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpButton helpKey="ordenarLlamadas"
+                              type="button"
+                              onClick={() => {
+                                setOrdenLlamadasLiquidacion(prev => prev === 'desc' ? 'asc' : prev === 'asc' ? 'ninguno' : 'desc');
+                                setOrdenMontoLiquidacion('ninguno');
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${ordenLlamadasLiquidacion !== 'ninguno' ? '#6366f1' : borderLight}`,
+                                background: ordenLlamadasLiquidacion !== 'ninguno' ? 'rgba(99,102,241,0.1)' : bgCard,
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                color: textDark,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.25rem',
+                                whiteSpace: 'nowrap'
+                              }}
+                              title="Ordenar por llamadas efectivas"
+                            >
+                              <ArrowUpDown size={11} />
+                              {ordenLlamadasLiquidacion === 'desc' ? 'Mayor a menor' : ordenLlamadasLiquidacion === 'asc' ? 'Menor a mayor' : 'Todas'}
+                            </HelpButton>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpButton helpKey="ordenarMonto"
+                              type="button"
+                              onClick={() => {
+                                setOrdenMontoLiquidacion(prev => prev === 'desc' ? 'asc' : prev === 'asc' ? 'ninguno' : 'desc');
+                                setOrdenLlamadasLiquidacion('ninguno');
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${ordenMontoLiquidacion !== 'ninguno' ? '#059669' : borderLight}`,
+                                background: ordenMontoLiquidacion !== 'ninguno' ? 'rgba(5,150,105,0.1)' : bgCard,
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                color: textDark,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.25rem',
+                                whiteSpace: 'nowrap'
+                              }}
+                              title="Ordenar por monto USD"
+                            >
+                              <ArrowUpDown size={11} />
+                              {ordenMontoLiquidacion === 'desc' ? 'Mayor a menor' : ordenMontoLiquidacion === 'asc' ? 'Menor a mayor' : 'Todos'}
+                            </HelpButton>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem', textAlign: 'right' }}>
+                            {hayFiltrosActivosLiquidacion && (
+                              <HelpButton helpKey="restaurar"
+                                type="button"
+                                onClick={handleResetFiltrosLiquidacion}
+                                style={{
+                                  padding: '0.35rem 0.55rem',
+                                  borderRadius: '6px',
+                                  border: '1px solid #ef4444',
+                                  background: 'rgba(239,68,68,0.08)',
+                                  color: '#dc2626',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.25rem',
+                                  whiteSpace: 'nowrap'
+                                }}
+                                title="Limpiar todos los filtros"
+                              >
+                                <RotateCcw size={11} /> Limpiar
+                              </HelpButton>
+                            )}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredPendientes.length === 0 ? (
+                          <tr>
+                            <td colSpan={8} style={{ textAlign: 'center', padding: '2.5rem 1rem', color: textMuted }}>
+                              <Filter size={24} style={{ opacity: 0.35, marginBottom: '0.5rem', display: 'block', margin: '0 auto' }} />
+                              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: textDark, marginBottom: '0.25rem' }}>
+                                No hay registros que coincidan con los filtros aplicados
+                              </div>
+                              <div style={{ fontSize: '0.8rem', color: textMuted, marginBottom: '0.75rem' }}>
+                                Prueba modificando la modalidad, sede, entrenador o término de búsqueda.
+                              </div>
+                              {hayFiltrosActivosLiquidacion && (
+                                <HelpButton helpKey="restaurar"
+                                  type="button"
+                                  onClick={handleResetFiltrosLiquidacion}
+                                  style={{
+                                    padding: '0.4rem 0.85rem',
+                                    borderRadius: '7px',
+                                    border: '1px solid #b45309',
+                                    background: 'rgba(180,83,9,0.1)',
+                                    color: '#b45309',
+                                    fontWeight: 700,
+                                    fontSize: '0.8rem',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.35rem'
+                                  }}
+                                >
+                                  <RotateCcw size={13} /> Restablecer filtros
+                                </HelpButton>
+                              )}
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {filteredPendientes.map((item, idx) => {
+                        ) : (
+                          filteredPendientes.map((item, idx) => {
                             const isSelected = selectedLiquidacionKeys.has(item.liquidacionKey);
                             return (
                               <tr key={item.liquidacionKey || item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: isSelected ? 'rgba(16,185,129,0.08)' : idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
@@ -184292,7 +184580,7 @@ export default function CentroManagers() {
                                 </td>
                               </tr>
                             );
-                          })}
+                          }))}
                         </tbody>
                         <tfoot>
                           <tr style={{ borderTop: `2px solid ${borderLight}` }}>
@@ -184306,7 +184594,6 @@ export default function CentroManagers() {
                         </tfoot>
                       </table>
                     </div>
-                  )}
                 </div>
 
                 {/* EN CAMINO A LA META */}
@@ -184342,26 +184629,203 @@ export default function CentroManagers() {
                   <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <CheckCircle size={16} color="#059669" /> Historial de pagos ({filteredPagados.length})
                   </h3>
-                  {filteredPagados.length === 0 ? (
-                    <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago para los filtros seleccionados.</p>
-                  ) : (
-                    <div style={{ overflowX: 'auto' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                        <thead>
-                          <tr style={{ background: 'rgba(5,150,105,0.08)', textAlign: 'left' }}>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Modalidad</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Destinatario</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Autorizado el</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Autorizado por</th>
-                            <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'center' }}>Notificación Eli</th>
-                            {canReversarPago && <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'right' }}>Acción</th>}
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr style={{ background: 'rgba(5,150,105,0.08)', textAlign: 'left' }}>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Modalidad</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Destinatario</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Autorizado el</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Autorizado por</th>
+                          <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'center' }}>Notificación Eli</th>
+                          {canReversarPago && <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark, textAlign: 'right' }}>Acción</th>}
+                        </tr>
+
+                        {/* FILA DE FILTROS EN HISTORIAL */}
+                        <tr style={{ background: 'rgba(245,245,247,0.92)', borderBottom: `2px solid ${borderLight}` }}>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpSelect helpKey="filtroTipoLlamada"
+                              value={filtroTipoLlamada}
+                              onChange={(e) => setFiltroTipoLlamada(e.target.value)}
+                              style={{
+                                width: '100%',
+                                minWidth: '100px',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${filtroTipoLlamada !== 'todas' ? '#8b5cf6' : borderLight}`,
+                                background: filtroTipoLlamada !== 'todas' ? 'rgba(139,92,246,0.1)' : bgCard,
+                                fontSize: '0.75rem',
+                                color: textDark,
+                                fontWeight: filtroTipoLlamada !== 'todas' ? 700 : 500
+                              }}
+                            >
+                              <option value="todas">Todas</option>
+                              <option value="grupales">👥 Grupales</option>
+                              <option value="individuales">👤 Individuales</option>
+                            </HelpSelect>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', minWidth: '150px' }}>
+                              <Search size={12} style={{ position: 'absolute', left: '7px', color: textMuted, pointerEvents: 'none' }} />
+                              <HelpInput helpKey="filtroDestinatario"
+                                type="text"
+                                value={filtroDestinatarioLiquidacion}
+                                onChange={(e) => setFiltroDestinatarioLiquidacion(e.target.value)}
+                                placeholder="Buscar en historial..."
+                                style={{
+                                  width: '100%',
+                                  padding: '0.35rem 1.4rem 0.35rem 1.55rem',
+                                  borderRadius: '6px',
+                                  border: `1px solid ${filtroDestinatarioLiquidacion ? '#059669' : borderLight}`,
+                                  background: filtroDestinatarioLiquidacion ? 'rgba(5,150,105,0.08)' : bgCard,
+                                  fontSize: '0.75rem',
+                                  color: textDark
+                                }}
+                              />
+                              {filtroDestinatarioLiquidacion && (
+                                <X
+                                  size={12}
+                                  style={{ position: 'absolute', right: '6px', color: textMuted, cursor: 'pointer' }}
+                                  onClick={() => setFiltroDestinatarioLiquidacion('')}
+                                  title="Borrar texto"
+                                />
+                              )}
+                            </div>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpSelect helpKey="filtroSede"
+                              value={filtroSedeLiquidacion}
+                              onChange={(e) => setFiltroSedeLiquidacion(e.target.value)}
+                              style={{
+                                width: '100%',
+                                minWidth: '100px',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${filtroSedeLiquidacion !== 'todas' ? '#10b981' : borderLight}`,
+                                background: filtroSedeLiquidacion !== 'todas' ? 'rgba(16,185,129,0.1)' : bgCard,
+                                fontSize: '0.75rem',
+                                color: textDark,
+                                fontWeight: filtroSedeLiquidacion !== 'todas' ? 700 : 500
+                              }}
+                            >
+                              <option value="todas">Todas las sedes</option>
+                              {['Lima', 'Quito', 'Guayaquil', 'Medellín', 'México', 'Cuenca', 'Monterrey', 'Sede Global'].map(s => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </HelpSelect>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpSelect helpKey="filtroEntrenador"
+                              value={filtroEntrenadorLiquidacion}
+                              onChange={(e) => setFiltroEntrenadorLiquidacion(e.target.value)}
+                              style={{
+                                width: '100%',
+                                minWidth: '110px',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${filtroEntrenadorLiquidacion !== 'todos' ? '#3b82f6' : borderLight}`,
+                                background: filtroEntrenadorLiquidacion !== 'todos' ? 'rgba(59,130,246,0.1)' : bgCard,
+                                fontSize: '0.75rem',
+                                color: textDark,
+                                fontWeight: filtroEntrenadorLiquidacion !== 'todos' ? 700 : 500
+                              }}
+                            >
+                              <option value="todos">Todos los entrenadores</option>
+                              {availableTrainers.map(ent => (
+                                <option key={ent} value={ent}>{ent}</option>
+                              ))}
+                            </HelpSelect>
+                          </th>
+                          <th style={{ padding: '0.4rem 0.4rem' }}>
+                            <HelpButton helpKey="ordenarMonto"
+                              type="button"
+                              onClick={() => setOrdenMontoLiquidacion(prev => prev === 'desc' ? 'asc' : prev === 'asc' ? 'ninguno' : 'desc')}
+                              style={{
+                                width: '100%',
+                                padding: '0.35rem 0.4rem',
+                                borderRadius: '6px',
+                                border: `1px solid ${ordenMontoLiquidacion !== 'ninguno' ? '#059669' : borderLight}`,
+                                background: ordenMontoLiquidacion !== 'ninguno' ? 'rgba(5,150,105,0.1)' : bgCard,
+                                fontSize: '0.72rem',
+                                fontWeight: 600,
+                                color: textDark,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.25rem',
+                                whiteSpace: 'nowrap'
+                              }}
+                              title="Ordenar por monto"
+                            >
+                              <ArrowUpDown size={11} />
+                              {ordenMontoLiquidacion === 'desc' ? 'Mayor a menor' : ordenMontoLiquidacion === 'asc' ? 'Menor a mayor' : 'Todos'}
+                            </HelpButton>
+                          </th>
+                          <th colSpan={canReversarPago ? 4 : 3} style={{ padding: '0.4rem 0.4rem', textAlign: 'right' }}>
+                            {hayFiltrosActivosLiquidacion && (
+                              <HelpButton helpKey="restaurar"
+                                type="button"
+                                onClick={handleResetFiltrosLiquidacion}
+                                style={{
+                                  padding: '0.35rem 0.55rem',
+                                  borderRadius: '6px',
+                                  border: '1px solid #ef4444',
+                                  background: 'rgba(239,68,68,0.08)',
+                                  color: '#dc2626',
+                                  fontSize: '0.72rem',
+                                  fontWeight: 700,
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.25rem',
+                                  whiteSpace: 'nowrap'
+                                }}
+                                title="Limpiar todos los filtros"
+                              >
+                                <RotateCcw size={11} /> Limpiar
+                              </HelpButton>
+                            )}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredPagados.length === 0 ? (
+                          <tr>
+                            <td colSpan={canReversarPago ? 9 : 8} style={{ textAlign: 'center', padding: '2.5rem 1rem', color: textMuted }}>
+                              <Filter size={24} style={{ opacity: 0.35, marginBottom: '0.5rem', display: 'block', margin: '0 auto' }} />
+                              <div style={{ fontWeight: 600, fontSize: '0.9rem', color: textDark, marginBottom: '0.25rem' }}>
+                                No hay pagos registrados para los filtros seleccionados
+                              </div>
+                              {hayFiltrosActivosLiquidacion && (
+                                <HelpButton helpKey="restaurar"
+                                  type="button"
+                                  onClick={handleResetFiltrosLiquidacion}
+                                  style={{
+                                    marginTop: '0.5rem',
+                                    padding: '0.4rem 0.85rem',
+                                    borderRadius: '7px',
+                                    border: '1px solid #059669',
+                                    background: 'rgba(5,150,105,0.1)',
+                                    color: '#059669',
+                                    fontWeight: 700,
+                                    fontSize: '0.8rem',
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '0.35rem'
+                                  }}
+                                >
+                                  <RotateCcw size={13} /> Restablecer filtros
+                                </HelpButton>
+                              )}
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {filteredPagados.map((item, idx) => (
+                        ) : (
+                          filteredPagados.map((item, idx) => (
                             <tr key={item.liquidacionKey || item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
                               <td style={{ padding: '0.65rem 0.6rem' }}>
                                 {item.tipo === 'individual' ? (
@@ -184431,7 +184895,7 @@ export default function CentroManagers() {
                                 </td>
                               )}
                             </tr>
-                          ))}
+                          )))}
                         </tbody>
                         <tfoot>
                           <tr style={{ borderTop: `2px solid ${borderLight}` }}>
@@ -184441,7 +184905,6 @@ export default function CentroManagers() {
                         </tfoot>
                       </table>
                     </div>
-                  )}
                 </div>
               </div>
             )}

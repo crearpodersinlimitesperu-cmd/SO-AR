@@ -32,10 +32,13 @@ export const managersFieldHelp = {
   filtroEstado: help('Filtrar estado de managers', 'Reduce la lista por graduación, deserción, en juego o falta de entrenador. No cambia estados ni asignaciones.'),
   filtroRendimiento: help('Filtrar rendimiento', 'Selecciona el indicador que necesitas revisar: graduación, deserción o pagos pendientes. El filtro no modifica registros.'),
   filtroTipoLlamada: help('Tipo de llamada', 'Filtra entre llamadas grupales de equipos o llamadas individuales 1 a 1.'),
+  filtroDestinatario: help('Buscar destinatario', 'Filtra la lista por nombre de persona, equipo o número de equipo.'),
   reporteNotaVoz: help('Reporte en nota de voz', 'Marca si el reporte semanal fue enviado al Coordinador de Maestría en formato de audio.')
 };
 
 export const managersActionHelp = {
+  ordenarLlamadas: help('Ordenar por llamadas', 'Alterna el orden de la tabla según la cantidad de llamadas efectivas.'),
+  ordenarMonto: help('Ordenar por monto', 'Alterna el orden de la tabla según el importe en dólares USD.'),
   recargarDirectorio: help('Reintentar conexión', 'Vuelve a consultar Firestore. No restaura catálogos antiguos ni modifica registros del directorio.'),
   inicio: help('Volver a Inicio', 'Regresa al inicio de Causa OS. Guarda primero los cambios pendientes del formulario.'),
   vistaRol: help('Cambiar vista', 'Alterna entre tu vista de entrenador y corporativa si tienes doble rol. No cambia tu identidad ni tus permisos.'),
