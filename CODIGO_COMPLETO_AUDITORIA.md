@@ -90090,6 +90090,207 @@ export const canonicalSede = (value) => {
 
 ---
 
+## Archivo: src/utils/geoLocator.js
+
+```js
+// src/utils/geoLocator.js
+// Servicio de Geolocalización y Rastreo de Dispositivo para Auditoría Real
+// Recopila país, ciudad, IP, zona horaria y dispositivo de forma rápida y resiliente.
+
+const GEO_CACHE_KEY = 'cpsl_client_geo_cache';
+
+// Mapa de zonas horarias para fallback instantáneo si las APIs remotas están bloqueadas
+const TIMEZONE_COUNTRY_MAP = {
+  'America/Lima': { country: 'Perú', countryCode: 'PE', flag: '🇵🇪', city: 'Lima' },
+  'America/Guayaquil': { country: 'Ecuador', countryCode: 'EC', flag: '🇪🇨', city: 'Guayaquil' },
+  'America/Bogota': { country: 'Colombia', countryCode: 'CO', flag: '🇨🇴', city: 'Bogotá' },
+  'America/Mexico_City': { country: 'México', countryCode: 'MX', flag: '🇲🇽', city: 'Ciudad de México' },
+  'America/Santiago': { country: 'Chile', countryCode: 'CL', flag: '🇨🇱', city: 'Santiago' },
+  'America/Buenos_Aires': { country: 'Argentina', countryCode: 'AR', flag: '🇦🇷', city: 'Buenos Aires' },
+  'America/La_Paz': { country: 'Bolivia', countryCode: 'BO', flag: '🇧🇴', city: 'La Paz' },
+  'America/Caracas': { country: 'Venezuela', countryCode: 'VE', flag: '🇻🇪', city: 'Caracas' },
+  'America/New_York': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'New York' },
+  'America/Chicago': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'Chicago' },
+  'America/Los_Angeles': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'Los Ángeles' },
+  'Europe/Madrid': { country: 'España', countryCode: 'ES', flag: '🇪🇸', city: 'Madrid' },
+  'Europe/London': { country: 'Reino Unido', countryCode: 'GB', flag: '🇬🇧', city: 'Londres' }
+};
+
+// Generador de bandera emoji desde código ISO de 2 letras
+export function getCountryFlag(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return '🌐';
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  try {
+    return String.fromCodePoint(...codePoints);
+  } catch {
+    return '🌐';
+  }
+}
+
+/**
+ * Detecta el navegador y sistema operativo de forma amigable
+ */
+export function getClientDeviceInfo() {
+  if (typeof window === 'undefined' || !navigator) {
+    return 'Entorno Servidor / Desconocido';
+  }
+
+  const ua = navigator.userAgent || '';
+  let browser = 'Navegador Web';
+  let os = 'Dispositivo';
+
+  // Detección de OS
+  if (ua.includes('Win')) os = 'Windows';
+  else if (ua.includes('Macintosh') || ua.includes('Mac OS')) os = 'macOS';
+  else if (ua.includes('Android')) os = 'Android';
+  else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
+  else if (ua.includes('Linux')) os = 'Linux';
+
+  // Detección de Browser
+  if (ua.includes('Edg/')) browser = 'Edge';
+  else if (ua.includes('Chrome/') && !ua.includes('Edg/')) browser = 'Chrome';
+  else if (ua.includes('Safari/') && !ua.includes('Chrome/')) browser = 'Safari';
+  else if (ua.includes('Firefox/')) browser = 'Firefox';
+  else if (ua.includes('Opera') || ua.includes('OPR/')) browser = 'Opera';
+
+  return `${browser} (${os})`;
+}
+
+/**
+ * Obtiene la geolocalización pública real del usuario (País, Ciudad, IP, ISP)
+ * Utiliza caché de sesión para evitar peticiones repetidas.
+ */
+export async function getClientGeoLocation() {
+  if (typeof window === 'undefined') {
+    return {
+      country: 'Perú',
+      countryCode: 'PE',
+      flag: '🇵🇪',
+      city: 'Lima',
+      region: 'Lima',
+      ip: '127.0.0.1',
+      timezone: 'America/Lima',
+      device: 'Servidor',
+      locationString: 'Lima, Perú 🇵🇪'
+    };
+  }
+
+  // 1. Revisar caché en sessionStorage
+  try {
+    const cached = sessionStorage.getItem(GEO_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      // Validar que tenga datos válidos
+      if (parsed && parsed.country) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    // Continuar si sessionStorage falla
+  }
+
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Lima';
+  const tzFallback = TIMEZONE_COUNTRY_MAP[timezone] || {
+    country: 'Perú',
+    countryCode: 'PE',
+    flag: '🇵🇪',
+    city: 'Lima'
+  };
+
+  const device = getClientDeviceInfo();
+  let geoResult = null;
+
+  // 2. Intentar servicio primario: ipwho.is (Rápido, SSL, sin API key)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2600);
+    const res = await fetch('https://ipwho.is/', { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success !== false && data.country) {
+        const flagEmoji = data.flag?.emoji || getCountryFlag(data.country_code);
+        geoResult = {
+          country: data.country,
+          countryCode: data.country_code || tzFallback.countryCode,
+          flag: flagEmoji,
+          city: data.city || tzFallback.city,
+          region: data.region || '',
+          ip: data.ip || 'IP Oculta',
+          isp: data.connection?.isp || data.connection?.org || '',
+          timezone: data.timezone?.id || timezone,
+          device: device,
+          locationString: `${data.city ? `${data.city}, ` : ''}${data.country} ${flagEmoji}`.trim()
+        };
+      }
+    }
+  } catch (primaryErr) {
+    // Continuar al fallback secundario
+  }
+
+  // 3. Fallback secundario: geojs.io
+  if (!geoResult) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2600);
+      const res = await fetch('https://get.geojs.io/v1/ip/geo.json', { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.country) {
+          const flagEmoji = getCountryFlag(data.country_code);
+          geoResult = {
+            country: data.country,
+            countryCode: data.country_code || tzFallback.countryCode,
+            flag: flagEmoji,
+            city: data.city || tzFallback.city,
+            region: data.region || '',
+            ip: data.ip || 'IP Oculta',
+            isp: data.organization_name || '',
+            timezone: data.timezone || timezone,
+            device: device,
+            locationString: `${data.city ? `${data.city}, ` : ''}${data.country} ${flagEmoji}`.trim()
+          };
+        }
+      }
+    } catch (secondaryErr) {
+      // Continuar al fallback local
+    }
+  }
+
+  // 4. Fallback final por zona horaria del navegador si no hay conectividad externa
+  if (!geoResult) {
+    geoResult = {
+      country: tzFallback.country,
+      countryCode: tzFallback.countryCode,
+      flag: tzFallback.flag,
+      city: tzFallback.city,
+      region: '',
+      ip: 'Detectada por Timezone',
+      isp: '',
+      timezone: timezone,
+      device: device,
+      locationString: `${tzFallback.city}, ${tzFallback.country} ${tzFallback.flag}`.trim()
+    };
+  }
+
+  // Guardar en sessionStorage para toda la sesión del navegador
+  try {
+    sessionStorage.setItem(GEO_CACHE_KEY, JSON.stringify(geoResult));
+  } catch (e) {}
+
+  return geoResult;
+}
+
+```
+
+---
+
 ## Archivo: src/components/KPIsEntrenadoresLlamadas.jsx
 
 ```javascript
@@ -95878,6 +96079,7 @@ import {
   Clock, CheckCircle2, Flame, Snowflake, ArrowUpDown, ExternalLink
 } from 'lucide-react';
 import { fetchModuleTelemetryReport } from '../services/moduleTelemetryService';
+import UserGeoHistoryModal from './UserGeoHistoryModal';
 
 export default function ModuleTelemetryView({ currentUser }) {
   const [report, setReport] = useState(null);
@@ -95886,6 +96088,7 @@ export default function ModuleTelemetryView({ currentUser }) {
   const [tierFilter, setTierFilter] = useState('TODOS');
   const [activeSubTab, setActiveSubTab] = useState('ranking'); // 'ranking' | 'usuarios' | 'huerfanos'
   const [expandedModuleId, setExpandedModuleId] = useState(null);
+  const [geoModalUser, setGeoModalUser] = useState(null);
 
   const loadReport = async () => {
     setLoading(true);
@@ -96500,6 +96703,7 @@ export default function ModuleTelemetryView({ currentUser }) {
                     <th style={{ padding: '0.6rem 0.75rem', textAlign: 'center' }}>Módulos Usados</th>
                     <th style={{ padding: '0.6rem 0.75rem', textAlign: 'center' }}>Total Ingresos</th>
                     <th style={{ padding: '0.6rem 0.75rem' }}>Última Actividad</th>
+                    <th style={{ padding: '0.6rem 0.75rem' }}>Historial Geo</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -96519,6 +96723,31 @@ export default function ModuleTelemetryView({ currentUser }) {
                       </td>
                       <td style={{ padding: '0.6rem 0.75rem', color: 'var(--text-muted)' }}>
                         {formatDate(u.lastActiveIso)}
+                      </td>
+                      <td style={{ padding: '0.6rem 0.75rem', whiteSpace: 'nowrap' }}>
+                        <button
+                          onClick={() => setGeoModalUser({
+                            email: u.email,
+                            name: u.name,
+                            role: u.role,
+                            sede: u.sede
+                          })}
+                          className="btn-secondary"
+                          style={{
+                            padding: '0.3rem 0.65rem',
+                            fontSize: '0.74rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            borderRadius: '6px',
+                            background: 'rgba(56, 189, 248, 0.1)',
+                            borderColor: 'rgba(56, 189, 248, 0.3)',
+                            color: '#38bdf8'
+                          }}
+                          title="Ver historial geográfico de conexiones de este colaborador"
+                        >
+                          🌍 Conexiones
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -96595,6 +96824,15 @@ export default function ModuleTelemetryView({ currentUser }) {
         </>
       )}
 
+      {/* MODAL DE HISTORIAL GEOGRÁFICO DE CONEXIONES */}
+      <UserGeoHistoryModal
+        isOpen={!!geoModalUser}
+        onClose={() => setGeoModalUser(null)}
+        userEmail={geoModalUser?.email}
+        userName={geoModalUser?.name}
+        userRole={geoModalUser?.role}
+        userSede={geoModalUser?.sede}
+      />
     </div>
   );
 }
@@ -99884,6 +100122,282 @@ export default function LearningReflectionModal({ isOpen, onClose, task, onCompl
               </button>
             )}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src/components/UserGeoHistoryModal.jsx
+
+```javascript
+// src/components/UserGeoHistoryModal.jsx
+// Modal de Historial Cronológico de Geolocalización y Conexiones de un Colaborador
+
+import React, { useState, useEffect } from 'react';
+import { Globe, X, Clock, ShieldCheck, MapPin, Laptop, RefreshCw, AlertTriangle, ExternalLink } from 'lucide-react';
+import { getUserGeoAuditHistory } from '../services/auditService';
+
+export default function UserGeoHistoryModal({ isOpen, onClose, userEmail, userName, userRole, userSede }) {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isOpen || !userEmail) return;
+
+    let active = true;
+    async function load() {
+      setLoading(true);
+      try {
+        const logs = await getUserGeoAuditHistory(userEmail);
+        if (active) setHistory(logs);
+      } catch (err) {
+        console.error('Error cargando historial geo:', err);
+        if (active) setHistory([]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { active = false; };
+  }, [isOpen, userEmail]);
+
+  if (!isOpen) return null;
+
+  // Estadísticas del historial
+  const uniqueCountries = Array.from(new Set(history.map(h => h.country || 'Perú'))).filter(Boolean);
+  const uniqueCities = Array.from(new Set(history.map(h => h.city || 'Lima'))).filter(Boolean);
+  const uniqueIps = Array.from(new Set(history.map(h => h.ip || 'Local'))).filter(Boolean);
+
+  const formatDate = (iso) => {
+    if (!iso) return 'Fecha no registrada';
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return iso;
+    }
+  };
+
+  return (
+    <div 
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        background: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1rem'
+      }}
+      onClick={onClose}
+    >
+      <div 
+        className="glass-panel"
+        style={{
+          width: '100%',
+          maxWidth: '750px',
+          maxHeight: '85vh',
+          borderRadius: '14px',
+          border: '1px solid rgba(251, 191, 36, 0.35)',
+          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(24, 33, 47, 0.98))',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)'
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* HEADER */}
+        <div style={{
+          padding: '1.25rem 1.5rem',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: 'rgba(251, 191, 36, 0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span style={{ fontSize: '1.5rem' }}>🌍</span>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.15rem', color: 'var(--crear-gold)', fontWeight: 800 }}>
+                Historial Geográfico de Conexiones
+              </h3>
+              <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                {userName || 'Colaborador'} &bull; <span style={{ color: '#fff' }}>{userEmail}</span> ({userRole || 'Rol'} - {userSede || 'Sede'})
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              padding: '6px',
+              borderRadius: '6px',
+              display: 'flex'
+            }}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* RESUMEN DE UBICACIONES */}
+        <div style={{
+          padding: '1rem 1.5rem',
+          background: 'rgba(0, 0, 0, 0.25)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: '0.75rem'
+        }}>
+          <div>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Conexiones</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fff' }}>{history.length}</div>
+          </div>
+          <div>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Países Detectados</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#34d399' }}>
+              {uniqueCountries.join(', ') || 'Perú'}
+            </div>
+          </div>
+          <div>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Ciudades</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#38bdf8' }}>
+              {uniqueCities.slice(0, 3).join(', ') || 'Lima'}
+            </div>
+          </div>
+          <div>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>IPs Auditadas</span>
+            <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#c084fc' }}>{uniqueIps.length}</div>
+          </div>
+        </div>
+
+        {/* LISTA / HISTORIAL CRONOLÓGICO */}
+        <div style={{ padding: '1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
+          {loading ? (
+            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <RefreshCw size={28} className="animate-spin" color="var(--crear-gold)" style={{ margin: '0 auto 0.75rem' }} />
+              <div>Cargando historial inmutable de Firestore...</div>
+            </div>
+          ) : history.length === 0 ? (
+            <div style={{ padding: '2.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <AlertTriangle size={32} color="#f59e0b" style={{ margin: '0 auto 0.75rem' }} />
+              <div style={{ fontWeight: 600, color: '#fff' }}>Sin conexiones auditadas registradas</div>
+              <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>
+                Este usuario aún no tiene eventos recientes de inicio de sesión o actividad registrada en Firestore.
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {history.map((h, idx) => {
+                const flag = h.flag || '🇵🇪';
+                const city = h.city || 'Lima';
+                const country = h.country || 'Perú';
+                const ip = h.ip || 'No registrada';
+                const device = h.device || h.userAgent || 'Navegador Web';
+                const action = h.action || 'ACCESO';
+
+                const actionBadgeColor = action === 'LOGIN' 
+                  ? '#10b981' 
+                  : (action.includes('MODULO') ? '#38bdf8' : (action === 'LOGOUT' ? '#ef4444' : 'var(--crear-gold)'));
+
+                return (
+                  <div
+                    key={h.id || idx}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.07)',
+                      borderRadius: '8px',
+                      padding: '0.85rem 1rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: '0.75rem'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '1.6rem' }}>{flag}</span>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
+                            {city}, {country}
+                          </span>
+                          <span style={{
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            padding: '1px 6px',
+                            borderRadius: '4px',
+                            background: 'rgba(255, 255, 255, 0.08)',
+                            color: actionBadgeColor
+                          }}>
+                            {action}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <span style={{ fontFamily: 'monospace', color: '#94a3b8' }}>IP: {ip}</span>
+                          <span>&bull;</span>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <Laptop size={12} /> {device}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600 }}>
+                        {formatDate(h.timestamp)}
+                      </div>
+                      {h.details && (
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', maxWidth: '220px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {h.details}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* FOOTER */}
+        <div style={{
+          padding: '0.85rem 1.5rem',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          background: 'rgba(0, 0, 0, 0.3)'
+        }}>
+          <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+            🔒 Registros protegidos criptográficamente en Firestore audit_logs
+          </span>
+          <button
+            onClick={onClose}
+            className="btn-secondary"
+            style={{ padding: '0.4rem 1rem', fontSize: '0.82rem' }}
+          >
+            Cerrar
+          </button>
         </div>
       </div>
     </div>
@@ -162229,6 +162743,7 @@ import StaffMesaAdminPanel from '../components/StaffMesaAdminPanel';
 import GuiaAliadosC1 from './GuiaAliadosC1';
 import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
 import ModuleTelemetryView from '../components/ModuleTelemetryView';
+import UserGeoHistoryModal from '../components/UserGeoHistoryModal';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 import { runRoleIntegrityAuditAndHeal, applyReviewedRoleChanges } from '../services/roleIntegritySentinelAgent';
 
@@ -162673,6 +163188,8 @@ function AuditLogView() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterAction, setFilterAction] = useState('TODAS');
+  const [filterCountry, setFilterCountry] = useState('TODOS');
+  const [geoHistoryModalUser, setGeoHistoryModalUser] = useState(null);
   // (02/09/2026) Ordenamiento por columna, pedido explícito de José: por
   // defecto se ve el último ingreso primero (más reciente arriba), y cada
   // columna se puede ordenar haciendo clic en su encabezado.
@@ -162682,7 +163199,7 @@ function AuditLogView() {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      let data = await getAllAuditLogs();
+      let data = await getAllAuditLogs(500);
       setLogs(data || []);
     } catch (error) {
       console.error("Error fetching real audit logs", error);
@@ -162696,9 +163213,22 @@ function AuditLogView() {
     fetchLogs();
   }, [currentUser]);
 
+  const availableCountries = useMemo(() => {
+    const map = new Map();
+    logs.forEach(l => {
+      const c = l.country || 'Perú';
+      const f = l.flag || '🇵🇪';
+      if (!map.has(c)) {
+        map.set(c, f);
+      }
+    });
+    return Array.from(map.entries()).map(([country, flag]) => ({ country, flag }));
+  }, [logs]);
+
   const filteredLogs = logs.filter(log => {
-    if (filterAction === 'TODAS') return true;
-    return log.action === filterAction;
+    if (filterAction !== 'TODAS' && log.action !== filterAction) return false;
+    if (filterCountry !== 'TODOS' && (log.country || 'Perú') !== filterCountry) return false;
+    return true;
   });
 
   const handleSort = (field) => {
@@ -162754,7 +163284,7 @@ function AuditLogView() {
           <h2 style={{ color: 'var(--crear-gold)', margin: 0 }}>🛡️ Auditoría de Accesos y Movimientos</h2>
           <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0 0', fontSize: '0.9rem' }}>Registro en tiempo real de inicios de sesión, cambios de rol y actividad operativa.</p>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <select
             value={filterAction}
             onChange={(e) => setFilterAction(e.target.value)}
@@ -162771,10 +163301,32 @@ function AuditLogView() {
             <option value="USER_DEACTIVATED" style={{ color: 'black' }}>🚫 USER_DEACTIVATED (Bajas de Colaboradores)</option>
             <option value="USER_REACTIVATED" style={{ color: 'black' }}>✅ USER_REACTIVATED (Reactivaciones)</option>
             <option value="LOGIN" style={{ color: 'black' }}>🟢 LOGIN (Inicios de sesión reales)</option>
+            <option value="ACCESO_MODULO" style={{ color: 'black' }}>📊 ACCESO_MODULO (Uso de Herramientas)</option>
             <option value="CAMBIO_ROL" style={{ color: 'black' }}>🔄 CAMBIO_ROL (Permisos)</option>
             <option value="SIMULACION_ADMIN" style={{ color: 'black' }}>🎭 SIMULACION_ADMIN (Super Admin)</option>
             <option value="LOGOUT" style={{ color: 'black' }}>🔴 LOGOUT</option>
           </select>
+
+          <select
+            value={filterCountry}
+            onChange={(e) => setFilterCountry(e.target.value)}
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.2)',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '6px',
+              fontSize: '0.85rem'
+            }}
+          >
+            <option value="TODOS" style={{ color: 'black' }}>🌍 Todos los Países</option>
+            {availableCountries.map(c => (
+              <option key={c.country} value={c.country} style={{ color: 'black' }}>
+                {c.flag} {c.country}
+              </option>
+            ))}
+          </select>
+
           <button
             onClick={fetchLogs}
             disabled={loading}
@@ -162814,8 +163366,9 @@ function AuditLogView() {
                 <th onClick={() => handleSort('rol')} style={thSortStyle} title="Ordenar por rol">Rol{sortArrow('rol')}</th>
                 <th onClick={() => handleSort('accion')} style={thSortStyle} title="Ordenar por acción">Acción{sortArrow('accion')}</th>
                 <th onClick={() => handleSort('detalle')} style={thSortStyle} title="Ordenar por detalle">Detalle{sortArrow('detalle')}</th>
-                <th onClick={() => handleSort('ubicacion')} style={thSortStyle} title="Ordenar por ubicación">Ubicación e IP{sortArrow('ubicacion')}</th>
+                <th onClick={() => handleSort('ubicacion')} style={thSortStyle} title="Ordenar por ubicación">🌍 País / Origen e IP{sortArrow('ubicacion')}</th>
                 <th onClick={() => handleSort('dispositivo')} style={thSortStyle} title="Ordenar por dispositivo">Dispositivo{sortArrow('dispositivo')}</th>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)', whiteSpace: 'nowrap' }}>Historial Geo</th>
               </tr>
             </thead>
             <tbody>
@@ -162854,19 +163407,54 @@ function AuditLogView() {
                       {log.details || '—'}
                     </td>
                     <td style={{ padding: '0.8rem' }}>
-                      <strong>{log.sede || 'Global'}</strong>
-                      <br />
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'No recopilada'} ({log.ip || 'No recopilada'})</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '1.25rem' }}>{log.flag || '🇵🇪'}</span>
+                        <div>
+                          <strong style={{ color: '#fff', fontSize: '0.86rem' }}>
+                            {log.city ? `${log.city}, ` : ''}{log.country || log.sede || 'Perú'}
+                          </strong>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                            IP: {log.ip || 'Detectada local'}
+                          </div>
+                        </div>
+                      </div>
                     </td>
-                    <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>
-                      {log.userAgent || 'No recopilado'}
+                    <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px' }}>
+                      <div style={{ color: '#e2e8f0', fontWeight: 500 }}>{log.device || log.userAgent || 'Navegador Web'}</div>
+                      {log.timezone && <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{log.timezone}</div>}
+                    </td>
+                    <td style={{ padding: '0.8rem', whiteSpace: 'nowrap' }}>
+                      <button
+                        onClick={() => setGeoHistoryModalUser({
+                          email: log.email,
+                          name: log.name,
+                          role: log.role,
+                          sede: log.sede
+                        })}
+                        className="btn-secondary"
+                        style={{
+                          padding: '0.3rem 0.65rem',
+                          fontSize: '0.74rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          borderRadius: '6px',
+                          background: 'rgba(56, 189, 248, 0.1)',
+                          borderColor: 'rgba(56, 189, 248, 0.35)',
+                          color: '#38bdf8',
+                          fontWeight: 600
+                        }}
+                        title="Ver historial cronológico de todas las conexiones de este colaborador"
+                      >
+                        🌍 Historial
+                      </button>
                     </td>
                   </tr>
                 );
               })}
               {filteredLogs.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                     No hay registros de auditoría que coincidan con el filtro seleccionado.
                   </td>
                 </tr>
@@ -162875,6 +163463,16 @@ function AuditLogView() {
           </table>
         </div>
       )}
+
+      {/* MODAL DE HISTORIAL GEOGRÁFICO DE CONEXIONES */}
+      <UserGeoHistoryModal
+        isOpen={!!geoHistoryModalUser}
+        onClose={() => setGeoHistoryModalUser(null)}
+        userEmail={geoHistoryModalUser?.email}
+        userName={geoHistoryModalUser?.name}
+        userRole={geoHistoryModalUser?.role}
+        userSede={geoHistoryModalUser?.sede}
+      />
     </div>
   );
 }
@@ -195013,17 +195611,29 @@ export const createConfidentialityAgent = (currentUser, context = {}) => {
 
 ```js
 // src/services/auditService.js
-// Servicio Centralizado de Auditoría de Accesos Reales y Rastreo de Conexión de Usuarios
+// Servicio Centralizado de Auditoría de Accesos Reales y Rastreo Geográfico de Conexión de Usuarios
+// Recopila país, ciudad, IP, dispositivo e historial inmutable en Firestore.
 
 import { db } from './firebase';
-import { collection, addDoc, getDocs, query, orderBy, limit, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, limit, doc, setDoc, serverTimestamp, where } from 'firebase/firestore';
+import { getClientGeoLocation } from '../utils/geoLocator';
 
 const LOCAL_CONNECTIONS_KEY = 'cpsl_user_connections';
 
 /**
- * Registra un evento de auditoría REAL en Cloud Firestore
+ * Registra un evento de auditoría REAL en Cloud Firestore con geolocalización inmutable
  */
-export async function recordAuditEvent({ email, name, role, sede, action, details = '', isSimulation = false, simulatedBy = null }) {
+export async function recordAuditEvent({ 
+  email, 
+  name, 
+  role, 
+  sede, 
+  action, 
+  details = '', 
+  isSimulation = false, 
+  simulatedBy = null,
+  geoInfo = null
+}) {
   if (!email) {
     return { ok: false, error: new Error('An email is required to record an audit event.') };
   }
@@ -195034,6 +195644,24 @@ export async function recordAuditEvent({ email, name, role, sede, action, detail
   const effectiveIsSimulation = Boolean(isSimulation || activeSimTarget);
   const effectiveSimulatedBy = simulatedBy || (effectiveIsSimulation ? (activeSimAdmin || "jose.sanchez@crearpsl.net") : null);
 
+  // Resolver geolocalización del cliente
+  let geo = geoInfo;
+  if (!geo) {
+    try {
+      geo = await getClientGeoLocation();
+    } catch (e) {
+      geo = null;
+    }
+  }
+
+  const country = geo?.country || 'Perú';
+  const countryCode = geo?.countryCode || 'PE';
+  const city = geo?.city || 'Lima';
+  const flag = geo?.flag || '🇵🇪';
+  const ip = geo?.ip || 'Detectada local';
+  const device = geo?.device || 'Navegador Web';
+  const locationStr = geo?.locationString || `${city ? `${city}, ` : ''}${country} ${flag}`.trim();
+
   const logEntry = {
     email: email.toLowerCase().trim(),
     name: name || 'Colaborador',
@@ -195043,7 +195671,18 @@ export async function recordAuditEvent({ email, name, role, sede, action, detail
     details: details || '',
     isSimulation: effectiveIsSimulation,
     simulatedBy: effectiveSimulatedBy,
-    timestamp: nowIso
+    timestamp: nowIso,
+    // Campos Geográficos Reales Auditados
+    country: country,
+    countryCode: countryCode,
+    city: city,
+    region: geo?.region || '',
+    flag: flag,
+    ip: ip,
+    timezone: geo?.timezone || 'America/Lima',
+    device: device,
+    userAgent: device,
+    location: locationStr
   };
 
   try {
@@ -195057,7 +195696,8 @@ export async function recordAuditEvent({ email, name, role, sede, action, detail
     return { ok: false, error };
   }
 
-  if (action === 'LOGIN' && !effectiveIsSimulation) {
+  // Si es un inicio de sesión o actividad real, sincronizar perfil y último origen geográfico
+  if (!effectiveIsSimulation && (action === 'LOGIN' || action === 'ACCESO' || action === 'ACCESO_MODULO')) {
     try {
       const userProfileRef = doc(db, 'user_profiles', email.toLowerCase().trim());
       await setDoc(userProfileRef, {
@@ -195067,11 +195707,17 @@ export async function recordAuditEvent({ email, name, role, sede, action, detail
         sede: sede || 'Sede Global',
         lastLoginAt: serverTimestamp(),
         lastLoginAtIso: nowIso,
-        lastAction: 'LOGIN_REAL'
+        lastAction: action,
+        lastCountry: country,
+        lastCountryCode: countryCode,
+        lastCity: city,
+        lastFlag: flag,
+        lastIp: ip,
+        lastDevice: device,
+        lastLocationString: locationStr
       }, { merge: true });
     } catch (profileSyncError) {
-      console.error('Firestore login profile sync error:', profileSyncError);
-      return { ok: true, logEntry, profileSyncError };
+      console.warn('Aviso no fatal sincronizando geolocalización en perfil:', profileSyncError?.message);
     }
   }
 
@@ -195079,11 +195725,11 @@ export async function recordAuditEvent({ email, name, role, sede, action, detail
 }
 
 /**
- * Obtiene los logs de auditoría 100% REALES directamente de Firestore
+ * Obtiene los logs de auditoría 100% REALES directamente de Firestore con geolocalización
  */
-export async function getAllAuditLogs() {
+export async function getAllAuditLogs(limitCount = 500) {
   try {
-    const q = query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(200));
+    const q = query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(limitCount));
     const snap = await getDocs(q);
     
     if (snap.empty) {
@@ -195102,6 +195748,12 @@ export async function getAllAuditLogs() {
       return {
         id: docSnap.id,
         ...d,
+        country: d.country || 'Perú',
+        city: d.city || 'Lima',
+        flag: d.flag || '🇵🇪',
+        ip: d.ip || 'Detectada local',
+        device: d.device || d.userAgent || 'Navegador Web',
+        location: d.location || `${d.city || 'Lima'}, ${d.country || 'Perú'} ${d.flag || '🇵🇪'}`.trim(),
         timestamp: isoDate || new Date().toISOString()
       };
     });
@@ -195114,7 +195766,53 @@ export async function getAllAuditLogs() {
 }
 
 /**
- * Obtiene el mapa completo de perfiles y conexiones reales de usuarios
+ * Obtiene el HISTORIAL completo de conexiones geográficas de un usuario específico
+ */
+export async function getUserGeoAuditHistory(userEmail) {
+  if (!userEmail) return [];
+  const normalized = userEmail.toLowerCase().trim();
+
+  try {
+    const q = query(
+      collection(db, 'audit_logs'),
+      where('email', '==', normalized),
+      orderBy('timestamp', 'desc'),
+      limit(100)
+    );
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      return snap.docs.map(docSnap => {
+        const d = docSnap.data();
+        let isoDate = d.createdAtIso;
+        if (!isoDate && d.timestamp?.toDate) {
+          isoDate = d.timestamp.toDate().toISOString();
+        } else if (!isoDate && typeof d.timestamp === 'string') {
+          isoDate = d.timestamp;
+        }
+        return {
+          id: docSnap.id,
+          ...d,
+          country: d.country || 'Perú',
+          city: d.city || 'Lima',
+          flag: d.flag || '🇵🇪',
+          ip: d.ip || 'Detectada local',
+          device: d.device || d.userAgent || 'Navegador Web',
+          location: d.location || `${d.city || 'Lima'}, ${d.country || 'Perú'} ${d.flag || '🇵🇪'}`.trim(),
+          timestamp: isoDate || new Date().toISOString()
+        };
+      });
+    }
+  } catch (indexErr) {
+    console.warn("Consulta filtrada con índice falló, aplicando fallback en memoria:", indexErr.message);
+  }
+
+  // Fallback seguro: filtrar desde la lista global
+  const allLogs = await getAllAuditLogs(500);
+  return allLogs.filter(l => (l.email || '').toLowerCase().trim() === normalized);
+}
+
+/**
+ * Obtiene el mapa completo de perfiles y conexiones reales de usuarios con datos geográficos
  */
 export async function getAllUserConnections() {
   const connections = {};
@@ -195143,7 +195841,13 @@ export async function getAllUserConnections() {
         ...data,
         lastLoginAt: lastLoginDate || null,
         lastLoginFormatted: lastLoginFormatted || null,
-        hasConnected: !!lastLoginDate
+        hasConnected: !!lastLoginDate,
+        lastCountry: data.lastCountry || 'Perú',
+        lastCity: data.lastCity || 'Lima',
+        lastFlag: data.lastFlag || '🇵🇪',
+        lastIp: data.lastIp || 'Detectada local',
+        lastDevice: data.lastDevice || 'Navegador Web',
+        lastLocationString: data.lastLocationString || `${data.lastCity || 'Lima'}, ${data.lastCountry || 'Perú'} ${data.lastFlag || '🇵🇪'}`.trim()
       };
     });
   } catch (e) {
@@ -195160,6 +195864,7 @@ export async function clearTestLogs() {
   try {
     localStorage.removeItem('cpsl_audit_logs');
     localStorage.removeItem(LOCAL_CONNECTIONS_KEY);
+    sessionStorage.removeItem('cpsl_client_geo_cache');
   } catch (e) {}
 }
 

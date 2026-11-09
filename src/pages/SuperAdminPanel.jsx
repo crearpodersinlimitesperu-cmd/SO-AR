@@ -24,6 +24,7 @@ import StaffMesaAdminPanel from '../components/StaffMesaAdminPanel';
 import GuiaAliadosC1 from './GuiaAliadosC1';
 import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
 import ModuleTelemetryView from '../components/ModuleTelemetryView';
+import UserGeoHistoryModal from '../components/UserGeoHistoryModal';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 import { runRoleIntegrityAuditAndHeal, applyReviewedRoleChanges } from '../services/roleIntegritySentinelAgent';
 
@@ -468,6 +469,8 @@ function AuditLogView() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterAction, setFilterAction] = useState('TODAS');
+  const [filterCountry, setFilterCountry] = useState('TODOS');
+  const [geoHistoryModalUser, setGeoHistoryModalUser] = useState(null);
   // (02/09/2026) Ordenamiento por columna, pedido explícito de José: por
   // defecto se ve el último ingreso primero (más reciente arriba), y cada
   // columna se puede ordenar haciendo clic en su encabezado.
@@ -477,7 +480,7 @@ function AuditLogView() {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      let data = await getAllAuditLogs();
+      let data = await getAllAuditLogs(500);
       setLogs(data || []);
     } catch (error) {
       console.error("Error fetching real audit logs", error);
@@ -491,9 +494,22 @@ function AuditLogView() {
     fetchLogs();
   }, [currentUser]);
 
+  const availableCountries = useMemo(() => {
+    const map = new Map();
+    logs.forEach(l => {
+      const c = l.country || 'Perú';
+      const f = l.flag || '🇵🇪';
+      if (!map.has(c)) {
+        map.set(c, f);
+      }
+    });
+    return Array.from(map.entries()).map(([country, flag]) => ({ country, flag }));
+  }, [logs]);
+
   const filteredLogs = logs.filter(log => {
-    if (filterAction === 'TODAS') return true;
-    return log.action === filterAction;
+    if (filterAction !== 'TODAS' && log.action !== filterAction) return false;
+    if (filterCountry !== 'TODOS' && (log.country || 'Perú') !== filterCountry) return false;
+    return true;
   });
 
   const handleSort = (field) => {
@@ -549,7 +565,7 @@ function AuditLogView() {
           <h2 style={{ color: 'var(--crear-gold)', margin: 0 }}>🛡️ Auditoría de Accesos y Movimientos</h2>
           <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0 0', fontSize: '0.9rem' }}>Registro en tiempo real de inicios de sesión, cambios de rol y actividad operativa.</p>
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <select
             value={filterAction}
             onChange={(e) => setFilterAction(e.target.value)}
@@ -566,10 +582,32 @@ function AuditLogView() {
             <option value="USER_DEACTIVATED" style={{ color: 'black' }}>🚫 USER_DEACTIVATED (Bajas de Colaboradores)</option>
             <option value="USER_REACTIVATED" style={{ color: 'black' }}>✅ USER_REACTIVATED (Reactivaciones)</option>
             <option value="LOGIN" style={{ color: 'black' }}>🟢 LOGIN (Inicios de sesión reales)</option>
+            <option value="ACCESO_MODULO" style={{ color: 'black' }}>📊 ACCESO_MODULO (Uso de Herramientas)</option>
             <option value="CAMBIO_ROL" style={{ color: 'black' }}>🔄 CAMBIO_ROL (Permisos)</option>
             <option value="SIMULACION_ADMIN" style={{ color: 'black' }}>🎭 SIMULACION_ADMIN (Super Admin)</option>
             <option value="LOGOUT" style={{ color: 'black' }}>🔴 LOGOUT</option>
           </select>
+
+          <select
+            value={filterCountry}
+            onChange={(e) => setFilterCountry(e.target.value)}
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.2)',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '6px',
+              fontSize: '0.85rem'
+            }}
+          >
+            <option value="TODOS" style={{ color: 'black' }}>🌍 Todos los Países</option>
+            {availableCountries.map(c => (
+              <option key={c.country} value={c.country} style={{ color: 'black' }}>
+                {c.flag} {c.country}
+              </option>
+            ))}
+          </select>
+
           <button
             onClick={fetchLogs}
             disabled={loading}
@@ -609,8 +647,9 @@ function AuditLogView() {
                 <th onClick={() => handleSort('rol')} style={thSortStyle} title="Ordenar por rol">Rol{sortArrow('rol')}</th>
                 <th onClick={() => handleSort('accion')} style={thSortStyle} title="Ordenar por acción">Acción{sortArrow('accion')}</th>
                 <th onClick={() => handleSort('detalle')} style={thSortStyle} title="Ordenar por detalle">Detalle{sortArrow('detalle')}</th>
-                <th onClick={() => handleSort('ubicacion')} style={thSortStyle} title="Ordenar por ubicación">Ubicación e IP{sortArrow('ubicacion')}</th>
+                <th onClick={() => handleSort('ubicacion')} style={thSortStyle} title="Ordenar por ubicación">🌍 País / Origen e IP{sortArrow('ubicacion')}</th>
                 <th onClick={() => handleSort('dispositivo')} style={thSortStyle} title="Ordenar por dispositivo">Dispositivo{sortArrow('dispositivo')}</th>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)', whiteSpace: 'nowrap' }}>Historial Geo</th>
               </tr>
             </thead>
             <tbody>
@@ -649,19 +688,54 @@ function AuditLogView() {
                       {log.details || '—'}
                     </td>
                     <td style={{ padding: '0.8rem' }}>
-                      <strong>{log.sede || 'Global'}</strong>
-                      <br />
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'No recopilada'} ({log.ip || 'No recopilada'})</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '1.25rem' }}>{log.flag || '🇵🇪'}</span>
+                        <div>
+                          <strong style={{ color: '#fff', fontSize: '0.86rem' }}>
+                            {log.city ? `${log.city}, ` : ''}{log.country || log.sede || 'Perú'}
+                          </strong>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                            IP: {log.ip || 'Detectada local'}
+                          </div>
+                        </div>
+                      </div>
                     </td>
-                    <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>
-                      {log.userAgent || 'No recopilado'}
+                    <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px' }}>
+                      <div style={{ color: '#e2e8f0', fontWeight: 500 }}>{log.device || log.userAgent || 'Navegador Web'}</div>
+                      {log.timezone && <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{log.timezone}</div>}
+                    </td>
+                    <td style={{ padding: '0.8rem', whiteSpace: 'nowrap' }}>
+                      <button
+                        onClick={() => setGeoHistoryModalUser({
+                          email: log.email,
+                          name: log.name,
+                          role: log.role,
+                          sede: log.sede
+                        })}
+                        className="btn-secondary"
+                        style={{
+                          padding: '0.3rem 0.65rem',
+                          fontSize: '0.74rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          borderRadius: '6px',
+                          background: 'rgba(56, 189, 248, 0.1)',
+                          borderColor: 'rgba(56, 189, 248, 0.35)',
+                          color: '#38bdf8',
+                          fontWeight: 600
+                        }}
+                        title="Ver historial cronológico de todas las conexiones de este colaborador"
+                      >
+                        🌍 Historial
+                      </button>
                     </td>
                   </tr>
                 );
               })}
               {filteredLogs.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                     No hay registros de auditoría que coincidan con el filtro seleccionado.
                   </td>
                 </tr>
@@ -670,6 +744,16 @@ function AuditLogView() {
           </table>
         </div>
       )}
+
+      {/* MODAL DE HISTORIAL GEOGRÁFICO DE CONEXIONES */}
+      <UserGeoHistoryModal
+        isOpen={!!geoHistoryModalUser}
+        onClose={() => setGeoHistoryModalUser(null)}
+        userEmail={geoHistoryModalUser?.email}
+        userName={geoHistoryModalUser?.name}
+        userRole={geoHistoryModalUser?.role}
+        userSede={geoHistoryModalUser?.sede}
+      />
     </div>
   );
 }

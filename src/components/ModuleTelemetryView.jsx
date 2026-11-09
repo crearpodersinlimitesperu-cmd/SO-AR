@@ -9,6 +9,7 @@ import {
   Clock, CheckCircle2, Flame, Snowflake, ArrowUpDown, ExternalLink
 } from 'lucide-react';
 import { fetchModuleTelemetryReport } from '../services/moduleTelemetryService';
+import UserGeoHistoryModal from './UserGeoHistoryModal';
 
 export default function ModuleTelemetryView({ currentUser }) {
   const [report, setReport] = useState(null);
@@ -17,6 +18,7 @@ export default function ModuleTelemetryView({ currentUser }) {
   const [tierFilter, setTierFilter] = useState('TODOS');
   const [activeSubTab, setActiveSubTab] = useState('ranking'); // 'ranking' | 'usuarios' | 'huerfanos'
   const [expandedModuleId, setExpandedModuleId] = useState(null);
+  const [geoModalUser, setGeoModalUser] = useState(null);
 
   const loadReport = async () => {
     setLoading(true);
@@ -631,6 +633,7 @@ export default function ModuleTelemetryView({ currentUser }) {
                     <th style={{ padding: '0.6rem 0.75rem', textAlign: 'center' }}>Módulos Usados</th>
                     <th style={{ padding: '0.6rem 0.75rem', textAlign: 'center' }}>Total Ingresos</th>
                     <th style={{ padding: '0.6rem 0.75rem' }}>Última Actividad</th>
+                    <th style={{ padding: '0.6rem 0.75rem' }}>Historial Geo</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -650,6 +653,31 @@ export default function ModuleTelemetryView({ currentUser }) {
                       </td>
                       <td style={{ padding: '0.6rem 0.75rem', color: 'var(--text-muted)' }}>
                         {formatDate(u.lastActiveIso)}
+                      </td>
+                      <td style={{ padding: '0.6rem 0.75rem', whiteSpace: 'nowrap' }}>
+                        <button
+                          onClick={() => setGeoModalUser({
+                            email: u.email,
+                            name: u.name,
+                            role: u.role,
+                            sede: u.sede
+                          })}
+                          className="btn-secondary"
+                          style={{
+                            padding: '0.3rem 0.65rem',
+                            fontSize: '0.74rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            borderRadius: '6px',
+                            background: 'rgba(56, 189, 248, 0.1)',
+                            borderColor: 'rgba(56, 189, 248, 0.3)',
+                            color: '#38bdf8'
+                          }}
+                          title="Ver historial geográfico de conexiones de este colaborador"
+                        >
+                          🌍 Conexiones
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -726,6 +754,15 @@ export default function ModuleTelemetryView({ currentUser }) {
         </>
       )}
 
+      {/* MODAL DE HISTORIAL GEOGRÁFICO DE CONEXIONES */}
+      <UserGeoHistoryModal
+        isOpen={!!geoModalUser}
+        onClose={() => setGeoModalUser(null)}
+        userEmail={geoModalUser?.email}
+        userName={geoModalUser?.name}
+        userRole={geoModalUser?.role}
+        userSede={geoModalUser?.sede}
+      />
     </div>
   );
 }
