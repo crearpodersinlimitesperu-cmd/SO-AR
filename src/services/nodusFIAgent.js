@@ -861,15 +861,15 @@ ${pregunta}
 }
 
 /**
- * DOCUMENTACIÓN DE ACTUALIZACIÓN Y TRAZABILIDAD: MÓDULO CAUSO OS
+ * DOCUMENTACIÓN DE ACTUALIZACIÓN Y TRAZABILIDAD: MÓDULO CAUSA OS
  * Especificación técnica y operacional de auditoría para Armando.
  */
 export const ESPECIFICACION_AUDITORIA_ARMANDO = {
-  titulo: 'Documentación de Actualización y Trazabilidad: Módulo CAUSO OS',
+  titulo: 'Documentación de Actualización y Trazabilidad: Módulo CAUSA OS',
   subtitulo: 'Especificación técnica y operacional de auditoría para Armando.',
   seccion1: {
     titulo: '1. Especificaciones del Cambio de Arquitectura',
-    descripcion: 'La presente actualización del sistema CAUSO OS introduce una modificación fundamental en la estructura de seguimiento de desempeño individual: la transición del modelo de 5 Factores/Futuros Imposibles (FIs) a un máximo estricto de 3 Resultados Imposibles (RIs) por participante.',
+    descripcion: 'La presente actualización del sistema CAUSA OS introduce una modificación fundamental en la estructura de seguimiento de desempeño individual: la transición del modelo de 5 Factores/Futuros Imposibles (FIs) a un máximo estricto de 3 Resultados Imposibles (RIs) por participante.',
     motivos: [
       {
         nombre: 'Foco Estratégico Concentrado',
@@ -877,7 +877,7 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
       },
       {
         nombre: 'Trazabilidad y Calidad de Auditoría',
-        detalle: 'Permite a la auditoría de CAUSO OS evaluada por Armando verificar con mayor profundidad las métricas objetivas y el impacto real de cada RI.'
+        detalle: 'Permite a la auditoría de CAUSA OS evaluada por Armando verificar con mayor profundidad las métricas objetivas y el impacto real de cada RI.'
       },
       {
         nombre: 'Alineación con Hábitos de Alto Rendimiento (HAR)',
@@ -887,7 +887,7 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
   },
   seccion2: {
     titulo: '2. Diferenciación y Arquitectura Conceptual: RIs vs. HAR',
-    descripcion: 'Para garantizar una auditoría limpia y estructurada dentro del sistema CAUSO OS, se establece una separación técnica y conceptual entre los Resultados Imposibles (RIs) y los Hábitos de Alto Rendimiento (HAR).',
+    descripcion: 'Para garantizar una auditoría limpia y estructurada dentro del sistema CAUSA OS, se establece una separación técnica y conceptual entre los Resultados Imposibles (RIs) y los Hábitos de Alto Rendimiento (HAR).',
     matriz: [
       {
         dimension: 'Naturaleza',
@@ -917,12 +917,12 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
     ]
   },
   seccion4: {
-    titulo: '4. Reglas de Negocio y Checklist de Auditoría en CAUSO OS',
+    titulo: '4. Reglas de Negocio y Checklist de Auditoría en CAUSA OS',
     reglas: [
       {
         numero: 1,
         nombre: 'Límite Estricto de 3 RIs',
-        descripcion: 'El sistema CAUSO OS bloquea cualquier intento de registrar un 4.º resultado. Los antiguos FIs quedan archivados en el historial de trazabilidad.'
+        descripcion: 'El sistema CAUSA OS bloquea cualquier intento de registrar un 4.º resultado. Los antiguos FIs quedan archivados en el historial de trazabilidad.'
       },
       {
         numero: 2,
@@ -937,7 +937,7 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
       {
         numero: 4,
         nombre: 'Validación de Auditoría por Armando',
-        descripcion: 'Ningún reporte semanal se marca como "Auditado" si no cuenta con la firma digital o verificación de Armando dentro del módulo CAUSO OS.'
+        descripcion: 'Ningún reporte semanal se marca como "Auditado" si no cuenta con la firma digital o verificación de Armando dentro del módulo CAUSA OS.'
       }
     ],
     checklist: [
@@ -971,9 +971,9 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
 };
 
 /**
- * Genera el esquema JSON canónico de datos CAUSO OS según la especificación técnica para Armando.
+ * Genera el esquema JSON canónico de datos CAUSA OS según la especificación técnica para Armando.
  */
-export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
+export function generarEsquemaCausaOSArmando(participante = {}, opciones = {}) {
   const pId = participante.id || participante.dni || 'PAR-2026-8942';
   const rawFis = Array.isArray(participante.fis) ? participante.fis : [];
   
@@ -1033,7 +1033,7 @@ export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
         descripcion: idx === 0 
           ? 'Realizar prospección y seguimiento prioritario antes del mediodía'
           : idx === 1 
-          ? 'Estudiar 45 minutos del módulo de arquitectura CAUSO OS'
+          ? 'Estudiar 45 minutos del módulo de arquitectura CAUSA OS'
           : 'Entrenamiento de fuerza de 60 minutos y caminata de 10k pasos',
         frecuencia: idx === 0 ? 'DIARIA_HABIL' : 'DIARIA',
         cumplimiento_semanal_target: idx === 0 ? 5 : (idx === 1 ? 7 : 6),
@@ -1049,7 +1049,7 @@ export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
 
   const bloqueAuditoria = {
     auditor: "Armando",
-    modulo: "CAUSO OS - Auditoría de RIs & HAR",
+    modulo: "CAUSA OS - Auditoría de RIs & HAR",
     fecha_ultima_auditoria: opciones.fechaAuditoria || new Date().toISOString().split('T')[0],
     estado_auditoria: opciones.estadoAuditoria || (resultadosImposibles.every(r => r.estado === 'APROBADO') ? 'APROBADO' : 'APROBADO_CON_OBSERVACIONES'),
     puntaje_disciplina_har: opciones.puntajeDisciplinaHar !== undefined ? opciones.puntajeDisciplinaHar : 88.3,
@@ -1058,7 +1058,7 @@ export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
       separacion_ri_har_correcta: checklistArmando.separacion_ri_har_correcta ?? true,
       partner_asignado_verificado: checklistArmando.partner_asignado_verificado ?? true
     },
-    notas_auditor: opciones.notasAuditor || `Auditoría verificada bajo la directiva oficial CAUSO OS para Armando. El participante mantiene exactamente 3 RIs y sus correspondientes HARs con validación del partner asignado.`
+    notas_auditor: opciones.notasAuditor || `Auditoría verificada bajo la directiva oficial CAUSA OS para Armando. El participante mantiene exactamente 3 RIs y sus correspondientes HARs con validación del partner asignado.`
   };
 
   const cleanName = participante.nombre || 'Carlos Eduardo Mendoza';
@@ -1085,9 +1085,9 @@ export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
 }
 
 /**
- * Validador estricto de Reglas de Negocio CAUSO OS para Armando
+ * Validador estricto de Reglas de Negocio CAUSA OS para Armando
  */
-export function validarReglasNegocioCausoOS(datos = {}) {
+export function validarReglasNegocioCausaOS(datos = {}) {
   const violaciones = [];
   const ris = Array.isArray(datos.resultados_imposibles) ? datos.resultados_imposibles : [];
   const hars = Array.isArray(datos.habitos_alto_rendimiento) ? datos.habitos_alto_rendimiento : [];
@@ -1113,7 +1113,7 @@ export function validarReglasNegocioCausoOS(datos = {}) {
   // Regla 4: Auditoría firmada/verificada por Armando
   const tieneArmando = datos.bloque_auditoria?.auditor === 'Armando';
   if (!tieneArmando) {
-    violaciones.push('Regla 4 violada: La auditoría debe estar verificada y firmada por Armando en el módulo CAUSO OS.');
+    violaciones.push('Regla 4 violada: La auditoría debe estar verificada y firmada por Armando en el módulo CAUSA OS.');
   }
 
   return {
@@ -1127,5 +1127,9 @@ export function validarReglasNegocioCausoOS(datos = {}) {
     }
   };
 }
+
+// Aliases para retrocompatibilidad
+export const generarEsquemaCausoOSArmando = generarEsquemaCausaOSArmando;
+export const validarReglasNegocioCausoOS = validarReglasNegocioCausaOS;
 
 

@@ -74637,7 +74637,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Auditor de 3 Resultados Imposibles vs HAR, cohorte NODUS post-PFD, rezago crítico y certificación Armando',
     keywords: ['resultados', 'resultados imposibles', 'futuros', 'futuros imposibles', 'ri', 'fi', 'ia', 'auditor', 'metas', 'nodus', 'armando', 'har'],
     route: '/resultados-imposibles',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas', 'qt', 'capitan']
+    roles: null
   },
   {
     id: 'opt-portafolio',
@@ -90001,6 +90001,7 @@ import {
 import { subscribeToKpisSummary, slugify } from '../services/kpisLlamadasService';
 import { useAuth } from '../context/AuthContext';
 import { canViewKPIsLlamadas } from '../config/permissions';
+import { splitConcatenatedTeamNumbers } from '../utils/formatTeam';
 
 const SHEET_MANAGERS_URL = 'https://docs.google.com/spreadsheets/d/1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow/edit?usp=drive_link';
 const SHEET_LLAMADOS_URL = 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link';
@@ -91505,7 +91506,16 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                         </td>
                         <td style={{ padding: '0.85rem 0.8rem', color: '#475569' }}>
                           <div style={{ fontWeight: 600 }}>{m.nombreEquipo || '—'}</div>
-                          {m.numEquipo && <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Equipo #{m.numEquipo}</div>}
+                          {m.numEquipo && (
+                            <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                              {(() => {
+                                const parts = splitConcatenatedTeamNumbers(m.numEquipo);
+                                return parts.length > 1
+                                  ? `Equipos ${parts.map(p => `#${p}`).join(' · ')}`
+                                  : `Equipo #${parts[0] || m.numEquipo}`;
+                              })()}
+                            </div>
+                          )}
                         </td>
                         <td style={{ padding: '0.85rem 1rem', color: m.entrenador !== 'Sin Asignar' ? '#1e293b' : '#94a3b8', fontWeight: 600 }}>
                           {m.entrenador}
@@ -99167,6 +99177,8 @@ import {
   auditarResultadosImposiblesEMPOR,
   generarTextoEvaluacionCompleta,
   ESPECIFICACION_AUDITORIA_ARMANDO,
+  generarEsquemaCausaOSArmando,
+  validarReglasNegocioCausaOS,
   generarEsquemaCausoOSArmando,
   validarReglasNegocioCausoOS
 } from '../services/nodusFIAgent';
@@ -99297,7 +99309,7 @@ export default function FuturosImposiblesView({
   const [iaEvaluation, setIaEvaluation] = useState(null);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
 
-  // Estados para Auditoría Armando (CAUSO OS - Especificación Oficial)
+  // Estados para Auditoría Armando (CAUSA OS - Especificación Oficial)
   const [showArmandoModal, setShowArmandoModal] = useState(false);
   const [activeArmandoTab, setActiveArmandoTab] = useState('especificaciones');
   const [armandoChecklistState, setArmandoChecklistState] = useState({ 1: true, 2: true, 3: true, 4: true, 5: true });
@@ -99745,7 +99757,7 @@ export default function FuturosImposiblesView({
           {isInternalUser && (
             <button
               onClick={() => setShowArmandoModal(true)}
-              title="Especificación técnica y operacional de auditoría para Armando (Manejo Interno CAUSO OS)"
+              title="Especificación técnica y operacional de auditoría para Armando (Manejo Interno CAUSA OS)"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -101776,7 +101788,7 @@ export default function FuturosImposiblesView({
         </div>
       )}
 
-      {/* 10. MODAL ESPECIFICACIÓN DE AUDITORÍA ARMANDO (CAUSO OS - 3 RIs & HAR) */}
+      {/* 10. MODAL ESPECIFICACIÓN DE AUDITORÍA ARMANDO (CAUSA OS - 3 RIs & HAR) */}
       {showArmandoModal && (
         <div style={{
           position: 'fixed',
@@ -101826,7 +101838,7 @@ export default function FuturosImposiblesView({
                     alignItems: 'center',
                     gap: '0.35rem'
                   }}>
-                    <ShieldAlert size={14} /> CAUSO OS &bull; ESPECIFICACIÓN OFICIAL
+                    <ShieldAlert size={14} /> CAUSA OS &bull; ESPECIFICACIÓN OFICIAL
                   </span>
                   <span style={{ fontSize: '0.72rem', color: textMuted }}>
                     Auditoría de Desempeño para Armando
@@ -101938,7 +101950,7 @@ export default function FuturosImposiblesView({
                   </div>
 
                   <h5 style={{ fontSize: '0.85rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', marginBottom: '0.75rem' }}>
-                    Reglas de Negocio Específicas en CAUSO OS
+                    Reglas de Negocio Específicas en CAUSA OS
                   </h5>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                     {ESPECIFICACION_AUDITORIA_ARMANDO.seccion4.reglas.map((r) => (
@@ -102012,7 +102024,7 @@ export default function FuturosImposiblesView({
                       Checklist de Auditoría para Armando
                     </h4>
                     <p style={{ margin: 0, fontSize: '0.82rem', color: textMuted }}>
-                      Controles obligatorios requeridos para validar y certificar los reportes semanales en CAUSO OS:
+                      Controles obligatorios requeridos para validar y certificar los reportes semanales en CAUSA OS:
                     </p>
                   </div>
 
@@ -102086,12 +102098,12 @@ export default function FuturosImposiblesView({
                         3. Estructura JSON Completa de Datos
                       </h4>
                       <div style={{ fontSize: '0.78rem', color: textMuted }}>
-                        Esquema oficial que CAUSO OS procesa para cada participante con RIs, HAR y Bloque de Auditoría
+                        Esquema oficial que CAUSA OS procesa para cada participante con RIs, HAR y Bloque de Auditoría
                       </div>
                     </div>
                     <button
                       onClick={() => {
-                        const schemaEjemplo = generarEsquemaCausoOSArmando();
+                        const schemaEjemplo = generarEsquemaCausaOSArmando();
                         copyToClipboard(JSON.stringify(schemaEjemplo, null, 2), '¡Esquema JSON oficial copiado al portapapeles!');
                       }}
                       style={{
@@ -102124,7 +102136,7 @@ export default function FuturosImposiblesView({
                     maxHeight: '400px',
                     overflowY: 'auto'
                   }}>
-                    {JSON.stringify(generarEsquemaCausoOSArmando(), null, 2)}
+                    {JSON.stringify(generarEsquemaCausaOSArmando(), null, 2)}
                   </pre>
                 </div>
               )}
@@ -102142,12 +102154,12 @@ export default function FuturosImposiblesView({
               gap: '0.6rem'
             }}>
               <span style={{ fontSize: '0.75rem', color: textMuted }}>
-                CAUSO OS &bull; Gobernanza y Trazabilidad Operacional para Armando
+                CAUSA OS &bull; Gobernanza y Trazabilidad Operacional para Armando
               </span>
               <div style={{ display: 'flex', gap: '0.6rem' }}>
                 <button
                   onClick={() => {
-                    const schemaEjemplo = generarEsquemaCausoOSArmando();
+                    const schemaEjemplo = generarEsquemaCausaOSArmando();
                     copyToClipboard(JSON.stringify(schemaEjemplo, null, 2), '¡Esquema JSON copiado al portapapeles!');
                   }}
                   style={{
@@ -173319,7 +173331,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Auditor de 3 Resultados Imposibles vs HAR, cohorte NODUS post-PFD, rezago crítico y certificación Armando',
     keywords: ['resultados', 'resultados imposibles', 'futuros', 'futuros imposibles', 'ri', 'fi', 'ia', 'auditor', 'metas', 'nodus', 'armando', 'har'],
     route: '/resultados-imposibles',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas', 'qt', 'capitan']
+    roles: null
   },
   {
     id: 'opt-portafolio',
@@ -197060,15 +197072,15 @@ ${pregunta}
 }
 
 /**
- * DOCUMENTACIÓN DE ACTUALIZACIÓN Y TRAZABILIDAD: MÓDULO CAUSO OS
+ * DOCUMENTACIÓN DE ACTUALIZACIÓN Y TRAZABILIDAD: MÓDULO CAUSA OS
  * Especificación técnica y operacional de auditoría para Armando.
  */
 export const ESPECIFICACION_AUDITORIA_ARMANDO = {
-  titulo: 'Documentación de Actualización y Trazabilidad: Módulo CAUSO OS',
+  titulo: 'Documentación de Actualización y Trazabilidad: Módulo CAUSA OS',
   subtitulo: 'Especificación técnica y operacional de auditoría para Armando.',
   seccion1: {
     titulo: '1. Especificaciones del Cambio de Arquitectura',
-    descripcion: 'La presente actualización del sistema CAUSO OS introduce una modificación fundamental en la estructura de seguimiento de desempeño individual: la transición del modelo de 5 Factores/Futuros Imposibles (FIs) a un máximo estricto de 3 Resultados Imposibles (RIs) por participante.',
+    descripcion: 'La presente actualización del sistema CAUSA OS introduce una modificación fundamental en la estructura de seguimiento de desempeño individual: la transición del modelo de 5 Factores/Futuros Imposibles (FIs) a un máximo estricto de 3 Resultados Imposibles (RIs) por participante.',
     motivos: [
       {
         nombre: 'Foco Estratégico Concentrado',
@@ -197076,7 +197088,7 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
       },
       {
         nombre: 'Trazabilidad y Calidad de Auditoría',
-        detalle: 'Permite a la auditoría de CAUSO OS evaluada por Armando verificar con mayor profundidad las métricas objetivas y el impacto real de cada RI.'
+        detalle: 'Permite a la auditoría de CAUSA OS evaluada por Armando verificar con mayor profundidad las métricas objetivas y el impacto real de cada RI.'
       },
       {
         nombre: 'Alineación con Hábitos de Alto Rendimiento (HAR)',
@@ -197086,7 +197098,7 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
   },
   seccion2: {
     titulo: '2. Diferenciación y Arquitectura Conceptual: RIs vs. HAR',
-    descripcion: 'Para garantizar una auditoría limpia y estructurada dentro del sistema CAUSO OS, se establece una separación técnica y conceptual entre los Resultados Imposibles (RIs) y los Hábitos de Alto Rendimiento (HAR).',
+    descripcion: 'Para garantizar una auditoría limpia y estructurada dentro del sistema CAUSA OS, se establece una separación técnica y conceptual entre los Resultados Imposibles (RIs) y los Hábitos de Alto Rendimiento (HAR).',
     matriz: [
       {
         dimension: 'Naturaleza',
@@ -197116,12 +197128,12 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
     ]
   },
   seccion4: {
-    titulo: '4. Reglas de Negocio y Checklist de Auditoría en CAUSO OS',
+    titulo: '4. Reglas de Negocio y Checklist de Auditoría en CAUSA OS',
     reglas: [
       {
         numero: 1,
         nombre: 'Límite Estricto de 3 RIs',
-        descripcion: 'El sistema CAUSO OS bloquea cualquier intento de registrar un 4.º resultado. Los antiguos FIs quedan archivados en el historial de trazabilidad.'
+        descripcion: 'El sistema CAUSA OS bloquea cualquier intento de registrar un 4.º resultado. Los antiguos FIs quedan archivados en el historial de trazabilidad.'
       },
       {
         numero: 2,
@@ -197136,7 +197148,7 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
       {
         numero: 4,
         nombre: 'Validación de Auditoría por Armando',
-        descripcion: 'Ningún reporte semanal se marca como "Auditado" si no cuenta con la firma digital o verificación de Armando dentro del módulo CAUSO OS.'
+        descripcion: 'Ningún reporte semanal se marca como "Auditado" si no cuenta con la firma digital o verificación de Armando dentro del módulo CAUSA OS.'
       }
     ],
     checklist: [
@@ -197170,9 +197182,9 @@ export const ESPECIFICACION_AUDITORIA_ARMANDO = {
 };
 
 /**
- * Genera el esquema JSON canónico de datos CAUSO OS según la especificación técnica para Armando.
+ * Genera el esquema JSON canónico de datos CAUSA OS según la especificación técnica para Armando.
  */
-export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
+export function generarEsquemaCausaOSArmando(participante = {}, opciones = {}) {
   const pId = participante.id || participante.dni || 'PAR-2026-8942';
   const rawFis = Array.isArray(participante.fis) ? participante.fis : [];
   
@@ -197232,7 +197244,7 @@ export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
         descripcion: idx === 0 
           ? 'Realizar prospección y seguimiento prioritario antes del mediodía'
           : idx === 1 
-          ? 'Estudiar 45 minutos del módulo de arquitectura CAUSO OS'
+          ? 'Estudiar 45 minutos del módulo de arquitectura CAUSA OS'
           : 'Entrenamiento de fuerza de 60 minutos y caminata de 10k pasos',
         frecuencia: idx === 0 ? 'DIARIA_HABIL' : 'DIARIA',
         cumplimiento_semanal_target: idx === 0 ? 5 : (idx === 1 ? 7 : 6),
@@ -197248,7 +197260,7 @@ export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
 
   const bloqueAuditoria = {
     auditor: "Armando",
-    modulo: "CAUSO OS - Auditoría de RIs & HAR",
+    modulo: "CAUSA OS - Auditoría de RIs & HAR",
     fecha_ultima_auditoria: opciones.fechaAuditoria || new Date().toISOString().split('T')[0],
     estado_auditoria: opciones.estadoAuditoria || (resultadosImposibles.every(r => r.estado === 'APROBADO') ? 'APROBADO' : 'APROBADO_CON_OBSERVACIONES'),
     puntaje_disciplina_har: opciones.puntajeDisciplinaHar !== undefined ? opciones.puntajeDisciplinaHar : 88.3,
@@ -197257,7 +197269,7 @@ export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
       separacion_ri_har_correcta: checklistArmando.separacion_ri_har_correcta ?? true,
       partner_asignado_verificado: checklistArmando.partner_asignado_verificado ?? true
     },
-    notas_auditor: opciones.notasAuditor || `Auditoría verificada bajo la directiva oficial CAUSO OS para Armando. El participante mantiene exactamente 3 RIs y sus correspondientes HARs con validación del partner asignado.`
+    notas_auditor: opciones.notasAuditor || `Auditoría verificada bajo la directiva oficial CAUSA OS para Armando. El participante mantiene exactamente 3 RIs y sus correspondientes HARs con validación del partner asignado.`
   };
 
   const cleanName = participante.nombre || 'Carlos Eduardo Mendoza';
@@ -197284,9 +197296,9 @@ export function generarEsquemaCausoOSArmando(participante = {}, opciones = {}) {
 }
 
 /**
- * Validador estricto de Reglas de Negocio CAUSO OS para Armando
+ * Validador estricto de Reglas de Negocio CAUSA OS para Armando
  */
-export function validarReglasNegocioCausoOS(datos = {}) {
+export function validarReglasNegocioCausaOS(datos = {}) {
   const violaciones = [];
   const ris = Array.isArray(datos.resultados_imposibles) ? datos.resultados_imposibles : [];
   const hars = Array.isArray(datos.habitos_alto_rendimiento) ? datos.habitos_alto_rendimiento : [];
@@ -197312,7 +197324,7 @@ export function validarReglasNegocioCausoOS(datos = {}) {
   // Regla 4: Auditoría firmada/verificada por Armando
   const tieneArmando = datos.bloque_auditoria?.auditor === 'Armando';
   if (!tieneArmando) {
-    violaciones.push('Regla 4 violada: La auditoría debe estar verificada y firmada por Armando en el módulo CAUSO OS.');
+    violaciones.push('Regla 4 violada: La auditoría debe estar verificada y firmada por Armando en el módulo CAUSA OS.');
   }
 
   return {
@@ -197326,6 +197338,10 @@ export function validarReglasNegocioCausoOS(datos = {}) {
     }
   };
 }
+
+// Aliases para retrocompatibilidad
+export const generarEsquemaCausoOSArmando = generarEsquemaCausaOSArmando;
+export const validarReglasNegocioCausoOS = validarReglasNegocioCausaOS;
 
 
 
@@ -199725,7 +199741,7 @@ test('auditarResultadosImposiblesEMPOR detects opportunities for precision and g
 });
 
 test('ESPECIFICACION_AUDITORIA_ARMANDO contains architecture changes, 3 RIs vs HAR, rules and 5 checklist points', () => {
-  assert.ok(ESPECIFICACION_AUDITORIA_ARMANDO.titulo.includes('Módulo CAUSO OS'));
+  assert.ok(ESPECIFICACION_AUDITORIA_ARMANDO.titulo.includes('Módulo CAUSA OS'));
   assert.ok(ESPECIFICACION_AUDITORIA_ARMANDO.subtitulo.includes('Armando'));
   assert.equal(ESPECIFICACION_AUDITORIA_ARMANDO.seccion1.motivos.length, 3);
   assert.equal(ESPECIFICACION_AUDITORIA_ARMANDO.seccion2.matriz.length, 5);
@@ -199751,7 +199767,7 @@ test('generarEsquemaCausoOSArmando creates canonical JSON matching specification
     },
     fis: [
       { ri_id: 'RI-001', titulo: 'Incrementar facturación mensual a S/ 50,000', categoria: 'Financiera', metrica_objetivo: 50000, metrica_actual: 32000, unidad: 'PEN', fecha_limite: '2026-12-15', estado: 'EN_PROGRESO' },
-      { ri_id: 'RI-002', titulo: 'Completar la certificación técnica de infraestructura CAUSO', categoria: 'Profesional', metrica_objetivo: 100, metrica_actual: 65, unidad: 'PORCENTAJE', fecha_limite: '2026-11-30', estado: 'EN_PROGRESO' },
+      { ri_id: 'RI-002', titulo: 'Completar la certificación técnica de infraestructura CAUSA', categoria: 'Profesional', metrica_objetivo: 100, metrica_actual: 65, unidad: 'PORCENTAJE', fecha_limite: '2026-11-30', estado: 'EN_PROGRESO' },
       { ri_id: 'RI-003', titulo: 'Reducir el porcentaje de grasa corporal al 14%', categoria: 'Salud y Vitalidad', metrica_objetivo: 14, metrica_actual: 17.5, unidad: 'PORCENTAJE', fecha_limite: '2026-12-31', estado: 'EN_PROGRESO' }
     ]
   };

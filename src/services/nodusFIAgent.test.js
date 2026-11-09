@@ -94,7 +94,7 @@ test('auditarResultadosImposiblesEMPOR detects opportunities for precision and g
 });
 
 test('ESPECIFICACION_AUDITORIA_ARMANDO contains architecture changes, 3 RIs vs HAR, rules and 5 checklist points', () => {
-  assert.ok(ESPECIFICACION_AUDITORIA_ARMANDO.titulo.includes('Módulo CAUSO OS'));
+  assert.ok(ESPECIFICACION_AUDITORIA_ARMANDO.titulo.includes('Módulo CAUSA OS'));
   assert.ok(ESPECIFICACION_AUDITORIA_ARMANDO.subtitulo.includes('Armando'));
   assert.equal(ESPECIFICACION_AUDITORIA_ARMANDO.seccion1.motivos.length, 3);
   assert.equal(ESPECIFICACION_AUDITORIA_ARMANDO.seccion2.matriz.length, 5);
@@ -120,7 +120,7 @@ test('generarEsquemaCausoOSArmando creates canonical JSON matching specification
     },
     fis: [
       { ri_id: 'RI-001', titulo: 'Incrementar facturación mensual a S/ 50,000', categoria: 'Financiera', metrica_objetivo: 50000, metrica_actual: 32000, unidad: 'PEN', fecha_limite: '2026-12-15', estado: 'EN_PROGRESO' },
-      { ri_id: 'RI-002', titulo: 'Completar la certificación técnica de infraestructura CAUSO', categoria: 'Profesional', metrica_objetivo: 100, metrica_actual: 65, unidad: 'PORCENTAJE', fecha_limite: '2026-11-30', estado: 'EN_PROGRESO' },
+      { ri_id: 'RI-002', titulo: 'Completar la certificación técnica de infraestructura CAUSA', categoria: 'Profesional', metrica_objetivo: 100, metrica_actual: 65, unidad: 'PORCENTAJE', fecha_limite: '2026-11-30', estado: 'EN_PROGRESO' },
       { ri_id: 'RI-003', titulo: 'Reducir el porcentaje de grasa corporal al 14%', categoria: 'Salud y Vitalidad', metrica_objetivo: 14, metrica_actual: 17.5, unidad: 'PORCENTAJE', fecha_limite: '2026-12-31', estado: 'EN_PROGRESO' }
     ]
   };

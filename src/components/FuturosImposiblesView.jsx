@@ -24,6 +24,8 @@ import {
   auditarResultadosImposiblesEMPOR,
   generarTextoEvaluacionCompleta,
   ESPECIFICACION_AUDITORIA_ARMANDO,
+  generarEsquemaCausaOSArmando,
+  validarReglasNegocioCausaOS,
   generarEsquemaCausoOSArmando,
   validarReglasNegocioCausoOS
 } from '../services/nodusFIAgent';
@@ -154,7 +156,7 @@ export default function FuturosImposiblesView({
   const [iaEvaluation, setIaEvaluation] = useState(null);
   const [copiedPrompt, setCopiedPrompt] = useState(false);
 
-  // Estados para Auditoría Armando (CAUSO OS - Especificación Oficial)
+  // Estados para Auditoría Armando (CAUSA OS - Especificación Oficial)
   const [showArmandoModal, setShowArmandoModal] = useState(false);
   const [activeArmandoTab, setActiveArmandoTab] = useState('especificaciones');
   const [armandoChecklistState, setArmandoChecklistState] = useState({ 1: true, 2: true, 3: true, 4: true, 5: true });
@@ -602,7 +604,7 @@ export default function FuturosImposiblesView({
           {isInternalUser && (
             <button
               onClick={() => setShowArmandoModal(true)}
-              title="Especificación técnica y operacional de auditoría para Armando (Manejo Interno CAUSO OS)"
+              title="Especificación técnica y operacional de auditoría para Armando (Manejo Interno CAUSA OS)"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -2633,7 +2635,7 @@ export default function FuturosImposiblesView({
         </div>
       )}
 
-      {/* 10. MODAL ESPECIFICACIÓN DE AUDITORÍA ARMANDO (CAUSO OS - 3 RIs & HAR) */}
+      {/* 10. MODAL ESPECIFICACIÓN DE AUDITORÍA ARMANDO (CAUSA OS - 3 RIs & HAR) */}
       {showArmandoModal && (
         <div style={{
           position: 'fixed',
@@ -2683,7 +2685,7 @@ export default function FuturosImposiblesView({
                     alignItems: 'center',
                     gap: '0.35rem'
                   }}>
-                    <ShieldAlert size={14} /> CAUSO OS &bull; ESPECIFICACIÓN OFICIAL
+                    <ShieldAlert size={14} /> CAUSA OS &bull; ESPECIFICACIÓN OFICIAL
                   </span>
                   <span style={{ fontSize: '0.72rem', color: textMuted }}>
                     Auditoría de Desempeño para Armando
@@ -2795,7 +2797,7 @@ export default function FuturosImposiblesView({
                   </div>
 
                   <h5 style={{ fontSize: '0.85rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase', marginBottom: '0.75rem' }}>
-                    Reglas de Negocio Específicas en CAUSO OS
+                    Reglas de Negocio Específicas en CAUSA OS
                   </h5>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
                     {ESPECIFICACION_AUDITORIA_ARMANDO.seccion4.reglas.map((r) => (
@@ -2869,7 +2871,7 @@ export default function FuturosImposiblesView({
                       Checklist de Auditoría para Armando
                     </h4>
                     <p style={{ margin: 0, fontSize: '0.82rem', color: textMuted }}>
-                      Controles obligatorios requeridos para validar y certificar los reportes semanales en CAUSO OS:
+                      Controles obligatorios requeridos para validar y certificar los reportes semanales en CAUSA OS:
                     </p>
                   </div>
 
@@ -2943,12 +2945,12 @@ export default function FuturosImposiblesView({
                         3. Estructura JSON Completa de Datos
                       </h4>
                       <div style={{ fontSize: '0.78rem', color: textMuted }}>
-                        Esquema oficial que CAUSO OS procesa para cada participante con RIs, HAR y Bloque de Auditoría
+                        Esquema oficial que CAUSA OS procesa para cada participante con RIs, HAR y Bloque de Auditoría
                       </div>
                     </div>
                     <button
                       onClick={() => {
-                        const schemaEjemplo = generarEsquemaCausoOSArmando();
+                        const schemaEjemplo = generarEsquemaCausaOSArmando();
                         copyToClipboard(JSON.stringify(schemaEjemplo, null, 2), '¡Esquema JSON oficial copiado al portapapeles!');
                       }}
                       style={{
@@ -2981,7 +2983,7 @@ export default function FuturosImposiblesView({
                     maxHeight: '400px',
                     overflowY: 'auto'
                   }}>
-                    {JSON.stringify(generarEsquemaCausoOSArmando(), null, 2)}
+                    {JSON.stringify(generarEsquemaCausaOSArmando(), null, 2)}
                   </pre>
                 </div>
               )}
@@ -2999,12 +3001,12 @@ export default function FuturosImposiblesView({
               gap: '0.6rem'
             }}>
               <span style={{ fontSize: '0.75rem', color: textMuted }}>
-                CAUSO OS &bull; Gobernanza y Trazabilidad Operacional para Armando
+                CAUSA OS &bull; Gobernanza y Trazabilidad Operacional para Armando
               </span>
               <div style={{ display: 'flex', gap: '0.6rem' }}>
                 <button
                   onClick={() => {
-                    const schemaEjemplo = generarEsquemaCausoOSArmando();
+                    const schemaEjemplo = generarEsquemaCausaOSArmando();
                     copyToClipboard(JSON.stringify(schemaEjemplo, null, 2), '¡Esquema JSON copiado al portapapeles!');
                   }}
                   style={{

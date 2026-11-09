@@ -1,0 +1,45 @@
+name: 📋 Desplegar Índices de Cloud Firestore
+on:
+  schedule:
+    - cron: '0 4 * * 1' # Cada lunes a las 04:00 UTC
+  workflow_dispatch:
+  push:
+    paths:
+      - 'firestore.indexes.json'
+    branches:
+      - master
+
+concurrency:
+  group: firestore-indexes-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy_indexes:
+    name: Despliegue Programado de Índices
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout repositorio
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 📦 Instalar Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: 🩺 Validar sintaxis de firestore.indexes.json
+        run: node -e "JSON.parse(require('fs').readFileSync('firestore.indexes.json', 'utf8')); console.log('✅ firestore.indexes.json es un JSON válido')"
+
+      - name: 🚀 Desplegar Índices a Cloud Firestore
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          node -e "require('fs').writeFileSync(process.env.RUNNER_TEMP + '/firestore-indexes-sa.json', process.env.GOOGLE_SERVICE_ACCOUNT_JSON, {mode: 0o600})"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firestore-indexes-sa.json"
+          firebase deploy --only firestore:indexes --project centro-operativo-cpsl --non-interactive
+
+      - name: 🗑️ Eliminar credencial temporal del runner
+        if: always()
+        run: rm -f "$RUNNER_TEMP/firestore-indexes-sa.json"

@@ -403,7 +403,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Auditor de 3 Resultados Imposibles vs HAR, cohorte NODUS post-PFD, rezago crítico y certificación Armando',
     keywords: ['resultados', 'resultados imposibles', 'futuros', 'futuros imposibles', 'ri', 'fi', 'ia', 'auditor', 'metas', 'nodus', 'armando', 'har'],
     route: '/resultados-imposibles',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas', 'qt', 'capitan']
+    roles: null
   },
   {
     id: 'opt-portafolio',

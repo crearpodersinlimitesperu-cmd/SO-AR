@@ -15,6 +15,34 @@
         { "fieldPath": "isDualTask", "order": "ASCENDING" },
         { "fieldPath": "sede", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "nodus_futuros_imposibles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sede", "order": "ASCENDING" },
+        { "fieldPath": "cycleId", "order": "ASCENDING" },
+        { "fieldPath": "estadoAprobacion", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "nodus_futuros_imposibles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "equipo", "order": "ASCENDING" },
+        { "fieldPath": "activo", "order": "ASCENDING" },
+        { "fieldPath": "futurosImposiblesAlert", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "audit_logs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sede", "order": "ASCENDING" },
+        { "fieldPath": "tipoAccion", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

@@ -14,6 +14,7 @@ import {
 import { subscribeToKpisSummary, slugify } from '../services/kpisLlamadasService';
 import { useAuth } from '../context/AuthContext';
 import { canViewKPIsLlamadas } from '../config/permissions';
+import { splitConcatenatedTeamNumbers } from '../utils/formatTeam';
 
 const SHEET_MANAGERS_URL = 'https://docs.google.com/spreadsheets/d/1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow/edit?usp=drive_link';
 const SHEET_LLAMADOS_URL = 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link';
@@ -1518,7 +1519,16 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                         </td>
                         <td style={{ padding: '0.85rem 0.8rem', color: '#475569' }}>
                           <div style={{ fontWeight: 600 }}>{m.nombreEquipo || '—'}</div>
-                          {m.numEquipo && <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Equipo #{m.numEquipo}</div>}
+                          {m.numEquipo && (
+                            <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+                              {(() => {
+                                const parts = splitConcatenatedTeamNumbers(m.numEquipo);
+                                return parts.length > 1
+                                  ? `Equipos ${parts.map(p => `#${p}`).join(' · ')}`
+                                  : `Equipo #${parts[0] || m.numEquipo}`;
+                              })()}
+                            </div>
+                          )}
                         </td>
                         <td style={{ padding: '0.85rem 1rem', color: m.entrenador !== 'Sin Asignar' ? '#1e293b' : '#94a3b8', fontWeight: 600 }}>
                           {m.entrenador}

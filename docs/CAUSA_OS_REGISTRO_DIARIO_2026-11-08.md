@@ -4,7 +4,7 @@
 **ID de Archivo:** `Causa OS - Registro Diario - 2026-11-08`  
 **Ubicación Destino Oficial:** Carpeta Drive `1hYpg2iqQgNIBycksrA8u8n9lFVm7IEJi` (Causa OS - Evidencias)  
 **Ambiente:** Producción (`centro-operativo-cpsl.web.app`)  
-**Compilación Activa:** Commit `0533e52` en branch `master`  
+**Compilación Activa:** Commit `4ef2b79` en branch `master`  
 
 ---
 
@@ -27,6 +27,7 @@
 ## 3. TRAZABILIDAD E HISTORIAL DE EVENTOS
 ### Commits Registrados en la Jornada (2026-11-08):
 ```text
+4ef2b79 docs: generar documento fundacional de arquitectura Causa OS y registro diario de trazabilidad
 0533e52 fix(calendar): descomponer equipos concatenados como 987 a Equipos #9 · #8 · #7 en eventos del calendario
 c8a7b48 refactor(causo-os): simplificar modal de revision eliminando tarjeta y botones redundantes de Armando
 d1cfc16 fix(search): habilitar Resultados Imposibles (IA) en buscador de Causa con keywords ampliadas y paridad total de roles
