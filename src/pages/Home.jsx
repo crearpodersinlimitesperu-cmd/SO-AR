@@ -702,17 +702,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     route: '/andres-command-center',
     roles: ['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']
   },
-  {
-    id: 'opt-trainer-hub',
-    title: 'Academia y Hub de Entrenamiento Zen',
-    category: 'Entrenamiento',
-    badge: 'Zen Mode',
-    emoji: '🎓',
-    desc: 'Espacio minimalista para entrenadores de salón, briefing de sala y canal directo confidencial',
-    keywords: ['entrenador', 'academia de entrenadores', 'hub zen', 'salon', 'briefing', 'entrenamiento'],
-    route: '/trainer-hub',
-    roles: ['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']
-  },
+
   {
     id: 'opt-call-coach-crm',
     title: 'CRM Entrenadores de Llamadas',
@@ -2480,11 +2470,7 @@ export default function Home() {
                     📞 CRM Entrenadores Llamadas
                   </button>
                 )}
-                {hasRoleAccess(['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']) && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/trainer-hub'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#eab308', background: 'rgba(234, 179, 8, 0.1)' }}>
-                    🎓 Hub Entrenadores (Zen)
-                  </button>
-                )}
+
                 {isDataAdmin(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/legal-admin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
                     ⚖️ Auditoría Legal
@@ -2681,11 +2667,7 @@ export default function Home() {
               📞 CRM Llamadas
             </ModuleHelpButton>
           )}
-          {hasRoleAccess(['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']) && (
-            <ModuleHelpButton helpKey="entrenador" onClick={() => navigate('/trainer-hub')} className="home-module-card">
-              🎓 Hub Entrenador
-            </ModuleHelpButton>
-          )}
+
           {isDataAdmin(currentUser) && (
             <ModuleHelpButton helpKey="auditoriaLegal" onClick={() => navigate('/legal-admin')} className="home-module-card">
               ⚖️ Auditoría Legal

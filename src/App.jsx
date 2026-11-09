@@ -27,7 +27,6 @@ const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
 const MaestriaGlobalDashboard = lazy(() => import('./pages/MaestriaGlobalDashboard'));
-const TrainerZenHub = lazy(() => import('./pages/TrainerZenHub'));
 const QuantumTeamHub = lazy(() => import('./pages/QuantumTeamHub'));
 const HrCommandCenter = lazy(() => import('./pages/HrCommandCenter'));
 const LegalCommandCenter = lazy(() => import('./pages/LegalCommandCenter'));
@@ -302,11 +301,7 @@ function App() {
               <MaestriaGlobalDashboard />
             </RoleRoute>
           } />
-          <Route path="/trainer-hub" element={
-            <RoleRoute allowedRoles={['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']} requireSuperAdmin={false}>
-              <TrainerZenHub />
-            </RoleRoute>
-          } />
+          <Route path="/trainer-hub" element={<Navigate to="/home" replace />} />
           <Route path="/call-coach-crm" element={
             <RoleRoute allowedRoles={['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']} requireSuperAdmin={false}>
               <CallCoachCRM />

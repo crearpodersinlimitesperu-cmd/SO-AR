@@ -1486,7 +1486,6 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                     else if (r === 'coord_maestria_global') navigate('/andres-command-center');
                     else if (r === 'qt') navigate('/qt-hub');
                     else if (r === 'entrenador_llamadas') navigate('/call-coach-crm');
-                    else if (r === 'entrenador') navigate('/trainer-hub');
                     else navigate('/home');
                   }}
                   style={{
@@ -1671,7 +1670,6 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                           else if (r === 'coord_maestria_global') targetRoute = '/andres-command-center';
                           else if (r === 'qt') targetRoute = '/qt-hub';
                           else if (r === 'entrenador_llamadas') targetRoute = '/call-coach-crm';
-                          else if (r === 'entrenador') targetRoute = '/trainer-hub';
                           navigate(targetRoute);
                           setTimeout(() => {
                             simulateUser(user);

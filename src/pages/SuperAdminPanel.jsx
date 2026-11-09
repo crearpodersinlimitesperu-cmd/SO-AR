@@ -1540,9 +1540,7 @@ export default function SuperAdminPanel() {
           <button onClick={() => navigate('/call-coach-crm')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(236, 72, 153, 0.4)', background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', fontWeight: 600 }}>
             📞 CRM Llamadas
           </button>
-          <button onClick={() => navigate('/trainer-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(234, 179, 8, 0.4)', background: 'rgba(234, 179, 8, 0.1)', color: '#eab308', fontWeight: 600 }}>
-            🎓 Hub Entrenadores (Zen)
-          </button>
+
           {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
             <button
               onClick={() => {

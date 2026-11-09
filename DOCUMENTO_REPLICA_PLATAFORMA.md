@@ -21181,6 +21181,21 @@ console.log(xorDecrypt(b64, 'quantum2026'));
 
 ---
 
+## Archivo: .cursor/settings.json
+
+```json
+{
+  "plugins": {
+    "github": {
+      "enabled": true
+    }
+  }
+}
+
+```
+
+---
+
 ## Archivo: scratch_scripts/scratch_inject.js
 
 ```js
@@ -73465,7 +73480,6 @@ const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
 const MaestriaGlobalDashboard = lazy(() => import('./pages/MaestriaGlobalDashboard'));
-const TrainerZenHub = lazy(() => import('./pages/TrainerZenHub'));
 const QuantumTeamHub = lazy(() => import('./pages/QuantumTeamHub'));
 const HrCommandCenter = lazy(() => import('./pages/HrCommandCenter'));
 const LegalCommandCenter = lazy(() => import('./pages/LegalCommandCenter'));
@@ -73740,11 +73754,7 @@ function App() {
               <MaestriaGlobalDashboard />
             </RoleRoute>
           } />
-          <Route path="/trainer-hub" element={
-            <RoleRoute allowedRoles={['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']} requireSuperAdmin={false}>
-              <TrainerZenHub />
-            </RoleRoute>
-          } />
+          <Route path="/trainer-hub" element={<Navigate to="/home" replace />} />
           <Route path="/call-coach-crm" element={
             <RoleRoute allowedRoles={['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']} requireSuperAdmin={false}>
               <CallCoachCRM />
@@ -81810,7 +81820,6 @@ export const MODULE_REGISTRY = [
   { id: 'cfo-dashboard', label: 'Dirección Financiera Global', emoji: '🏦', route: '/cfo-dashboard', roles: null, visible: (u) => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'finance-workspace', label: 'Operativa Financiera', emoji: '💸', route: '/finance-workspace', roles: null, visible: (u) => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(u?.appRole) },
   { id: 'maestria-global', label: 'Comando Global Maestría', emoji: '🎯', route: '/maestria-global', roles: null, visible: (u) => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'trainer-hub', label: 'Academia y Hub de Entrenamiento', emoji: '🎓', route: '/trainer-hub', roles: null, visible: (u) => ['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'call-coach-crm', label: 'CRM Entrenadores de Llamadas', emoji: '📞', route: '/call-coach-crm', roles: null, visible: (u) => ['entrenador_llamadas', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'qt-hub', label: 'Hub Operativo QT', emoji: '⚡', route: '/qt-hub', roles: null, visible: (u) => ['qt', 'gerente', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
   { id: 'hr-command-center', label: 'HR Command Center', emoji: '🏢', route: '/hr-command-center', roles: null, visible: (u) => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
@@ -115281,7 +115290,6 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                     else if (r === 'coord_maestria_global') navigate('/andres-command-center');
                     else if (r === 'qt') navigate('/qt-hub');
                     else if (r === 'entrenador_llamadas') navigate('/call-coach-crm');
-                    else if (r === 'entrenador') navigate('/trainer-hub');
                     else navigate('/home');
                   }}
                   style={{
@@ -115466,7 +115474,6 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
                           else if (r === 'coord_maestria_global') targetRoute = '/andres-command-center';
                           else if (r === 'qt') targetRoute = '/qt-hub';
                           else if (r === 'entrenador_llamadas') targetRoute = '/call-coach-crm';
-                          else if (r === 'entrenador') targetRoute = '/trainer-hub';
                           navigate(targetRoute);
                           setTimeout(() => {
                             simulateUser(user);
@@ -144651,211 +144658,6 @@ export default function ReportesBoard() {
 
 ---
 
-## Archivo: src/pages/TrainerZenHub.jsx
-
-```javascript
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { getTrainerBriefing, getZeroEgoFeedback, acknowledgeFeedback, getComplementaryModules } from '../services/trainerService';
-import ChecklistBoard from './ChecklistBoard'; // Para el Multi-Rol contenedor
-import { toast } from 'react-hot-toast';
-import { 
-  Focus, MessageSquare, BookOpen, Clock, AlertTriangle, 
-  CheckCircle, ChevronLeft, Calendar, FileText, Lock
-} from 'lucide-react';
-
-export default function TrainerZenHub() {
-  const { currentUser } = useAuth();
-  const navigate = useNavigate();
-  
-  const [briefing, setBriefing] = useState(null);
-  const [feedbacks, setFeedbacks] = useState([]);
-  const [modules, setModules] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showLegacy, setShowLegacy] = useState(false); // Para Multi-Rol
-
-  // Zen Mode Trigger: Viernes(5), Sábado(6), Domingo(0)
-  const today = new Date().getDay();
-  const isWeekend = today === 5 || today === 6 || today === 0;
-
-  useEffect(() => {
-    async function loadData() {
-      const b = await getTrainerBriefing(currentUser?.sede);
-      const f = await getZeroEgoFeedback(currentUser?.email);
-      const m = await getComplementaryModules();
-      
-      setBriefing(b);
-      setFeedbacks(f);
-      setModules(m);
-      setLoading(false);
-    }
-    loadData();
-  }, [currentUser]);
-
-  const handleAcknowledge = async (id) => {
-    const success = await acknowledgeFeedback(id);
-    if (success) {
-      setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, acknowledged: true } : f));
-      toast.success('Feedback firmado y cerrado criptográficamente.', { icon: '🔒' });
-    }
-  };
-
-  if (loading) return <div style={{ padding: '2rem', color: '#fff' }}>Iniciando Hub de Entrenamiento...</div>;
-
-  return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#e5e5e5', fontFamily: 'var(--font-body)', paddingBottom: '4rem' }}>
-      
-      {/* HEADER ZEN MODE */}
-      <div style={{ background: isWeekend ? '#000' : '#111', padding: '1.5rem 3rem', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={() => navigate('/home')} style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}>
-            <ChevronLeft size={24} />
-          </button>
-          <div>
-            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 300, color: '#fff', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Focus size={24} color={isWeekend ? "#10b981" : "#888"} /> 
-              Hub de Entrenamiento {isWeekend && <span style={{ fontSize: '0.8rem', background: '#10b981', color: '#000', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>ZEN MODE</span>}
-            </h1>
-            <p style={{ margin: 0, color: '#666', fontSize: '0.85rem' }}>Instructor: {currentUser?.name || 'Entrenador'}</p>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: '1200px', margin: '2rem auto', padding: '0 2rem', display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem' }}>
-        
-        {/* COLUMNA PRINCIPAL */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          
-          {/* MÓDULO 1: BRIEFING DEL COORDINADOR */}
-          {briefing && (
-            <div style={{ background: '#151515', borderRadius: '8px', border: '1px solid #222', overflow: 'hidden' }}>
-              <div style={{ background: '#1a1a1a', padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid #222' }}>
-                <Calendar size={18} color="#38bdf8" />
-                <h2 style={{ margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: 500 }}>Briefing Operativo: Sede {briefing.sede}</h2>
-              </div>
-              <div style={{ padding: '1.5rem' }}>
-                <p style={{ margin: '0 0 1rem 0', color: '#aaa', fontSize: '0.9rem' }}>Actualizado por: {briefing.coordinatorName} ({new Date(briefing.updatedAt).toLocaleDateString()})</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div style={{ background: '#111', padding: '1rem', borderRadius: '6px', borderLeft: '3px solid #f59e0b' }}>
-                    <strong style={{ display: 'block', color: '#f59e0b', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px' }}>Temperatura del Grupo</strong>
-                    {briefing.temperature}
-                  </div>
-                  <div style={{ background: '#111', padding: '1rem', borderRadius: '6px', borderLeft: '3px solid #ef4444' }}>
-                    <strong style={{ display: 'block', color: '#ef4444', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px' }}>Perfiles Críticos</strong>
-                    {briefing.criticalProfiles}
-                  </div>
-                  <div style={{ background: '#111', padding: '1rem', borderRadius: '6px', borderLeft: '3px solid #10b981' }}>
-                    <strong style={{ display: 'block', color: '#10b981', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px' }}>Logística y Horarios</strong>
-                    {briefing.logisticNotes}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* MÓDULO 2: BUZÓN ZERO-EGO (MENTORÍA) */}
-          <div style={{ background: '#151515', borderRadius: '8px', border: '1px solid #222', overflow: 'hidden' }}>
-            <div style={{ background: '#1a1a1a', padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid #222' }}>
-              <MessageSquare size={18} color="#a855f7" />
-              <h2 style={{ margin: 0, fontSize: '1.1rem', color: '#fff', fontWeight: 500 }}>Feedback Direccional (Zero-Ego)</h2>
-            </div>
-            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {feedbacks.length === 0 ? (
-                <p style={{ color: '#666', textAlign: 'center', margin: '2rem 0' }}>No tienes feedback pendiente.</p>
-              ) : (
-                feedbacks.map(fbk => (
-                  <div key={fbk.id} style={{ background: fbk.acknowledged ? '#0a0a0a' : '#1a1423', border: fbk.acknowledged ? '1px solid #222' : '1px solid #4c1d95', borderRadius: '8px', padding: '1.5rem', opacity: fbk.acknowledged ? 0.6 : 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                      <div>
-                        <h3 style={{ margin: '0 0 4px 0', color: fbk.acknowledged ? '#888' : '#d8b4fe', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          {fbk.title}
-                          {fbk.acknowledged && <CheckCircle size={16} color="#10b981" />}
-                        </h3>
-                        <span style={{ fontSize: '0.8rem', color: '#666' }}>De: {fbk.from} | {new Date(fbk.date).toLocaleDateString()}</span>
-                      </div>
-                      {!fbk.acknowledged && <AlertTriangle size={20} color="#a855f7" />}
-                    </div>
-                    <p style={{ color: '#ccc', margin: '0 0 1.5rem 0', lineHeight: 1.6 }}>"{fbk.content}"</p>
-                    
-                    {!fbk.acknowledged && (
-                      <button 
-                        onClick={() => handleAcknowledge(fbk.id)}
-                        style={{ width: '100%', padding: '1rem', background: '#7e22ce', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 700, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', transition: 'background 0.2s' }}
-                        onMouseOver={e => e.currentTarget.style.background = '#6b21a8'}
-                        onMouseOut={e => e.currentTarget.style.background = '#7e22ce'}
-                      >
-                        <Lock size={16} /> ACEPTO Y APLICARÉ EN MI PRÓXIMA SALA
-                      </button>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-          
-          {/* MÓDULO: CONTENEDOR MULTI-ROL (LEGACY) */}
-          <div style={{ marginTop: '1rem' }}>
-            <button 
-              onClick={() => setShowLegacy(!showLegacy)}
-              style={{ width: '100%', background: '#111', border: '1px dashed #333', color: '#888', padding: '1rem', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }}
-              onMouseOver={e => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#666'; }}
-              onMouseOut={e => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#333'; }}
-            >
-              {showLegacy ? 'OCULTAR TAREAS ADMINISTRATIVAS' : 'MOSTRAR TAREAS DE GERENCIA / ADMINISTRACIÓN'}
-            </button>
-            {showLegacy && (
-              <div style={{ marginTop: '1rem', background: '#0a0a0a', border: '1px solid #222', borderRadius: '8px', padding: '1rem' }}>
-                <ChecklistBoard />
-              </div>
-            )}
-          </div>
-
-        </div>
-
-        {/* COLUMNA LATERAL */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          
-          {/* MÓDULO 3: GLOSARIO NEC (ESTÁNDAR) */}
-          <div style={{ background: '#151515', borderRadius: '8px', border: '1px solid #222', padding: '1.5rem' }}>
-            <h3 style={{ margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fca5a5' }}>
-              <BookOpen size={18} /> Estándar NEC y Legal
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ background: '#1a1a1a', border: '1px solid #333', padding: '1rem', borderRadius: '6px' }}>
-                <strong style={{ color: '#fff', fontSize: '0.85rem', display: 'block', marginBottom: '4px' }}>Ley de Oro: "Creación"</strong>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: '#888' }}>Sustituir el término "Transformación" por "Creación" (Tecnología NEC) en todo salón C1, C2 y MJ.</p>
-              </div>
-              <button style={{ width: '100%', padding: '0.8rem', background: 'transparent', color: '#38bdf8', border: '1px solid #38bdf8', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
-                <FileText size={16} /> Ver Contrato de Confidencialidad
-              </button>
-            </div>
-          </div>
-
-          {/* MÓDULO 4: CATÁLOGO COMPLEMENTARIOS */}
-          <div style={{ background: '#151515', borderRadius: '8px', border: '1px solid #222', padding: '1.5rem' }}>
-            <h3 style={{ margin: '0 0 1rem 0', color: '#10b981', fontSize: '1rem' }}>Módulos Complementarios Flexibles</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {modules.map(mod => (
-                <div key={mod.id} style={{ background: '#1a1a1a', padding: '0.75rem', borderRadius: '6px', borderLeft: '2px solid #10b981' }}>
-                  <div style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 500 }}>{mod.title}</div>
-                  <div style={{ color: '#666', fontSize: '0.75rem', marginTop: '4px' }}>{mod.duration} | {mod.focus}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
-```
-
----
-
 ## Archivo: src/pages/CausaOSTask.jsx
 
 ```javascript
@@ -163209,9 +163011,7 @@ export default function SuperAdminPanel() {
           <button onClick={() => navigate('/call-coach-crm')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(236, 72, 153, 0.4)', background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', fontWeight: 600 }}>
             📞 CRM Llamadas
           </button>
-          <button onClick={() => navigate('/trainer-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(234, 179, 8, 0.4)', background: 'rgba(234, 179, 8, 0.1)', color: '#eab308', fontWeight: 600 }}>
-            🎓 Hub Entrenadores (Zen)
-          </button>
+
           {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
             <button
               onClick={() => {
@@ -175571,17 +175371,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     route: '/andres-command-center',
     roles: ['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']
   },
-  {
-    id: 'opt-trainer-hub',
-    title: 'Academia y Hub de Entrenamiento Zen',
-    category: 'Entrenamiento',
-    badge: 'Zen Mode',
-    emoji: '🎓',
-    desc: 'Espacio minimalista para entrenadores de salón, briefing de sala y canal directo confidencial',
-    keywords: ['entrenador', 'academia de entrenadores', 'hub zen', 'salon', 'briefing', 'entrenamiento'],
-    route: '/trainer-hub',
-    roles: ['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']
-  },
+
   {
     id: 'opt-call-coach-crm',
     title: 'CRM Entrenadores de Llamadas',
@@ -177349,11 +177139,7 @@ export default function Home() {
                     📞 CRM Entrenadores Llamadas
                   </button>
                 )}
-                {hasRoleAccess(['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']) && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/trainer-hub'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#eab308', background: 'rgba(234, 179, 8, 0.1)' }}>
-                    🎓 Hub Entrenadores (Zen)
-                  </button>
-                )}
+
                 {isDataAdmin(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/legal-admin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
                     ⚖️ Auditoría Legal
@@ -177550,11 +177336,7 @@ export default function Home() {
               📞 CRM Llamadas
             </ModuleHelpButton>
           )}
-          {hasRoleAccess(['entrenador', 'direccion', 'superadmin', 'ceo', 'director_maestria']) && (
-            <ModuleHelpButton helpKey="entrenador" onClick={() => navigate('/trainer-hub')} className="home-module-card">
-              🎓 Hub Entrenador
-            </ModuleHelpButton>
-          )}
+
           {isDataAdmin(currentUser) && (
             <ModuleHelpButton helpKey="auditoriaLegal" onClick={() => navigate('/legal-admin')} className="home-module-card">
               ⚖️ Auditoría Legal
@@ -203981,113 +203763,6 @@ export async function pingNodusApi(apiKey) {
     sedesDisponibles: res.ok && Array.isArray(res.data) ? res.data.length : 0,
     error: res.error || null
   };
-}
-
-```
-
----
-
-## Archivo: src/services/trainerService.js
-
-```js
-import { collection, getDocs, doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from './firebase';
-
-// ============================================================================
-// SERVICIO PARA ENTRENADORES DE SALÓN (C1, C2, MJ)
-// ============================================================================
-
-/**
- * Obtiene el Feedback "Zero-Ego" Direccional.
- * Este feedback es estrictamente entre Dirección y el Entrenador.
- */
-export async function getZeroEgoFeedback(trainerEmail) {
-  // En producción, consulta a 'directional_feedback' where trainerEmail == email
-  // Mockeamos la data según el PRD
-  
-  const mockData = [
-    {
-      id: 'fbk_001',
-      trainer: 'alonso',
-      title: 'Estructura Conversacional',
-      content: 'Alonso, recuerda anclar el cierre de la dinámica de los botes salvavidas con la teoría NEC antes del break. La energía bajó en Lima la semana pasada. Aplica el ajuste.',
-      date: '2026-09-30T10:00:00Z',
-      acknowledged: false,
-      from: 'Dirección General'
-    },
-    {
-      id: 'fbk_002',
-      trainer: 'mike',
-      title: 'Postura y Pulcritud',
-      content: 'Mike, necesitamos mayor rigurosidad en la vestimenta del domingo de C2. Eres la máxima autoridad de la sala. Código de vestimenta oficial estricto, sin excepciones.',
-      date: '2026-10-01T08:30:00Z',
-      acknowledged: false,
-      from: 'Dirección General'
-    },
-    {
-      id: 'fbk_003',
-      trainer: 'cirilo',
-      title: 'Ortografía en Proyecciones',
-      content: 'Cirilo, se reportaron errores ortográficos en los slides de las 4 Fases en Ecuador. El léxico debe ser impecable. Revisa la presentación antes de conectarla.',
-      date: '2026-09-28T14:15:00Z',
-      acknowledged: true, // Ya lo reconoció
-      from: 'Dirección General'
-    }
-  ];
-
-  if (!trainerEmail) return [];
-
-  // Filtrado simulado para el usuario activo (en MVP mostramos si coincide el nombre en el email)
-  const relevantMock = mockData.filter(m => trainerEmail.toLowerCase().includes(m.trainer));
-  
-  // Si no hay específicos (porque es Fer Aragón, Andrés o Marcos), devolvemos uno genérico de prueba
-  if (relevantMock.length === 0) {
-    return [{
-      id: `fbk_gen_${Date.now()}`,
-      title: 'Calibración NEC Global',
-      content: 'Recuerda que la "Transformación" ya no es el concepto oficial. Toda narrativa en salón debe girar en torno a la "Creación de Poder sin Límites" (Tecnología NEC). Adapta tu discurso en la apertura.',
-      date: new Date().toISOString(),
-      acknowledged: false,
-      from: 'Dirección Académica'
-    }];
-  }
-
-  return relevantMock;
-}
-
-export async function acknowledgeFeedback(feedbackId) {
-  try {
-    // Si estuviéramos en producción real:
-    // await updateDoc(doc(db, 'directional_feedback', feedbackId), {
-    //   acknowledged: true,
-    //   acknowledgedAt: serverTimestamp()
-    // });
-    
-    return true; // Mock success
-  } catch (error) {
-    console.error("Error reconociendo feedback:", error);
-    return false;
-  }
-}
-
-/**
- * Obtiene el Briefing de Sesión del Coordinador
- */
-export async function getTrainerBriefing(sede) {
-  return null;
-}
-
-/**
- * Catálogo de Entrenamientos Complementarios
- */
-export async function getComplementaryModules() {
-  return [
-    { id: 'm1', title: 'Módulo de Liderazgo Cuántico', duration: '4h', level: 'Avanzado', focus: 'Identidad y Postura' },
-    { id: 'm2', title: 'Neuroventas y Cierre (Vende sin Vender)', duration: '8h', level: 'Intermedio', focus: 'Enrolamiento' },
-    { id: 'm3', title: 'Inteligencia Financiera NEC', duration: '6h', level: 'Básico', focus: 'Finanzas Personales' },
-    { id: 'm4', title: 'Sanación de Relaciones Causa-Efecto', duration: '5h', level: 'Profundo', focus: 'Vulnerabilidad y Perdón' },
-    { id: 'm5', title: 'Mastermind: Arquitectura de Metas', duration: '4h', level: 'Avanzado', focus: 'Planificación' },
-  ];
 }
 
 ```
