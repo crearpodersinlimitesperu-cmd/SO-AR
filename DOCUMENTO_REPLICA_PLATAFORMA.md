@@ -90452,7 +90452,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                   : 'Datos locales • Sin confirmar'}
             </span>
             <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-              699 Managers • 34 Entrenadores • 5,402 Llamadas
+              {statsGlobal.totalManagers.toLocaleString('en-US')} Managers • {processedTrainers.length} Entrenadores • {statsGlobal.totalLlamadas.toLocaleString('en-US')} Llamadas
             </span>
           </div>
 
@@ -90460,7 +90460,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             Auditoría Ejecutiva: Llamadas, Graduados y Deserción
           </h2>
           <p style={{ margin: '0.4rem 0 0 0', color: '#cbd5e1', fontSize: '0.92rem', maxWidth: '720px' }}>
-            Monitoreo en tiempo real de llamadas ($77,550 USD), rendimiento de retención (Graduados vs. Desertores), asignaciones de entrenadores y matriz de 1 a 16 llamadas.
+            Monitoreo en tiempo real de llamadas (${statsGlobal.montoTotal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} USD), rendimiento de retención (Graduados vs. Desertores), asignaciones de entrenadores y matriz de 1 a 16 llamadas.
           </p>
         </div>
 
@@ -118976,10 +118976,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       if (name.includes('factura') || email.includes('factura')) return false;
 
       // Debe ser un coordinador de C1 o C2 con llamadas reales o equipos asignados
-      const hasC1C2Calls = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0);
+      const hasC1C2Calls = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0 || Number(c.asignados) > 0 || Number(c.asistieron) > 0);
       const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
 
-      return hasC1C2Calls && hasEquipos;
+      return hasC1C2Calls || hasEquipos;
     }).map(c => {
       let sentadosC1 = c.sentadosC1;
       let sentadosC2 = c.sentadosC2;

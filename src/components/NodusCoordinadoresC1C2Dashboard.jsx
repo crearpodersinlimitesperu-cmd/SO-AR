@@ -326,10 +326,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       if (name.includes('factura') || email.includes('factura')) return false;
 
       // Debe ser un coordinador de C1 o C2 con llamadas reales o equipos asignados
-      const hasC1C2Calls = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0);
+      const hasC1C2Calls = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0 || Number(c.asignados) > 0 || Number(c.asistieron) > 0);
       const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
 
-      return hasC1C2Calls && hasEquipos;
+      return hasC1C2Calls || hasEquipos;
     }).map(c => {
       let sentadosC1 = c.sentadosC1;
       let sentadosC2 = c.sentadosC2;
