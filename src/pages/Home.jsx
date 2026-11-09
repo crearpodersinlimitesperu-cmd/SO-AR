@@ -703,17 +703,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: ['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']
   },
 
-  {
-    id: 'opt-call-coach-crm',
-    title: 'CRM Entrenadores de Llamadas',
-    category: 'Llamadas',
-    badge: 'Llamadas y Enrolamiento',
-    emoji: '📞',
-    desc: 'Seguimiento de metas, efectividad de llamadas y enrolamiento en tiempo real con Coordinación MJ',
-    keywords: ['llamadas', 'entrenador de llamadas', 'crm llamadas', 'enrolamiento', 'metas llamadas', 'coordinador mj'],
-    route: '/call-coach-crm',
-    roles: ['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']
-  },
+
   {
     id: 'opt-qt-hub',
     title: 'Hub Operativo Pit-Stop Quantum Team (QT)',
@@ -2465,11 +2455,7 @@ export default function Home() {
                     ⚡ Hub Pit-Stop QT
                   </button>
                 )}
-                {hasRoleAccess(['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']) && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/call-coach-crm'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ec4899', background: 'rgba(236, 72, 153, 0.1)' }}>
-                    📞 CRM Entrenadores Llamadas
-                  </button>
-                )}
+
 
                 {isDataAdmin(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/legal-admin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
@@ -2662,11 +2648,7 @@ export default function Home() {
               ⚡ Hub QT
             </ModuleHelpButton>
           )}
-          {hasRoleAccess(['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']) && (
-            <ModuleHelpButton helpKey="llamadas" onClick={() => navigate('/call-coach-crm')} className="home-module-card">
-              📞 CRM Llamadas
-            </ModuleHelpButton>
-          )}
+
 
           {isDataAdmin(currentUser) && (
             <ModuleHelpButton helpKey="auditoriaLegal" onClick={() => navigate('/legal-admin')} className="home-module-card">

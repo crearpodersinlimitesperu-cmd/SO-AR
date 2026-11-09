@@ -1537,9 +1537,7 @@ export default function SuperAdminPanel() {
           <button onClick={() => navigate('/qt-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(249, 115, 22, 0.4)', background: 'rgba(249, 115, 22, 0.1)', color: '#f97316', fontWeight: 600 }}>
             ⚡ Hub Pit-Stop QT
           </button>
-          <button onClick={() => navigate('/call-coach-crm')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(236, 72, 153, 0.4)', background: 'rgba(236, 72, 153, 0.1)', color: '#ec4899', fontWeight: 600 }}>
-            📞 CRM Llamadas
-          </button>
+
 
           {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
             <button

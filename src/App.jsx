@@ -19,7 +19,6 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import Home from './pages/Home';
 import CentroManagers from './pages/CentroManagers';
 import SuperAdminPanel from './pages/SuperAdminPanel';
-import CallCoachCRM from './pages/CallCoachCRM';
 import GuiaAliadosC1 from './pages/GuiaAliadosC1';
 import ContrasteNodusSheets from './pages/ContrasteNodusSheets';
 
@@ -302,11 +301,7 @@ function App() {
             </RoleRoute>
           } />
           <Route path="/trainer-hub" element={<Navigate to="/home" replace />} />
-          <Route path="/call-coach-crm" element={
-            <RoleRoute allowedRoles={['entrenador_llamadas', 'direccion', 'superadmin', 'ceo', 'coordinador_mj', 'coord_maestria']} requireSuperAdmin={false}>
-              <CallCoachCRM />
-            </RoleRoute>
-          } />
+          <Route path="/call-coach-crm" element={<Navigate to="/home" replace />} />
           <Route path="/qt-hub" element={
             <RoleRoute allowedRoles={['qt', 'gerente', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
               <QuantumTeamHub />
