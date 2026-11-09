@@ -62,3 +62,41 @@ test('Nodus FI Diagnostico: Paridad multisede y filtrado por sede', () => {
   assert.ok(sedesEncontradas.has('cuenca'), 'Debe incluir Cuenca');
   assert.ok(sedesEncontradas.has('guayaquil'), 'Debe incluir Guayaquil');
 });
+
+test('Nodus FI Anti-Falsificación: Detección y purga de placeholders genéricos', async () => {
+  const { isSyntheticPlaceholder, evaluarCalidadOntologicaFI } = await import('../src/services/nodusFIAgent.js');
+
+  // 1. Textos genéricos falsos deben ser detectados como synthetic
+  assert.strictEqual(
+    isSyntheticPlaceholder('Estándar superior alcanzado y validado en Nodus Maestría del Juego'),
+    true,
+    'Debe detectar placeholder de Salud'
+  );
+  assert.strictEqual(
+    isSyntheticPlaceholder('Meta financiera cuantificable aprobada y en seguimiento de 90 días'),
+    true,
+    'Debe detectar placeholder de Finanzas'
+  );
+  assert.strictEqual(
+    isSyntheticPlaceholder('Liderazgo transformacional y resultados de alto impacto'),
+    true,
+    'Debe detectar placeholder de Relaciones'
+  );
+
+  // 2. Metas reales auténticas NO deben ser detectadas como synthetic
+  assert.strictEqual(
+    isSyntheticPlaceholder('Reducir 10kg de grasa corporal y entrenar 5 veces por semana con plan medido'),
+    false,
+    'Meta real no debe ser synthetic'
+  );
+  assert.strictEqual(
+    isSyntheticPlaceholder('Facturar $15,000 USD mensuales netos en mi negocio de consultoría'),
+    false,
+    'Meta real cuantificable no debe ser synthetic'
+  );
+
+  // 3. Evaluar calidad ontológica de placeholder sintético debe resultar en NO_PRESENTADO
+  const evalPlaceholder = evaluarCalidadOntologicaFI('Salud', 'Salud', 'Estándar superior alcanzado y validado en Nodus Maestría del Juego');
+  assert.strictEqual(evalPlaceholder.nivel, 'NO_PRESENTADO', 'Placeholder sintético debe ser catalogado como NO_PRESENTADO');
+  assert.strictEqual(evalPlaceholder.puntaje, 0, 'Puntaje de placeholder debe ser 0');
+});

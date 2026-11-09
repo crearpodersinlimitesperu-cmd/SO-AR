@@ -20,6 +20,7 @@ import {
   ejecutarDiagnosticoFIs, 
   evaluarCalidadOntologicaFI, 
   normalizarTexto,
+  isSyntheticPlaceholder,
   PROMPT_MAESTRO_AUDITORIA_3_RI,
   GUIA_PROPOSITO_3_CAPAS_RI,
   generarPromptParaParticipante,
@@ -175,6 +176,9 @@ export default function FuturosImposiblesView({
   const [modalOpen, setModalOpen] = useState(false);
   const [activeAreaTab, setActiveAreaTab] = useState(0);
   const [mentorNote, setMentorNote] = useState('');
+  const [editingMetaMap, setEditingMetaMap] = useState({});
+  const [isCheckingLiveNodus, setIsCheckingLiveNodus] = useState(false);
+  const [liveNodusStatus, setLiveNodusStatus] = useState(null);
 
   // Estados para Asistente IA, Prompt Maestro y Guía de Propósito
   const [showPromptModal, setShowPromptModal] = useState(false);
@@ -257,13 +261,43 @@ export default function FuturosImposiblesView({
     const rawFis = participant.fis || [];
     // Directiva de Alta Dirección (Tecnología NEC): Evaluación de exactamente 3 Resultados Imposibles de estándar superior
     const activeFis = rawFis.slice(0, 3);
-    const fis = activeFis.map((fi, areaIndex) => {
-      const review = reviewOverrides[`${participant.id}__${areaIndex}`];
-      return review ? { ...fi, estado: review.estado, feedback: review.feedback || fi.feedback } : fi;
-    });
-
     const cleanDni = String(participant.dni || '').replace(/\D/g, '');
     const cleanName = normSearch(participant.nombre);
+
+    const defaultAreas = ['Salud & Vitalidad', 'Finanzas & Riqueza', 'Relaciones & Familia'];
+    const paddedFis = [...activeFis];
+    while (paddedFis.length < 3) {
+      paddedFis.push({
+        area: defaultAreas[paddedFis.length] || `Resultado Imposible ${paddedFis.length + 1}`,
+        meta: '',
+        estado: 'no_presentado',
+        feedback: ''
+      });
+    }
+
+    const fis = paddedFis.slice(0, 3).map((fi, areaIndex) => {
+      const reviewKey = `${participant.id}__${areaIndex}`;
+      const review = reviewOverrides[reviewKey] || (cleanDni ? reviewOverrides[`${cleanDni}__${areaIndex}`] : null);
+      
+      let meta = (review?.meta !== undefined ? review.meta : fi.meta) || '';
+      // Purga absoluta de textos genéricos/sintéticos: si es placeholder, es cadena vacía (sin redacción real)
+      if (isSyntheticPlaceholder(meta)) {
+        meta = '';
+      }
+      
+      const hasRealMeta = Boolean(meta.trim());
+      const estado = review?.estado || (hasRealMeta ? fi.estado : 'no_presentado');
+      const feedback = review?.feedback || (hasRealMeta ? fi.feedback : '') || '';
+
+      return {
+        ...fi,
+        area: fi.area || defaultAreas[areaIndex],
+        titulo: fi.titulo || `Resultado Imposible ${areaIndex + 1}: ${defaultAreas[areaIndex]}`,
+        meta,
+        estado: hasRealMeta ? estado : 'no_presentado',
+        feedback
+      };
+    });
 
     // Resolución determinista de equipo oficial
     let resolvedEquipo = cleanTeamCode(participant.equipo);
@@ -284,46 +318,12 @@ export default function FuturosImposiblesView({
     }
     resolvedEquipo = resolvedEquipo || 'Sin Equipo';
     
-    // Inmutabilidad: Preservamos el universo histórico pero auditamos estrictamente sobre el estándar de 3 Resultados
-    let effectiveFis = fis;
-    if ((!effectiveFis || effectiveFis.length === 0) && Number(participant.aprobados) >= 3) {
-      effectiveFis = [
-        {
-          titulo: 'Resultado Imposible 1: Salud & Vitalidad',
-          area: 'Salud & Vitalidad',
-          meta: 'Estándar superior alcanzado y validado en Nodus Maestría del Juego',
-          estado: 'aprobado',
-          feedback: 'Aprobado por el Mentor en Maestría del Juego (Nodus).'
-        },
-        {
-          titulo: 'Resultado Imposible 2: Finanzas & Riqueza',
-          area: 'Finanzas & Riqueza',
-          meta: 'Meta financiera cuantificable aprobada y en seguimiento de 90 días',
-          estado: 'aprobado',
-          feedback: 'Aprobado por el Mentor en Maestría del Juego (Nodus).'
-        },
-        {
-          titulo: 'Resultado Imposible 3: Relaciones & Liderazgo',
-          area: 'Relaciones & Familia',
-          meta: 'Liderazgo transformacional y resultados de alto impacto',
-          estado: 'aprobado',
-          feedback: 'Aprobado por el Mentor en Maestría del Juego (Nodus).'
-        }
-      ];
-    }
-    const hasFiDetail = effectiveFis.length > 0;
-    const total3 = hasFiDetail 
-      ? effectiveFis.filter((fi) => fi.estado !== 'no_presentado' && (fi.meta || '').trim()).length 
-      : Math.min(Number(participant.totalFi) || 0, 3);
-    const aprobados3 = hasFiDetail 
-      ? effectiveFis.filter((fi) => fi.estado === 'aprobado').length 
-      : Math.min(Number(participant.aprobados) || 0, 3);
-    const pendientes3 = hasFiDetail 
-      ? effectiveFis.filter((fi) => fi.estado === 'pendiente').length 
-      : Math.min(Number(participant.pendientes) || 0, 3);
-    const devueltos3 = hasFiDetail 
-      ? effectiveFis.filter((fi) => fi.estado === 'devuelto').length 
-      : Math.min(Number(participant.devueltos) || 0, 3);
+    // Veracidad total: las métricas se computan exclusivamente sobre declaraciones auténticas
+    const effectiveFis = fis;
+    const total3 = effectiveFis.filter((fi) => fi.estado !== 'no_presentado' && (fi.meta || '').trim().length > 0).length;
+    const aprobados3 = effectiveFis.filter((fi) => fi.estado === 'aprobado' && (fi.meta || '').trim().length > 0).length;
+    const pendientes3 = effectiveFis.filter((fi) => fi.estado === 'pendiente' && (fi.meta || '').trim().length > 0).length;
+    const devueltos3 = effectiveFis.filter((fi) => fi.estado === 'devuelto' && (fi.meta || '').trim().length > 0).length;
 
     return {
       ...participant,
@@ -433,9 +433,101 @@ export default function FuturosImposiblesView({
     setSelectedParticipant(participant);
     setActiveAreaTab(0);
     setMentorNote(participant.fis?.[0]?.feedback || '');
+    setEditingMetaMap({
+      0: participant.fis?.[0]?.meta || '',
+      1: participant.fis?.[1]?.meta || '',
+      2: participant.fis?.[2]?.meta || ''
+    });
+    setLiveNodusStatus(null);
     setIaEvaluation(null);
     setCopiedPrompt(false);
     setModalOpen(true);
+  };
+
+  const handleSaveMetaDeclarada = async (idx) => {
+    if (!selectedParticipant) return;
+    const partId = selectedParticipant.id;
+    const cleanDni = String(selectedParticipant.dni || '').replace(/\D/g, '');
+    const area = selectedParticipant.fis?.[idx] || {};
+    const metaTexto = (editingMetaMap[idx] || '').trim();
+
+    if (!metaTexto) {
+      triggerToast('Ingresa el texto de la meta declarada antes de guardar', 'warning');
+      return;
+    }
+
+    const reviewId = `${partId}__${idx}`;
+    try {
+      await setDoc(doc(db, 'nodus_fi_reviews', reviewId), {
+        participantId: partId,
+        identificacion: cleanDni,
+        participantName: selectedParticipant.nombre || '',
+        sede: selectedParticipant.sede || '',
+        equipo: selectedParticipant.equipo || '',
+        areaIndex: idx,
+        area: area.area || '',
+        meta: metaTexto,
+        estado: 'pendiente',
+        feedback: mentorNote || 'Meta declarada y registrada para seguimiento en Causa OS.',
+        reviewedByEmail: currentUser?.email || '',
+        reviewedByName: currentUser?.name || '',
+        reviewedAt: serverTimestamp(),
+        source: 'causa_os_manual_entry'
+      }, { merge: true });
+
+      const currentFis = Array.isArray(selectedParticipant.fis) ? selectedParticipant.fis : [];
+      const updatedFis = currentFis.map((f, i) => i === idx ? { ...f, meta: metaTexto, estado: 'pendiente' } : f);
+      const newTotal = updatedFis.filter(f => f.meta && f.meta.trim().length > 0).length;
+      setSelectedParticipant(prev => ({
+        ...prev,
+        fis: updatedFis,
+        totalFi: newTotal
+      }));
+
+      triggerToast(`Resultado ${idx + 1} guardado y persistido en Causa OS`, 'success');
+    } catch (err) {
+      console.error('Error al guardar meta:', err);
+      triggerToast('Error al persistir la meta en base de datos', 'error');
+    }
+  };
+
+  const handleCheckNodusLive = async () => {
+    if (!selectedParticipant) return;
+    const cleanDni = String(selectedParticipant.dni || '').replace(/\D/g, '');
+    if (!cleanDni) {
+      triggerToast('El participante no tiene DNI registrado', 'warning');
+      return;
+    }
+    setIsCheckingLiveNodus(true);
+    setLiveNodusStatus(null);
+    try {
+      const res = await fetch(`https://imo.crearpslglobal.com/api/participante?identificacion=${cleanDni}`, {
+        headers: { 'x-api-key': '7VEBgG3zFHRC1m28yDLsfwUhvukq0KWdQaliSPNt' }
+      });
+      const json = await res.json();
+      if (json.ok && json.data) {
+        setLiveNodusStatus({
+          found: true,
+          data: json.data,
+          msg: `Participante verificado en NODUS: ${json.data.nombres} ${json.data.apellidos} · Equipo: ${json.data.equipo_actual?.nombre || 'Sin equipo'} · Sede: ${json.data.sede?.nombre || 'Sin sede'}.`
+        });
+        triggerToast('Datos del participante verificados en NODUS en vivo', 'success');
+      } else {
+        setLiveNodusStatus({
+          found: false,
+          msg: 'No se encontró registro activo en la API oficial de NODUS con este DNI.'
+        });
+        triggerToast('No se encontró el participante en NODUS', 'warning');
+      }
+    } catch (err) {
+      setLiveNodusStatus({
+        found: false,
+        msg: 'No se pudo conectar con la API de Nodus en este momento.'
+      });
+      triggerToast('Error de conexión con NODUS', 'error');
+    } finally {
+      setIsCheckingLiveNodus(false);
+    }
   };
 
   const handleCopiarPromptParticipante = async () => {
@@ -477,6 +569,13 @@ export default function FuturosImposiblesView({
     const areaIdx = activeAreaTab;
     const area = selectedParticipant.fis?.[areaIdx] || {};
     const reviewId = `${partId}__${areaIdx}`;
+
+    const currentMetaText = (editingMetaMap[areaIdx] !== undefined ? editingMetaMap[areaIdx] : (area.meta || '')).trim();
+    if (estado === 'aprobado' && (!currentMetaText || isSyntheticPlaceholder(currentMetaText))) {
+      triggerToast('No se puede certificar como Aprobado un Resultado Imposible sin una declaración redactada y medible.', 'warning');
+      return;
+    }
+
     const feedback = mentorNote.trim() || (estado === 'aprobado'
       ? 'Meta aprobada y certificada por Mentor.'
       : 'Devuelto para ajuste: requiere métricas cuantificables y fecha límite.');
@@ -488,6 +587,7 @@ export default function FuturosImposiblesView({
         equipo: selectedParticipant.equipo || '',
         areaIndex: areaIdx,
         area: area.area || '',
+        meta: currentMetaText,
         estado,
         feedback,
         reviewedByEmail: currentUser?.email || '',
@@ -501,6 +601,7 @@ export default function FuturosImposiblesView({
         participantName: selectedParticipant.nombre || '',
         areaIndex: areaIdx,
         area: area.area || '',
+        meta: currentMetaText,
         estado,
         feedback,
         actorEmail: currentUser?.email || '',
@@ -515,17 +616,18 @@ export default function FuturosImposiblesView({
             { area: 'Finanzas & Riqueza', meta: '', estado: 'no_presentado' },
             { area: 'Relaciones & Familia', meta: '', estado: 'no_presentado' }
           ];
-      const updatedFis = currentFis.map((fi, index) => index === areaIdx ? { ...fi, estado, feedback } : fi);
-      const newAprobados = updatedFis.filter((f) => f.estado === 'aprobado').length;
-      const newPendientes = updatedFis.filter((f) => f.estado === 'pendiente').length;
+      const updatedFis = currentFis.map((fi, index) => index === areaIdx ? { ...fi, meta: currentMetaText, estado, feedback } : fi);
+      const newAprobados = updatedFis.filter((f) => f.estado === 'aprobado' && f.meta && !isSyntheticPlaceholder(f.meta)).length;
+      const newPendientes = updatedFis.filter((f) => f.estado === 'pendiente' && f.meta && !isSyntheticPlaceholder(f.meta)).length;
       const newDevueltos = updatedFis.filter((f) => f.estado === 'devuelto').length;
+      const newTotal = updatedFis.filter(f => f.meta && f.meta.trim().length > 0 && !isSyntheticPlaceholder(f.meta)).length;
       const updated = {
         ...selectedParticipant,
         fis: updatedFis,
+        totalFi: newTotal,
         aprobados: newAprobados,
         pendientes: newPendientes,
-        devueltos: newDevueltos,
-        totalFi: updatedFis.length
+        devueltos: newDevueltos
       };
       setSelectedParticipant(updated);
       triggerToast(estado === 'aprobado' ? `FI "${area.area}" aprobado y auditado.` : 'FI devuelto y registrado en la trazabilidad.', estado === 'aprobado' ? 'success' : 'warning');
@@ -1615,8 +1717,8 @@ export default function FuturosImposiblesView({
             <div style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
               {/* BANNER DE REGLA DE AVANCE: EXACTAMENTE 3 RESULTADOS IMPOSIBLES */}
               <div style={{
-                background: selectedParticipant.aprobados === 3 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                border: `1px solid ${selectedParticipant.aprobados === 3 ? '#10b981' : '#f59e0b'}`,
+                background: selectedParticipant.aprobados === 3 ? 'rgba(16, 185, 129, 0.12)' : (selectedParticipant.totalFi === 0 ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)'),
+                border: `1px solid ${selectedParticipant.aprobados === 3 ? '#10b981' : (selectedParticipant.totalFi === 0 ? '#ef4444' : '#f59e0b')}`,
                 borderRadius: '8px',
                 padding: '0.75rem 1rem',
                 marginBottom: '1.25rem',
@@ -1626,15 +1728,55 @@ export default function FuturosImposiblesView({
                 flexWrap: 'wrap',
                 gap: '0.5rem'
               }}>
-                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: selectedParticipant.aprobados === 3 ? '#10b981' : '#f59e0b' }}>
-                  {selectedParticipant.aprobados === 3
-                    ? '🚀 HABILITADO PARA AVANZAR: Cumple con exactamente 3 Resultados Imposibles aprobados.'
-                    : `🔒 AVANCE BLOQUEADO: Requiere exactamente 3 Resultados Imposibles aprobados para avanzar (actualmente ${selectedParticipant.aprobados}/3).`}
+                <div>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 800, color: selectedParticipant.aprobados === 3 ? '#10b981' : (selectedParticipant.totalFi === 0 ? '#ef4444' : '#f59e0b'), marginBottom: '0.2rem' }}>
+                    {selectedParticipant.aprobados === 3
+                      ? '🚀 HABILITADO PARA AVANZAR: Cumple con exactamente 3 Resultados Imposibles aprobados.'
+                      : selectedParticipant.totalFi === 0
+                      ? '⚠️ PENDIENTE DE DECLARACIÓN: El participante aún no ha registrado sus Resultados Imposibles en Nodus (imo.crearpslglobal.com/futurosimposibles).'
+                      : `🔒 AVANCE BLOQUEADO: Requiere exactamente 3 Resultados Imposibles aprobados para avanzar (actualmente ${selectedParticipant.aprobados}/3).`}
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: textMuted }}>
+                    Inmutabilidad: Auditoría veraz de declaraciones reales sin frases genéricas ni inventadas.
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: textMuted }}>
-                  Inmutabilidad: Registros históricos de ciclos previos preservados en base de datos.
-                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCheckNodusLive}
+                  disabled={isCheckingLiveNodus}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    background: 'rgba(56, 189, 248, 0.12)',
+                    border: '1px solid rgba(56, 189, 248, 0.3)',
+                    color: '#38bdf8',
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {isCheckingLiveNodus ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                  Verificar en NODUS en Vivo
+                </button>
               </div>
+
+              {liveNodusStatus && (
+                <div style={{
+                  background: liveNodusStatus.found ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                  border: `1px solid ${liveNodusStatus.found ? '#10b981' : '#ef4444'}`,
+                  borderRadius: '8px',
+                  padding: '0.65rem 0.9rem',
+                  marginBottom: '1.25rem',
+                  fontSize: '0.78rem',
+                  color: liveNodusStatus.found ? '#6ee7b7' : '#fca5a5'
+                }}>
+                  {liveNodusStatus.msg}
+                </div>
+              )}
 
               {/* Badges de estado general */}
               <div style={{ 
@@ -1666,12 +1808,14 @@ export default function FuturosImposiblesView({
                 const fallbackAreas = ['Salud & Vitalidad', 'Finanzas & Riqueza', 'Relaciones & Familia'];
                 const rawFis = Array.isArray(selectedParticipant.fis) ? selectedParticipant.fis : [];
                 const participantFis = [0, 1, 2].map((idx) => {
-                  if (rawFis[idx]) return rawFis[idx];
+                  const item = rawFis[idx] || {};
+                  const currentMeta = editingMetaMap[idx] !== undefined ? editingMetaMap[idx] : (item.meta || '');
+                  const cleanMeta = isSyntheticPlaceholder(currentMeta) ? '' : currentMeta;
                   return {
-                    area: fallbackAreas[idx] || `Resultado Imposible ${idx + 1}`,
-                    meta: '',
-                    estado: 'no_presentado',
-                    feedback: ''
+                    area: item.area || fallbackAreas[idx] || `Resultado Imposible ${idx + 1}`,
+                    meta: cleanMeta,
+                    estado: cleanMeta ? item.estado : 'no_presentado',
+                    feedback: item.feedback || ''
                   };
                 });
 
@@ -1702,15 +1846,15 @@ export default function FuturosImposiblesView({
                     }}>
                       {participantFis.map((fi, idx) => {
                         const isActive = activeAreaTab === idx;
-                        const isApr = fi.estado === 'aprobado';
-                        const isPen = fi.estado === 'pendiente';
-                        const isDev = fi.estado === 'devuelto';
-                        const isNoPres = fi.estado === 'no_presentado' || !fi.meta;
+                        const isNoPres = fi.estado === 'no_presentado' || !fi.meta || isSyntheticPlaceholder(fi.meta);
+                        const isApr = fi.estado === 'aprobado' && !isNoPres;
+                        const isPen = fi.estado === 'pendiente' && !isNoPres;
+                        const isDev = fi.estado === 'devuelto' && !isNoPres;
 
                         const badgeBg = isApr ? 'rgba(16, 185, 129, 0.15)' : isPen ? 'rgba(245, 158, 11, 0.15)' : isDev ? 'rgba(234, 88, 12, 0.15)' : 'rgba(100, 116, 139, 0.15)';
                         const badgeBorder = isApr ? '#10b981' : isPen ? '#f59e0b' : isDev ? '#ea580c' : '#64748b';
                         const badgeColor = isApr ? '#10b981' : isPen ? '#f59e0b' : isDev ? '#ea580c' : '#94a3b8';
-                        const badgeText = isApr ? 'Aprobado' : isPen ? 'Pendiente' : isDev ? 'Devuelto' : 'Sin Registro';
+                        const badgeText = isApr ? 'Aprobado' : isPen ? 'Pendiente' : isDev ? 'Devuelto' : 'Sin Redacción';
 
                         return (
                           <div
@@ -2044,7 +2188,7 @@ export default function FuturosImposiblesView({
                       </span>
                     </div>
 
-                    {/* Texto de la Meta */}
+                    {/* Declaración Real del Participante (Meta Cuantificable) */}
                     <div style={{ 
                       background: 'rgba(0, 0, 0, 0.25)', 
                       border: `1px solid ${borderLight}`, 
@@ -2052,25 +2196,69 @@ export default function FuturosImposiblesView({
                       padding: '1.1rem',
                       marginBottom: '1.25rem' 
                     }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: textMuted, marginBottom: '0.35rem' }}>
-                        TEXTO REGISTRADO EN NODUS:
-                      </div>
-                      {isNoPresentado ? (
-                        <div style={{ color: '#ef4444', fontStyle: 'italic', fontSize: '0.88rem' }}>
-                          🚨 El participante aún no ha redactado ni cargado su Resultado Imposible para esta meta en la plataforma oficial.
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#38bdf8' }}>
+                          DECLARACIÓN REAL DEL PARTICIPANTE (META CUANTIFICABLE):
                         </div>
-                      ) : (
-                        <div>
-                          {fi.titulo && (
-                            <div style={{ fontWeight: 700, color: '#38bdf8', marginBottom: '0.35rem', fontSize: '0.95rem' }}>
-                              {fi.titulo}
-                            </div>
-                          )}
-                          <div style={{ fontSize: '0.9rem', color: textDark, lineHeight: 1.5 }}>
-                            "{fi.meta}"
-                          </div>
+                        {editingMetaMap[activeAreaTab] !== undefined && editingMetaMap[activeAreaTab] !== (fi.meta || '') && (
+                          <span style={{ fontSize: '0.72rem', color: '#f59e0b', fontWeight: 700 }}>
+                            ● Cambios sin guardar
+                          </span>
+                        )}
+                      </div>
+
+                      {isNoPresentado && !(editingMetaMap[activeAreaTab] || '').trim() && (
+                        <div style={{ color: '#ef4444', fontStyle: 'italic', fontSize: '0.84rem', marginBottom: '0.65rem', background: 'rgba(239, 68, 68, 0.08)', padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                          🚨 El participante aún no ha redactado ni cargado su Resultado Imposible en la plataforma oficial de Nodus (imo.crearpslglobal.com/futurosimposibles). Puedes registrar su meta personal declarada a continuación:
                         </div>
                       )}
+
+                      <textarea
+                        value={editingMetaMap[activeAreaTab] !== undefined ? editingMetaMap[activeAreaTab] : (fi.meta || '')}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setEditingMetaMap(prev => ({ ...prev, [activeAreaTab]: val }));
+                        }}
+                        placeholder="Escribe aquí la meta declarada por el participante (ej. Pesar 72 kg al 15 de diciembre con 14% de grasa corporal y correr 10k en menos de 50 minutos para modelar disciplina a mis hijos)..."
+                        rows={3}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem',
+                          borderRadius: '6px',
+                          border: `1px solid ${(editingMetaMap[activeAreaTab] || fi.meta) ? '#38bdf8' : 'rgba(239, 68, 68, 0.4)'}`,
+                          background: 'rgba(0,0,0,0.3)',
+                          color: textDark,
+                          fontSize: '0.88rem',
+                          lineHeight: 1.45,
+                          outline: 'none',
+                          boxSizing: 'border-box'
+                        }}
+                      />
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.55rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '0.72rem', color: isNoPresentado ? '#ef4444' : textMuted }}>
+                          {isNoPresentado ? '⚠️ Sin redacción en Nodus. Registra la declaración auténtica para habilitar la auditoría ontológica.' : 'Estándar superior: debe incluir cifra medible, fecha límite y propósito de fondo.'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleSaveMetaDeclarada(activeAreaTab)}
+                          style={{
+                            background: '#0284c7',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '0.4rem 0.9rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.35rem'
+                          }}
+                        >
+                          <Check size={13} /> Guardar Meta en Causa OS
+                        </button>
+                      </div>
                     </div>
 
                     {/* ANÁLISIS E.M.P.O.R. DEL RESULTADO ACTIVO (3 PILARES) */}

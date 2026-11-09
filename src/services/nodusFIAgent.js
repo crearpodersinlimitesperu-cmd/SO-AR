@@ -358,16 +358,39 @@ export function generarDictamenEjecutivoIA(metricas, filtroSede, filtroEquipo) {
 }
 
 /**
+ * Textos genéricos y placeholders sintéticos que no constituyen una declaración real
+ */
+export const SYNTHETIC_PLACEHOLDER_SNIPPETS = [
+  'estándar superior alcanzado',
+  'estandar superior alcanzado',
+  'meta financiera cuantificable',
+  'liderazgo transformacional y resultados',
+  'estándar superior alcanzado en vitalidad',
+  'aprobado por el mentor en maestría',
+  'aprobado por el mentor'
+];
+
+/**
+ * Detecta si el texto es un placeholder sintético o está vacío
+ */
+export function isSyntheticPlaceholder(text) {
+  if (!text || typeof text !== 'string') return true;
+  const lower = text.toLowerCase().trim();
+  if (lower.length < 5) return true;
+  return SYNTHETIC_PLACEHOLDER_SNIPPETS.some(snippet => lower.includes(snippet));
+}
+
+/**
  * Validador ontológico y de calidad de un Resultado Imposible (RI)
  */
 export function evaluarCalidadOntologicaFI(area, titulo, meta) {
-  if (!meta || meta.trim().length === 0) {
+  if (!meta || meta.trim().length === 0 || isSyntheticPlaceholder(meta)) {
     return {
       puntaje: 0,
       nivel: 'NO_PRESENTADO',
-      etiqueta: 'Sin Redactar',
-      color: '#94a3b8',
-      observaciones: 'El participante aún no ha registrado este Resultado Imposible.'
+      etiqueta: 'Sin Redacción Específica',
+      color: '#ea580c',
+      observaciones: 'El participante aún no ha registrado la redacción auténtica de este Resultado Imposible en el portal oficial (imo.crearpslglobal.com/futurosimposibles). Requiere ingresar su meta personal cuantificable.'
     };
   }
 
@@ -687,7 +710,7 @@ export function generarPromptParaParticipante(participante = {}) {
 
   const formatMeta = (idx) => {
     const ri = ris[idx];
-    if (!ri || !ri.meta || !ri.meta.trim()) {
+    if (!ri || !ri.meta || !ri.meta.trim() || isSyntheticPlaceholder(ri.meta)) {
       return `[SIN REDACTAR EN PLATAFORMA] (Área: ${ri?.area || `Resultado ${idx + 1}`})`;
     }
     const area = ri.area ? `[Área: ${ri.area}] ` : '';
@@ -752,9 +775,9 @@ export function auditarResultadosImposiblesEMPOR(resultados = [], participante =
     let reflejoAsertivo = '';
     let ajusteInmediato = null;
 
-    if (!meta) {
+    if (!meta || isSyntheticPlaceholder(meta)) {
       estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
-      reflejoAsertivo = `El ${area} aún no registra una declaración redactada en la plataforma oficial de Nodus.`;
+      reflejoAsertivo = `El ${area} aún no registra una declaración redactada por el participante en la plataforma oficial de Nodus.`;
       ajusteInmediato = `Redacta tu meta bajo el estándar E.M.P.O.R.: Define una cifra o entregable exacto, una fecha innegociable dentro de los 90 días y el "Para Qué" profundo que sostendrá tu compromiso.`;
     } else if (!pilarMedicion && !pilarProposito) {
       estado = 'REQUIERE ELEVAR EL ESTÁNDAR';
