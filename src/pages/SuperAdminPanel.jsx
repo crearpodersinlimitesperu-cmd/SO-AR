@@ -23,6 +23,7 @@ import AliadosC1AdminPanel from '../components/AliadosC1AdminPanel';
 import StaffMesaAdminPanel from '../components/StaffMesaAdminPanel';
 import GuiaAliadosC1 from './GuiaAliadosC1';
 import NodusLiveModulesDashboard from '../components/NodusLiveModulesDashboard';
+import ModuleTelemetryView from '../components/ModuleTelemetryView';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 import { runRoleIntegrityAuditAndHeal, applyReviewedRoleChanges } from '../services/roleIntegritySentinelAgent';
 
@@ -1680,6 +1681,20 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano')) && (
               <button style={tabStyle('auditoria')} onClick={() => setActiveView('auditoria')}>🛡️ Auditoría</button>
             )}
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+              <button 
+                style={{
+                  ...tabStyle('telemetria_modulos'),
+                  background: activeView === 'telemetria_modulos' ? 'var(--crear-gold)' : 'rgba(251, 191, 36, 0.1)',
+                  color: activeView === 'telemetria_modulos' ? '#000' : 'var(--crear-gold)',
+                  border: '1px solid rgba(251, 191, 36, 0.4)',
+                  fontWeight: 700
+                }} 
+                onClick={() => setActiveView('telemetria_modulos')}
+              >
+                📊 Uso de Módulos (Agente Telemetría)
+              </button>
+            )}
             {currentUser?.isSuperAdmin && (
               <button style={tabStyle('diagnosticos')} onClick={() => setActiveView('diagnosticos')}>🩺 Diagnósticos</button>
             )}
@@ -1734,6 +1749,9 @@ export default function SuperAdminPanel() {
           )}
           {activeView === 'auditoria' && (
             <AuditLogView />
+          )}
+          {activeView === 'telemetria_modulos' && (
+            <ModuleTelemetryView currentUser={currentUser} />
           )}
           {activeView === 'diagnosticos' && currentUser?.isSuperAdmin && (
             <DiagnosticsView />

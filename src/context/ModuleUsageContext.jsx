@@ -6,6 +6,7 @@ import { allowedUsageModules, moduleForVisit } from '../utils/moduleNavigation';
 import {
   canUseLocalUsage, emptyUsage, readUsage, recordUsage, resetUsage, frequentModules
 } from '../utils/moduleUsage';
+import { recordModuleVisitTelemetry } from '../services/moduleTelemetryService';
 
 const ModuleUsageContext = createContext(null);
 const knownIds = MODULE_REGISTRY.filter(mod => mod.route).map(mod => mod.id);
@@ -47,6 +48,8 @@ export function ModuleUsageProvider({ children, routePolicies }) {
       const usage = recordUsage(window.localStorage, currentUser, originalAdminUser, module.id,
         allowedModules.map(mod => mod.id), knownIds);
       setState({ owner, usage, error: null });
+      // Registro auditable en Firestore para telemetría centralizada de Centro de Mando
+      recordModuleVisitTelemetry(module, location.pathname, currentUser, originalAdminUser).catch(() => {});
     } catch (error) {
       fail(error);
     }
