@@ -589,6 +589,26 @@ export default function GeneradorFlyer() {
 
           {!porEquipo && <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             <button
+              onClick={() => navigate('/video-c2-imo')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.6rem 1.1rem',
+                borderRadius: '12px',
+                background: isLight ? '#ffffff' : 'rgba(255, 255, 255, 0.05)',
+                border: `1px solid ${themeStyles.cardBorder}`,
+                color: '#f59e0b',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+              title="Abrir generador de reels dinámicos de Vuelos C2 para IMOs"
+            >
+              <Sparkles size={15} /> Reel Vuelos C2
+            </button>
+
+            <button
               onClick={sincronizarConCalendario}
               style={{
                 display: 'flex',

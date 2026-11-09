@@ -62,6 +62,7 @@ const BrandScriptBoard = lazy(() => import('./pages/BrandScriptBoard'));
 const NodusDataMap = lazy(() => import('./pages/NodusDataMap'));
 const CalendarioMJ = lazy(() => import('./pages/CalendarioMJ'));
 const GeneradorFlyer = lazy(() => import('./pages/GeneradorFlyer'));
+const VideoC2ImoReel = lazy(() => import('./pages/VideoC2ImoReel'));
 const MonitorVuelosCartas = lazy(() => import('./pages/MonitorVuelosCartas'));
 const VendeSinVender = lazy(() => import('./pages/VendeSinVender'));
 const MasterclassDistinciones = lazy(() => import('./pages/MasterclassDistinciones'));
@@ -571,6 +572,13 @@ function App() {
           <Route path="/generador-flyer" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <ErrorBoundary><GeneradorFlyer /></ErrorBoundary>
+            </RoleRoute>
+          } />
+
+          {/* Video Reel Dinámico Vuelos C2 para IMOs */}
+          <Route path="/video-c2-imo" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
+              <ErrorBoundary><VideoC2ImoReel /></ErrorBoundary>
             </RoleRoute>
           } />
 

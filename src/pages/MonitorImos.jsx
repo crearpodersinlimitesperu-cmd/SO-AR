@@ -826,6 +826,27 @@ export default function MonitorImos() {
 
         <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <button
+            onClick={() => navigate('/video-c2-imo')}
+            style={{
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.35) 100%)',
+              color: '#f59e0b',
+              border: '1px solid rgba(245, 158, 11, 0.5)',
+              padding: '0.5rem 1rem',
+              borderRadius: '6px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 0 12px rgba(245, 158, 11, 0.25)',
+              transition: 'all 0.2s ease'
+            }}
+            title="Video Reel Dinámico de Vuelos C2 para enviar a los IMOs"
+          >
+            🎬 Reel Vuelos C2 (IMOs)
+          </button>
+
+          <button
             onClick={() => setShowNeuroModal(true)}
             style={{
               background: 'rgba(59, 130, 246, 0.15)',
