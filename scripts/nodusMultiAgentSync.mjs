@@ -860,13 +860,36 @@ class NodusNormalizerAgent {
             ? 'Coordinador C1'
             : 'Coordinador';
 
-      const isC2Coord = ciclo === 'Ciclo 2' || coordinatorRole === 'Coordinador C2' || (c2Value > 0 && (c1Value === 0 || c1Value === null));
-      const sentadosC1 = isC2Coord ? 0 : totalAsistieron;
-      const sentadosC2 = isC2Coord ? totalAsistieron : 0;
-      const gestionesC1 = c1Value ?? (isC2Coord ? 0 : (gestionesValue ?? 0));
-      const gestionesC2 = c2Value ?? (isC2Coord ? (gestionesValue ?? 0) : 0);
-      const confirmadosC1 = isC2Coord ? 0 : confirmado;
-      const confirmadosC2 = isC2Coord ? confirmado : 0;
+      const hasC1 = (c1Value ?? 0) > 0;
+      const hasC2 = (c2Value ?? 0) > 0;
+      const totalCallsC1C2 = (c1Value ?? 0) + (c2Value ?? 0);
+
+      let sentadosC1 = 0;
+      let sentadosC2 = 0;
+      let confirmadosC1 = 0;
+      let confirmadosC2 = 0;
+
+      if (hasC1 && hasC2 && totalCallsC1C2 > 0) {
+        // Coordinador Mixto C1 / C2: distribución proporcional rigurosa según llamadas operativas reales
+        const ratioC2 = (c2Value ?? 0) / totalCallsC1C2;
+        sentadosC2 = Math.round(totalAsistieron * ratioC2);
+        sentadosC1 = totalAsistieron - sentadosC2;
+        confirmadosC2 = Math.round(confirmado * ratioC2);
+        confirmadosC1 = confirmado - confirmadosC2;
+      } else if (hasC2 || ciclo === 'Ciclo 2' || coordinatorRole === 'Coordinador C2') {
+        sentadosC1 = 0;
+        sentadosC2 = totalAsistieron;
+        confirmadosC1 = 0;
+        confirmadosC2 = confirmado;
+      } else {
+        sentadosC1 = totalAsistieron;
+        sentadosC2 = 0;
+        confirmadosC1 = confirmado;
+        confirmadosC2 = 0;
+      }
+
+      const gestionesC1 = c1Value ?? ((hasC2 && !hasC1) ? 0 : (gestionesValue ?? 0));
+      const gestionesC2 = c2Value ?? ((hasC1 && !hasC2) ? 0 : (gestionesValue ?? 0));
 
       const enrichedEquipos = (item.equipos || []).map(eq => {
         const eqKey = (eq.equipo || '').trim().toLowerCase();

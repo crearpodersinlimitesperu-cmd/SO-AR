@@ -339,7 +339,22 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       let confirmadosC2 = c.confirmadosC2;
 
       // Cálculo resiliente en caliente si faltasen campos precalculados o si la suma da 0 con asistentes reales
-      if (sentadosC1 === undefined || sentadosC2 === undefined || (sentadosC1 === 0 && sentadosC2 === 0 && (c.asistieron || 0) > 0)) {
+      const c1Calls = Number(c.c1 ?? c.gestionesC1 ?? 0);
+      const c2Calls = Number(c.c2 ?? c.gestionesC2 ?? 0);
+      const totalCalls = c1Calls + c2Calls;
+
+      // Si el coordinador tiene gestiones verificadas en C2 y sentadosC2 figura en 0, calcular el desglose real proporcional
+      if (totalCalls > 0 && c2Calls > 0 && (sentadosC2 === 0 || sentadosC2 === undefined)) {
+        const ratioC2 = c2Calls / totalCalls;
+        const totalAsist = (c.asistieron || c.sentadosTotal || 0);
+        sentadosC2 = Math.round(totalAsist * ratioC2);
+        sentadosC1 = totalAsist - sentadosC2;
+        if (confirmadosC2 === 0 || confirmadosC2 === undefined) {
+          const totalConf = (c.estados?.confirmado || c.confirmadosTotal || 0);
+          confirmadosC2 = Math.round(totalConf * ratioC2);
+          confirmadosC1 = totalConf - confirmadosC2;
+        }
+      } else if (sentadosC1 === undefined || sentadosC2 === undefined || (sentadosC1 === 0 && sentadosC2 === 0 && (c.asistieron || 0) > 0)) {
         let sc1 = 0, sc2 = 0, gc1 = 0, gc2 = 0, cc1 = 0, cc2 = 0;
         (c.equipos || []).forEach(eq => {
           const phase = recordedPhase(eq, c);
@@ -624,7 +639,17 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       if (selectedEntrenamiento === 'C2' && (c.sentadosC2 === 0 && c.gestionesC2 === 0)) continue;
 
       // 4. Filtro por Equipo
-      let matchingEquipos = (c.equipos || []).filter(eq => selectedEntrenamiento === 'TODOS' || recordedPhase(eq, c) === selectedEntrenamiento);
+      let matchingEquipos = (c.equipos || []).filter(eq => {
+        if (selectedEntrenamiento === 'TODOS') return true;
+        const phase = recordedPhase(eq, c);
+        if (phase === selectedEntrenamiento) return true;
+        // Si el equipo no tiene fase explícita en su nombre pero el coordinador tiene actividad comprobada en la fase seleccionada:
+        if (!eq.fase && !eq.capitulo) {
+          if (selectedEntrenamiento === 'C2' && (c.sentadosC2 > 0 || Number(c.c2 || c.gestionesC2 || 0) > 0)) return true;
+          if (selectedEntrenamiento === 'C1' && (c.sentadosC1 > 0 || Number(c.c1 || c.gestionesC1 || 0) > 0)) return true;
+        }
+        return false;
+      });
       if (selectedEquipo !== 'TODOS') {
         matchingEquipos = matchingEquipos.filter(eq => eq.equipo === selectedEquipo);
         if (matchingEquipos.length === 0) continue;
@@ -701,6 +726,17 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
             dispSentadosC2 = dispAsistieron;
           } else {
             dispSentadosC1 = dispAsistieron;
+          }
+        }
+        // Si el equipo no tiene etiqueta de fase explícita pero el coordinador tiene gestiones verificadas en C2:
+        if (dispSentadosC2 === 0 && (c.sentadosC2 > 0 || Number(c.c2 || c.gestionesC2 || 0) > 0) && dispAsistieron > 0) {
+          const coordTotalG = (Number(c.gestionesC1 || c.c1 || 0)) + (Number(c.gestionesC2 || c.c2 || 0));
+          if (coordTotalG > 0 && Number(c.c2 || c.gestionesC2 || 0) > 0) {
+            const ratioC2 = Number(c.c2 || c.gestionesC2 || 0) / coordTotalG;
+            dispSentadosC2 = Math.round(dispAsistieron * ratioC2);
+            dispSentadosC1 = dispAsistieron - dispSentadosC2;
+            dispGestionesC2 = Math.round(dispGestiones * ratioC2);
+            dispGestionesC1 = dispGestiones - dispGestionesC2;
           }
         }
       } else if (selectedEntrenamiento === 'C1') {
