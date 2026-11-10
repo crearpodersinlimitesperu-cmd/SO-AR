@@ -54094,7 +54094,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                             <p class="text-xs text-amber-400 font-medium tracking-wider uppercase">Facilitación y Conducción de Sala</p>
                         </div>
                     </div>
-                    <div class="bg-black/40 p-5 rounded-xl border border-gray-800 space-y-3 text-sm text-gray-300">
+                    <div class="bg-black/40 p-5 rounded-xl border border-gray-800 space-y-3 text-sm text-gray-300 mb-5">
                         <div class="flex items-start gap-2">
                             <span class="text-amber-400 font-bold">●</span>
                             <div><strong>Evento:</strong> Creación E32 (Maestría del Juego).</div>
@@ -54102,6 +54102,52 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                         <div class="flex items-start gap-2">
                             <span class="text-amber-400 font-bold">●</span>
                             <div><strong>Fechas de estadía:</strong> Del Jueves 12 al Domingo 15 de Noviembre, 2026.</div>
+                        </div>
+                    </div>
+
+                    <!-- Horarios Oficiales de Grounding y Alineación de Maestría del Juego -->
+                    <div class="pt-4 border-t border-gray-800">
+                        <h3 class="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-clock"></i> Horarios Oficiales de Grounding y Alineación (Maestría del Juego)
+                        </h3>
+                        <div class="space-y-3 text-xs sm:text-sm">
+                            <!-- Viernes -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-amber-400">🕓</span> Viernes (Día de Apertura)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">16:30 PM:</strong> <span>Grounding de Coordinación de Maestría con entrenadores (en el Salón de Creación / Salón 1).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">17:00 PM:</strong> <span>Grounding de entrenadores con managers e inicio de registro con participantes.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">18:00 PM:</strong> <span>Inicio formal del entrenamiento en sala.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">19:00 PM:</strong> <span>Hora máxima de entrada para participantes.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">22:30 PM:</strong> <span>Hora límite de salida de salón (innegociable para descanso del equipo).</span></li>
+                                </ul>
+                            </div>
+
+                            <!-- Sábado -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-cyan-400">🕘</span> Sábado (Jornada Intensiva)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">09:00 AM – 10:00 AM:</strong> <span>Mesa de enrolamiento de mañana.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">17:00 PM – 19:00 PM:</strong> <span>Mesa de enrolamiento de tarde (extensible a 19:30 PM).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">22:30 PM:</strong> <span>Hora máxima de salida de participantes y cierre de salón.</span></li>
+                                </ul>
+                            </div>
+
+                            <!-- Domingo -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-purple-400">🕘</span> Domingo (Cierre de Fin de Semana)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">09:00 AM – 10:00 AM:</strong> <span>Mesa de enrolamiento (cierre estricto sin extensión).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">17:00 PM – 19:00 PM:</strong> <span>Mesa de enrolamiento de tarde (extensible a 19:30 PM).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">20:30 PM:</strong> <span>Susurros y cierre general en salón principal con todos los equipos.</span></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -54954,7 +55000,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                             <p class="text-xs text-amber-400 font-medium tracking-wider uppercase">Facilitación y Conducción de Sala E30</p>
                         </div>
                     </div>
-                    <div class="bg-black/40 p-5 rounded-xl border border-gray-800 space-y-3 text-sm text-gray-300">
+                    <div class="bg-black/40 p-5 rounded-xl border border-gray-800 space-y-3 text-sm text-gray-300 mb-5">
                         <div class="flex items-start gap-2">
                             <span class="text-amber-400 font-bold">●</span>
                             <div><strong>Evento:</strong> Creación E30.</div>
@@ -54962,6 +55008,52 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                         <div class="flex items-start gap-2">
                             <span class="text-amber-400 font-bold">●</span>
                             <div><strong>Fechas de estadía:</strong> Del Viernes 13 (madrugada) al Lunes 16 de Noviembre, 2026.</div>
+                        </div>
+                    </div>
+
+                    <!-- Horarios Oficiales de Grounding y Alineación de Maestría del Juego -->
+                    <div class="pt-4 border-t border-gray-800">
+                        <h3 class="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-clock"></i> Horarios Oficiales de Grounding y Alineación (Maestría del Juego)
+                        </h3>
+                        <div class="space-y-3 text-xs sm:text-sm">
+                            <!-- Viernes -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-amber-400">🕓</span> Viernes (Día de Apertura)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">16:30 PM:</strong> <span>Grounding de Coordinación de Maestría con entrenadores (en el Salón de Creación / Salón 1).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">17:00 PM:</strong> <span>Grounding de entrenadores con managers e inicio de registro con participantes.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">18:00 PM:</strong> <span>Inicio formal del entrenamiento en sala.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">19:00 PM:</strong> <span>Hora máxima de entrada para participantes.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">22:30 PM:</strong> <span>Hora límite de salida de salón (innegociable para descanso del equipo).</span></li>
+                                </ul>
+                            </div>
+
+                            <!-- Sábado -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-cyan-400">🕘</span> Sábado (Jornada Intensiva)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">09:00 AM – 10:00 AM:</strong> <span>Mesa de enrolamiento de mañana.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">17:00 PM – 19:00 PM:</strong> <span>Mesa de enrolamiento de tarde (extensible a 19:30 PM).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">22:30 PM:</strong> <span>Hora máxima de salida de participantes y cierre de salón.</span></li>
+                                </ul>
+                            </div>
+
+                            <!-- Domingo -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-purple-400">🕘</span> Domingo (Cierre de Fin de Semana)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">09:00 AM – 10:00 AM:</strong> <span>Mesa de enrolamiento (cierre estricto sin extensión).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">17:00 PM – 19:00 PM:</strong> <span>Mesa de enrolamiento de tarde (extensible a 19:30 PM).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">20:30 PM:</strong> <span>Susurros y cierre general en salón principal con todos los equipos.</span></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -57928,6 +58020,52 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                             <div>
                                 <strong class="text-white">Módulo de Relación (Equipo 31):</strong>
                                 <span class="block mt-1 text-gray-300">Liderarás el espacio de relación para el E31, enfocado en la ecología del equipo y la construcción de redes conversacionales sólidas.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Horarios Oficiales de Grounding y Alineación de Maestría del Juego -->
+                    <div class="pt-4 border-t border-gray-800">
+                        <h3 class="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-clock"></i> Horarios Oficiales de Grounding y Alineación (Maestría del Juego)
+                        </h3>
+                        <div class="space-y-3 text-xs sm:text-sm">
+                            <!-- Viernes -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-amber-400">🕓</span> Viernes (Día de Apertura)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">16:30 PM:</strong> <span>Grounding de Coordinación de Maestría con entrenadores (en el Salón de Creación / Salón 1).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">17:00 PM:</strong> <span>Grounding de entrenadores con managers e inicio de registro con participantes.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">18:00 PM:</strong> <span>Inicio formal del entrenamiento en sala.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">19:00 PM:</strong> <span>Hora máxima de entrada para participantes.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-amber-400 font-mono min-w-[70px]">22:30 PM:</strong> <span>Hora límite de salida de salón (innegociable para descanso del equipo).</span></li>
+                                </ul>
+                            </div>
+
+                            <!-- Sábado -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-cyan-400">🕘</span> Sábado (Jornada Intensiva)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">09:00 AM – 10:00 AM:</strong> <span>Mesa de enrolamiento de mañana.</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">17:00 PM – 19:00 PM:</strong> <span>Mesa de enrolamiento de tarde (extensible a 19:30 PM).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-cyan-400 font-mono min-w-[130px]">22:30 PM:</strong> <span>Hora máxima de salida de participantes y cierre de salón.</span></li>
+                                </ul>
+                            </div>
+
+                            <!-- Domingo -->
+                            <div class="bg-black/50 p-4 rounded-xl border border-gray-800">
+                                <h4 class="font-bold text-white mb-2.5 flex items-center gap-2">
+                                    <span class="text-purple-400">🕘</span> Domingo (Cierre de Fin de Semana)
+                                </h4>
+                                <ul class="space-y-1.5 text-gray-300 ml-1">
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">09:00 AM – 10:00 AM:</strong> <span>Mesa de enrolamiento (cierre estricto sin extensión).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">17:00 PM – 19:00 PM:</strong> <span>Mesa de enrolamiento de tarde (extensible a 19:30 PM).</span></li>
+                                    <li class="flex items-start gap-2"><strong class="text-purple-400 font-mono min-w-[130px]">20:30 PM:</strong> <span>Susurros y cierre general en salón principal con todos los equipos.</span></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
