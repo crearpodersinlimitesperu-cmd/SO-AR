@@ -36611,7 +36611,7 @@ Mesa de Registro: pantalla de puerta para buscar, verificar pago y marcar asiste
 **Gerente de Sede / Supervisor:** todos los operadores con usuario activo; supervisión en vivo del Dashboard; revisión del Reporte de Entrenadores por desviaciones enrolados/sentados; auditoría y firma del Cierre de Caja del viernes; reportes de sábado y domingo consolidados.
 
 ### 13.18 Flujos Operativos Paso a Paso
-**Flujo A — Registro de llegada:** (1) saludar y pedir DNI (si no lo trae, buscar por nombres/apellidos); (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible.
+**Flujo A — Registro de llegada e Identificación Estricta (Especialmente en C1):** (1) saludar y exigir obligatoriamente el Documento de Identificación físico (DNI, Pasaporte o Cédula vigente). Comprobación de identidad física sin excepción: nadie ingresa a sala ni se le entrega gafete sin cotejo estricto de su documento oficial contra Nodus/Causa OS; (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible únicamente tras comprobar el documento físico y el pago.
 **Flujo B — Cuadre y cierre nocturno:** (1) cerrar la atención en mesa y abrir Cierre de Caja; (2) contar el dinero físico billete por billete, sumar vouchers de POS y escribir los montos reales (si no cuadra, revisar recibo por recibo); (3) firmar el acta digital con 'Cerrar Caja Oficialmente' y entregar el efectivo físico al Gerente de Sede.
 
 ### 13.19 Ejercicios de Entrenamiento y Anexos
@@ -74641,7 +74641,7 @@ Mesa de Registro: pantalla de puerta para buscar, verificar pago y marcar asiste
 **Gerente de Sede / Supervisor:** todos los operadores con usuario activo; supervisión en vivo del Dashboard; revisión del Reporte de Entrenadores por desviaciones enrolados/sentados; auditoría y firma del Cierre de Caja del viernes; reportes de sábado y domingo consolidados.
 
 ### 13.18 Flujos Operativos Paso a Paso
-**Flujo A — Registro de llegada:** (1) saludar y pedir DNI (si no lo trae, buscar por nombres/apellidos); (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible.
+**Flujo A — Registro de llegada e Identificación Estricta (Especialmente en C1):** (1) saludar y exigir obligatoriamente el Documento de Identificación físico (DNI, Pasaporte o Cédula vigente). Comprobación de identidad física sin excepción: nadie ingresa a sala ni se le entrega gafete sin cotejo estricto de su documento oficial contra Nodus/Causa OS; (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible únicamente tras comprobar el documento físico y el pago.
 **Flujo B — Cuadre y cierre nocturno:** (1) cerrar la atención en mesa y abrir Cierre de Caja; (2) contar el dinero físico billete por billete, sumar vouchers de POS y escribir los montos reales (si no cuadra, revisar recibo por recibo); (3) firmar el acta digital con 'Cerrar Caja Oficialmente' y entregar el efectivo físico al Gerente de Sede.
 
 ### 13.19 Ejercicios de Entrenamiento y Anexos
@@ -124975,7 +124975,7 @@ const CHECKLIST_LABELS_STAFF_MESA = [
   { id: 'notar_postura', title: '1. Notar: Observación sin juicio ni compra de historias' },
   { id: 'contexto_grandeza', title: '2. Contexto: Sostener la conversación de posibilidad' },
   { id: 'adulto_a_adulto', title: '3. Contacto directo adulto a adulto sin lástima ni condescendencia' },
-  { id: 'verif_dni_nodus', title: '4. Cotejo estricto de DNI físico vs Sistema Causa / Nodus' },
+  { id: 'verif_dni_nodus', title: '4. Comprobación OBLIGATORIA de Documento Físico (DNI/Pasaporte/Cédula) vs Nodus SIN EXCEPCIÓN (Rigor C1)' },
   { id: 'escucha_5min', title: '5. Límite de atención de máximo 5 minutos por participante' },
   { id: 'anotaciones_limpias', title: '6. Anotaciones limpias y objetivas (hechos, no juicios)' },
   { id: 'reporte_entrenador', title: '7. Reporte inmediato al Entrenador de sala ante anomalías' },
@@ -125630,6 +125630,36 @@ export default function StaffMesaAdminPanel({ currentUser }) {
           <div style={{ fontSize: '0.75rem', color: '#fca5a5', marginTop: '0.25rem' }}>
             Intentos de captura/impresión bloqueados
           </div>
+        </div>
+      </div>
+
+      {/* BANNER DE RIGOR OPERATIVO: COMPROBACIÓN DE IDENTIDAD EN MESA (ESPECIAL C1) */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%)',
+          border: '1.5px solid #ef4444',
+          borderRadius: '12px',
+          padding: '1.25rem 1.5rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '1rem',
+          boxShadow: '0 4px 20px rgba(239, 68, 68, 0.2)'
+        }}
+      >
+        <span style={{ fontSize: '1.8rem', lineHeight: 1 }}>🛡️</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+            <span style={{ background: '#ef4444', color: '#fff', fontSize: '0.72rem', fontWeight: 900, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+              DIRECTIVA DE RIGOR OPERACIONAL C1
+            </span>
+            <strong style={{ color: '#fca5a5', fontSize: '1.05rem' }}>
+              Comprobación Obligatoria de Documentos de Identidad Físicos Sin Excepción
+            </strong>
+          </div>
+          <p style={{ margin: 0, color: '#e2e8f0', fontSize: '0.88rem', lineHeight: '1.55' }}>
+            Todo integrante del <strong>Staff de Mesa y Apoyos</strong> debe solicitar el documento oficial en físico (DNI, Pasaporte o Cédula vigente) a cada participante que se acerque a registrarse, especialmente en <strong>Capítulo Uno (C1)</strong>. <strong>Queda estrictamente prohibido el ingreso a sala por confianza ("ya me conocen", "es amigo/familiar", "luego lo muestro")</strong>. Se debe validar identidad física vs Nodus/Causa OS antes de marcar "En Sala" y entregar gafete.
+          </p>
         </div>
       </div>
 
@@ -161599,8 +161629,8 @@ export default function ManualGuia() {
 
             <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>A. Evaluacion del CC1Y2 (Coordinador Capitulo Uno y Dos) — Nivel 5</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
-              <InfoCard color="#0ea5e9" title="Eficiencia y Velocidad de Registro">
-                Donde: modulos Mesa Registro y Participantes Sede. Que auditar: el 100% de los participantes fisicos en sala deben tener status en verde ("Registrado" y "Pagado") antes del primer break; correcta identificacion/asignacion del IMO (Enrolador) en cada perfil.
+              <InfoCard color="#0ea5e9" title="Eficiencia y Comprobación de Identidad en Mesa (C1)">
+                Donde: módulos Mesa Registro y Participantes Sede. Qué auditar: comprobación obligatoria de documento de identificación físico (DNI, Pasaporte o Cédula) al 100% de los participantes sin excepción alguna, en especial en C1; el 100% de los participantes físicos en sala deben tener status en verde ("Registrado" y "Pagado") antes del primer break; correcta identificación/asignación del IMO (Enrolador) en cada perfil. Nadie ingresa por confianza ni sin documento comprobado.
               </InfoCard>
               <InfoCard color="#0ea5e9" title="Conversion y Captura Financiera (Cierre de C1)">
                 Donde: modulo Reportes → Enrolamiento y modulo Cierre de Caja. Que auditar el domingo de C1: ratio de conversion de alumnos de C1 a C2/Maestria; cuadre al 100% entre los pagos de la mesa externa de conversion y el "Cierre de Caja" del sistema ese mismo domingo.
@@ -177235,6 +177265,11 @@ export default function GuiaAliadosC1() {
                   tag: 'Presencia Absoluta'
                 },
                 {
+                  title: 'Comprobación Obligatoria de Identidad en Mesa (C1)',
+                  desc: 'Todo apoyo o staff en Mesa de Registro debe exigir y corroborar el Documento de Identificación físico (DNI, Cédula o Pasaporte) de cada participante sin excepción alguna. El ingreso a sala requiere cotejo estricto contra Nodus; nadie entra por confianza ni sin documento comprobado.',
+                  tag: 'Seguridad y Compliance'
+                },
+                {
                   title: 'Creación del Contexto',
                   desc: 'El Aliado es responsable de crear activamente el contexto para entrenarse en todo lo que está disponible antes, durante y después del C1, aprovechando cada herramienta, reto y espacio de aprendizaje.',
                   tag: 'Alineación Total'
@@ -177433,6 +177468,75 @@ export default function GuiaAliadosC1() {
                     </ul>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* PROTOCOLO ESTRICTO: APOYOS Y STAFF DE MESA DE REGISTRO (ESPECIAL C1) */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(30, 41, 59, 0.95) 100%)',
+              border: '1.5px solid #ef4444',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              marginBottom: '1.5rem',
+              boxShadow: '0 8px 24px rgba(239, 68, 68, 0.15)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem', borderBottom: '1px solid rgba(239, 68, 68, 0.3)', paddingBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>🚨</span>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fca5a5', fontWeight: 900, letterSpacing: '-0.01em' }}>
+                      MANDATO INMUTABLE: COMPROBACIÓN DE DOCUMENTOS DE IDENTIFICACIÓN SIN EXCEPCIÓN
+                    </h3>
+                    <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
+                      Protocolo obligatorio para Apoyos, Staff de Mesa de Registro y Capitanes · <strong>Rigor Absoluto en Capítulo Uno (C1)</strong>
+                    </span>
+                  </div>
+                </div>
+                <span style={{ background: '#ef4444', color: '#ffffff', padding: '3px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  TOLERANCIA CERO
+                </span>
+              </div>
+
+              <p style={{ margin: '0 0 1rem 0', color: '#f8fafc', fontSize: '0.92rem', lineHeight: '1.6' }}>
+                En <strong>Capítulo Uno (C1)</strong> se produce el primer contacto legal, formativo y presencial con el participante. Por razones de seguridad del recinto, cumplimiento normativo, pólizas y control civil, <strong>LOS DOCUMENTOS DE IDENTIFICACIÓN (DNI, CÉDULA O PASAPORTE FÍSICO VIGENTE) DEBEN SER COMPROBADOS Y COTEJADOS AL 100% SIN NINGUNA EXCEPCIÓN</strong> antes de permitir el ingreso a sala y antes de entregar el gafete oficial.
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.9rem' }}>
+                <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #ef4444' }}>
+                  <strong style={{ color: '#fca5a5', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.86rem', marginBottom: '0.35rem' }}>
+                    ❌ Prohibido el Ingreso por Confianza
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.45', display: 'block' }}>
+                    Queda estrictamente prohibido permitir el paso o marcar como "En Sala" a alguien bajo argumentos como <em>«ya me conocen»</em>, <em>«es familiar de tal líder»</em>, <em>«lo dejé en el carro/hotel»</em> o <em>«luego te lo muestro»</em>. Si no hay documento físico comprobado, <strong>no ingresa a sala</strong>.
+                  </span>
+                </div>
+
+                <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #38bdf8' }}>
+                  <strong style={{ color: '#7dd3fc', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.86rem', marginBottom: '0.35rem' }}>
+                    🔍 Cotejo Físico vs Nodus / Causa OS
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.45', display: 'block' }}>
+                    El apoyo en mesa debe exigir el documento en mano, verificar la concordancia exacta de foto/rostro, nombres completos y número de identificación dígito por dígito frente a la base oficial del sistema antes de emitir la acreditación.
+                  </span>
+                </div>
+
+                <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
+                  <strong style={{ color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.86rem', marginBottom: '0.35rem' }}>
+                    ⚖️ Validación de Pagos y Contrato Legal
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.45', display: 'block' }}>
+                    La verificación del documento es el requisito previo e indispensable para validar la firma del acuerdo de exoneración de responsabilidad y corroborar el estatus de arancel ("Pagado"). Sin documento no hay trazabilidad legal admisible.
+                  </span>
+                </div>
+
+                <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+                  <strong style={{ color: '#6ee7b7', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.86rem', marginBottom: '0.35rem' }}>
+                    🚪 Protocolo ante Inconsistencias
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.45', display: 'block' }}>
+                    Si una persona no presenta su documento o los datos no coinciden, el staff de mesa retiene amablemente al participante en el área de acreditación y escala de inmediato con el Coordinador de C1 o el Gerente de Sede para resolución antes de abrir puertas.
+                  </span>
+                </div>
               </div>
             </div>
 

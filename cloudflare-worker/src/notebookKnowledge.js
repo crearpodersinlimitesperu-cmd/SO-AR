@@ -1547,7 +1547,7 @@ Mesa de Registro: pantalla de puerta para buscar, verificar pago y marcar asiste
 **Gerente de Sede / Supervisor:** todos los operadores con usuario activo; supervisión en vivo del Dashboard; revisión del Reporte de Entrenadores por desviaciones enrolados/sentados; auditoría y firma del Cierre de Caja del viernes; reportes de sábado y domingo consolidados.
 
 ### 13.18 Flujos Operativos Paso a Paso
-**Flujo A — Registro de llegada:** (1) saludar y pedir DNI (si no lo trae, buscar por nombres/apellidos); (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible.
+**Flujo A — Registro de llegada e Identificación Estricta (Especialmente en C1):** (1) saludar y exigir obligatoriamente el Documento de Identificación físico (DNI, Pasaporte o Cédula vigente). Comprobación de identidad física sin excepción: nadie ingresa a sala ni se le entrega gafete sin cotejo estricto de su documento oficial contra Nodus/Causa OS; (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible únicamente tras comprobar el documento físico y el pago.
 **Flujo B — Cuadre y cierre nocturno:** (1) cerrar la atención en mesa y abrir Cierre de Caja; (2) contar el dinero físico billete por billete, sumar vouchers de POS y escribir los montos reales (si no cuadra, revisar recibo por recibo); (3) firmar el acta digital con 'Cerrar Caja Oficialmente' y entregar el efectivo físico al Gerente de Sede.
 
 ### 13.19 Ejercicios de Entrenamiento y Anexos

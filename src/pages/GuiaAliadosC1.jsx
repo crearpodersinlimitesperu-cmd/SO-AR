@@ -319,6 +319,11 @@ export default function GuiaAliadosC1() {
                   tag: 'Presencia Absoluta'
                 },
                 {
+                  title: 'Comprobación Obligatoria de Identidad en Mesa (C1)',
+                  desc: 'Todo apoyo o staff en Mesa de Registro debe exigir y corroborar el Documento de Identificación físico (DNI, Cédula o Pasaporte) de cada participante sin excepción alguna. El ingreso a sala requiere cotejo estricto contra Nodus; nadie entra por confianza ni sin documento comprobado.',
+                  tag: 'Seguridad y Compliance'
+                },
+                {
                   title: 'Creación del Contexto',
                   desc: 'El Aliado es responsable de crear activamente el contexto para entrenarse en todo lo que está disponible antes, durante y después del C1, aprovechando cada herramienta, reto y espacio de aprendizaje.',
                   tag: 'Alineación Total'
@@ -517,6 +522,75 @@ export default function GuiaAliadosC1() {
                     </ul>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* PROTOCOLO ESTRICTO: APOYOS Y STAFF DE MESA DE REGISTRO (ESPECIAL C1) */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(30, 41, 59, 0.95) 100%)',
+              border: '1.5px solid #ef4444',
+              borderRadius: '12px',
+              padding: '1.5rem',
+              marginBottom: '1.5rem',
+              boxShadow: '0 8px 24px rgba(239, 68, 68, 0.15)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem', borderBottom: '1px solid rgba(239, 68, 68, 0.3)', paddingBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>🚨</span>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#fca5a5', fontWeight: 900, letterSpacing: '-0.01em' }}>
+                      MANDATO INMUTABLE: COMPROBACIÓN DE DOCUMENTOS DE IDENTIFICACIÓN SIN EXCEPCIÓN
+                    </h3>
+                    <span style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>
+                      Protocolo obligatorio para Apoyos, Staff de Mesa de Registro y Capitanes · <strong>Rigor Absoluto en Capítulo Uno (C1)</strong>
+                    </span>
+                  </div>
+                </div>
+                <span style={{ background: '#ef4444', color: '#ffffff', padding: '3px 10px', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  TOLERANCIA CERO
+                </span>
+              </div>
+
+              <p style={{ margin: '0 0 1rem 0', color: '#f8fafc', fontSize: '0.92rem', lineHeight: '1.6' }}>
+                En <strong>Capítulo Uno (C1)</strong> se produce el primer contacto legal, formativo y presencial con el participante. Por razones de seguridad del recinto, cumplimiento normativo, pólizas y control civil, <strong>LOS DOCUMENTOS DE IDENTIFICACIÓN (DNI, CÉDULA O PASAPORTE FÍSICO VIGENTE) DEBEN SER COMPROBADOS Y COTEJADOS AL 100% SIN NINGUNA EXCEPCIÓN</strong> antes de permitir el ingreso a sala y antes de entregar el gafete oficial.
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.9rem' }}>
+                <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #ef4444' }}>
+                  <strong style={{ color: '#fca5a5', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.86rem', marginBottom: '0.35rem' }}>
+                    ❌ Prohibido el Ingreso por Confianza
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.45', display: 'block' }}>
+                    Queda estrictamente prohibido permitir el paso o marcar como "En Sala" a alguien bajo argumentos como <em>«ya me conocen»</em>, <em>«es familiar de tal líder»</em>, <em>«lo dejé en el carro/hotel»</em> o <em>«luego te lo muestro»</em>. Si no hay documento físico comprobado, <strong>no ingresa a sala</strong>.
+                  </span>
+                </div>
+
+                <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #38bdf8' }}>
+                  <strong style={{ color: '#7dd3fc', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.86rem', marginBottom: '0.35rem' }}>
+                    🔍 Cotejo Físico vs Nodus / Causa OS
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.45', display: 'block' }}>
+                    El apoyo en mesa debe exigir el documento en mano, verificar la concordancia exacta de foto/rostro, nombres completos y número de identificación dígito por dígito frente a la base oficial del sistema antes de emitir la acreditación.
+                  </span>
+                </div>
+
+                <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
+                  <strong style={{ color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.86rem', marginBottom: '0.35rem' }}>
+                    ⚖️ Validación de Pagos y Contrato Legal
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.45', display: 'block' }}>
+                    La verificación del documento es el requisito previo e indispensable para validar la firma del acuerdo de exoneración de responsabilidad y corroborar el estatus de arancel ("Pagado"). Sin documento no hay trazabilidad legal admisible.
+                  </span>
+                </div>
+
+                <div style={{ background: 'rgba(15, 23, 42, 0.85)', padding: '1rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+                  <strong style={{ color: '#6ee7b7', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.86rem', marginBottom: '0.35rem' }}>
+                    🚪 Protocolo ante Inconsistencias
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: '#cbd5e1', lineHeight: '1.45', display: 'block' }}>
+                    Si una persona no presenta su documento o los datos no coinciden, el staff de mesa retiene amablemente al participante en el área de acreditación y escala de inmediato con el Coordinador de C1 o el Gerente de Sede para resolución antes de abrir puertas.
+                  </span>
+                </div>
               </div>
             </div>
 

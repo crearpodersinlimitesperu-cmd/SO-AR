@@ -47,7 +47,7 @@ const CHECKLIST_LABELS_STAFF_MESA = [
   { id: 'notar_postura', title: '1. Notar: Observación sin juicio ni compra de historias' },
   { id: 'contexto_grandeza', title: '2. Contexto: Sostener la conversación de posibilidad' },
   { id: 'adulto_a_adulto', title: '3. Contacto directo adulto a adulto sin lástima ni condescendencia' },
-  { id: 'verif_dni_nodus', title: '4. Cotejo estricto de DNI físico vs Sistema Causa / Nodus' },
+  { id: 'verif_dni_nodus', title: '4. Comprobación OBLIGATORIA de Documento Físico (DNI/Pasaporte/Cédula) vs Nodus SIN EXCEPCIÓN (Rigor C1)' },
   { id: 'escucha_5min', title: '5. Límite de atención de máximo 5 minutos por participante' },
   { id: 'anotaciones_limpias', title: '6. Anotaciones limpias y objetivas (hechos, no juicios)' },
   { id: 'reporte_entrenador', title: '7. Reporte inmediato al Entrenador de sala ante anomalías' },
@@ -702,6 +702,36 @@ export default function StaffMesaAdminPanel({ currentUser }) {
           <div style={{ fontSize: '0.75rem', color: '#fca5a5', marginTop: '0.25rem' }}>
             Intentos de captura/impresión bloqueados
           </div>
+        </div>
+      </div>
+
+      {/* BANNER DE RIGOR OPERATIVO: COMPROBACIÓN DE IDENTIDAD EN MESA (ESPECIAL C1) */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%)',
+          border: '1.5px solid #ef4444',
+          borderRadius: '12px',
+          padding: '1.25rem 1.5rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '1rem',
+          boxShadow: '0 4px 20px rgba(239, 68, 68, 0.2)'
+        }}
+      >
+        <span style={{ fontSize: '1.8rem', lineHeight: 1 }}>🛡️</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+            <span style={{ background: '#ef4444', color: '#fff', fontSize: '0.72rem', fontWeight: 900, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase' }}>
+              DIRECTIVA DE RIGOR OPERACIONAL C1
+            </span>
+            <strong style={{ color: '#fca5a5', fontSize: '1.05rem' }}>
+              Comprobación Obligatoria de Documentos de Identidad Físicos Sin Excepción
+            </strong>
+          </div>
+          <p style={{ margin: 0, color: '#e2e8f0', fontSize: '0.88rem', lineHeight: '1.55' }}>
+            Todo integrante del <strong>Staff de Mesa y Apoyos</strong> debe solicitar el documento oficial en físico (DNI, Pasaporte o Cédula vigente) a cada participante que se acerque a registrarse, especialmente en <strong>Capítulo Uno (C1)</strong>. <strong>Queda estrictamente prohibido el ingreso a sala por confianza ("ya me conocen", "es amigo/familiar", "luego lo muestro")</strong>. Se debe validar identidad física vs Nodus/Causa OS antes de marcar "En Sala" y entregar gafete.
+          </p>
         </div>
       </div>
 

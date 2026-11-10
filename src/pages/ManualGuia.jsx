@@ -435,8 +435,8 @@ export default function ManualGuia() {
 
             <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>A. Evaluacion del CC1Y2 (Coordinador Capitulo Uno y Dos) — Nivel 5</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
-              <InfoCard color="#0ea5e9" title="Eficiencia y Velocidad de Registro">
-                Donde: modulos Mesa Registro y Participantes Sede. Que auditar: el 100% de los participantes fisicos en sala deben tener status en verde ("Registrado" y "Pagado") antes del primer break; correcta identificacion/asignacion del IMO (Enrolador) en cada perfil.
+              <InfoCard color="#0ea5e9" title="Eficiencia y Comprobación de Identidad en Mesa (C1)">
+                Donde: módulos Mesa Registro y Participantes Sede. Qué auditar: comprobación obligatoria de documento de identificación físico (DNI, Pasaporte o Cédula) al 100% de los participantes sin excepción alguna, en especial en C1; el 100% de los participantes físicos en sala deben tener status en verde ("Registrado" y "Pagado") antes del primer break; correcta identificación/asignación del IMO (Enrolador) en cada perfil. Nadie ingresa por confianza ni sin documento comprobado.
               </InfoCard>
               <InfoCard color="#0ea5e9" title="Conversion y Captura Financiera (Cierre de C1)">
                 Donde: modulo Reportes → Enrolamiento y modulo Cierre de Caja. Que auditar el domingo de C1: ratio de conversion de alumnos de C1 a C2/Maestria; cuadre al 100% entre los pagos de la mesa externa de conversion y el "Cierre de Caja" del sistema ese mismo domingo.
