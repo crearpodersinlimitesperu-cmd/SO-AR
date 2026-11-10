@@ -43,7 +43,7 @@ export default function ContratoCaminataFuego() {
     numeroDocumento: '',
     email: '',
     telefono: '',
-    rolActividad: 'PARTICIPANTE',
+    rolActividad: 'Participante',
     sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
     aceptoRiesgos: false,
     aceptoSalud: false,
@@ -920,7 +920,7 @@ export default function ContratoCaminataFuego() {
                     numeroDocumento: '',
                     email: '',
                     telefono: '',
-                    rolActividad: 'PARTICIPANTE',
+                    rolActividad: 'Participante',
                     sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
                     aceptoRiesgos: false,
                     aceptoSalud: false,
@@ -1105,8 +1105,14 @@ export default function ContratoCaminataFuego() {
                     outline: 'none'
                   }}
                 >
-                  <option value="PARTICIPANTE">PARTICIPANTE (Inscrito activo en el entrenamiento vivencial)</option>
-                  <option value="PARTNER">PARTNER (Rol asignado de acompañamiento, soporte y asistencia en sala)</option>
+                  <option value="Participante">Participante</option>
+                  <option value="Entrenador">Entrenador</option>
+                  <option value="Oficina">Oficina</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Capitán">Capitán</option>
+                  <option value="Aliados">Aliados</option>
+                  <option value="Staff de Caminata">Staff de Caminata</option>
+                  <option value="Staff de Mesa">Staff de Mesa</option>
                 </select>
               </div>
 

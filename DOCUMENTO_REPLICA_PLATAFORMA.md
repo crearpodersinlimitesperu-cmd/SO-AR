@@ -61000,21 +61000,21 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
 
       <form id="firewalkForm" onsubmit="handleSubmit(event)" class="space-y-5">
         
-        <!-- Rol -->
+                <!-- Rol -->
         <div>
-          <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2">
-            1. Rol en la Dinámica Vivencial *
+          <label for="rolActividad" class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2">
+            Rol en la Actividad *
           </label>
-          <div class="grid grid-cols-2 gap-3">
-            <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer hover:border-orange-500 transition-all">
-              <input type="radio" name="rolActividad" value="PARTICIPANTE" checked class="accent-orange-500 w-4 h-4">
-              <span class="text-sm font-bold text-white">PARTICIPANTE</span>
-            </label>
-            <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer hover:border-orange-500 transition-all">
-              <input type="radio" name="rolActividad" value="PARTNER" class="accent-orange-500 w-4 h-4">
-              <span class="text-sm font-bold text-white">PARTNER / STAFF</span>
-            </label>
-          </div>
+          <select id="rolActividad" name="rolActividad" required class="w-full px-4 py-3 rounded-xl bg-slate-800/90 border border-slate-700 text-white font-semibold focus:outline-none focus:border-orange-500 text-sm cursor-pointer">
+            <option value="Participante" selected>Participante</option>
+            <option value="Entrenador">Entrenador</option>
+            <option value="Oficina">Oficina</option>
+            <option value="Manager">Manager</option>
+            <option value="Capitán">Capitán</option>
+            <option value="Aliados">Aliados</option>
+            <option value="Staff de Caminata">Staff de Caminata</option>
+            <option value="Staff de Mesa">Staff de Mesa</option>
+          </select>
         </div>
 
         <!-- Datos del Declarante -->
@@ -61176,7 +61176,7 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
       const email = document.getElementById('email').value.trim();
       const tel = document.getElementById('telefono').value.trim();
       const firma = document.getElementById('firmaTexto').value.trim();
-      const rol = document.querySelector('input[name="rolActividad"]:checked').value;
+      const rol = document.getElementById('rolActividad').value;
       const aceptoImagen = document.getElementById('aceptoImagen').checked;
 
       const code = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
@@ -152632,7 +152632,7 @@ export default function ContratoCaminataFuego() {
     numeroDocumento: '',
     email: '',
     telefono: '',
-    rolActividad: 'PARTICIPANTE',
+    rolActividad: 'Participante',
     sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
     aceptoRiesgos: false,
     aceptoSalud: false,
@@ -153509,7 +153509,7 @@ export default function ContratoCaminataFuego() {
                     numeroDocumento: '',
                     email: '',
                     telefono: '',
-                    rolActividad: 'PARTICIPANTE',
+                    rolActividad: 'Participante',
                     sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
                     aceptoRiesgos: false,
                     aceptoSalud: false,
@@ -153694,8 +153694,14 @@ export default function ContratoCaminataFuego() {
                     outline: 'none'
                   }}
                 >
-                  <option value="PARTICIPANTE">PARTICIPANTE (Inscrito activo en el entrenamiento vivencial)</option>
-                  <option value="PARTNER">PARTNER (Rol asignado de acompañamiento, soporte y asistencia en sala)</option>
+                  <option value="Participante">Participante</option>
+                  <option value="Entrenador">Entrenador</option>
+                  <option value="Oficina">Oficina</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Capitán">Capitán</option>
+                  <option value="Aliados">Aliados</option>
+                  <option value="Staff de Caminata">Staff de Caminata</option>
+                  <option value="Staff de Mesa">Staff de Mesa</option>
                 </select>
               </div>
 
