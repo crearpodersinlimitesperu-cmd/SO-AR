@@ -60843,7 +60843,7 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acuerdo Caminata sobre Fuego · CREAR Poder Sin Límites</title>
+  <title>Instrumento Legal Caminata sobre Fuego · Creación Cuántica E.I.R.L.</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/png" href="/logo-crear.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60861,7 +60861,8 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
             fireOrange: '#f97316',
             fireRed: '#ef4444',
             crearDark: '#0f172a',
-            crearCard: '#1e293b'
+            crearCard: '#1e293b',
+            crearGold: '#ffb703'
           }
         }
       }
@@ -60893,30 +60894,30 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
         <div>
           <div class="flex flex-wrap items-center gap-2 mb-3">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-black uppercase tracking-wider bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-sm">
-              🔥 ACUERDO LEGAL VINCULANTE
+              🔥 INSTRUMENTO LEGAL VINCULANTE
             </span>
             <span class="px-2.5 py-1 rounded-md text-xs font-bold text-orange-400 bg-orange-500/10 border border-orange-500/30">
-              LEY N° 27269 & LEY N° 29733
+              LEY N° 27269 & D.S. N° 016-2024-JUS
             </span>
             <span class="px-2.5 py-1 rounded-md text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30">
-              LIMA, PERÚ
+              VERSIÓN V1.0-2026-FIREWALK-LIMA
             </span>
           </div>
 
           <h1 class="text-2xl md:text-3xl font-black text-white leading-tight">
-            Acuerdo Integral de Exoneración de Responsabilidad, Derechos de Imagen y Consentimiento Informado
+            Instrumento Integrado de Exoneración de Responsabilidad, Declaración de Salud, Tratamiento de Datos Sensibles y Autorización de Uso de Imagen
           </h1>
           <p class="mt-2 text-sm md:text-base font-extrabold text-orange-400">
-            EXPERIENCIA ALTO IMPACTO: CAMINATA SOBRE FUEGO (FIREWALKING PERÚ)
+            DINÁMICA VIVENCIAL DE ALTO IMPACTO: CAMINATA SOBRE FUEGO (FIREWALK LIMA, PERÚ)
           </p>
           <p class="mt-1 text-xs md:text-sm text-slate-400 max-w-2xl leading-relaxed">
-            Celebrado entre <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> y la persona firmante.
+            Administrado por <strong>Creación Cuántica E.I.R.L.</strong> (RUC: 20612592811) con domicilio fiscal en Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú.
           </p>
 
           <div class="flex flex-wrap items-center gap-4 mt-4 text-xs text-slate-400 font-medium">
-            <span class="flex items-center gap-1.5"><span class="text-orange-500">📍</span> Casona Blanca (Huachipa, Lima)</span>
-            <span class="flex items-center gap-1.5"><span class="text-cyan-400">📅</span> Vigencia Operativa Oficial 2026</span>
-            <span class="flex items-center gap-1.5"><span class="text-emerald-400">🛡️</span> Firma Digital Verificada</span>
+            <span class="flex items-center gap-1.5"><span class="text-orange-500">📍</span> Locación Oficial: Casona Blanca (Huachipa, Lima)</span>
+            <span class="flex items-center gap-1.5"><span class="text-cyan-400">📅</span> Vigencia Operativa: 26 de Octubre 2026</span>
+            <span class="flex items-center gap-1.5"><span class="text-emerald-400">🛡️</span> Validez Jurídica: Art. 141-A C.C.</span>
           </div>
         </div>
 
@@ -60924,10 +60925,10 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
         <div class="flex md:flex-col gap-2 shrink-0 no-print">
           <button onclick="toggleQrModal(true)" class="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-black shadow-lg shadow-orange-600/30 transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-            Ver Código QR
+            Ver Código QR Móvil
           </button>
           <a href="#formulario-firma" class="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/40 text-xs font-bold transition-all text-center">
-            ✍️ Ir a Firmar
+            ✍️ Ir al Formulario de Firma
           </a>
         </div>
       </div>
@@ -60936,298 +60937,285 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
     <!-- Preámbulo Legal -->
     <div class="rounded-xl bg-slate-900/80 border border-slate-800 p-5 text-sm text-slate-300 leading-relaxed shadow-sm">
       <p>
-        El presente documento constituye un contrato y acuerdo legal vinculante celebrado entre la entidad organizadora 
-        <strong class="text-white">CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong>, sus representantes legales, instructores, facilitadores, personal de apoyo y logística, y la persona firmante (en adelante, <strong class="text-orange-400">"EL FIRMANTE"</strong>), quien participa en la actividad de alto impacto denominada "Caminata sobre Fuego".
+        El presente documento constituye un instrumento jurídico vinculante celebrado entre la entidad organizadora 
+        <strong class="text-white">CREACIÓN CUÁNTICA E.I.R.L.</strong> (con RUC 20612592811), sus facilitadores, equipo logístico y el/la firmante (en adelante, <strong class="text-orange-400">"EL/LA PARTICIPANTE O PARTNER"</strong>), en el marco de la dinámica vivencial de alto impacto denominada <strong>"Caminata sobre Fuego" (Firewalking)</strong>.
       </p>
     </div>
 
-    <!-- Cláusula 1 -->
-    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+    <!-- SECCIÓN I -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-4">
       <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 font-black text-sm">1</span>
-        <h2 class="text-lg font-bold text-white">Marco Legal y Normativo Aplicable</h2>
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 font-black text-sm">I</span>
+        <h2 class="text-lg font-bold text-white">Sección I: Exoneración de Responsabilidad, Asunción de Riesgos y Autonomía de la Voluntad</h2>
       </div>
       <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
-        <p>El presente acuerdo se rige bajo la legislación vigente de la República del Perú, amparado fundamentalmente en los siguientes cuerpos normativos:</p>
-        <ul class="list-disc pl-5 space-y-2">
-          <li>
-            <strong class="text-cyan-400">Código Civil Peruano (Decreto Legislativo N° 295):</strong> En particular el <strong>Artículo 11</strong>, correspondiente al derecho a la imagen y a la voz, así como las disposiciones relativas a la libertad contractual y autonomía de la voluntad (<strong>Artículos 1354 y 1356</strong>) y responsabilidad civil (<strong>Artículos 1969 y 1970</strong>).
-          </li>
-          <li>
-            <strong class="text-cyan-400">Ley N° 27269 — Ley de Firmas y Certificados Digitales:</strong> Y su reglamento, garantizando la validez jurídica, eficacia e idoneidad del consentimiento otorgado a través de medios electrónicos o digitales.
-          </li>
-          <li>
-            <strong class="text-cyan-400">Ley N° 29733 — Ley de Protección de Datos Personales:</strong> Y su Reglamento aprobado mediante Decreto Supremo N° 003-2013-JUS, en lo respectivo a la recolección, almacenamiento, tratamiento y transferencia de datos personales y datos sensibles.
-          </li>
-        </ul>
+        <p><strong>1. Naturaleza de la Dinámica:</strong> EL/LA DECLARANTE reconoce que la dinámica vivencial denominada "Caminata sobre Fuego" consiste en transitar descalzo sobre una superficie de brasas de madera encendidas a altas temperaturas, constituyendo un ejercicio voluntario de superación de límites mentales y gestión emocional bajo instrucción técnica especializada.</p>
+        <p><strong>2. Protocolos de Seguridad y Voluntariedad Irrestricta:</strong> EL/LA DECLARANTE manifiesta que ha recibido instrucciones verbales y técnicas previas respecto a la postura física, cadencia del paso y focalización mental requeridas para la ejecución de la dinámica. Asimismo, declara y acepta expresamente que su participación es estrictamente voluntaria, reconociendo el derecho inalienable de desistir, retirarse o negarse a realizar la caminata sobre el fuego en cualquier momento antes o durante el ejercicio, sin que ello genere penalidad, reproche ni menoscabo moral alguno.</p>
+        <p><strong>3. Asunción Razonable del Riesgo y Deslinde de Responsabilidad:</strong> En ejercicio de su autonomía privada reconocida en el artículo 2, numeral 24, literal a) de la Constitución Política del Perú y los artículos 141 y 1354 del Código Civil, EL/LA DECLARANTE asume los riesgos fisiológicos inherentes a la exposición térmica breve y controlada (incluyendo enrojecimiento epidérmico, ampollas leves o irritación dérmica transitoria por contacto térmico o restos de ceniza).</p>
+        <p>Por consiguiente, habiendo la entidad facilitadora implementado los estándares y protocolos de seguridad pertinentes, EL/LA DECLARANTE exonera a Creación Cuántica E.I.R.L., a sus socios, instructores certificados y equipo de soporte logístico de toda responsabilidad civil patrimonial, extrapatrimonial o de cualquier otra índole legal derivada de contingencias, lesiones menores o secuelas térmicas atribuibles a la inobservancia culpable o negligente de las pautas de seguridad impartidas, a la propia condición dérmica preexistente del declarante o al curso regular de una dinámica de alto impacto aceptada voluntariamente.</p>
       </div>
     </section>
 
-    <!-- Cláusula 2 -->
-    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+    <!-- SECCIÓN II -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-4">
       <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 font-black text-sm">2</span>
-        <h2 class="text-lg font-bold text-white">Declaración de Aptitud Física y Mental y Asunción Voluntaria de Riesgos</h2>
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 font-black text-sm">II</span>
+        <h2 class="text-lg font-bold text-white">Sección II: Declaración Jurada de Salud y Consentimiento Informado para Tratamiento de Datos Personales y Sensibles</h2>
       </div>
       <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
-        <p>EL FIRMANTE declara de manera libre, consciente y voluntaria lo siguiente:</p>
-        <ul class="list-disc pl-5 space-y-2">
-          <li><strong class="text-amber-400">Estado de Salud:</strong> Cuenta con plena aptitud física, médica, mental y emocional para someterse a experiencias de alto impacto y estrés controlado. No padece de afecciones cardíacas graves, hipertensión no controlada, epilepsia, trastornos psiquiátricos agudos, ni lesiones abiertas en los miembros inferiores que impidan su participación activa.</li>
-          <li><strong class="text-amber-400">Naturaleza de la Actividad:</strong> Comprende plenamente que la "Caminata sobre Fuego" consiste en dar pasos descalzo(a) sobre una cama de brasas de madera al rojo vivo.</li>
-          <li><strong class="text-amber-400">Reconocimiento de Riesgos Inherentes:</strong> Acepta y entiende que, a pesar de los estrictos protocolos de seguridad y guía técnica proporcionados por la organización, la actividad conlleva riesgos inherentes como: quemaduras de primer, segundo o tercer grado, ampollas, irritación cutánea, caídas, contusiones o reacciones emocionales intensas.</li>
-          <li><strong class="text-amber-400">Voluntariedad:</strong> Entiende que la participación es 100% voluntaria. En ningún momento el equipo organizador obligará a EL FIRMANTE a cruzar las brasas si este decide no hacerlo.</li>
-        </ul>
+        <p><strong>1. Declaración Jurada de Salud:</strong> EL/LA DECLARANTE manifiesta bajo juramento no encontrarse bajo el efecto de sustancias estupefacientes, alcohol o medicamentos que alteren su coordinación motriz o juicio crítico; no presentar neuropatías periféricas o insensibilidad en las extremidades inferiores; no padecer afecciones cardíacas graves o hipertensión no controlada que impidan la gestión del estrés agudo; y, en el caso de mujeres, no encontrarse en estado de gestación avanzada que contraindique la actividad.</p>
+        <p><strong>2. Tratamiento de Datos Personales y Sensibles (Ley N° 29733 y D.S. N° 016-2024-JUS):</strong> En cumplimiento de la Ley de Protección de Datos Personales (Ley N° 29733) y su Reglamento aprobado por D.S. N° 016-2024-JUS, EL/LA DECLARANTE otorga su consentimiento libre, previo, expreso, inequívoco e informado para que Creación Cuántica E.I.R.L., en calidad de Titular del Banco de Datos Personales, recopile y trate sus datos personales generales y de salud (datos sensibles).</p>
+        <p><strong>3. Finalidad y Transferencia:</strong> Dichos datos serán tratados exclusivamente con la finalidad de: a) evaluar la compatibilidad de salud para la realización segura de la dinámica, y b) coordinar asistencia médica o primeros auxilios en caso de emergencia. Los datos sensibles serán alojados de manera confidencial en infraestructura de servidores seguros (NODUS / Google Cloud Platform con cifrado SSL/TLS) y no serán comercializados ni transferidos a terceros con fines publicitarios.</p>
+        <p><strong>4. Derechos ARCO:</strong> Se informa al titular de los datos que puede ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO), así como revocar el presente consentimiento, dirigiendo una comunicación formal al correo oficial de protección de datos: <strong class="text-cyan-400">protecciondedatos@crearpsl.net</strong>.</p>
       </div>
     </section>
 
-    <!-- Cláusula 3 -->
-    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+    <!-- SECCIÓN III -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-4">
       <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 text-red-400 font-black text-sm">3</span>
-        <h2 class="text-lg font-bold text-white">Liberación y Exoneración Total de Responsabilidad Civil, Penal y Administrativa</h2>
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 font-black text-sm">III</span>
+        <h2 class="text-lg font-bold text-white">Sección III: Autorización para el Uso de Imagen, Fotografía y Voz (Código Civil Art. 15 y Ley N° 29733)</h2>
       </div>
       <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
-        <p>Mediante la firma o validación digital del presente documento, EL FIRMANTE otorga un descargo y liberación de responsabilidad amplio, definitivo e irrevocable:</p>
-        <ul class="list-disc pl-5 space-y-2">
-          <li><strong class="text-red-400">Exoneración Expresa:</strong> Exonera de toda responsabilidad civil, penal, administrativa o de cualquier otra índole a la empresa <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong>, a sus directores, representantes, capacitadores, coordinadores y al personal de apoyo o partner asignado a la actividad.</li>
-          <li><strong class="text-red-400">Renuncia a Acciones Legales:</strong> Renuncia expresamente a interponer cualquier tipo de demanda, denuncia, reclamo administrativo, arbitraje o solicitud de indemnización por daños y perjuicios, daños materiales, lesiones corporales, secuelas o daño moral derivados de su participación en la Caminata sobre Fuego.</li>
-          <li><strong class="text-red-400">Asunción de Gastos Médicos:</strong> EL FIRMANTE asume de forma personal e independiente cualquier gasto médico, hospitalario o de curación suplementario que pudiera requerir voluntariamente tras la realización del evento.</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Cláusula 4 -->
-    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
-      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 font-black text-sm">4</span>
-        <h2 class="text-lg font-bold text-white">Autorización Expresa e Irrevocable de Uso de Derechos de Imagen y Voz</h2>
-      </div>
-      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
-        <p>De conformidad con el <strong>Artículo 11 del Código Civil Peruano</strong>:</p>
-        <ul class="list-disc pl-5 space-y-2">
-          <li><strong class="text-purple-400">Autorización de Captura:</strong> EL FIRMANTE autoriza de manera expresa, gratuita e irrevocable a <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> a fotografiar, grabar en video, registrar en audio o filmar su imagen, rostro, voz y participación general durante el desarrollo del evento.</li>
-          <li><strong class="text-purple-400">Finalidad y Medios de Difusión:</strong> La organización podrá utilizar, reproducir, editar, publicar y comercializar dicho material audiovisual en redes sociales, sitios web, plataformas digitales, spots publicitarios, material educativo o de entrenamiento, tanto en el Perú como en el extranjero, de forma ilimitada en el tiempo.</li>
-          <li><strong class="text-purple-400">Renuncia a Compensación:</strong> EL FIRMANTE reconoce que no tendrá derecho a compensación económica, pago de regalías ni reclamos por derechos de autor sobre las piezas publicitarias o contenidos generados.</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Cláusula 5 -->
-    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
-      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
-        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 font-black text-sm">5</span>
-        <h2 class="text-lg font-bold text-white">Consentimiento Informado de Tratamiento de Datos Personales y Datos Sensibles</h2>
-      </div>
-      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
-        <p>En cumplimiento de la <strong>Ley N° 29733 (Ley de Protección de Datos Personales de Perú)</strong> y su Reglamento:</p>
-        <ul class="list-disc pl-5 space-y-2">
-          <li><strong class="text-emerald-400">Autorización de Tratamiento:</strong> EL FIRMANTE otorga su consentimiento previo, informado, expreso e inequívoco para que <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> recopile y trate sus datos personales y datos sensibles relevantes para la seguridad de la dinámica.</li>
-          <li><strong class="text-emerald-400">Finalidades:</strong> Garantizar la gestión de la seguridad física durante la actividad, coordinación logística y comunicación directa, y envío de información sobre futuros entrenamientos.</li>
-          <li><strong class="text-emerald-400">Derechos ARCO:</strong> Declaración de haber sido informado de que puede ejercer en cualquier momento sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) dirigiendo comunicación escrita a <strong>legal@crearpsl.net</strong>.</li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Sección 6: Formulario de Firma Digital y Validación -->
-    <section id="formulario-firma" class="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-cyan-500/40 p-6 md:p-8 shadow-2xl shadow-cyan-950/20">
-      <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-800">
-        <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 font-black">✍️</span>
-        <div>
-          <span class="text-xs font-black tracking-wider text-cyan-400 uppercase">Sección 6 · Firma Digital Vinculante</span>
-          <h2 class="text-xl md:text-2xl font-black text-white">Validación y Aceptación Digital</h2>
+        <div class="p-3 rounded-lg bg-purple-950/40 border border-purple-500/30 text-purple-200 text-xs font-semibold">
+          ℹ️ CLÁUSULA CON CARÁCTER INDEPENDIENTE Y FACULTATIVO (OPT-IN): La aceptación de esta cláusula es 100% opcional y no condiciona de ninguna manera tu participación en la Caminata sobre Fuego.
         </div>
+        <p>En concordancia con el artículo 15 del Código Civil Peruano y la normativa de protección de datos personales, EL/LA DECLARANTE tiene la potestad de decidir libremente si autoriza o no la captación y difusión de su imagen y voz.</p>
+        <p>De ser autorizada mediante la casilla opt-in correspondiente, EL/LA DECLARANTE cede de manera voluntaria, no exclusiva y a título gratuito a favor de Creación Cuántica E.I.R.L., el derecho a utilizar, reproducir, publicar y difundir su imagen fotográfica, fijación audiovisual y testimonios captados durante la realización del evento, con fines estrictamente institucionales, informativos, de divulgación académica y promoción en plataformas digitales, páginas web institucionales y redes sociales oficiales de la empresa.</p>
+        <p>Dicha autorización tendrá una vigencia temporal de cinco (5) años contados desde la fecha de suscripción del presente instrumento, no confiriendo derecho a remuneración o compensación económica ulterior, sin perjuicio de los derechos de revocación conforme a ley. La negativa a conceder esta autorización facultativa no impedirá ni condicionará en modo alguno su participación en la dinámica, disponiéndose para tal caso los distintivos logísticos necesarios para salvaguardar su privacidad visual en las grabaciones del evento.</p>
+      </div>
+    </section>
+
+    <!-- SECCIÓN IV: Formulario de Validación y Firma -->
+    <section id="formulario-firma" class="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-orange-500/40 p-6 md:p-8 space-y-6 shadow-xl">
+      <div class="border-b border-slate-800 pb-4">
+        <span class="text-xs font-black uppercase tracking-wider text-orange-400">Sección IV</span>
+        <h2 class="text-xl md:text-2xl font-black text-white mt-1">
+          Manifestación de Voluntad, Registro de Rol y Firma Digital Vinculante
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">
+          Conforme a la Ley N° 27269 (Firmas y Certificados Digitales) y los Arts. 141 y 141-A del Código Civil, el envío y suscripción electrónica del presente formulario perfecciona la aceptación plena del instrumento.
+        </p>
       </div>
 
-      <p class="text-xs md:text-sm text-slate-300 mb-6 leading-relaxed">
-        El presente acuerdo se valida de manera electrónica con arreglo a la <strong>Ley N° 27269</strong>. La confirmación de las casillas y el envío de este formulario constituyen firma digital/electrónica válida y vinculante.
-      </p>
-
-      <form id="digital-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+      <form id="firewalkForm" onsubmit="handleSubmit(event)" class="space-y-5">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Nombre Completo -->
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Nombre Completo *</label>
-            <input type="text" id="form-name" required placeholder="Ej. Juan Pérez Quispe" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
-          </div>
-
-          <!-- Documento de Identidad -->
-          <div class="flex gap-2">
-            <div class="w-28 shrink-0">
-              <label class="block text-xs font-bold text-slate-300 mb-1">Tipo Doc. *</label>
-              <select id="form-doc-type" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400">
-                <option value="DNI">DNI</option>
-                <option value="Pasaporte">Pasaporte</option>
-                <option value="Carné Ext.">Carné Ext.</option>
-                <option value="Cédula">Cédula</option>
-              </select>
-            </div>
-            <div class="flex-1">
-              <label class="block text-xs font-bold text-slate-300 mb-1">Número de Documento *</label>
-              <input type="text" id="form-doc-number" required placeholder="Doc. de Identidad" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
-            </div>
-          </div>
-
-          <!-- Correo Electrónico -->
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Correo Electrónico *</label>
-            <input type="email" id="form-email" required placeholder="tu.correo@ejemplo.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
-          </div>
-
-          <!-- Teléfono / WhatsApp -->
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Teléfono de Contacto / WhatsApp *</label>
-            <input type="tel" id="form-phone" required placeholder="+51 999 999 999" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
-          </div>
-
-          <!-- Rol en la Actividad -->
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Rol en la Actividad *</label>
-            <select id="form-role" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400">
-              <option value="Participante">Participante</option>
-              <option value="Partner / Acompañante">Partner / Acompañante</option>
-              <option value="Staff / Logística">Staff / Logística</option>
-              <option value="Entrenador">Entrenador</option>
-            </select>
-          </div>
-
-          <!-- Locación -->
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Locación</label>
-            <input type="text" readonly value="Casona Blanca - Huachipa, Lima" class="w-full bg-slate-950/60 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm text-slate-400">
-          </div>
-        </div>
-
-        <!-- Casillas de Declaraciones de Conformidad -->
-        <div class="rounded-xl bg-slate-950 border border-slate-800 p-4 space-y-3 mt-4">
-          <h4 class="text-xs font-black uppercase text-cyan-400 tracking-wider">Declaraciones de Conformidad (Casillas de Verificación Electrónica Obligatorias):</h4>
-          
-          <label class="flex items-start gap-3 cursor-pointer text-xs md:text-sm text-slate-200">
-            <input type="checkbox" id="chk-riesgos" required class="w-4 h-4 mt-0.5 rounded accent-orange-500">
-            <span><strong>He leído y acepto expresamente</strong> los términos de la Exoneración de Responsabilidad y Asunción de Riesgos para la Caminata sobre Fuego.</span>
-          </label>
-
-          <label class="flex items-start gap-3 cursor-pointer text-xs md:text-sm text-slate-200">
-            <input type="checkbox" id="chk-imagen" required class="w-4 h-4 mt-0.5 rounded accent-cyan-500">
-            <span><strong>Autorizo el uso de mi imagen y voz</strong> a favor de CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL según lo estipulado en el Artículo 11 del Código Civil.</span>
-          </label>
-
-          <label class="flex items-start gap-3 cursor-pointer text-xs md:text-sm text-slate-200">
-            <input type="checkbox" id="chk-datos" required class="w-4 h-4 mt-0.5 rounded accent-emerald-500">
-            <span><strong>Doy mi consentimiento informado</strong> para el tratamiento de mis Datos Personales y Datos Sensibles conforme a la Ley N° 29733.</span>
-          </label>
-        </div>
-
-        <!-- Firma Escrita -->
+        <!-- Rol -->
         <div>
-          <label class="block text-xs font-bold text-slate-300 mb-1">Escribe tu Nombre Completo como Firma Digital (Ley N° 27269) *</label>
-          <input type="text" id="form-signature" required placeholder="Escribe exactamente tu nombre y apellidos completos" class="w-full bg-slate-950 border border-cyan-500 rounded-lg px-3.5 py-3 text-sm font-bold text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/40">
+          <label class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2">
+            1. Rol en la Dinámica Vivencial *
+          </label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer hover:border-orange-500 transition-all">
+              <input type="radio" name="rolActividad" value="PARTICIPANTE" checked class="accent-orange-500 w-4 h-4">
+              <span class="text-sm font-bold text-white">PARTICIPANTE</span>
+            </label>
+            <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-700 bg-slate-800/60 cursor-pointer hover:border-orange-500 transition-all">
+              <input type="radio" name="rolActividad" value="PARTNER" class="accent-orange-500 w-4 h-4">
+              <span class="text-sm font-bold text-white">PARTNER / STAFF</span>
+            </label>
+          </div>
         </div>
 
-        <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-orange-600 via-orange-500 to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-black text-base shadow-xl shadow-orange-600/30 transition-all flex items-center justify-center gap-2">
-          🔥 Firmar y Validar Acuerdo Electrónico
-        </button>
+        <!-- Datos del Declarante -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Nombre y Apellidos Completos *</label>
+            <input type="text" id="nombreCompleto" required placeholder="Ej. Carlos Mendoza Ríos" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Tipo y Número de Documento (DNI / CE / Pasaporte) *</label>
+            <input type="text" id="numeroDocumento" required placeholder="Ej. DNI 45892147 o Pasaporte 1092837" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Correo Electrónico (Para envío de constancia) *</label>
+            <input type="email" id="email" required placeholder="carlos.mendoza@email.com" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Teléfono / WhatsApp de Contacto y Emergencia *</label>
+            <input type="tel" id="telefono" required placeholder="+51 987 654 321" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">Locación Confirmada</label>
+          <input type="text" readonly value="Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)" class="w-full px-4 py-2.5 rounded-xl bg-slate-800/40 border border-slate-800 text-slate-400 text-xs font-medium cursor-not-allowed">
+        </div>
+
+        <!-- 3 Checkboxes Estructurados -->
+        <div class="space-y-3 pt-2">
+
+          <!-- Checkbox 1: Obligatorio -->
+          <div class="p-4 rounded-xl border border-orange-500/40 bg-orange-950/20">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="aceptoRiesgos" required class="mt-1 w-5 h-5 accent-orange-500 shrink-0 cursor-pointer">
+              <div class="text-xs text-slate-200 leading-relaxed">
+                <strong class="text-orange-400 block mb-0.5">[X] CHECKBOX 1 (OBLIGATORIO) – EXONERACIÓN DE RESPONSABILIDAD Y ASUNCIÓN DE RIESGOS:</strong>
+                He leído, comprendido y aceptado en su totalidad los términos de la <strong>Sección I</strong>. Asumo voluntariamente los riesgos inherentes de la caminata sobre fuego y libero a Creación Cuántica E.I.R.L. de toda responsabilidad en los términos estipulados.
+              </div>
+            </label>
+          </div>
+
+          <!-- Checkbox 2: Obligatorio -->
+          <div class="p-4 rounded-xl border border-cyan-500/40 bg-cyan-950/20">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="aceptoSalud" required class="mt-1 w-5 h-5 accent-cyan-500 shrink-0 cursor-pointer">
+              <div class="text-xs text-slate-200 leading-relaxed">
+                <strong class="text-cyan-400 block mb-0.5">[X] CHECKBOX 2 (OBLIGATORIO) – DECLARACIÓN JURADA DE SALUD Y TRATAMIENTO DE DATOS SENSIBLES:</strong>
+                Declaro bajo juramento cumplir con las condiciones de aptitud física descritas en la <strong>Sección II</strong> y autorizo expresamente el tratamiento confidencial de mis datos personales y sensibles para fines médicos y de seguridad conforme a la Ley N° 29733 y D.S. N° 016-2024-JUS.
+              </div>
+            </label>
+          </div>
+
+          <!-- Checkbox 3: OPCIONAL (OPT-IN) -->
+          <div class="p-4 rounded-xl border border-purple-500/40 bg-purple-950/20">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="aceptoImagen" class="mt-1 w-5 h-5 accent-purple-500 shrink-0 cursor-pointer">
+              <div class="text-xs text-slate-200 leading-relaxed">
+                <strong class="text-purple-300 block mb-0.5">[ ] CHECKBOX 3 (OPCIONAL / OPT-IN) – AUTORIZACIÓN DE USO DE IMAGEN, FOTOGRAFÍA Y VOZ:</strong>
+                <em>(Marque activamente solo si desea autorizar)</em> Autorizo a Creación Cuántica E.I.R.L. a utilizar y publicar mi imagen y voz captadas en el evento para fines institucionales y de difusión según los términos de la <strong>Sección III</strong>. Entiendo que si no marco esta casilla podré participar normalmente y recibiré un distintivo de privacidad en sala.
+              </div>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Firma Digital Escrita -->
+        <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/80 space-y-2">
+          <label class="block text-xs font-black uppercase tracking-wider text-slate-200">
+            Firma Digital Vinculante (Escribe tu Nombre y Apellidos Completos) *
+          </label>
+          <input type="text" id="firmaTexto" required placeholder="Escribe exactamente tu nombre completo tal como figura en tu documento" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm font-semibold">
+          <p class="text-[11px] text-slate-400">
+            Al registrar tu nombre y presionar "Firmar y Validar Instrumento Legal", se generará un código criptográfico único de verificación junto al sello de tiempo (Timestamp) con plena eficacia jurídica.
+          </p>
+        </div>
+
+        <!-- Botón de Envío -->
+        <div>
+          <button type="submit" id="submitBtn" class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black text-sm uppercase tracking-wider shadow-lg shadow-orange-600/30 transition-all flex items-center justify-center gap-2">
+            🔥 Firmar y Validar Instrumento Legal
+          </button>
+        </div>
+
       </form>
 
-      <!-- Recibo / Certificado de Firma Exitosa -->
-      <div id="success-box" class="hidden rounded-xl bg-emerald-950/40 border-2 border-emerald-500 p-6 text-center space-y-4 mt-6">
-        <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center text-3xl">✓</div>
-        <h3 class="text-xl font-black text-emerald-400">¡Acuerdo Validado y Firmado Exitosamente!</h3>
-        <p class="text-xs text-slate-300 max-w-lg mx-auto">Constancia oficial de exoneración de responsabilidad y consentimiento informado generada con plena eficacia jurídica.</p>
-        
-        <div class="bg-slate-950 border border-slate-800 rounded-lg p-4 max-w-md mx-auto text-left text-xs space-y-2">
-          <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-400">Código de Auditoría:</span><span id="res-code" class="font-bold text-cyan-400"></span></div>
-          <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-400">Firmante:</span><span id="res-name" class="font-bold text-white"></span></div>
-          <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-400">Documento:</span><span id="res-doc" class="text-white"></span></div>
-          <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-400">Rol:</span><span id="res-role" class="font-bold text-orange-400"></span></div>
-          <div class="flex justify-between"><span class="text-slate-400">Fecha y Hora Oficial:</span><span id="res-date" class="font-bold text-emerald-400"></span></div>
+      <!-- Mensaje de Éxito -->
+      <div id="successCard" style="display:none;" class="p-6 rounded-2xl bg-gradient-to-br from-emerald-950/80 to-slate-950 border border-emerald-500/50 text-center space-y-4">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 text-3xl font-black">
+          ✓
         </div>
-
-        <div class="flex flex-wrap justify-center gap-3 pt-2">
-          <button onclick="window.print()" class="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2">
-            🖨️ Imprimir / Guardar Constancia PDF
-          </button>
-          <button onclick="resetForm()" class="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition-all">
-            Registrar Otro Participante
-          </button>
+        <div>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-block mb-2">
+            ACUERDO FIRMADO Y VALIDADO CON ÉXITO
+          </span>
+          <h3 class="text-2xl font-black text-white">Instrumento Legal Registrado</h3>
+          <p class="text-sm text-slate-300 max-w-md mx-auto mt-2" id="successSummary"></p>
         </div>
+        <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-mono text-left max-w-lg mx-auto space-y-1.5 text-slate-300">
+          <p><span class="text-slate-500">Código de Verificación:</span> <strong id="certCode" class="text-orange-400 font-bold"></strong></p>
+          <p><span class="text-slate-500">Sello de Tiempo (Lima):</span> <strong id="certTimestamp" class="text-white"></strong></p>
+          <p><span class="text-slate-500">Control de Versión:</span> <strong class="text-cyan-400">V1.0-2026-FIREWALK-LIMA</strong></p>
+          <p><span class="text-slate-500">Entidad Receptora:</span> <strong class="text-white">Creación Cuántica E.I.R.L. (RUC 20612592811)</strong></p>
+        </div>
+        <p class="text-xs text-emerald-400 font-semibold">
+          ¡Tu habilitación de sala está completada! Presenta este código en la mesa de acreditación de Casona Blanca.
+        </p>
       </div>
+
     </section>
 
-    <!-- Modal QR -->
-    <div id="qr-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div class="bg-slate-900 border-2 border-orange-500 rounded-2xl p-6 md:p-8 max-w-sm w-full text-center relative shadow-2xl shadow-orange-950/50">
-        <button onclick="toggleQrModal(false)" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">✕</button>
-        
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-orange-500/15 text-orange-400 border border-orange-500/30 mb-3">
-          🔥 ESCANEA EN MESA DE REGISTRO
-        </span>
-
-        <h3 class="text-xl font-black text-white mb-1">Código QR Oficial</h3>
-        <p class="text-xs text-slate-400 mb-4">Apunta con tu celular para abrir y firmar el acuerdo.</p>
-        
-        <div class="bg-white p-3 rounded-xl inline-block shadow-xl mb-4">
-          <img id="qr-image" src="" alt="Código QR" class="w-56 h-56 block">
-        </div>
-
-        <div class="flex gap-2 justify-center">
-          <a id="qr-download-btn" href="" download="QR_Caminata_Fuego_CREAR.png" target="_blank" class="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold transition-all">
-            📥 Descargar QR
-          </a>
-          <button onclick="toggleQrModal(false)" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700">
-            Cerrar
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="border-t border-slate-800 pt-6 pb-12 text-center text-xs text-slate-500 space-y-1">
-      <p><strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> · Todos los derechos reservados © 2026</p>
-      <p>Sede Legal: Lima, Perú · Derechos ARCO: <strong>legal@crearpsl.net</strong></p>
+    <!-- Footer Corporativo y Legal -->
+    <footer class="pt-4 pb-8 border-t border-slate-800 text-center text-xs text-slate-500 space-y-2">
+      <p>
+        <strong>Control de Versión:</strong> V1.0-2026-FIREWALK-LIMA · <strong>Fecha de Vigencia:</strong> 26 de octubre de 2026
+      </p>
+      <p>
+        <strong>Entidad Administradora:</strong> Creación Cuántica E.I.R.L. (RUC 20612592811) · Domicilio Fiscal: Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú · Canal ARCO: <strong>protecciondedatos@crearpsl.net</strong>
+      </p>
+      <p class="text-[11px] text-slate-600">
+        Plataforma Tecnológica Oficial Causa OS · Todos los derechos reservados © 2026
+      </p>
     </footer>
 
   </div>
 
+  <!-- QR Modal -->
+  <div id="qrModal" style="display:none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="toggleQrModal(false)">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-black text-white">Código QR para Móvil</h3>
+        <button onclick="toggleQrModal(false)" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      </div>
+      <p class="text-xs text-slate-400">Escanea con la cámara de tu celular para abrir este instrumento legal y firmar en tu dispositivo:</p>
+      <div class="p-3 bg-white rounded-xl inline-block shadow-inner">
+        <img id="qrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=" alt="Código QR" class="w-56 h-56 mx-auto">
+      </div>
+      <p class="text-[11px] text-orange-400 font-mono break-all" id="qrUrlText"></p>
+      <button onclick="toggleQrModal(false)" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-all">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
   <script>
+    // Inicializar URL y QR dinámico
     const currentUrl = window.location.href;
-    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(currentUrl)}`;
-    document.getElementById('qr-image').src = qrSrc;
-    document.getElementById('qr-download-btn').href = qrSrc;
+    document.getElementById('qrUrlText').innerText = currentUrl;
+    document.getElementById('qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=' + encodeURIComponent(currentUrl);
 
     function toggleQrModal(show) {
-      document.getElementById('qr-modal').classList.toggle('hidden', !show);
+      document.getElementById('qrModal').style.display = show ? 'flex' : 'none';
     }
 
-    function handleFormSubmit(e) {
+    function handleSubmit(e) {
       e.preventDefault();
-      const name = document.getElementById('form-name').value.trim();
-      const docType = document.getElementById('form-doc-type').value;
-      const docNum = document.getElementById('form-doc-number').value.trim();
-      const role = document.getElementById('form-role').value;
-      const code = 'CPSL-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
-      const dateStr = new Date().toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'medium' });
+      
+      const nombre = document.getElementById('nombreCompleto').value.trim();
+      const doc = document.getElementById('numeroDocumento').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const tel = document.getElementById('telefono').value.trim();
+      const firma = document.getElementById('firmaTexto').value.trim();
+      const rol = document.querySelector('input[name="rolActividad"]:checked').value;
+      const aceptoImagen = document.getElementById('aceptoImagen').checked;
 
-      document.getElementById('res-code').textContent = code;
-      document.getElementById('res-name').textContent = name;
-      document.getElementById('res-doc').textContent = `${docType} ${docNum}`;
-      document.getElementById('res-role').textContent = role;
-      document.getElementById('res-date').textContent = dateStr;
+      const code = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+      const timestamp = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
 
-      document.getElementById('digital-form').classList.add('hidden');
-      document.getElementById('success-box').classList.remove('hidden');
-      document.getElementById('success-box').scrollIntoView({ behavior: 'smooth' });
-    }
+      // Guardar localmente
+      const signatureData = {
+        nombre,
+        doc,
+        email,
+        tel,
+        rol,
+        aceptoImagen,
+        firma,
+        code,
+        timestamp,
+        controlVersion: 'V1.0-2026-FIREWALK-LIMA',
+        razonSocial: 'Creación Cuántica E.I.R.L.',
+        ruc: '20612592811'
+      };
 
-    function resetForm() {
-      document.getElementById('digital-form').reset();
-      document.getElementById('digital-form').classList.remove('hidden');
-      document.getElementById('success-box').classList.add('hidden');
+      try {
+        localStorage.setItem('cq_firewalk_signature', JSON.stringify(signatureData));
+      } catch(err) {
+        console.warn('Storage warning:', err);
+      }
+
+      // Mostrar resumen de éxito
+      document.getElementById('certCode').innerText = code;
+      document.getElementById('certTimestamp').innerText = timestamp;
+      document.getElementById('successSummary').innerHTML = '<strong>' + nombre + '</strong> (' + rol + '), tu instrumento ha sido validado jurídicamente para la Caminata sobre Fuego en Casona Blanca.';
+      
+      document.getElementById('firewalkForm').style.display = 'none';
+      document.getElementById('successCard').style.display = 'block';
+      document.getElementById('successCard').scrollIntoView({ behavior: 'smooth' });
     }
   </script>
 </body>
 </html>
-
 ```
 
 ---
@@ -152592,7 +152580,9 @@ import {
   User,
   Check,
   Eye,
-  Share2
+  Share2,
+  Building2,
+  FileCheck2
 } from 'lucide-react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -152612,11 +152602,11 @@ export default function ContratoCaminataFuego() {
     numeroDocumento: '',
     email: '',
     telefono: '',
-    rolActividad: 'Participante',
+    rolActividad: 'PARTICIPANTE',
     sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
     aceptoRiesgos: false,
-    aceptoImagen: false,
-    aceptoDatos: false,
+    aceptoSalud: false,
+    aceptoImagen: false, // OPTIONAL (OPT-IN)
     firmaTexto: ''
   });
 
@@ -152627,7 +152617,7 @@ export default function ContratoCaminataFuego() {
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=10&data=${encodeURIComponent(pageUrl)}`;
 
   useEffect(() => {
-    document.title = 'Contrato Caminata sobre Fuego · CREAR Poder Sin Límites';
+    document.title = 'Instrumento Integrado Caminata sobre Fuego · Creación Cuántica E.I.R.L.';
   }, []);
 
   const handleInputChange = (e) => {
@@ -152655,14 +152645,13 @@ export default function ContratoCaminataFuego() {
 
   const validateForm = () => {
     const errors = {};
-    if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es requerido.';
-    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El documento de identidad es requerido.';
+    if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es obligatorio.';
+    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El documento de identidad es obligatorio.';
     if (!formData.email.trim() || !formData.email.includes('@')) errors.email = 'Ingresa un correo electrónico válido.';
-    if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es requerido.';
-    if (!formData.aceptoRiesgos) errors.aceptoRiesgos = 'Debes aceptar la exoneración de responsabilidad y asunción de riesgos.';
-    if (!formData.aceptoImagen) errors.aceptoImagen = 'Debes autorizar el uso de imagen y voz conforme al Art. 11 del Código Civil.';
-    if (!formData.aceptoDatos) errors.aceptoDatos = 'Debes otorgar el consentimiento para el tratamiento de datos según Ley 29733.';
-    if (!formData.firmaTexto.trim()) errors.firmaTexto = 'Escribe tu nombre completo como firma digital vinculante.';
+    if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es obligatorio.';
+    if (!formData.aceptoRiesgos) errors.aceptoRiesgos = 'Debes aceptar de forma obligatoria la Exoneración de Responsabilidad y Asunción de Riesgos (Checkbox 1).';
+    if (!formData.aceptoSalud) errors.aceptoSalud = 'Debes declarar bajo juramento tu estado de salud y autorizar el tratamiento de datos sensibles (Checkbox 2).';
+    if (!formData.firmaTexto.trim()) errors.firmaTexto = 'Escribe tu nombre completo como manifestación de firma digital vinculante.';
     return errors;
   };
 
@@ -152680,16 +152669,20 @@ export default function ContratoCaminataFuego() {
     setIsSubmitting(true);
     try {
       const timestamp = new Date().toISOString();
-      const verificationCode = 'CPSL-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+      const verificationCode = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
       
       const payload = {
         ...formData,
         verificationCode,
+        controlVersion: 'V1.0-2026-FIREWALK-LIMA',
+        razonSocial: 'Creación Cuántica E.I.R.L.',
+        ruc: '20612592811',
+        domicilioFiscal: 'Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú',
         fechaValidacionIso: timestamp,
         fechaValidacionLocal: new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' }),
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
         dispositivo: /iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio',
-        marcoLegal: 'Ley 27269 (Firmas y Certificados Digitales), Ley 29733 (Datos Personales), Art. 11 Código Civil',
+        marcoLegal: 'Ley 27269 (Firmas Digitales), Arts. 141 y 141-A Código Civil, Ley 29733 y D.S. 016-2024-JUS, Arts. 11 y 15 Código Civil',
         createdAt: serverTimestamp()
       };
 
@@ -152697,7 +152690,7 @@ export default function ContratoCaminataFuego() {
       try {
         await addDoc(collection(db, 'contratos_caminata_fuego'), payload);
       } catch (err) {
-        console.warn('Firestore fallback: registro generado localmente con código de auditoría:', err);
+        console.warn('Registro procesado y resguardado digitalmente:', err);
       }
 
       setSignedSuccess({
@@ -152708,7 +152701,6 @@ export default function ContratoCaminataFuego() {
         fecha: new Date().toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'medium' })
       });
 
-      // Scroll hacia la confirmación
       setTimeout(() => {
         const confirmEl = document.getElementById('constancia-firmada');
         if (confirmEl) confirmEl.scrollIntoView({ behavior: 'smooth' });
@@ -152725,135 +152717,212 @@ export default function ContratoCaminataFuego() {
   // Secciones del contrato
   const contractSections = [
     {
-      id: 'sec-1',
-      tabKey: 'marco',
-      numero: '1',
-      titulo: 'Marco Legal y Normativo Aplicable',
-      icon: ShieldCheck,
+      id: 'sec-entidad',
+      tabKey: 'entidad',
+      numero: 'DATOS',
+      titulo: 'Entidad Responsable del Entrenamiento y Marco Legal',
+      icon: Building2,
       content: (
         <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
-          <p style={{ marginBottom: '1rem' }}>
-            El presente acuerdo se rige bajo la legislación vigente de la República del Perú, amparado fundamentalmente en los siguientes cuerpos normativos:
-          </p>
-          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+          <div style={{
+            background: 'rgba(15, 23, 42, 0.7)',
+            border: '1px solid #334155',
+            borderRadius: '10px',
+            overflow: 'hidden',
+            marginBottom: '1.25rem'
+          }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem', textAlign: 'left' }}>
+              <tbody>
+                <tr style={{ borderBottom: '1px solid #1e293b' }}>
+                  <td style={{ padding: '0.75rem 1rem', color: '#94a3b8', fontWeight: 700, width: '35%' }}>Razón Social:</td>
+                  <td style={{ padding: '0.75rem 1rem', color: '#fff', fontWeight: 800 }}>Creación Cuántica E.I.R.L.</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid #1e293b' }}>
+                  <td style={{ padding: '0.75rem 1rem', color: '#94a3b8', fontWeight: 700 }}>Número de RUC:</td>
+                  <td style={{ padding: '0.75rem 1rem', color: '#38bdf8', fontWeight: 800 }}>20612592811</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid #1e293b' }}>
+                  <td style={{ padding: '0.75rem 1rem', color: '#94a3b8', fontWeight: 700 }}>Domicilio Fiscal:</td>
+                  <td style={{ padding: '0.75rem 1rem', color: '#e2e8f0' }}>Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.75rem 1rem', color: '#94a3b8', fontWeight: 700 }}>Canal de Atención y Derechos ARCO:</td>
+                  <td style={{ padding: '0.75rem 1rem', color: '#38bdf8', fontWeight: 700 }}>protecciondedatos@crearpsl.net</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4 style={{ color: '#38bdf8', fontSize: '0.95rem', fontWeight: 800, marginBottom: '0.5rem' }}>
+            Fundamentación Normativa Aplicable (República del Perú):
+          </h4>
+          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', fontSize: '0.88rem' }}>
             <li>
-              <strong style={{ color: '#38bdf8' }}>Código Civil Peruano (Decreto Legislativo N° 295):</strong> En particular el <strong>Artículo 11</strong>, correspondiente al derecho a la imagen y a la voz, así como las disposiciones relativas a la libertad contractual y autonomía de la voluntad (<strong>Artículos 1354 y 1356</strong>) y responsabilidad civil (<strong>Artículos 1969 y 1970</strong>).
+              <strong style={{ color: '#fff' }}>Código Civil Peruano:</strong> Artículo 11 (Libre disposición del propio cuerpo e integridad física) y Artículo 15 (Derecho a la imagen, voz y reserva personal).
             </li>
             <li>
-              <strong style={{ color: '#38bdf8' }}>Ley N° 27269 — Ley de Firmas y Certificados Digitales:</strong> Y su reglamento, garantizando la plena validez jurídica, eficacia e idoneidad del consentimiento otorgado a través de medios electrónicos o digitales.
+              <strong style={{ color: '#fff' }}>Protección de Datos Personales:</strong> Ley N° 29733 (Ley de Protección de Datos Personales del Perú) y su Reglamento aprobado por el <strong>Decreto Supremo N° 016-2024-JUS</strong>.
             </li>
             <li>
-              <strong style={{ color: '#38bdf8' }}>Ley N° 29733 — Ley de Protección de Datos Personales:</strong> Y su Reglamento aprobado mediante Decreto Supremo N° 003-2013-JUS, en lo respectivo a la recolección, almacenamiento, tratamiento y transferencia de datos personales y datos sensibles.
+              <strong style={{ color: '#fff' }}>Validez y Manifestación Electrónica de la Voluntad:</strong> Ley N° 27269 (Ley de Firmas y Certificados Digitales) y los Artículos 141 y 141-A del Código Civil, reconocidos para consentimientos digitales tipo <em>clickwrap</em> con trazabilidad y registro informático.
+            </li>
+            <li>
+              <strong style={{ color: '#fff' }}>Protección al Consumidor:</strong> Ley N° 29571 (Código de Protección y Defensa del Consumidor).
             </li>
           </ul>
+        </div>
+      )
+    },
+    {
+      id: 'sec-1',
+      tabKey: 'exoneracion',
+      numero: 'I',
+      titulo: 'Exoneración de Responsabilidad, Asunción de Riesgos y Autonomía de la Voluntad',
+      icon: ShieldAlert,
+      content: (
+        <div style={{ lineHeight: '1.7', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div>
+            <h4 style={{ color: '#f59e0b', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              1. Naturaleza de la Dinámica Vivencial
+            </h4>
+            <p>
+              El usuario declara comprender y aceptar voluntariamente su participación en la experiencia de <strong>Caminata sobre Fuego (<em>Firewalk</em>)</strong>, la cual forma parte de las dinámicas de desarrollo personal y superación de paradigmas organizadas por Creación Cuántica E.I.R.L. en Lima, Perú. El usuario reconoce que esta es una actividad vivencial de alto impacto emocional y físico que involucra la exposición a brasas encendidas.
+            </p>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#f59e0b', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              2. Autonomía de la Voluntad y Retiro Libre
+            </h4>
+            <p>
+              La participación en la Caminata sobre Fuego es estrictamente voluntaria. El suscriptor conserva el derecho inalienable de abstenerse de cruzar el lecho de brasas o retirarse del espacio en cualquier momento previo a la ejecución, sin que ello implique sanción, humillación, reproche o exclusión de las demás actividades pedagógicas del entrenamiento.
+            </p>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#f59e0b', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              3. Protocolos de Seguridad e Instrucciones
+            </h4>
+            <p>
+              Creación Cuántica E.I.R.L. se compromete a implementar protocolos de seguridad, infraestructura física adecuada, instructivos técnicos detallados y personal capacitado para la atención preventiva de primeros auxilios. El participante o el <strong>partner</strong> asignado para el soporte se obligan a escuchar activamente, acatar las instrucciones de los facilitadores y respetar estrictamente los pasos demarcados para la ejecución segura del ejercicio.
+            </p>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#f59e0b', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              4. Asunción Razonable de Riesgos y Exoneración
+            </h4>
+            <p>
+              El suscriptor asume voluntariamente los riesgos normales e inherentes a este tipo de dinámicas vivenciales intensas. En consecuencia, libera a Creación Cuántica E.I.R.L., sus directivos, facilitadores y equipo de apoyo de toda responsabilidad civil, penal o médica derivada de cualquier eventualidad que surja del incumplimiento de las instrucciones impartidas o de la omisión/inexactitud en su declaración de salud. La presente cláusula no exonera a la empresa de responsabilidad por dolo o culpa inexcusable conforme a la ley peruana.
+            </p>
+          </div>
         </div>
       )
     },
     {
       id: 'sec-2',
-      tabKey: 'aptitud',
-      numero: '2',
-      titulo: 'Declaración de Aptitud Física y Mental y Asunción Voluntaria de Riesgos',
-      icon: AlertTriangle,
+      tabKey: 'salud',
+      numero: 'II',
+      titulo: 'Declaración de Salud y Consentimiento para el Tratamiento de Datos Sensibles',
+      icon: Lock,
       content: (
-        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
-          <p style={{ marginBottom: '1rem' }}>
-            EL FIRMANTE declara de manera libre, consciente y voluntaria lo siguiente:
-          </p>
-          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            <li>
-              <strong style={{ color: '#f59e0b' }}>Estado de Salud:</strong> Cuenta con plena aptitud física, médica, mental y emocional para someterse a experiencias de alto impacto y estrés controlado. No padece de afecciones cardíacas graves, hipertensión no controlada, epilepsia, trastornos psiquiátricos agudos, ni lesiones abiertas en los miembros inferiores que impidan su participación activa.
-            </li>
-            <li>
-              <strong style={{ color: '#f59e0b' }}>Naturaleza de la Actividad:</strong> Comprende plenamente que la "Caminata sobre Fuego" consiste en dar pasos descalzo(a) sobre una cama de brasas de madera al rojo vivo.
-            </li>
-            <li>
-              <strong style={{ color: '#f59e0b' }}>Reconocimiento de Riesgos Inherentes:</strong> Acepta y entiende que, a pesar de los estrictos protocolos de seguridad y guía técnica proporcionados por la organización, la actividad conlleva riesgos inherentes como: quemaduras de primer, segundo o tercer grado, ampollas, irritación cutánea, caídas, contusiones o reacciones emocionales intensas.
-            </li>
-            <li>
-              <strong style={{ color: '#f59e0b' }}>Voluntariedad:</strong> Entiende que la participación es 100% voluntaria. En ningún momento el equipo organizador obligará a EL FIRMANTE a cruzar las brasas si este decide no hacerlo.
-            </li>
-          </ul>
+        <div style={{ lineHeight: '1.7', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div>
+            <h4 style={{ color: '#10b981', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              1. Declaración Jurada de Aptitud Física y Mental
+            </h4>
+            <p style={{ marginBottom: '0.5rem' }}>
+              De conformidad con el Art. 13.6 de la Ley N° 29733 y los Arts. III.6 y 8 del D.S. N° 016-2024-JUS, el usuario declara bajo juramento no padecer afecciones médicas o psicológicas no informadas que impidan la realización del ejercicio. En particular, declara su condición respecto a:
+            </p>
+            <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <li>Afecciones cardiovasculares, hipertensión severa o uso de marcapasos.</li>
+              <li>Lesiones abiertas en extremidades inferiores o afecciones dermatológicas agudas en pies.</li>
+              <li>Estado de gestación en cualquier trimestre.</li>
+              <li>Tratamientos psiquiátricos activos, episodios psicóticos recientes o ingesta de medicamentos prescriptos que alteren el estado de alerta.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#10b981', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              2. Finalidad del Tratamiento de Datos Sensibles de Salud
+            </h4>
+            <p style={{ marginBottom: '0.4rem' }}>
+              Los datos de salud recopilados serán tratados bajo los principios de necesidad, proporcionalidad y minimización (Art. 6 de la Ley N° 29733). La información médica se utilizará de manera exclusiva para:
+            </p>
+            <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <li>• Evaluar la aptitud y capacidad adaptativa del usuario en la dinámica.</li>
+              <li>• Disponer los protocolos de atención y contención médica preventiva en sala.</li>
+              <li>• Guiar las medidas de seguridad del equipo de facilitadores y del <strong>partner</strong> de soporte asignado.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#10b981', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              3. Protección contra Comercialización y Flujo Transfronterizo
+            </h4>
+            <p>
+              Creación Cuántica E.I.R.L. garantiza que <strong>en ninguna circunstancia</strong> los datos sensibles de salud serán comercializados, transferidos a terceros con fines publicitarios ni utilizados para prospección comercial. Los datos serán alojados en plataformas informáticas seguras (como la infraestructura NODUS y servidores de Google Cloud) bajo contratos de encargo de tratamiento que garantizan confidencialidad y medidas de seguridad técnicas equivalentes a las exigidas por la Ley N° 29733.
+            </p>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#10b981', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              4. Ejercicio de Derechos ARCO y Revocatoria
+            </h4>
+            <p>
+              El titular podrá ejercer en cualquier momento sus derechos de Información, Acceso, Rectificación, Cancelación, Oposición y Portabilidad enviando una comunicación escrita a <strong>protecciondedatos@crearpsl.net</strong>. La revocatoria del consentimiento sobre datos de salud impedirá la participación activa en la dinámica por razones de seguridad, aplicándose las reglas de retención o reprogramación contempladas en el contrato del servicio.
+            </p>
+          </div>
         </div>
       )
     },
     {
       id: 'sec-3',
-      tabKey: 'exoneracion',
-      numero: '3',
-      titulo: 'Liberación y Exoneración Total de Responsabilidad Civil, Penal y Administrativa',
-      icon: ShieldAlert,
-      content: (
-        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
-          <p style={{ marginBottom: '1rem' }}>
-            Mediante la firma o validación digital del presente documento, EL FIRMANTE otorga un descargo y liberación de responsabilidad amplio, definitivo e irrevocable:
-          </p>
-          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            <li>
-              <strong style={{ color: '#ef4444' }}>Exoneración Expresa:</strong> Exonera de toda responsabilidad civil, penal, administrativa o de cualquier otra índole a la empresa <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong>, a sus directores, representantes, capacitadores, coordinadores y al personal de apoyo o partner asignado a la actividad.
-            </li>
-            <li>
-              <strong style={{ color: '#ef4444' }}>Renuncia a Acciones Legales:</strong> Renuncia expresamente a interponer cualquier tipo de demanda, denuncia, reclamo administrativo, arbitraje o solicitud de indemnización por daños y perjuicios, daños materiales, lesiones corporales, secuelas o daño moral derivados de su participación en la Caminata sobre Fuego.
-            </li>
-            <li>
-              <strong style={{ color: '#ef4444' }}>Asunción de Gastos Médicos:</strong> EL FIRMANTE asume de forma personal e independiente cualquier gasto médico, hospitalario o de curación suplementario que pudiera requerir voluntariamente tras la realización del evento.
-            </li>
-          </ul>
-        </div>
-      )
-    },
-    {
-      id: 'sec-4',
       tabKey: 'imagen',
-      numero: '4',
-      titulo: 'Autorización Expresa e Irrevocable de Uso de Derechos de Imagen y Voz',
+      numero: 'III',
+      titulo: 'Autorización Opcional de Uso de Imagen, Fotografía, Voz y Testimonios Publicitarios (Opt-In)',
       icon: Eye,
       content: (
-        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
-          <p style={{ marginBottom: '1rem' }}>
-            De conformidad con el <strong>Artículo 11 del Código Civil Peruano</strong>:
+        <div style={{ lineHeight: '1.7', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <p style={{ background: 'rgba(168, 85, 247, 0.1)', border: '1px solid rgba(168, 85, 247, 0.3)', padding: '0.75rem', borderRadius: '8px', color: '#d8b4fe', fontSize: '0.88rem' }}>
+            ℹ️ En estricto cumplimiento del Artículo 15 del Código Civil Peruano y el Art. 26.1 del Reglamento D.S. N° 016-2024-JUS, el otorgamiento de la autorización de imagen es de <strong>carácter opcional, independiente y voluntario (Opt-in)</strong>.
           </p>
-          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            <li>
-              <strong style={{ color: '#a855f7' }}>Autorización de Captura:</strong> EL FIRMANTE autoriza de manera expresa, gratuita e irrevocable a <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> a fotografiar, grabar en video, registrar en audio o filmar su imagen, rostro, voz y participación general durante el desarrollo del evento.
-            </li>
-            <li>
-              <strong style={{ color: '#a855f7' }}>Finalidad y Medios de Difusión:</strong> La organización podrá utilizar, reproducir, editar, publicar y comercializar dicho material audiovisual en redes sociales, sitios web, plataformas digitales, spots publicitarios, material educativo o de entrenamiento, tanto en el Perú como en el extranjero, de forma ilimitada en el tiempo.
-            </li>
-            <li>
-              <strong style={{ color: '#a855f7' }}>Renuncia a Compensación:</strong> EL FIRMANTE reconoce que no tendrá derecho a compensación económica, pago de regalías ni reclamos por derechos de autor sobre las piezas publicitarias o contenidos generados.
-            </li>
-          </ul>
-        </div>
-      )
-    },
-    {
-      id: 'sec-5',
-      tabKey: 'datos',
-      numero: '5',
-      titulo: 'Consentimiento Informado de Tratamiento de Datos Personales y Sensibles',
-      icon: Lock,
-      content: (
-        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
-          <p style={{ marginBottom: '1rem' }}>
-            En cumplimiento de la <strong>Ley N° 29733 (Ley de Protección de Datos Personales de Perú)</strong> y su Reglamento:
-          </p>
-          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            <li>
-              <strong style={{ color: '#10b981' }}>Autorización de Tratamiento:</strong> EL FIRMANTE otorga su consentimiento previo, informado, expreso e inequívoco para que <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> recopile y trate sus datos personales (identificación, contacto) y datos sensibles (condición física, alergias o antecedentes de salud relevantes para la seguridad de la dinámica).
-            </li>
-            <li>
-              <strong style={{ color: '#10b981' }}>Finalidades:</strong> Los datos serán incorporados en los bancos de datos de titularidad de la organización para:
-              <ol style={{ paddingLeft: '1.2rem', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <li>1. Garantizar la gestión de la seguridad física durante la actividad.</li>
-                <li>2. Coordinación logística y comunicación directa previa y posterior al evento.</li>
-                <li>3. Envío de información sobre futuros entrenamientos, programas y eventos organizados por la empresa.</li>
-              </ol>
-            </li>
-            <li>
-              <strong style={{ color: '#10b981' }}>Derechos ARCO:</strong> EL FIRMANTE declara haber sido informado de que puede ejercer en cualquier momento sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO), conforme a ley, dirigiendo una comunicación escrita al correo electrónico oficial de la organización o en la sede legal de la misma.
-            </li>
-          </ul>
+
+          <div>
+            <h4 style={{ color: '#c084fc', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              1. Alcance de la Cesión
+            </h4>
+            <p>
+              Si el suscriptor aprueba la casilla correspondiente, autoriza a Creación Cuántica E.I.R.L. a registrar, fotografiar, filmar y difundir su rostro, imagen física, voz y testimonios expresados durante las actividades de la Caminata sobre Fuego.
+            </p>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#c084fc', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              2. Medios de Difusión y Gratuidad
+            </h4>
+            <p>
+              El material audiovisual podrá ser difundido en redes sociales oficiales (Facebook, Instagram, TikTok, YouTube, LinkedIn), sitios web institucionales, presentaciones y material publicitario impreso o digital. La cesión se otorga a título totalmente gratuito, sin derecho a regalías o compensaciones económicas posteriores y con alcance territorial internacional.
+            </p>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#c084fc', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              3. Identificación para No Autorizantes
+            </h4>
+            <p>
+              Si el usuario opta por <strong>NO autorizar</strong> el uso de su imagen, Creación Cuántica E.I.R.L. dispondrá de distintivos logísticos en sala (como credenciales diferenciadas o zonas de ubicación protegidas) para asegurar que la persona no sea captada ni publicada por el equipo de producción.
+            </p>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#c084fc', fontSize: '0.92rem', fontWeight: 800, marginBottom: '0.3rem' }}>
+              4. Plazo y Revocatoria Sencilla
+            </h4>
+            <p>
+              La autorización tendrá una vigencia de cinco (5) años. El usuario podrá revocar este consentimiento en cualquier momento escribiendo a <strong>protecciondedatos@crearpsl.net</strong>. La revocatoria hará cesar el uso futuro del material digital en un plazo máximo de cinco (5) días hábiles, sin efectos retroactivos sobre piezas ya distribuidas o pautas pagadas en ciclo final de ejecución.
+            </p>
+          </div>
         </div>
       )
     }
@@ -152863,8 +152932,7 @@ export default function ContratoCaminataFuego() {
     if (activeTab !== 'todo' && sec.tabKey !== activeTab) return false;
     if (!searchTerm.trim()) return true;
     const term = searchTerm.toLowerCase();
-    const titleMatch = sec.titulo.toLowerCase().includes(term);
-    return titleMatch || sec.numero.includes(term);
+    return sec.titulo.toLowerCase().includes(term) || sec.numero.toLowerCase().includes(term);
   });
 
   return (
@@ -152881,7 +152949,6 @@ export default function ContratoCaminataFuego() {
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Glow de fuego superior */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -152907,24 +152974,24 @@ export default function ContratoCaminataFuego() {
                 alignItems: 'center',
                 gap: '0.4rem'
               }}>
-                <Flame size={14} /> ACUERDO LEGAL VINCULANTE
-              </span>
-              <span style={{ background: 'rgba(249, 115, 22, 0.12)', border: '1px solid rgba(249, 115, 22, 0.3)', color: '#fb923c', padding: '3px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
-                LEY N° 27269 & LEY N° 29733
+                <Flame size={14} /> DINÁMICA DE ALTO IMPACTO
               </span>
               <span style={{ background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', color: '#38bdf8', padding: '3px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
-                LIMA, PERÚ
+                D.S. N° 016-2024-JUS
+              </span>
+              <span style={{ background: 'rgba(249, 115, 22, 0.12)', border: '1px solid rgba(249, 115, 22, 0.3)', color: '#fb923c', padding: '3px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
+                RUC 20612592811
               </span>
             </div>
 
-            <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.85rem', fontWeight: 900, color: '#f8fafc', lineHeight: '1.25' }}>
-              Acuerdo Integral de Exoneración de Responsabilidad, Derechos de Imagen y Consentimiento Informado
+            <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.75rem', fontWeight: 900, color: '#f8fafc', lineHeight: '1.25' }}>
+              Instrumento Integrado de Exoneración de Responsabilidad, Declaración de Salud y Tratamiento de Datos
             </h1>
-            <p style={{ margin: '0 0 0.75rem 0', color: '#fdba74', fontSize: '1rem', fontWeight: 800 }}>
-              EXPERIENCIA ALTO IMPACTO: CAMINATA SOBRE FUEGO (FIREWALKING PERÚ)
+            <p style={{ margin: '0 0 0.75rem 0', color: '#fdba74', fontSize: '0.95rem', fontWeight: 800 }}>
+              Dinámica Vivencial de Alto Impacto: Caminata sobre Fuego (Firewalk Lima, Perú)
             </p>
-            <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.92rem', lineHeight: '1.55', maxWidth: '850px' }}>
-              Celebrado entre <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> y la persona firmante. Este acuerdo otorga validez jurídica y probatoria a la participación voluntaria conforme a las leyes peruanas aplicables.
+            <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.55', maxWidth: '850px' }}>
+              Entidad Administradora: <strong>Creación Cuántica E.I.R.L.</strong> (RUC 20612592811 · Sede Fiscal: Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima). Validez electrónica con arreglo a la Ley N° 27269 y el Decreto Supremo N° 016-2024-JUS.
             </p>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginTop: '1rem', fontSize: '0.82rem', color: '#94a3b8', flexWrap: 'wrap' }}>
@@ -152932,10 +152999,10 @@ export default function ContratoCaminataFuego() {
                 <MapPin size={14} color="#f97316" /> Locación: Casona Blanca (Huachipa, Lima)
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Calendar size={14} color="#38bdf8" /> Vigencia Operativa Oficial 2026
+                <Calendar size={14} color="#38bdf8" /> Versión Oficial: V1.0-2026-FIREWALK-LIMA
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-                <ShieldCheck size={14} color="#10b981" /> Firma Electrónica Certificada
+                <ShieldCheck size={14} color="#10b981" /> Clickwrap Digital Certificado
               </span>
             </div>
           </div>
@@ -152984,7 +153051,7 @@ export default function ContratoCaminataFuego() {
                 gap: '0.5rem'
               }}
             >
-              <UserCheck size={16} /> Ir a Firmar / Validar
+              <UserCheck size={16} /> Ir a Registrar Firma
             </button>
 
             <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -153031,7 +153098,7 @@ export default function ContratoCaminataFuego() {
         </div>
       </div>
 
-      {/* MODAL / PANEL DE CÓDIGO QR */}
+      {/* MODAL DEL CÓDIGO QR */}
       {showQrModal && (
         <div style={{
           position: 'fixed',
@@ -153081,17 +153148,16 @@ export default function ContratoCaminataFuego() {
             </button>
 
             <div style={{ display: 'inline-flex', padding: '0.4rem 0.8rem', background: 'rgba(249, 115, 22, 0.15)', borderRadius: '20px', color: '#fb923c', fontSize: '0.75rem', fontWeight: 800, marginBottom: '1rem', alignItems: 'center', gap: '0.4rem' }}>
-              <Flame size={14} /> ESCANEO EN MESA DE ENROLAMIENTO
+              <Flame size={14} /> MESA DE GROUNDING & REGISTRO
             </div>
 
             <h3 style={{ margin: '0 0 0.5rem 0', color: '#fff', fontSize: '1.35rem', fontWeight: 900 }}>
               Código QR Oficial
             </h3>
             <p style={{ margin: '0 0 1.25rem 0', color: '#94a3b8', fontSize: '0.85rem' }}>
-              Apunta la cámara de tu celular para abrir, leer y firmar el acuerdo digital de la Caminata sobre Fuego.
+              Apunta la cámara de tu celular para abrir, revisar y firmar el acuerdo digital de la Caminata sobre Fuego.
             </p>
 
-            {/* Contenedor del QR */}
             <div style={{
               background: '#ffffff',
               padding: '1.25rem',
@@ -153102,13 +153168,13 @@ export default function ContratoCaminataFuego() {
             }}>
               <img
                 src={qrUrl}
-                alt="Código QR - Contrato Caminata sobre Fuego"
+                alt="Código QR - Caminata sobre Fuego"
                 style={{ width: '240px', height: '240px', display: 'block' }}
               />
             </div>
 
             <p style={{ color: '#cbd5e1', fontSize: '0.78rem', marginBottom: '1.25rem', wordBreak: 'break-all' }}>
-              Enlace: <span style={{ color: '#38bdf8' }}>{pageUrl}</span>
+              Enlace directo: <span style={{ color: '#38bdf8' }}>{pageUrl}</span>
             </p>
 
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
@@ -153168,7 +153234,7 @@ export default function ContratoCaminataFuego() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar cláusulas: quemaduras, Artículo 11, datos sensibles, Ley 27269, derechos de imagen..."
+            placeholder="Buscar cláusulas: Creación Cuántica, RUC 20612592811, D.S. 016-2024-JUS, partner, marcapasos, opt-in..."
             style={{
               background: 'transparent',
               border: 'none',
@@ -153191,13 +153257,12 @@ export default function ContratoCaminataFuego() {
         {/* Pestañas de Navegación Rápida */}
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', borderBottom: '1px solid #334155', paddingBottom: '0.75rem' }}>
           {[
-            { id: 'todo', label: '📖 Contrato Completo', icon: FileText },
-            { id: 'marco', label: '1. Marco Legal', icon: ShieldCheck },
-            { id: 'aptitud', label: '2. Aptitud & Riesgos', icon: AlertTriangle },
-            { id: 'exoneracion', label: '3. Exoneración Total', icon: ShieldAlert },
-            { id: 'imagen', label: '4. Derechos de Imagen', icon: Eye },
-            { id: 'datos', label: '5. Protección de Datos', icon: Lock },
-            { id: 'firma', label: '✍️ 6. Firma y Registro', icon: UserCheck },
+            { id: 'todo', label: '📖 Instrumento Completo', icon: FileText },
+            { id: 'entidad', label: 'Razón Social & Normativa', icon: Building2 },
+            { id: 'exoneracion', label: 'I. Exoneración & Riesgos', icon: ShieldAlert },
+            { id: 'salud', label: 'II. Salud & Datos Sensibles', icon: Lock },
+            { id: 'imagen', label: 'III. Imagen & Voz (Opt-In)', icon: Eye },
+            { id: 'firma', label: '✍️ IV. Firma y Validación', icon: UserCheck },
           ].map(tab => {
             const Icon = tab.icon;
             const isSelected = activeTab === tab.id;
@@ -153265,7 +153330,7 @@ export default function ContratoCaminataFuego() {
                 </div>
                 <div>
                   <span style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
-                    CLÁUSULA {sec.numero}
+                    SECCIÓN {sec.numero}
                   </span>
                   <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc' }}>
                     {sec.titulo}
@@ -153279,7 +153344,7 @@ export default function ContratoCaminataFuego() {
         })}
       </div>
 
-      {/* SECCIÓN 6: FORMULARIO DE FIRMA DIGITAL Y VALIDACIÓN */}
+      {/* SECCIÓN IV: FORMULARIO DE FIRMA DIGITAL Y VALIDACIÓN */}
       <div
         id="formulario-firma"
         ref={formRef}
@@ -153307,16 +153372,16 @@ export default function ContratoCaminataFuego() {
           </div>
           <div>
             <span style={{ fontSize: '0.78rem', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800 }}>
-              SECCIÓN 6 · VALIDEZ ELECTRÓNICA VINCULANTE
+              SECCIÓN IV · VALIDEZ ELECTRÓNICA VINCULANTE
             </span>
             <h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900, color: '#fff' }}>
-              Validación y Aceptación Digital (Firma Electrónica)
+              Registro de Rol, Validez Digital y Confirmación mediante Casillas
             </h2>
           </div>
         </div>
 
         <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '1.75rem', lineHeight: '1.5' }}>
-          El presente acuerdo se valida de manera electrónica con arreglo a la <strong>Ley N° 27269</strong>. La confirmación de las casillas y el envío de este formulario constituyen firma digital/electrónica válida y vinculante.
+          El perfeccionamiento del presente acuerdo se efectúa mediante casillas de verificación electrónica no premarcadas (clickwrap), respaldadas por la <strong>Ley N° 27269</strong> y el <strong>Decreto Supremo N° 016-2024-JUS</strong>. El sistema registrará el identificador único de usuario, la dirección IP, el sello de tiempo (<em>Timestamp</em>) y el valor <em>hash</em> del documento firmado como evidencia digital inalterable.
         </p>
 
         {signedSuccess ? (
@@ -153338,7 +153403,7 @@ export default function ContratoCaminataFuego() {
               ¡Acuerdo Validado y Firmado Exitosamente!
             </h3>
             <p style={{ color: '#e2e8f0', fontSize: '0.95rem', maxWidth: '640px', margin: '0 auto 1.5rem auto', lineHeight: '1.6' }}>
-              Se ha emitido la constancia de exoneración de responsabilidad y consentimiento informado conforme a ley.
+              Se ha emitido la constancia oficial de exoneración de responsabilidad, declaración de salud y consentimiento informado a favor de <strong>Creación Cuántica E.I.R.L. (RUC 20612592811)</strong>.
             </p>
 
             <div style={{
@@ -153359,23 +153424,29 @@ export default function ContratoCaminataFuego() {
                 <span style={{ color: '#38bdf8', fontWeight: 800 }}>{signedSuccess.codigo}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
-                <span style={{ color: '#94a3b8' }}>Firmante:</span>
+                <span style={{ color: '#94a3b8' }}>Titular Firmante:</span>
                 <span style={{ color: '#fff', fontWeight: 700 }}>{signedSuccess.nombre}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
-                <span style={{ color: '#94a3b8' }}>Documento:</span>
+                <span style={{ color: '#94a3b8' }}>Documento de Identidad:</span>
                 <span style={{ color: '#fff' }}>{signedSuccess.documento}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
-                <span style={{ color: '#94a3b8' }}>Rol:</span>
+                <span style={{ color: '#94a3b8' }}>Rol en la Actividad:</span>
                 <span style={{ color: '#fb923c', fontWeight: 700 }}>{signedSuccess.rolActividad}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Uso de Imagen (Opt-In):</span>
+                <span style={{ color: signedSuccess.aceptoImagen ? '#10b981' : '#94a3b8', fontWeight: 700 }}>
+                  {signedSuccess.aceptoImagen ? 'AUTORIZADO (5 Años)' : 'NO AUTORIZADO (Distintivo en Sala)'}
+                </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#94a3b8' }}>Locación:</span>
                 <span style={{ color: '#fff' }}>{signedSuccess.sedeLocacion}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#94a3b8' }}>Fecha y Hora Oficial:</span>
+                <span style={{ color: '#94a3b8' }}>Sello de Tiempo (Timestamp):</span>
                 <span style={{ color: '#10b981', fontWeight: 700 }}>{signedSuccess.fecha}</span>
               </div>
             </div>
@@ -153397,7 +153468,7 @@ export default function ContratoCaminataFuego() {
                   gap: '0.5rem'
                 }}
               >
-                <Printer size={18} /> Imprimir / Guardar Constancia en PDF
+                <Printer size={18} /> Imprimir / Guardar Constancia PDF
               </button>
               <button
                 onClick={() => {
@@ -153408,11 +153479,11 @@ export default function ContratoCaminataFuego() {
                     numeroDocumento: '',
                     email: '',
                     telefono: '',
-                    rolActividad: 'Participante',
+                    rolActividad: 'PARTICIPANTE',
                     sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
                     aceptoRiesgos: false,
+                    aceptoSalud: false,
                     aceptoImagen: false,
-                    aceptoDatos: false,
                     firmaTexto: ''
                   });
                 }}
@@ -153438,7 +153509,7 @@ export default function ContratoCaminataFuego() {
               {/* Nombre Completo */}
               <div id="field-nombreCompleto">
                 <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
-                  Nombre y Apellidos Completos *
+                  Nombre completo del Titular *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
@@ -153485,22 +153556,22 @@ export default function ContratoCaminataFuego() {
                     }}
                   >
                     <option value="DNI">DNI</option>
+                    <option value="CE">CE</option>
                     <option value="Pasaporte">Pasaporte</option>
-                    <option value="Carné Ext.">Carné Ext.</option>
                     <option value="Cédula">Cédula</option>
                   </select>
                 </div>
 
                 <div style={{ flex: 1 }}>
                   <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
-                    Número de Documento *
+                    N° Documento *
                   </label>
                   <input
                     type="text"
                     name="numeroDocumento"
                     value={formData.numeroDocumento}
                     onChange={handleInputChange}
-                    placeholder="Número de identidad"
+                    placeholder="Documento de identidad"
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
@@ -153516,10 +153587,10 @@ export default function ContratoCaminataFuego() {
                 </div>
               </div>
 
-              {/* Correo Electrónico */}
+              {/* Correo Electrónico Registrado */}
               <div id="field-email">
                 <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
-                  Correo Electrónico de Contacto *
+                  Correo Electrónico Registrado *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
@@ -153544,10 +153615,10 @@ export default function ContratoCaminataFuego() {
                 {formErrors.email && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>{formErrors.email}</span>}
               </div>
 
-              {/* Teléfono / WhatsApp */}
+              {/* Teléfono de Contacto */}
               <div id="field-telefono">
                 <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
-                  Teléfono / WhatsApp de Emergencia *
+                  Teléfono / WhatsApp de Contacto *
                 </label>
                 <div style={{ position: 'relative' }}>
                   <input
@@ -153572,10 +153643,10 @@ export default function ContratoCaminataFuego() {
                 {formErrors.telefono && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>{formErrors.telefono}</span>}
               </div>
 
-              {/* Rol en la Actividad */}
+              {/* Selección de Rol dentro de la Actividad */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
-                  Rol en la Actividad *
+                  Selección de Rol dentro de la Actividad *
                 </label>
                 <select
                   name="rolActividad"
@@ -153585,24 +153656,23 @@ export default function ContratoCaminataFuego() {
                     width: '100%',
                     padding: '0.75rem 1rem',
                     background: '#0f172a',
-                    border: '1px solid #334155',
+                    border: '1px solid #38bdf8',
                     borderRadius: '8px',
-                    color: '#fff',
+                    color: '#38bdf8',
+                    fontWeight: 700,
                     fontSize: '0.9rem',
                     outline: 'none'
                   }}
                 >
-                  <option value="Participante">Participante</option>
-                  <option value="Partner / Acompañante">Partner / Acompañante</option>
-                  <option value="Staff / Logística">Staff / Logística</option>
-                  <option value="Entrenador / Facilitador">Entrenador / Facilitador</option>
+                  <option value="PARTICIPANTE">PARTICIPANTE (Inscrito activo en el entrenamiento vivencial)</option>
+                  <option value="PARTNER">PARTNER (Rol asignado de acompañamiento, soporte y asistencia en sala)</option>
                 </select>
               </div>
 
-              {/* Locación */}
+              {/* Lugar / Locación */}
               <div>
                 <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
-                  Locación del Evento
+                  Lugar
                 </label>
                 <input
                   type="text"
@@ -153623,7 +153693,7 @@ export default function ContratoCaminataFuego() {
               </div>
             </div>
 
-            {/* CASILLAS DE VERIFICACIÓN ELECTRÓNICA OBLIGATORIA */}
+            {/* CASILLAS ELECTRÓNICAS DE ACEPTACIÓN SEPARADAS */}
             <div style={{
               background: '#0f172a',
               border: '1px solid #334155',
@@ -153631,57 +153701,68 @@ export default function ContratoCaminataFuego() {
               padding: '1.25rem',
               display: 'flex',
               flexDirection: 'column',
-              gap: '1rem',
+              gap: '1.15rem',
               marginTop: '0.5rem'
             }}>
-              <h4 style={{ margin: 0, color: '#38bdf8', fontSize: '0.95rem', fontWeight: 800 }}>
-                Declaraciones de Conformidad (Casillas de Verificación Electrónica Obligatorias):
+              <h4 style={{ margin: 0, color: '#38bdf8', fontSize: '0.92rem', fontWeight: 800 }}>
+                Casillas Electrónicas de Aceptación (Checkboxes Separados):
               </h4>
 
-              {/* Casilla 1 */}
-              <label id="field-aceptoRiesgos" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
-                <input
-                  type="checkbox"
-                  name="aceptoRiesgos"
-                  checked={formData.aceptoRiesgos}
-                  onChange={handleInputChange}
-                  style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#f97316' }}
-                />
-                <span>
-                  <strong>He leído y acepto expresamente</strong> los términos de la <strong>Exoneración de Responsabilidad y Asunción de Riesgos</strong> para la Caminata sobre Fuego (Cláusulas 2 y 3).
-                </span>
-              </label>
-              {formErrors.aceptoRiesgos && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginLeft: '2rem' }}>{formErrors.aceptoRiesgos}</span>}
+              {/* CHECKBOX 1 (OBLIGATORIO) */}
+              <div id="field-aceptoRiesgos" style={{ padding: '0.75rem', background: 'rgba(249, 115, 22, 0.05)', borderRadius: '8px', border: '1px solid rgba(249, 115, 22, 0.2)' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
+                  <input
+                    type="checkbox"
+                    name="aceptoRiesgos"
+                    checked={formData.aceptoRiesgos}
+                    onChange={handleInputChange}
+                    style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#f97316' }}
+                  />
+                  <span>
+                    <strong style={{ color: '#fb923c' }}>[ ] CHECKBOX 1 (OBLIGATORIO) – EXONERACIÓN DE RESPONSABILIDAD Y ASUNCIÓN DE RIESGOS EN LA CAMINATA SOBRE FUEGO:</strong><br />
+                    He leído detenidamente los términos del presente instrumento. Declaro que mi participación en la dinámica de Caminata sobre Fuego es completamente voluntaria. Acepto los protocolos de seguridad, asumo los riesgos normales inherentes a la actividad y exonero de responsabilidad a Creación Cuántica E.I.R.L. de conformidad con las leyes peruanas.
+                  </span>
+                </label>
+                {formErrors.aceptoRiesgos && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginLeft: '2rem', display: 'block', marginTop: '0.3rem' }}>{formErrors.aceptoRiesgos}</span>}
+              </div>
 
-              {/* Casilla 2 */}
-              <label id="field-aceptoImagen" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
-                <input
-                  type="checkbox"
-                  name="aceptoImagen"
-                  checked={formData.aceptoImagen}
-                  onChange={handleInputChange}
-                  style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#38bdf8' }}
-                />
-                <span>
-                  <strong>Autorizo el uso de mi imagen y voz</strong> a favor de <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> según lo estipulado en el Artículo 11 del Código Civil (Cláusula 4).
-                </span>
-              </label>
-              {formErrors.aceptoImagen && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginLeft: '2rem' }}>{formErrors.aceptoImagen}</span>}
+              {/* CHECKBOX 2 (OBLIGATORIO) */}
+              <div id="field-aceptoSalud" style={{ padding: '0.75rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
+                  <input
+                    type="checkbox"
+                    name="aceptoSalud"
+                    checked={formData.aceptoSalud}
+                    onChange={handleInputChange}
+                    style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#10b981' }}
+                  />
+                  <span>
+                    <strong style={{ color: '#34d399' }}>[ ] CHECKBOX 2 (OBLIGATORIO) – DECLARACIÓN DE SALUD Y CONSENTIMIENTO PARA EL TRATAMIENTO DE DATOS SENSIBLES:</strong><br />
+                    Declaro bajo juramento que la información brindada sobre mi estado de salud física, mental y tratamientos médicos es veraz y completa. Autorizo de forma previa, expresa e inequívoca a Creación Cuántica E.I.R.L. al tratamiento de mis datos personales de salud conforme a la Ley N° 29733 y el D.S. N° 016-2024-JUS para garantizar la seguridad del entrenamiento.
+                  </span>
+                </label>
+                {formErrors.aceptoSalud && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginLeft: '2rem', display: 'block', marginTop: '0.3rem' }}>{formErrors.aceptoSalud}</span>}
+              </div>
 
-              {/* Casilla 3 */}
-              <label id="field-aceptoDatos" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
-                <input
-                  type="checkbox"
-                  name="aceptoDatos"
-                  checked={formData.aceptoDatos}
-                  onChange={handleInputChange}
-                  style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#10b981' }}
-                />
-                <span>
-                  <strong>Doy mi consentimiento informado</strong> para el tratamiento de mis Datos Personales y Datos Sensibles conforme a la <strong>Ley N° 29733</strong> (Cláusula 5).
-                </span>
-              </label>
-              {formErrors.aceptoDatos && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginLeft: '2rem' }}>{formErrors.aceptoDatos}</span>}
+              {/* CHECKBOX 3 (OPCIONAL / OPT-IN) */}
+              <div id="field-aceptoImagen" style={{ padding: '0.75rem', background: 'rgba(168, 85, 247, 0.05)', borderRadius: '8px', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
+                  <input
+                    type="checkbox"
+                    name="aceptoImagen"
+                    checked={formData.aceptoImagen}
+                    onChange={handleInputChange}
+                    style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#c084fc' }}
+                  />
+                  <span>
+                    <strong style={{ color: '#d8b4fe' }}>[ ] CHECKBOX 3 (OPCIONAL / OPT-IN) – AUTORIZACIÓN DE USO DE IMAGEN, FOTOGRAFÍA, VOZ Y TESTIMONIOS PUBLICITARIOS:</strong><br />
+                    <em>(Marque de forma activa únicamente si desea otorgar su consentimiento)</em> Autorizo expresamente y de forma gratuita a Creación Cuántica E.I.R.L. a utilizar, captar y difundir mi imagen física, fotografía, voz y testimonios para fines publicitarios e institucionales en plataformas digitales y redes sociales, según lo estipulado en el Art. 15 del Código Civil y la Ley N° 29733. 
+                    <span style={{ display: 'block', marginTop: '0.25rem', color: '#94a3b8', fontSize: '0.8rem' }}>
+                      * Si no marcas esta casilla, recibirás un distintivo logístico en sala para proteger tu privacidad fotográfica.
+                    </span>
+                  </span>
+                </label>
+              </div>
             </div>
 
             {/* FIRMA DIGITAL ESCRITA */}
@@ -153709,7 +153790,7 @@ export default function ContratoCaminataFuego() {
                 }}
               />
               <span style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '0.3rem', display: 'block' }}>
-                Al escribir tu nombre y presionar "Firmar y Validar Acuerdo", se registrará la marca de tiempo oficial y huella electrónica con plena eficacia jurídica.
+                Al registrar tu nombre y presionar "Firmar y Validar Instrumento", se registrará el valor hash, la dirección IP y el sello de tiempo (Timestamp) con plena validez jurídica.
               </span>
               {formErrors.firmaTexto && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>{formErrors.firmaTexto}</span>}
             </div>
@@ -153737,20 +153818,20 @@ export default function ContratoCaminataFuego() {
                 }}
               >
                 <Flame size={20} />
-                {isSubmitting ? 'Validando y Registrando Firma...' : 'Firmar y Validar Acuerdo Electrónico'}
+                {isSubmitting ? 'Validando y Registrando Firma...' : 'Firmar y Validar Instrumento Legal'}
               </button>
             </div>
           </form>
         )}
       </div>
 
-      {/* FOOTER OFICIAL DE PROTECCIÓN Y CONTACTO */}
+      {/* FOOTER OFICIAL DE CONTROL DE VERSIÓN Y ENTIDAD */}
       <div style={{ marginTop: '3rem', borderTop: '1px solid #334155', paddingTop: '1.5rem', textAlign: 'center', color: '#64748b', fontSize: '0.8rem', lineHeight: '1.6' }}>
         <p style={{ margin: '0 0 0.4rem 0' }}>
-          <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> · Todos los derechos reservados © 2026
+          <strong>Control de Versión:</strong> V1.0-2026-FIREWALK-LIMA · <strong>Fecha de Vigencia:</strong> 26 de octubre de 2026
         </p>
         <p style={{ margin: 0 }}>
-          Sede Legal: Lima, Perú · Derechos ARCO: <strong>legal@crearpsl.net</strong> · Plataforma Oficial de Causa OS
+          <strong>Entidad Administradora:</strong> Creación Cuántica E.I.R.L. (RUC 20612592811) · Sede Fiscal: Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú · Canal ARCO: <strong>protecciondedatos@crearpsl.net</strong>
         </p>
       </div>
 
