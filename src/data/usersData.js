@@ -4,9 +4,10 @@ import { USERS_TO_IMPORT } from './usersToImport.js';
 export const usersData = USERS_TO_IMPORT;
 
 export const normalizeRole = (role) => {
-  if (!role) return 'miembro';
+  if (!role || role === 'undefined' || role === 'null') return 'gerente';
   
   const r = role.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  if (r === 'undefined' || r === 'null') return 'gerente';
 
   // Coordinadora Junior (Rezagados C1 & QT)
   if (r === 'coord_jr' || r === 'coordinador_junior' || r === 'coordinadora_junior' || r.includes('coordinador junior') || r.includes('coordinadora junior') || r.includes('coord junior')) return 'coord_jr';
@@ -205,16 +206,18 @@ export const ROLE_DISPLAY_NAMES = {
 };
 
 export const getRoleDisplayName = (role) => {
-  if (!role) return 'Colaborador';
+  if (!role || role === 'undefined' || role === 'null') return 'Checklist Operativo';
   const canonical = normalizeRole(role);
   if (ROLE_DISPLAY_NAMES[canonical]) return ROLE_DISPLAY_NAMES[canonical];
   if (ROLE_DISPLAY_NAMES[role]) return ROLE_DISPLAY_NAMES[role];
-  return String(role)
+  if (canonical === 'miembro' || canonical === 'undefined' || canonical === 'null') return 'Checklist Operativo';
+  const cleaned = String(role)
     .replace(/_/g, ' ')
     .split(' ')
     .filter(Boolean)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
+  return cleaned === 'Undefined' || cleaned === 'Null' ? 'Checklist Operativo' : cleaned;
 };
 
 export const ROLE_COLORS = {

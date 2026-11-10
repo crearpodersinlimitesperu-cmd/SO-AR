@@ -11,7 +11,8 @@ export default function HomeOficina() {
   const { tasks: allTasks, loading: loadingTasks } = useChecklist();
   const navigate = useNavigate();
 
-  const myTasks = allTasks.filter(t => t.role === currentUser?.appRole);
+  const operativeRole = currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'gerente';
+  const myTasks = allTasks.filter(t => t.role === operativeRole);
   
   // Contadores
   const completed = myTasks.filter(t => t.completed || t.status === 'Completada').length;
@@ -57,26 +58,26 @@ export default function HomeOficina() {
           
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <li 
-              onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
+              onClick={() => navigate(`/checklist/${operativeRole}?filter=criticas`)}
               style={{ padding: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', color: 'var(--color-error)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}
             >
               <AlertCircle size={18} /> <strong>{criticas}</strong> críticas (Requieren acción hoy)
             </li>
             <li 
-              onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
+              onClick={() => navigate(`/checklist/${operativeRole}?filter=importantes`)}
               style={{ padding: '0.8rem', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px', color: '#ffb347', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(245, 158, 11, 0.2)' }}
             >
               <Circle size={18} /> <strong>{importantes}</strong> importantes
             </li>
             <li 
-              onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=completed`)}
+              onClick={() => navigate(`/checklist/${operativeRole}?filter=completed`)}
               style={{ padding: '0.8rem', background: 'rgba(52, 168, 83, 0.1)', borderRadius: '8px', color: 'var(--color-success)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(52, 168, 83, 0.2)' }}
             >
               <CheckCircle2 size={18} /> <strong>{completed}</strong> completadas
             </li>
           </ul>
 
-          <button onClick={() => navigate(`/checklist/${currentUser?.appRole}`)} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+          <button onClick={() => navigate(`/checklist/${operativeRole}`)} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
             IR A MI CHECKLIST OPERATIVO
           </button>
         </div>
@@ -100,7 +101,7 @@ export default function HomeOficina() {
                 return (
                   <li 
                     key={task.id}
-                    onClick={() => navigate(`/checklist/${currentUser?.appRole}`)}
+                    onClick={() => navigate(`/checklist/${operativeRole}`)}
                     style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.8rem', border: `1px solid ${color}33` }}
                   >
                     <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0 }}></span>

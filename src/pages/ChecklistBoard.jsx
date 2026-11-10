@@ -64,8 +64,21 @@ const getCountdownInfo = (deadlineIso, now = new Date()) => {
 
 export default function ChecklistBoard() {
   const { roleId: rawRoleId } = useParams();
-  const roleId = normalizeRole(decodeURIComponent(rawRoleId));
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
+
+  // Si roleId no existe o es "undefined", redirigir al rol del usuario inmediatamente
+  useEffect(() => {
+    if (!rawRoleId || rawRoleId === 'undefined' || rawRoleId === 'null') {
+      const targetRole = currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'gerente';
+      navigate(`/checklist/${targetRole}`, { replace: true });
+    }
+  }, [rawRoleId, currentUser, navigate]);
+
+  const cleanRoleId = (!rawRoleId || rawRoleId === 'undefined' || rawRoleId === 'null')
+    ? (currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'gerente')
+    : rawRoleId;
+  const roleId = normalizeRole(decodeURIComponent(cleanRoleId));
   const [searchParams, setSearchParams] = useSearchParams();
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
@@ -91,7 +104,6 @@ export default function ChecklistBoard() {
     }
   }, [searchParams]);
 
-  const { currentUser } = useAuth();
   const [foreignTaskForWarning, setForeignTaskForWarning] = useState(null);
   const userSedeNorm = currentUser?.sede ? normalizeSede(currentUser.sede) : null;
   const [selectedSedeFilter, setSelectedSedeFilter] = useState(() => {
@@ -134,8 +146,11 @@ export default function ChecklistBoard() {
     : currentStage;
   const role = roles.find(r => r.id === roleId) || {
     id: roleId,
-    name: getRoleDisplayName(roleId)
+    name: (roleId && roleId !== 'undefined' && roleId !== 'null' && roleId !== 'miembro')
+      ? getRoleDisplayName(roleId)
+      : 'Checklist Operativo'
   };
+  const roleDisplayName = (role?.name && role.name !== 'Undefined' && role.name !== 'undefined') ? role.name : 'Checklist Operativo';
 
   // Verificación de Autorización por Rol (N7)
   const isAuthorized = currentUser?.canAccessRole ? currentUser.canAccessRole(roleId) : true;
@@ -305,10 +320,10 @@ export default function ChecklistBoard() {
       if (isCurrentStageInRole) {
         const meta = PHASE_META[effectiveStage] || { label: effectiveStage };
         scopedTasks = myTasks.filter(t => t.cyclePhase === effectiveStage);
-        viewTitle = `${role?.name || 'Checklist'}: Fase Activa ${meta.label}`;
+        viewTitle = `${roleDisplayName}: Fase Activa ${meta.label}`;
       } else {
         scopedTasks = filterStalePastTasks(myTasks);
-        viewTitle = `${role?.name || 'Checklist'}: Tareas Operativas Vigentes`;
+        viewTitle = `${roleDisplayName}: Tareas Operativas Vigentes`;
       }
     } else if (qtPhaseFilter !== 'all') {
       const meta = PHASE_META[qtPhaseFilter] || { label: qtPhaseFilter };
@@ -319,10 +334,10 @@ export default function ChecklistBoard() {
         }
         return false;
       });
-      viewTitle = `${role?.name || 'Checklist'}: Fase ${meta.label}`;
+      viewTitle = `${roleDisplayName}: Fase ${meta.label}`;
     } else {
       scopedTasks = myTasks;
-      viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral`;
+      viewTitle = `${roleDisplayName}: Catálogo Operativo Integral`;
     }
   } else {
     // Vista Normal del Checklist Activo para roles de fase única
@@ -510,7 +525,7 @@ export default function ChecklistBoard() {
       )}
 
       <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
-        <h1 className="text-gold uppercase" style={{ fontSize: '1.8rem', margin: '0 0 0.5rem 0' }}>{role.name}</h1>
+        <h1 className="text-gold uppercase" style={{ fontSize: '1.8rem', margin: '0 0 0.5rem 0' }}>{roleDisplayName}</h1>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
             <p className={filterParam ? "text-blue" : "text-muted"} style={{ margin: 0, fontWeight: filterParam ? 'bold' : 'normal' }}>

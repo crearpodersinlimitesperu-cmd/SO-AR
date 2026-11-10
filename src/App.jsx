@@ -399,6 +399,16 @@ function App() {
           } />
           <Route path="/gerente-dashboard" element={<Navigate to="/gerente" replace />} />
           
+          <Route path="/checklist" element={
+            <PrivateRoute>
+              <ChecklistBoard />
+            </PrivateRoute>
+          } />
+          <Route path="/checklist/undefined" element={
+            <PrivateRoute>
+              <ChecklistBoard />
+            </PrivateRoute>
+          } />
           <Route path="/checklist/:roleId" element={
             <PrivateRoute>
               <ChecklistBoard />

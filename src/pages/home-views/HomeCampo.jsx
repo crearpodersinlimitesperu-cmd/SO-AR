@@ -11,7 +11,8 @@ export default function HomeCampo() {
   const { tasks: allTasks, loading: loadingTasks } = useChecklist();
   const navigate = useNavigate();
 
-  const myTasks = allTasks.filter(t => t.role === currentUser?.appRole);
+  const operativeRole = currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'capitan';
+  const myTasks = allTasks.filter(t => t.role === operativeRole);
   const pendingTasks = myTasks.filter(t => !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validación');
   
   // Ordenar por prioridad (rojos primero)
@@ -63,7 +64,7 @@ export default function HomeCampo() {
               return (
                 <li 
                   key={task.id}
-                  onClick={() => navigate(`/checklist/${currentUser?.appRole}`)}
+                  onClick={() => navigate(`/checklist/${operativeRole}`)}
                   style={{ 
                     padding: '1.2rem', 
                     background: bg, 
@@ -97,7 +98,7 @@ export default function HomeCampo() {
       {/* BOTÓN PRINCIPAL */}
       <button 
         className="btn-primary" 
-        onClick={() => navigate(`/checklist/${currentUser?.appRole}`)} 
+        onClick={() => navigate(`/checklist/${operativeRole}`)} 
         style={{ padding: '1.2rem', fontSize: '1.2rem', borderRadius: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }}
       >
         IR A MI CHECKLIST OPERATIVO

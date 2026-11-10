@@ -76315,6 +76315,16 @@ function App() {
           } />
           <Route path="/gerente-dashboard" element={<Navigate to="/gerente" replace />} />
           
+          <Route path="/checklist" element={
+            <PrivateRoute>
+              <ChecklistBoard />
+            </PrivateRoute>
+          } />
+          <Route path="/checklist/undefined" element={
+            <PrivateRoute>
+              <ChecklistBoard />
+            </PrivateRoute>
+          } />
           <Route path="/checklist/:roleId" element={
             <PrivateRoute>
               <ChecklistBoard />
@@ -77419,6 +77429,7 @@ export default function Home() {
   };
 
   const { currentUser, logout, switchRole, reauthenticateGoogle } = useAuth();
+  const userOperativeRole = currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'gerente';
   const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, setViewMode, customModules } = useUI();
@@ -78698,21 +78709,21 @@ export default function Home() {
             {/* Resumen de contadores */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
               <div 
-                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
+                onClick={() => navigate(`/checklist/${userOperativeRole}?filter=criticas`)}
                 style={{ padding: '0.8rem', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
               >
                 <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#ef4444' }}>{criticasCount}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🔴 Críticas</div>
               </div>
               <div 
-                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
+                onClick={() => navigate(`/checklist/${userOperativeRole}?filter=importantes`)}
                 style={{ padding: '0.8rem', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
               >
                 <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#ffb347' }}>{importantesCount}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🟡 Importantes</div>
               </div>
               <div 
-                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=completed`)}
+                onClick={() => navigate(`/checklist/${userOperativeRole}?filter=completed`)}
                 style={{ padding: '0.8rem', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
               >
                 <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#10b981' }}>{completedForProgress}</div>
@@ -78737,7 +78748,7 @@ export default function Home() {
                   return (
                     <div 
                       key={task.id}
-                      onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole}`)}
+                      onClick={() => navigate(userOperativeRole === 'gerente' ? '/gerente' : `/checklist/${userOperativeRole}`)}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -79183,19 +79194,19 @@ export default function Home() {
                 <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem' }}>HOY (Tus Pendientes)</h3>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <li 
-                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
+                    onClick={() => navigate(`/checklist/${userOperativeRole}?filter=criticas`)}
                     style={{ padding: '0.65rem 0.8rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', color: 'var(--color-error)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.85rem' }}
                   >
                     <AlertCircle size={16} /> <strong>{criticasCount}</strong> críticas (Hoy)
                   </li>
                   <li 
-                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
+                    onClick={() => navigate(`/checklist/${userOperativeRole}?filter=importantes`)}
                     style={{ padding: '0.65rem 0.8rem', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '6px', color: '#ffb347', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(245, 158, 11, 0.2)', fontSize: '0.85rem' }}
                   >
                     <Circle size={16} /> <strong>{importantesCount}</strong> importantes
                   </li>
                   <li 
-                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=completed`)}
+                    onClick={() => navigate(`/checklist/${userOperativeRole}?filter=completed`)}
                     style={{ padding: '0.65rem 0.8rem', background: 'rgba(52, 168, 83, 0.1)', borderRadius: '6px', color: 'var(--color-success)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(52, 168, 83, 0.2)', fontSize: '0.85rem' }}
                   >
                     <CheckCircle2 size={16} /> <strong>{completedForProgress}</strong> completadas
@@ -79207,7 +79218,7 @@ export default function Home() {
               <div className="glass-panel" style={{ padding: '1.2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', marginBottom: '0.8rem' }}>
                   <h3 className="text-blue" style={{ marginTop: 0, marginBottom: 0, borderBottom: 'none', paddingBottom: 0, fontSize: '1rem' }}>TU PRIORIDAD (Top 3)</h3>
-                  <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'gerente'}`)} style={{ background: 'transparent', border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', borderRadius: '4px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>Ver Tareas Generales →</button>
+                  <button onClick={() => navigate(`/checklist/${userOperativeRole}`)} style={{ background: 'transparent', border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', borderRadius: '4px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>Ver Tareas Generales →</button>
                 </div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {urgentTasks.slice(0, 3).length === 0 ? (
@@ -79226,7 +79237,7 @@ export default function Home() {
                               setSelectedTaskForDetail(task);
                               setShowTaskDetailModal(true);
                             } else {
-                              navigate(`/checklist/${currentUser?.appRole}?filter=${isCrit ? 'criticas' : 'importantes'}`);
+                              navigate(`/checklist/${userOperativeRole}?filter=${isCrit ? 'criticas' : 'importantes'}`);
                             }
                           }}
                           style={{ padding: '0.65rem 0.8rem', background: bg, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', border: `1px solid ${color}33` }}
@@ -173279,7 +173290,7 @@ export default function GerenteDashboard() {
                           </div>
                         )}
                       </div>
-                      <button onClick={() => navigate(`/checklist/${t.role}?filter=criticas`)} style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                      <button onClick={() => navigate(`/checklist/${t.role || 'gerente'}?filter=criticas`)} style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                         Ver <ArrowRight size={13} />
                       </button>
                     </div>
@@ -180214,6 +180225,7 @@ export default function Home() {
   };
 
   const { currentUser, logout, switchRole, reauthenticateGoogle, updateCurrentUserFields } = useAuth();
+  const userOperativeRole = currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'gerente';
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [isCheckingLegal, setIsCheckingLegal] = useState(true);
 
@@ -182156,21 +182168,21 @@ export default function Home() {
             {/* Resumen de contadores */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
               <div 
-                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
+                onClick={() => navigate(`/checklist/${userOperativeRole}?filter=criticas`)}
                 style={{ padding: '0.8rem', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
               >
                 <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#ef4444' }}>{criticasCount}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🔴 Críticas</div>
               </div>
               <div 
-                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
+                onClick={() => navigate(`/checklist/${userOperativeRole}?filter=importantes`)}
                 style={{ padding: '0.8rem', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
               >
                 <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#ffb347' }}>{importantesCount}</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🟡 Importantes</div>
               </div>
               <div 
-                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=completed`)}
+                onClick={() => navigate(`/checklist/${userOperativeRole}?filter=completed`)}
                 style={{ padding: '0.8rem', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
               >
                 <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#10b981' }}>{completedForProgress}</div>
@@ -182195,7 +182207,7 @@ export default function Home() {
                   return (
                     <div 
                       key={task.id}
-                      onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole}`)}
+                      onClick={() => navigate(userOperativeRole === 'gerente' ? '/gerente' : `/checklist/${userOperativeRole}`)}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -182844,19 +182856,19 @@ export default function Home() {
                 <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem' }}>HOY (Tus Pendientes)</h3>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <li 
-                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
+                    onClick={() => navigate(`/checklist/${userOperativeRole}?filter=criticas`)}
                     style={{ padding: '0.65rem 0.8rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', color: 'var(--color-error)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.85rem' }}
                   >
                     <AlertCircle size={16} /> <strong>{criticasCount}</strong> críticas (Hoy)
                   </li>
                   <li 
-                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
+                    onClick={() => navigate(`/checklist/${userOperativeRole}?filter=importantes`)}
                     style={{ padding: '0.65rem 0.8rem', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '6px', color: '#ffb347', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(245, 158, 11, 0.2)', fontSize: '0.85rem' }}
                   >
                     <Circle size={16} /> <strong>{importantesCount}</strong> importantes
                   </li>
                   <li 
-                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=completed`)}
+                    onClick={() => navigate(`/checklist/${userOperativeRole}?filter=completed`)}
                     style={{ padding: '0.65rem 0.8rem', background: 'rgba(52, 168, 83, 0.1)', borderRadius: '6px', color: 'var(--color-success)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(52, 168, 83, 0.2)', fontSize: '0.85rem' }}
                   >
                     <CheckCircle2 size={16} /> <strong>{completedForProgress}</strong> completadas
@@ -182868,7 +182880,7 @@ export default function Home() {
               <div className="glass-panel" style={{ padding: '1.2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', marginBottom: '0.8rem' }}>
                   <h3 className="text-blue" style={{ marginTop: 0, marginBottom: 0, borderBottom: 'none', paddingBottom: 0, fontSize: '1rem' }}>TU PRIORIDAD (Top 3)</h3>
-                  <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'gerente'}`)} style={{ background: 'transparent', border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', borderRadius: '4px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>Ver Tareas Generales →</button>
+                  <button onClick={() => navigate(`/checklist/${userOperativeRole}`)} style={{ background: 'transparent', border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', borderRadius: '4px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>Ver Tareas Generales →</button>
                 </div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {urgentTasks.slice(0, 3).length === 0 ? (
@@ -182887,7 +182899,7 @@ export default function Home() {
                               setSelectedTaskForDetail(task);
                               setShowTaskDetailModal(true);
                             } else {
-                              navigate(`/checklist/${currentUser?.appRole}?filter=${isCrit ? 'criticas' : 'importantes'}`);
+                              navigate(`/checklist/${userOperativeRole}?filter=${isCrit ? 'criticas' : 'importantes'}`);
                             }
                           }}
                           style={{ padding: '0.65rem 0.8rem', background: bg, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', border: `1px solid ${color}33` }}
@@ -183496,8 +183508,21 @@ const getCountdownInfo = (deadlineIso, now = new Date()) => {
 
 export default function ChecklistBoard() {
   const { roleId: rawRoleId } = useParams();
-  const roleId = normalizeRole(decodeURIComponent(rawRoleId));
+  const { currentUser } = useAuth();
   const navigate = useNavigate();
+
+  // Si roleId no existe o es "undefined", redirigir al rol del usuario inmediatamente
+  useEffect(() => {
+    if (!rawRoleId || rawRoleId === 'undefined' || rawRoleId === 'null') {
+      const targetRole = currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'gerente';
+      navigate(`/checklist/${targetRole}`, { replace: true });
+    }
+  }, [rawRoleId, currentUser, navigate]);
+
+  const cleanRoleId = (!rawRoleId || rawRoleId === 'undefined' || rawRoleId === 'null')
+    ? (currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'gerente')
+    : rawRoleId;
+  const roleId = normalizeRole(decodeURIComponent(cleanRoleId));
   const [searchParams, setSearchParams] = useSearchParams();
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
@@ -183523,7 +183548,6 @@ export default function ChecklistBoard() {
     }
   }, [searchParams]);
 
-  const { currentUser } = useAuth();
   const [foreignTaskForWarning, setForeignTaskForWarning] = useState(null);
   const userSedeNorm = currentUser?.sede ? normalizeSede(currentUser.sede) : null;
   const [selectedSedeFilter, setSelectedSedeFilter] = useState(() => {
@@ -183566,8 +183590,11 @@ export default function ChecklistBoard() {
     : currentStage;
   const role = roles.find(r => r.id === roleId) || {
     id: roleId,
-    name: getRoleDisplayName(roleId)
+    name: (roleId && roleId !== 'undefined' && roleId !== 'null' && roleId !== 'miembro')
+      ? getRoleDisplayName(roleId)
+      : 'Checklist Operativo'
   };
+  const roleDisplayName = (role?.name && role.name !== 'Undefined' && role.name !== 'undefined') ? role.name : 'Checklist Operativo';
 
   // Verificación de Autorización por Rol (N7)
   const isAuthorized = currentUser?.canAccessRole ? currentUser.canAccessRole(roleId) : true;
@@ -183737,10 +183764,10 @@ export default function ChecklistBoard() {
       if (isCurrentStageInRole) {
         const meta = PHASE_META[effectiveStage] || { label: effectiveStage };
         scopedTasks = myTasks.filter(t => t.cyclePhase === effectiveStage);
-        viewTitle = `${role?.name || 'Checklist'}: Fase Activa ${meta.label}`;
+        viewTitle = `${roleDisplayName}: Fase Activa ${meta.label}`;
       } else {
         scopedTasks = filterStalePastTasks(myTasks);
-        viewTitle = `${role?.name || 'Checklist'}: Tareas Operativas Vigentes`;
+        viewTitle = `${roleDisplayName}: Tareas Operativas Vigentes`;
       }
     } else if (qtPhaseFilter !== 'all') {
       const meta = PHASE_META[qtPhaseFilter] || { label: qtPhaseFilter };
@@ -183751,10 +183778,10 @@ export default function ChecklistBoard() {
         }
         return false;
       });
-      viewTitle = `${role?.name || 'Checklist'}: Fase ${meta.label}`;
+      viewTitle = `${roleDisplayName}: Fase ${meta.label}`;
     } else {
       scopedTasks = myTasks;
-      viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral`;
+      viewTitle = `${roleDisplayName}: Catálogo Operativo Integral`;
     }
   } else {
     // Vista Normal del Checklist Activo para roles de fase única
@@ -183942,7 +183969,7 @@ export default function ChecklistBoard() {
       )}
 
       <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
-        <h1 className="text-gold uppercase" style={{ fontSize: '1.8rem', margin: '0 0 0.5rem 0' }}>{role.name}</h1>
+        <h1 className="text-gold uppercase" style={{ fontSize: '1.8rem', margin: '0 0 0.5rem 0' }}>{roleDisplayName}</h1>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
           <div>
             <p className={filterParam ? "text-blue" : "text-muted"} style={{ margin: 0, fontWeight: filterParam ? 'bold' : 'normal' }}>
@@ -193407,7 +193434,8 @@ export default function HomeOficina() {
   const { tasks: allTasks, loading: loadingTasks } = useChecklist();
   const navigate = useNavigate();
 
-  const myTasks = allTasks.filter(t => t.role === currentUser?.appRole);
+  const operativeRole = currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'gerente';
+  const myTasks = allTasks.filter(t => t.role === operativeRole);
   
   // Contadores
   const completed = myTasks.filter(t => t.completed || t.status === 'Completada').length;
@@ -193453,26 +193481,26 @@ export default function HomeOficina() {
           
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <li 
-              onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
+              onClick={() => navigate(`/checklist/${operativeRole}?filter=criticas`)}
               style={{ padding: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', color: 'var(--color-error)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}
             >
               <AlertCircle size={18} /> <strong>{criticas}</strong> críticas (Requieren acción hoy)
             </li>
             <li 
-              onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
+              onClick={() => navigate(`/checklist/${operativeRole}?filter=importantes`)}
               style={{ padding: '0.8rem', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px', color: '#ffb347', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(245, 158, 11, 0.2)' }}
             >
               <Circle size={18} /> <strong>{importantes}</strong> importantes
             </li>
             <li 
-              onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=completed`)}
+              onClick={() => navigate(`/checklist/${operativeRole}?filter=completed`)}
               style={{ padding: '0.8rem', background: 'rgba(52, 168, 83, 0.1)', borderRadius: '8px', color: 'var(--color-success)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(52, 168, 83, 0.2)' }}
             >
               <CheckCircle2 size={18} /> <strong>{completed}</strong> completadas
             </li>
           </ul>
 
-          <button onClick={() => navigate(`/checklist/${currentUser?.appRole}`)} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+          <button onClick={() => navigate(`/checklist/${operativeRole}`)} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
             IR A MI CHECKLIST OPERATIVO
           </button>
         </div>
@@ -193496,7 +193524,7 @@ export default function HomeOficina() {
                 return (
                   <li 
                     key={task.id}
-                    onClick={() => navigate(`/checklist/${currentUser?.appRole}`)}
+                    onClick={() => navigate(`/checklist/${operativeRole}`)}
                     style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.8rem', border: `1px solid ${color}33` }}
                   >
                     <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0 }}></span>
@@ -193639,7 +193667,8 @@ export default function HomeCampo() {
   const { tasks: allTasks, loading: loadingTasks } = useChecklist();
   const navigate = useNavigate();
 
-  const myTasks = allTasks.filter(t => t.role === currentUser?.appRole);
+  const operativeRole = currentUser?.appRole || currentUser?.activeRole || currentUser?.role || 'capitan';
+  const myTasks = allTasks.filter(t => t.role === operativeRole);
   const pendingTasks = myTasks.filter(t => !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validación');
   
   // Ordenar por prioridad (rojos primero)
@@ -193691,7 +193720,7 @@ export default function HomeCampo() {
               return (
                 <li 
                   key={task.id}
-                  onClick={() => navigate(`/checklist/${currentUser?.appRole}`)}
+                  onClick={() => navigate(`/checklist/${operativeRole}`)}
                   style={{ 
                     padding: '1.2rem', 
                     background: bg, 
@@ -193725,7 +193754,7 @@ export default function HomeCampo() {
       {/* BOTÓN PRINCIPAL */}
       <button 
         className="btn-primary" 
-        onClick={() => navigate(`/checklist/${currentUser?.appRole}`)} 
+        onClick={() => navigate(`/checklist/${operativeRole}`)} 
         style={{ padding: '1.2rem', fontSize: '1.2rem', borderRadius: '12px', boxShadow: '0 8px 16px rgba(0,0,0,0.3)' }}
       >
         IR A MI CHECKLIST OPERATIVO
