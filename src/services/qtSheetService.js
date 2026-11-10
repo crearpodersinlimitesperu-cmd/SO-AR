@@ -145,7 +145,7 @@ export function parseCSV(text) {
  * Transforma y SANEAMENTE INTELIGENTE de las filas crudas del CSV en objetos de miembros de QT
  * Corrige automáticamente filas desfasadas, datos invertidos y elimina duplicados.
  */
-// Lista de bajas y renuncias confirmadas por la direcciÃ³n de CREAR PSL
+// Lista de bajas y renuncias confirmadas por la dirección de CREAR PSL
 export const INACTIVE_QT_MEMBERS_OVERRIDE = [
   '9875120',                    // Leyla Kelly Pasquel Alfaro (Renuncia a QT y a Oficina)
   'leylakellypasquel@gmail.com',
