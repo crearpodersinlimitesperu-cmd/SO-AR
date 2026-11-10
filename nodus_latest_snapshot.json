@@ -2941,6 +2941,25 @@
       "equipoId": "142",
       "equipoNombre": "EQUIPO 8 — MÉXICO CICLO 1 ✓",
       "totalParticipantes": 78
+    },
+    {
+      "equipoId": "149",
+      "equipoNombre": "EQUIPO 32 — LIMA CICLO 1 ✓",
+      "sede": "Lima",
+      "totalParticipantes": 151,
+      "capitulo1": 151,
+      "capitulo2": 41,
+      "asistieronC2": 32,
+      "confirmadosC2": 31,
+      "porConfirmarC2": 0,
+      "noContestaC2": 0,
+      "siguienteC2": 4,
+      "sinGestionC2": 6,
+      "desertoresC2": 1,
+      "pagaronC2": 13,
+      "pagaronC2MJ": 23,
+      "abonosC2": 5,
+      "totalPagosC2": 36
     }
   ]
 }

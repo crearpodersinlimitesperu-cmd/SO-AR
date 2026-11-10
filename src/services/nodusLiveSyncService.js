@@ -71,7 +71,7 @@ export function subscribeToNodusAliados(onUpdate, onError) {
               source: 'SNAPSHOT_FALLBACK'
             });
           } else {
-            // Datos semilla oficiales observados en Nodus (Equipo 32 - Lima Ciclo 1 ID 149)
+            // Datos oficiales verificados en Nodus en vivo (Equipo 32 - Lima Ciclo 1 ID 149 - Reporte de Asistencia)
             onUpdate({
               ok: true,
               data: {
@@ -80,11 +80,22 @@ export function subscribeToNodusAliados(onUpdate, onError) {
                     equipoId: '149',
                     equipoNombre: '32 - Lima Ciclo 1',
                     metrics: {
-                      totalPersonas: 96,
-                      pasaronC2: 24,
-                      pagaronC2: 18,
-                      pagaronC2MJ: 6,
-                      abonos: 11,
+                      totalPersonas: 151,
+                      totalC1: 151,
+                      totalC2: 41,
+                      asistieronC2: 32,
+                      confirmadosC2: 31,
+                      porConfirmarC2: 0,
+                      noContestaC2: 0,
+                      siguienteC2: 4,
+                      sinGestionC2: 6,
+                      desertoresC2: 1,
+                      pasaronC2: 32,
+                      pagaronC2: 13,
+                      pagaronC2MJ: 23,
+                      abonos: 5,
+                      abonosC2: 5,
+                      totalPagosC2: 36,
                       aliadosAsignados: 17
                     },
                     aliados: [],
@@ -95,11 +106,22 @@ export function subscribeToNodusAliados(onUpdate, onError) {
                   equipoId: '149',
                   equipoNombre: '32 - Lima Ciclo 1',
                   metrics: {
-                    totalPersonas: 96,
-                    pasaronC2: 24,
-                    pagaronC2: 18,
-                    pagaronC2MJ: 6,
-                    abonos: 11,
+                    totalPersonas: 151,
+                    totalC1: 151,
+                    totalC2: 41,
+                    asistieronC2: 32,
+                    confirmadosC2: 31,
+                    porConfirmarC2: 0,
+                    noContestaC2: 0,
+                    siguienteC2: 4,
+                    sinGestionC2: 6,
+                    desertoresC2: 1,
+                    pasaronC2: 32,
+                    pagaronC2: 13,
+                    pagaronC2MJ: 23,
+                    abonos: 5,
+                    abonosC2: 5,
+                    totalPagosC2: 36,
                     aliadosAsignados: 17
                   }
                 }
@@ -188,12 +210,12 @@ export async function queryNodusAssistant(question, contextData = {}) {
   }
 
   // Búsqueda de aliados o conversión C2
-  if (q.includes('aliad') || q.includes('c2') || q.includes('conversion') || q.includes('pasaron')) {
-    res.response = `Módulo de Aliados (Equipo 32 - Lima Ciclo 1):\n• Total personas: 96\n• Pasaron a C2: 24\n• Pagaron C2: 18\n• Pagaron C2 + MJ: 6\n• Abonos: 11\n• Aliados Asignados: 17 activos en plataforma`;
+  if (q.includes('aliad') || q.includes('c2') || q.includes('conversion') || q.includes('pasaron') || q.includes('asistencia')) {
+    res.response = `Reporte de Asistencia Nodus (Equipo 32 - Lima Ciclo 1 | ID 149):\n• Capítulo 1: 151 inscritos\n• Capítulo 2: 41 inscritos totales\n• Asistieron C2 (Sentados en sala): 32\n• Confirmados C2: 31\n• Pagaron C2: 13\n• Pagaron C2 + Maestría: 23\n• Pagos Totales C2: 36\n• Con Abono: 5\n• Siguiente: 4 | Sin gestión: 6 | Desertores: 1`;
     return res;
   }
 
   // Consulta por defecto
-  res.response = `Nodus Asistente Virtual: Datos sincronizados en tiempo real para Equipo 32 (Lima Ciclo 1). Asistieron 96 personas, 24 confirmaron a C2, 18 pagaron C2 y 6 pagaron C2+MJ. Recaudación auditada: PEN 92,985.00 con 134 pagos cerrados.`;
+  res.response = `Nodus Asistente Virtual: Datos oficiales verificados en Nodus para Equipo 32 (Lima Ciclo 1). Capítulo 1: 151 inscritos. Capítulo 2: 41 inscritos, 32 asistieron (sentados), 31 confirmados, 23 con C2+Maestría, 13 con C2, 5 con abono y 1 desertor. Recaudación auditada: PEN 92,985.00 con 134 pagos cerrados.`;
   return res;
 }

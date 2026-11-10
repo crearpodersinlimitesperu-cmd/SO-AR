@@ -56,7 +56,16 @@
       status.textContent=(complete?'Datos institucionales registrados.':'Datos institucionales pendientes: por ahora figuran únicamente los nombres de los gerentes.')+(unavailable?' No se pudo consultar Causa OS; se muestran los datos base disponibles.':'');
       document.getElementById('print-letter').disabled=false;
       const params=new URLSearchParams(location.search);params.set('sede',id);history.replaceState(null,'','?'+params.toString());
-      const hotel=document.getElementById('field-hotel');if(/^Hotel Sede /i.test(hotel.textContent))hotel.textContent='[HOSPEDAJE PENDIENTE]';
+      const hotel=document.getElementById('field-hotel');
+      if (hotel) {
+        if (seed.hotel) {
+          hotel.textContent = seed.hotel;
+        } else if (id === 'lima' || !id) {
+          hotel.textContent = 'Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima - Código de Reserva: 32425545)';
+        } else if (/^Hotel Sede /i.test(hotel.textContent)) {
+          hotel.textContent = '[HOSPEDAJE PENDIENTE]';
+        }
+      }
     }
     select.value=sedeId(new URLSearchParams(location.search).get('sede'));
     select.addEventListener('change',render); await render();

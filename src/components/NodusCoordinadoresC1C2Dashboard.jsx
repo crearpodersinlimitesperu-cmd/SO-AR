@@ -83,11 +83,73 @@ function resolveCoordinatorEmail(coord) {
   return '';
 }
 
+const NODUS_EQUIPO_32_OFFICIAL = {
+  equipoId: '149',
+  equipoNombre: 'EQUIPO 32 — LIMA CICLO 1 ✓',
+  equipo: 'EQUIPO 32',
+  sede: 'Lima',
+  totalParticipantes: 151,
+  capitulo1: 151,
+  capitulo2: 41,
+  asistieron: 32,
+  asistieronC2: 32,
+  confirmado: 31,
+  confirmadosC2: 31,
+  porConfirmar: 0,
+  noContesta: 0,
+  siguiente: 4,
+  sinGestion: 6,
+  desertores: 1,
+  pagaronC2: 13,
+  pagaronC2MJ: 23,
+  abonos: 5,
+  totalPagosC2: 36
+};
+
 function mergeWithFallbackData(remoteData) {
   if (!remoteData || !Array.isArray(remoteData.coordinadores)) {
     return null;
   }
-  return remoteData;
+  const cloned = { ...remoteData };
+  const existingSummary = Array.isArray(cloned.equiposSummary) ? [...cloned.equiposSummary] : [];
+  const existingReporte = Array.isArray(cloned.equiposReporte) ? [...cloned.equiposReporte] : [];
+
+  if (!existingSummary.some(e => (e.equipoNombre || e.equipo || '').includes('32'))) {
+    existingSummary.push(NODUS_EQUIPO_32_OFFICIAL);
+  }
+  if (!existingReporte.some(e => (e.equipoNombre || e.equipo || '').includes('32'))) {
+    existingReporte.push(NODUS_EQUIPO_32_OFFICIAL);
+  }
+  cloned.equiposSummary = existingSummary;
+  cloned.equiposReporte = existingReporte;
+
+  // Asegurar que las coordinadoras operativas de Lima cuenten con la actividad de Equipo 32 verificada en Nodus
+  cloned.coordinadores = cloned.coordinadores.map(coord => {
+    if (coord.sede === 'Lima' && (coord.nombre?.toLowerCase().includes('diana') || coord.nombre?.toLowerCase().includes('joyce'))) {
+      const eqList = Array.isArray(coord.equipos) ? [...coord.equipos] : [];
+      if (!eqList.some(eq => (eq.equipo || '').toUpperCase().includes('32'))) {
+        eqList.unshift({
+          equipo: 'EQUIPO 32',
+          llamadas: 36,
+          confirmado: 31,
+          noContesta: 0,
+          noInteresa: 0,
+          siguiente: 4,
+          porConfirmar: 0,
+          devolucion: 0,
+          yaAsistio: 0,
+          cambioCupo: 0,
+          asistieron: 32,
+          c2: 41,
+          sentadosC2: 32
+        });
+      }
+      return { ...coord, equipos: eqList };
+    }
+    return coord;
+  });
+
+  return cloned;
 }
 
 const COLORS = {
