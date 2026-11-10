@@ -559,12 +559,15 @@ export function ChecklistProvider({ children }) {
         // invariables desde checklistData.js, ignorando posibles corrupciones en Firestore.
         let mergedData = data;
         if (baseTaskDef && !data.isCustom && !taskId.startsWith('custom_')) {
+          const hasManual = Boolean(data.hasManualDeadline || data.isManualDeadline || data.manualDeadline);
+          const computedDeadline = calculateAutomaticDeadline(baseTaskDef, currentCycle);
           mergedData = {
             ...data,
             cyclePhase: baseTaskDef.cyclePhase,
             task: baseTaskDef.task,
             role: baseTaskDef.role,
-            isCritical: baseTaskDef.isCritical
+            isCritical: baseTaskDef.isCritical,
+            deadline: (hasManual && data.deadline) ? data.deadline : (computedDeadline || data.deadline)
           };
         }
 
@@ -609,8 +612,9 @@ export function ChecklistProvider({ children }) {
               sede: userSede,
               cycleId: cycle?.id
             });
-            const perTeamDeadline = isPersisted
-              ? (task.deadline || calculateAutomaticDeadline(baseTaskDef, cycle))
+            const hasManual = Boolean(task.hasManualDeadline || task.isManualDeadline || task.manualDeadline);
+            const perTeamDeadline = (isPersisted && hasManual && task.deadline)
+              ? task.deadline
               : calculateAutomaticDeadline(baseTaskDef, cycle);
 
             expanded.push({
@@ -1677,12 +1681,32 @@ export function ChecklistProvider({ children }) {
 
   // Filtro visual de Fase Activa (Cero eliminación en base de datos; preservación histórica absoluta)
   const isTaskInActiveWindow = (task) => {
-    if (!task.isClosed && !task.completed) return true;
-    if (task.deadline) {
+    // Si la tarea está cerrada o completada hace más de 7 días, se excluye del tablero activo
+    if (task.isClosed || task.completed) {
+      const doneTimestamp = task.completedAt || task.updatedAt || task.closedAt;
+      if (doneTimestamp) {
+        const doneDate = new Date(doneTimestamp);
+        if (!isNaN(doneDate.getTime()) && (Date.now() - doneDate.getTime()) > (7 * 24 * 60 * 60 * 1000)) {
+          return false;
+        }
+      }
+      if (task.deadline) {
+        const deadlineDate = new Date(task.deadline);
+        if (!isNaN(deadlineDate.getTime()) && (Date.now() - deadlineDate.getTime()) > (7 * 24 * 60 * 60 * 1000)) {
+          return false;
+        }
+      }
+    }
+
+    // Tareas pendientes con fecha límite vencida hace más de 14 días: pertenecen a fases/ciclos concluidos
+    // y NO deben contaminar el backlog activo diario salvo que el usuario active "showAllHistoricalTasks".
+    if (!task.completed && task.deadline) {
       const deadlineDate = new Date(task.deadline);
-      const diffDays = (Date.now() - deadlineDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (diffDays > 7 && (task.isClosed || task.completed)) {
-        return false;
+      if (!isNaN(deadlineDate.getTime())) {
+        const diffDays = (Date.now() - deadlineDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (diffDays > 14) {
+          return false;
+        }
       }
     }
     return true;

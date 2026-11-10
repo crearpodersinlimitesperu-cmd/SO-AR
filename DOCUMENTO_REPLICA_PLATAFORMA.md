@@ -76985,6 +76985,7 @@ const getCountdownInfo = (deadlineIso, now) => {
   const mins = Math.floor((absMs % 3600000) / 60000);
   const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
 
+  if (diffMs < -14 * 24 * 3600000) return { label: `⌛ Fase Pasada (${days}d)`, color: '#9ca3af', bg: 'rgba(156,163,175,0.15)', border: 'rgba(156,163,175,0.3)', overdue: false };
   if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
   if (diffMs < 3 * 3600000) return { label: `🔴 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
   if (diffMs < 24 * 3600000) return { label: `🟠 ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
@@ -81593,12 +81594,15 @@ export function ChecklistProvider({ children }) {
         // invariables desde checklistData.js, ignorando posibles corrupciones en Firestore.
         let mergedData = data;
         if (baseTaskDef && !data.isCustom && !taskId.startsWith('custom_')) {
+          const hasManual = Boolean(data.hasManualDeadline || data.isManualDeadline || data.manualDeadline);
+          const computedDeadline = calculateAutomaticDeadline(baseTaskDef, currentCycle);
           mergedData = {
             ...data,
             cyclePhase: baseTaskDef.cyclePhase,
             task: baseTaskDef.task,
             role: baseTaskDef.role,
-            isCritical: baseTaskDef.isCritical
+            isCritical: baseTaskDef.isCritical,
+            deadline: (hasManual && data.deadline) ? data.deadline : (computedDeadline || data.deadline)
           };
         }
 
@@ -81643,8 +81647,9 @@ export function ChecklistProvider({ children }) {
               sede: userSede,
               cycleId: cycle?.id
             });
-            const perTeamDeadline = isPersisted
-              ? (task.deadline || calculateAutomaticDeadline(baseTaskDef, cycle))
+            const hasManual = Boolean(task.hasManualDeadline || task.isManualDeadline || task.manualDeadline);
+            const perTeamDeadline = (isPersisted && hasManual && task.deadline)
+              ? task.deadline
               : calculateAutomaticDeadline(baseTaskDef, cycle);
 
             expanded.push({
@@ -82711,12 +82716,32 @@ export function ChecklistProvider({ children }) {
 
   // Filtro visual de Fase Activa (Cero eliminación en base de datos; preservación histórica absoluta)
   const isTaskInActiveWindow = (task) => {
-    if (!task.isClosed && !task.completed) return true;
-    if (task.deadline) {
+    // Si la tarea está cerrada o completada hace más de 7 días, se excluye del tablero activo
+    if (task.isClosed || task.completed) {
+      const doneTimestamp = task.completedAt || task.updatedAt || task.closedAt;
+      if (doneTimestamp) {
+        const doneDate = new Date(doneTimestamp);
+        if (!isNaN(doneDate.getTime()) && (Date.now() - doneDate.getTime()) > (7 * 24 * 60 * 60 * 1000)) {
+          return false;
+        }
+      }
+      if (task.deadline) {
+        const deadlineDate = new Date(task.deadline);
+        if (!isNaN(deadlineDate.getTime()) && (Date.now() - deadlineDate.getTime()) > (7 * 24 * 60 * 60 * 1000)) {
+          return false;
+        }
+      }
+    }
+
+    // Tareas pendientes con fecha límite vencida hace más de 14 días: pertenecen a fases/ciclos concluidos
+    // y NO deben contaminar el backlog activo diario salvo que el usuario active "showAllHistoricalTasks".
+    if (!task.completed && task.deadline) {
       const deadlineDate = new Date(task.deadline);
-      const diffDays = (Date.now() - deadlineDate.getTime()) / (1000 * 60 * 60 * 24);
-      if (diffDays > 7 && (task.isClosed || task.completed)) {
-        return false;
+      if (!isNaN(deadlineDate.getTime())) {
+        const diffDays = (Date.now() - deadlineDate.getTime()) / (1000 * 60 * 60 * 24);
+        if (diffDays > 14) {
+          return false;
+        }
       }
     }
     return true;
@@ -120017,6 +120042,7 @@ const getCountdown = (deadlineIso) => {
   const mins = Math.floor((absMs % 3600000) / 60000);
   const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
 
+  if (diffMs < -14 * 24 * 3600000) return { label: `⌛ Fase Pasada (${days}d)`, color: '#9ca3af', bg: 'rgba(156,163,175,0.15)', border: 'rgba(156,163,175,0.3)', overdue: false };
   if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
   if (diffMs < 3 * 3600000) return { label: `🔴 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
   if (diffMs < 24 * 3600000) return { label: `🟠 ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
@@ -178366,6 +178392,7 @@ const getCountdownInfo = (deadlineIso, now) => {
   const mins = Math.floor((absMs % 3600000) / 60000);
   const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
 
+  if (diffMs < -14 * 24 * 3600000) return { label: `⌛ Fase Pasada (${days}d)`, color: '#9ca3af', bg: 'rgba(156,163,175,0.15)', border: 'rgba(156,163,175,0.3)', overdue: false };
   if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
   if (diffMs < 3 * 3600000) return { label: `🔴 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
   if (diffMs < 24 * 3600000) return { label: `🟠 ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
@@ -181667,6 +181694,11 @@ const getCountdownInfo = (deadlineIso, now = new Date()) => {
   const mins = Math.floor((absMs % 3600000) / 60000);
   const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
 
+  // Si la fecha límite venció hace más de 14 días, la tarea pertenece a una fase/ciclo ya concluido
+  if (diffMs < -14 * 24 * 3600000) {
+    return { label: `⌛ Fase Pasada (${days}d)`, color: '#9ca3af', bg: 'rgba(156,163,175,0.15)', border: 'rgba(156,163,175,0.3)', overdue: false };
+  }
+
   if (diffMs <= 0) return { label: `🚨 VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
   if (diffMs < 3 * 3600000) return { label: `🔥 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
   if (diffMs < 24 * 3600000) return { label: `⏳ ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
@@ -181868,13 +181900,32 @@ export default function ChecklistBoard() {
     );
   }
 
+  const getTaskEffectiveDeadline = (t) => {
+    const hasManual = Boolean(t?.hasManualDeadline || t?.isManualDeadline || t?.manualDeadline);
+    return (hasManual && t?.deadline) ? t.deadline : calculateAutomaticDeadline(t, cycleForTask(t));
+  };
+
   const sortByDeadline = (tasksArray) => {
     return tasksArray.sort((a, b) => {
-      const dA = a.deadline || calculateAutomaticDeadline(a, cycleForTask(a));
-      const dB = b.deadline || calculateAutomaticDeadline(b, cycleForTask(b));
+      const dA = getTaskEffectiveDeadline(a);
+      const dB = getTaskEffectiveDeadline(b);
       const timeA = dA ? new Date(dA).getTime() : Infinity;
       const timeB = dB ? new Date(dB).getTime() : Infinity;
       return timeA - timeB;
+    });
+  };
+
+  // Filtro de rigor operativo: excluye tareas de ciclos/fases ya concluidos (> 14 días vencidas) en vistas activas
+  const filterStalePastTasks = (taskList) => {
+    const nowMs = Date.now();
+    return taskList.filter(t => {
+      if (t.completed || t.status === 'Completada') return true;
+      const d = getTaskEffectiveDeadline(t);
+      if (!d) return true;
+      const dTime = new Date(d).getTime();
+      if (isNaN(dTime)) return true;
+      const daysOverdue = (nowMs - dTime) / (1000 * 60 * 60 * 24);
+      return daysOverdue <= 14;
     });
   };
 
@@ -181882,10 +181933,16 @@ export default function ChecklistBoard() {
   let viewTitle = `Checklist Causa OS Activo: ${effectiveStage}`;
 
   if (filterParam === 'criticas') {
-    scopedTasks = myTasks.filter(t => t.isCritical || t.priority === 'Crítica');
-    viewTitle = "Mostrando: Tareas Críticas (Urgentes)";
+    const base = (qtPhaseFilter === 'active' && isCurrentStageInRole)
+      ? myTasks.filter(t => t.cyclePhase === effectiveStage)
+      : filterStalePastTasks(myTasks);
+    scopedTasks = base.filter(t => t.isCritical || t.priority === 'Crítica');
+    viewTitle = "Mostrando: Tareas Críticas (Activas)";
   } else if (filterParam === 'importantes') {
-    scopedTasks = myTasks.filter(t => !t.isCritical && t.priority !== 'Crítica');
+    const base = (qtPhaseFilter === 'active' && isCurrentStageInRole)
+      ? myTasks.filter(t => t.cyclePhase === effectiveStage)
+      : filterStalePastTasks(myTasks);
+    scopedTasks = base.filter(t => !t.isCritical && t.priority !== 'Crítica');
     viewTitle = "Mostrando: Tareas Importantes";
   } else if (showPhaseTabs) {
     if (qtPhaseFilter === 'active') {
@@ -181894,8 +181951,8 @@ export default function ChecklistBoard() {
         scopedTasks = myTasks.filter(t => t.cyclePhase === effectiveStage);
         viewTitle = `${role?.name || 'Checklist'}: Fase Activa ${meta.label}`;
       } else {
-        scopedTasks = myTasks;
-        viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral`;
+        scopedTasks = filterStalePastTasks(myTasks);
+        viewTitle = `${role?.name || 'Checklist'}: Tareas Operativas Vigentes`;
       }
     } else if (qtPhaseFilter !== 'all') {
       const meta = PHASE_META[qtPhaseFilter] || { label: qtPhaseFilter };
@@ -182644,7 +182701,7 @@ export default function ChecklistBoard() {
                     <div className="task-card-detail-content">
                       {/* FECHA Y HORA LÍMITE AUTOMÁTICA Causa OS */}
                       {(() => {
-                        const effectiveDeadline = task.deadline || calculateAutomaticDeadline(task, cycleForTask(task));
+                        const effectiveDeadline = getTaskEffectiveDeadline(task);
                         const countdown = getCountdownInfo(effectiveDeadline);
                         return (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
@@ -205899,7 +205956,7 @@ export function parseCSV(text) {
  * Transforma y SANEAMENTE INTELIGENTE de las filas crudas del CSV en objetos de miembros de QT
  * Corrige automáticamente filas desfasadas, datos invertidos y elimina duplicados.
  */
-// Lista de bajas y renuncias confirmadas por la direcciÃ³n de CREAR PSL
+// Lista de bajas y renuncias confirmadas por la dirección de CREAR PSL
 export const INACTIVE_QT_MEMBERS_OVERRIDE = [
   '9875120',                    // Leyla Kelly Pasquel Alfaro (Renuncia a QT y a Oficina)
   'leylakellypasquel@gmail.com',
