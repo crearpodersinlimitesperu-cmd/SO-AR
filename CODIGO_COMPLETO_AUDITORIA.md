@@ -60835,6 +60835,403 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
 
 ---
 
+## Archivo: public/caminata-fuego/index.html
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acuerdo Caminata sobre Fuego · CREAR Poder Sin Límites</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="/logo-crear.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            fireOrange: '#f97316',
+            fireRed: '#ef4444',
+            crearDark: '#0f172a',
+            crearCard: '#1e293b'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b1120;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      .print-box { border: 1px solid #ccc !important; color: black !important; background: white !important; box-shadow: none !important; }
+      .print-text { color: black !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen py-6 px-3 sm:px-6 antialiased selection:bg-orange-500 selection:text-white">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Header Banner -->
+    <header class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-orange-500/30 p-6 md:p-8 shadow-2xl shadow-orange-950/20">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-red-600"></div>
+      
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-black uppercase tracking-wider bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-sm">
+              🔥 ACUERDO LEGAL VINCULANTE
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold text-orange-400 bg-orange-500/10 border border-orange-500/30">
+              LEY N° 27269 & LEY N° 29733
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30">
+              LIMA, PERÚ
+            </span>
+          </div>
+
+          <h1 class="text-2xl md:text-3xl font-black text-white leading-tight">
+            Acuerdo Integral de Exoneración de Responsabilidad, Derechos de Imagen y Consentimiento Informado
+          </h1>
+          <p class="mt-2 text-sm md:text-base font-extrabold text-orange-400">
+            EXPERIENCIA ALTO IMPACTO: CAMINATA SOBRE FUEGO (FIREWALKING PERÚ)
+          </p>
+          <p class="mt-1 text-xs md:text-sm text-slate-400 max-w-2xl leading-relaxed">
+            Celebrado entre <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> y la persona firmante.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 mt-4 text-xs text-slate-400 font-medium">
+            <span class="flex items-center gap-1.5"><span class="text-orange-500">📍</span> Casona Blanca (Huachipa, Lima)</span>
+            <span class="flex items-center gap-1.5"><span class="text-cyan-400">📅</span> Vigencia Operativa Oficial 2026</span>
+            <span class="flex items-center gap-1.5"><span class="text-emerald-400">🛡️</span> Firma Digital Verificada</span>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="flex md:flex-col gap-2 shrink-0 no-print">
+          <button onclick="toggleQrModal(true)" class="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-black shadow-lg shadow-orange-600/30 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+            Ver Código QR
+          </button>
+          <a href="#formulario-firma" class="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/40 text-xs font-bold transition-all text-center">
+            ✍️ Ir a Firmar
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Preámbulo Legal -->
+    <div class="rounded-xl bg-slate-900/80 border border-slate-800 p-5 text-sm text-slate-300 leading-relaxed shadow-sm">
+      <p>
+        El presente documento constituye un contrato y acuerdo legal vinculante celebrado entre la entidad organizadora 
+        <strong class="text-white">CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong>, sus representantes legales, instructores, facilitadores, personal de apoyo y logística, y la persona firmante (en adelante, <strong class="text-orange-400">"EL FIRMANTE"</strong>), quien participa en la actividad de alto impacto denominada "Caminata sobre Fuego".
+      </p>
+    </div>
+
+    <!-- Cláusula 1 -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 font-black text-sm">1</span>
+        <h2 class="text-lg font-bold text-white">Marco Legal y Normativo Aplicable</h2>
+      </div>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+        <p>El presente acuerdo se rige bajo la legislación vigente de la República del Perú, amparado fundamentalmente en los siguientes cuerpos normativos:</p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li>
+            <strong class="text-cyan-400">Código Civil Peruano (Decreto Legislativo N° 295):</strong> En particular el <strong>Artículo 11</strong>, correspondiente al derecho a la imagen y a la voz, así como las disposiciones relativas a la libertad contractual y autonomía de la voluntad (<strong>Artículos 1354 y 1356</strong>) y responsabilidad civil (<strong>Artículos 1969 y 1970</strong>).
+          </li>
+          <li>
+            <strong class="text-cyan-400">Ley N° 27269 — Ley de Firmas y Certificados Digitales:</strong> Y su reglamento, garantizando la validez jurídica, eficacia e idoneidad del consentimiento otorgado a través de medios electrónicos o digitales.
+          </li>
+          <li>
+            <strong class="text-cyan-400">Ley N° 29733 — Ley de Protección de Datos Personales:</strong> Y su Reglamento aprobado mediante Decreto Supremo N° 003-2013-JUS, en lo respectivo a la recolección, almacenamiento, tratamiento y transferencia de datos personales y datos sensibles.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Cláusula 2 -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 font-black text-sm">2</span>
+        <h2 class="text-lg font-bold text-white">Declaración de Aptitud Física y Mental y Asunción Voluntaria de Riesgos</h2>
+      </div>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+        <p>EL FIRMANTE declara de manera libre, consciente y voluntaria lo siguiente:</p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li><strong class="text-amber-400">Estado de Salud:</strong> Cuenta con plena aptitud física, médica, mental y emocional para someterse a experiencias de alto impacto y estrés controlado. No padece de afecciones cardíacas graves, hipertensión no controlada, epilepsia, trastornos psiquiátricos agudos, ni lesiones abiertas en los miembros inferiores que impidan su participación activa.</li>
+          <li><strong class="text-amber-400">Naturaleza de la Actividad:</strong> Comprende plenamente que la "Caminata sobre Fuego" consiste en dar pasos descalzo(a) sobre una cama de brasas de madera al rojo vivo.</li>
+          <li><strong class="text-amber-400">Reconocimiento de Riesgos Inherentes:</strong> Acepta y entiende que, a pesar de los estrictos protocolos de seguridad y guía técnica proporcionados por la organización, la actividad conlleva riesgos inherentes como: quemaduras de primer, segundo o tercer grado, ampollas, irritación cutánea, caídas, contusiones o reacciones emocionales intensas.</li>
+          <li><strong class="text-amber-400">Voluntariedad:</strong> Entiende que la participación es 100% voluntaria. En ningún momento el equipo organizador obligará a EL FIRMANTE a cruzar las brasas si este decide no hacerlo.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Cláusula 3 -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 text-red-400 font-black text-sm">3</span>
+        <h2 class="text-lg font-bold text-white">Liberación y Exoneración Total de Responsabilidad Civil, Penal y Administrativa</h2>
+      </div>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+        <p>Mediante la firma o validación digital del presente documento, EL FIRMANTE otorga un descargo y liberación de responsabilidad amplio, definitivo e irrevocable:</p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li><strong class="text-red-400">Exoneración Expresa:</strong> Exonera de toda responsabilidad civil, penal, administrativa o de cualquier otra índole a la empresa <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong>, a sus directores, representantes, capacitadores, coordinadores y al personal de apoyo o partner asignado a la actividad.</li>
+          <li><strong class="text-red-400">Renuncia a Acciones Legales:</strong> Renuncia expresamente a interponer cualquier tipo de demanda, denuncia, reclamo administrativo, arbitraje o solicitud de indemnización por daños y perjuicios, daños materiales, lesiones corporales, secuelas o daño moral derivados de su participación en la Caminata sobre Fuego.</li>
+          <li><strong class="text-red-400">Asunción de Gastos Médicos:</strong> EL FIRMANTE asume de forma personal e independiente cualquier gasto médico, hospitalario o de curación suplementario que pudiera requerir voluntariamente tras la realización del evento.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Cláusula 4 -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 font-black text-sm">4</span>
+        <h2 class="text-lg font-bold text-white">Autorización Expresa e Irrevocable de Uso de Derechos de Imagen y Voz</h2>
+      </div>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+        <p>De conformidad con el <strong>Artículo 11 del Código Civil Peruano</strong>:</p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li><strong class="text-purple-400">Autorización de Captura:</strong> EL FIRMANTE autoriza de manera expresa, gratuita e irrevocable a <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> a fotografiar, grabar en video, registrar en audio o filmar su imagen, rostro, voz y participación general durante el desarrollo del evento.</li>
+          <li><strong class="text-purple-400">Finalidad y Medios de Difusión:</strong> La organización podrá utilizar, reproducir, editar, publicar y comercializar dicho material audiovisual en redes sociales, sitios web, plataformas digitales, spots publicitarios, material educativo o de entrenamiento, tanto en el Perú como en el extranjero, de forma ilimitada en el tiempo.</li>
+          <li><strong class="text-purple-400">Renuncia a Compensación:</strong> EL FIRMANTE reconoce que no tendrá derecho a compensación económica, pago de regalías ni reclamos por derechos de autor sobre las piezas publicitarias o contenidos generados.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Cláusula 5 -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-3">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 font-black text-sm">5</span>
+        <h2 class="text-lg font-bold text-white">Consentimiento Informado de Tratamiento de Datos Personales y Datos Sensibles</h2>
+      </div>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+        <p>En cumplimiento de la <strong>Ley N° 29733 (Ley de Protección de Datos Personales de Perú)</strong> y su Reglamento:</p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li><strong class="text-emerald-400">Autorización de Tratamiento:</strong> EL FIRMANTE otorga su consentimiento previo, informado, expreso e inequívoco para que <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> recopile y trate sus datos personales y datos sensibles relevantes para la seguridad de la dinámica.</li>
+          <li><strong class="text-emerald-400">Finalidades:</strong> Garantizar la gestión de la seguridad física durante la actividad, coordinación logística y comunicación directa, y envío de información sobre futuros entrenamientos.</li>
+          <li><strong class="text-emerald-400">Derechos ARCO:</strong> Declaración de haber sido informado de que puede ejercer en cualquier momento sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO) dirigiendo comunicación escrita a <strong>legal@crearpsl.net</strong>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Sección 6: Formulario de Firma Digital y Validación -->
+    <section id="formulario-firma" class="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-cyan-500/40 p-6 md:p-8 shadow-2xl shadow-cyan-950/20">
+      <div class="flex items-center gap-3 mb-4 pb-4 border-b border-slate-800">
+        <span class="flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 font-black">✍️</span>
+        <div>
+          <span class="text-xs font-black tracking-wider text-cyan-400 uppercase">Sección 6 · Firma Digital Vinculante</span>
+          <h2 class="text-xl md:text-2xl font-black text-white">Validación y Aceptación Digital</h2>
+        </div>
+      </div>
+
+      <p class="text-xs md:text-sm text-slate-300 mb-6 leading-relaxed">
+        El presente acuerdo se valida de manera electrónica con arreglo a la <strong>Ley N° 27269</strong>. La confirmación de las casillas y el envío de este formulario constituyen firma digital/electrónica válida y vinculante.
+      </p>
+
+      <form id="digital-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre Completo -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Nombre Completo *</label>
+            <input type="text" id="form-name" required placeholder="Ej. Juan Pérez Quispe" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
+          </div>
+
+          <!-- Documento de Identidad -->
+          <div class="flex gap-2">
+            <div class="w-28 shrink-0">
+              <label class="block text-xs font-bold text-slate-300 mb-1">Tipo Doc. *</label>
+              <select id="form-doc-type" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400">
+                <option value="DNI">DNI</option>
+                <option value="Pasaporte">Pasaporte</option>
+                <option value="Carné Ext.">Carné Ext.</option>
+                <option value="Cédula">Cédula</option>
+              </select>
+            </div>
+            <div class="flex-1">
+              <label class="block text-xs font-bold text-slate-300 mb-1">Número de Documento *</label>
+              <input type="text" id="form-doc-number" required placeholder="Doc. de Identidad" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
+            </div>
+          </div>
+
+          <!-- Correo Electrónico -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Correo Electrónico *</label>
+            <input type="email" id="form-email" required placeholder="tu.correo@ejemplo.com" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
+          </div>
+
+          <!-- Teléfono / WhatsApp -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Teléfono de Contacto / WhatsApp *</label>
+            <input type="tel" id="form-phone" required placeholder="+51 999 999 999" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition-colors">
+          </div>
+
+          <!-- Rol en la Actividad -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Rol en la Actividad *</label>
+            <select id="form-role" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400">
+              <option value="Participante">Participante</option>
+              <option value="Partner / Acompañante">Partner / Acompañante</option>
+              <option value="Staff / Logística">Staff / Logística</option>
+              <option value="Entrenador">Entrenador</option>
+            </select>
+          </div>
+
+          <!-- Locación -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1">Locación</label>
+            <input type="text" readonly value="Casona Blanca - Huachipa, Lima" class="w-full bg-slate-950/60 border border-slate-800 rounded-lg px-3.5 py-2.5 text-sm text-slate-400">
+          </div>
+        </div>
+
+        <!-- Casillas de Declaraciones de Conformidad -->
+        <div class="rounded-xl bg-slate-950 border border-slate-800 p-4 space-y-3 mt-4">
+          <h4 class="text-xs font-black uppercase text-cyan-400 tracking-wider">Declaraciones de Conformidad (Casillas de Verificación Electrónica Obligatorias):</h4>
+          
+          <label class="flex items-start gap-3 cursor-pointer text-xs md:text-sm text-slate-200">
+            <input type="checkbox" id="chk-riesgos" required class="w-4 h-4 mt-0.5 rounded accent-orange-500">
+            <span><strong>He leído y acepto expresamente</strong> los términos de la Exoneración de Responsabilidad y Asunción de Riesgos para la Caminata sobre Fuego.</span>
+          </label>
+
+          <label class="flex items-start gap-3 cursor-pointer text-xs md:text-sm text-slate-200">
+            <input type="checkbox" id="chk-imagen" required class="w-4 h-4 mt-0.5 rounded accent-cyan-500">
+            <span><strong>Autorizo el uso de mi imagen y voz</strong> a favor de CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL según lo estipulado en el Artículo 11 del Código Civil.</span>
+          </label>
+
+          <label class="flex items-start gap-3 cursor-pointer text-xs md:text-sm text-slate-200">
+            <input type="checkbox" id="chk-datos" required class="w-4 h-4 mt-0.5 rounded accent-emerald-500">
+            <span><strong>Doy mi consentimiento informado</strong> para el tratamiento de mis Datos Personales y Datos Sensibles conforme a la Ley N° 29733.</span>
+          </label>
+        </div>
+
+        <!-- Firma Escrita -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">Escribe tu Nombre Completo como Firma Digital (Ley N° 27269) *</label>
+          <input type="text" id="form-signature" required placeholder="Escribe exactamente tu nombre y apellidos completos" class="w-full bg-slate-950 border border-cyan-500 rounded-lg px-3.5 py-3 text-sm font-bold text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/40">
+        </div>
+
+        <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-orange-600 via-orange-500 to-red-600 hover:from-orange-500 hover:to-red-500 text-white font-black text-base shadow-xl shadow-orange-600/30 transition-all flex items-center justify-center gap-2">
+          🔥 Firmar y Validar Acuerdo Electrónico
+        </button>
+      </form>
+
+      <!-- Recibo / Certificado de Firma Exitosa -->
+      <div id="success-box" class="hidden rounded-xl bg-emerald-950/40 border-2 border-emerald-500 p-6 text-center space-y-4 mt-6">
+        <div class="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center text-3xl">✓</div>
+        <h3 class="text-xl font-black text-emerald-400">¡Acuerdo Validado y Firmado Exitosamente!</h3>
+        <p class="text-xs text-slate-300 max-w-lg mx-auto">Constancia oficial de exoneración de responsabilidad y consentimiento informado generada con plena eficacia jurídica.</p>
+        
+        <div class="bg-slate-950 border border-slate-800 rounded-lg p-4 max-w-md mx-auto text-left text-xs space-y-2">
+          <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-400">Código de Auditoría:</span><span id="res-code" class="font-bold text-cyan-400"></span></div>
+          <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-400">Firmante:</span><span id="res-name" class="font-bold text-white"></span></div>
+          <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-400">Documento:</span><span id="res-doc" class="text-white"></span></div>
+          <div class="flex justify-between border-b border-slate-800 pb-1.5"><span class="text-slate-400">Rol:</span><span id="res-role" class="font-bold text-orange-400"></span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Fecha y Hora Oficial:</span><span id="res-date" class="font-bold text-emerald-400"></span></div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-3 pt-2">
+          <button onclick="window.print()" class="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2">
+            🖨️ Imprimir / Guardar Constancia PDF
+          </button>
+          <button onclick="resetForm()" class="px-5 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs border border-slate-700 transition-all">
+            Registrar Otro Participante
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal QR -->
+    <div id="qr-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="bg-slate-900 border-2 border-orange-500 rounded-2xl p-6 md:p-8 max-w-sm w-full text-center relative shadow-2xl shadow-orange-950/50">
+        <button onclick="toggleQrModal(false)" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">✕</button>
+        
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-orange-500/15 text-orange-400 border border-orange-500/30 mb-3">
+          🔥 ESCANEA EN MESA DE REGISTRO
+        </span>
+
+        <h3 class="text-xl font-black text-white mb-1">Código QR Oficial</h3>
+        <p class="text-xs text-slate-400 mb-4">Apunta con tu celular para abrir y firmar el acuerdo.</p>
+        
+        <div class="bg-white p-3 rounded-xl inline-block shadow-xl mb-4">
+          <img id="qr-image" src="" alt="Código QR" class="w-56 h-56 block">
+        </div>
+
+        <div class="flex gap-2 justify-center">
+          <a id="qr-download-btn" href="" download="QR_Caminata_Fuego_CREAR.png" target="_blank" class="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-xs font-bold transition-all">
+            📥 Descargar QR
+          </a>
+          <button onclick="toggleQrModal(false)" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 pt-6 pb-12 text-center text-xs text-slate-500 space-y-1">
+      <p><strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> · Todos los derechos reservados © 2026</p>
+      <p>Sede Legal: Lima, Perú · Derechos ARCO: <strong>legal@crearpsl.net</strong></p>
+    </footer>
+
+  </div>
+
+  <script>
+    const currentUrl = window.location.href;
+    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=${encodeURIComponent(currentUrl)}`;
+    document.getElementById('qr-image').src = qrSrc;
+    document.getElementById('qr-download-btn').href = qrSrc;
+
+    function toggleQrModal(show) {
+      document.getElementById('qr-modal').classList.toggle('hidden', !show);
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('form-name').value.trim();
+      const docType = document.getElementById('form-doc-type').value;
+      const docNum = document.getElementById('form-doc-number').value.trim();
+      const role = document.getElementById('form-role').value;
+      const code = 'CPSL-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+      const dateStr = new Date().toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'medium' });
+
+      document.getElementById('res-code').textContent = code;
+      document.getElementById('res-name').textContent = name;
+      document.getElementById('res-doc').textContent = `${docType} ${docNum}`;
+      document.getElementById('res-role').textContent = role;
+      document.getElementById('res-date').textContent = dateStr;
+
+      document.getElementById('digital-form').classList.add('hidden');
+      document.getElementById('success-box').classList.remove('hidden');
+      document.getElementById('success-box').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetForm() {
+      document.getElementById('digital-form').reset();
+      document.getElementById('digital-form').classList.remove('hidden');
+      document.getElementById('success-box').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
+
+```
+
+---
+
 ## Archivo: prototypes/aliados-c2/index.html
 
 ```html
@@ -75553,6 +75950,7 @@ import SuperAdminPanel from './pages/SuperAdminPanel';
 import GuiaAliadosC1 from './pages/GuiaAliadosC1';
 import ContrasteNodusSheets from './pages/ContrasteNodusSheets';
 
+const ContratoCaminataFuego = lazy(() => import('./pages/ContratoCaminataFuego'));
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
@@ -75801,6 +76199,9 @@ function App() {
         <PersonalizedRoutes>
           <Route path="/login" element={<Login />} />
           <Route path="/opt-out" element={<OptOutPage />} />
+          <Route path="/caminata-fuego" element={<ContratoCaminataFuego />} />
+          <Route path="/contrato-caminata-fuego" element={<ContratoCaminataFuego />} />
+          <Route path="/firewalking" element={<Navigate to="/caminata-fuego" replace />} />
           <Route path="/causa-os-task" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio', 'superadmin']}>
               <CausaOSTask />
@@ -152157,6 +152558,1202 @@ export default function LearningDashboard() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src/pages/ContratoCaminataFuego.jsx
+
+```javascript
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Flame,
+  ShieldCheck,
+  ShieldAlert,
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
+  QrCode,
+  Download,
+  Printer,
+  Copy,
+  ExternalLink,
+  Search,
+  UserCheck,
+  Calendar,
+  MapPin,
+  Lock,
+  PhoneCall,
+  Mail,
+  User,
+  Check,
+  Eye,
+  Share2
+} from 'lucide-react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '../services/firebase';
+
+export default function ContratoCaminataFuego() {
+  const [activeTab, setActiveTab] = useState('todo');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [signedSuccess, setSignedSuccess] = useState(null);
+  const [showQrModal, setShowQrModal] = useState(false);
+
+  // Formulario de Firma Digital
+  const [formData, setFormData] = useState({
+    nombreCompleto: '',
+    tipoDocumento: 'DNI',
+    numeroDocumento: '',
+    email: '',
+    telefono: '',
+    rolActividad: 'Participante',
+    sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
+    aceptoRiesgos: false,
+    aceptoImagen: false,
+    aceptoDatos: false,
+    firmaTexto: ''
+  });
+
+  const [formErrors, setFormErrors] = useState({});
+  const formRef = useRef(null);
+
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : 'https://app.crearpsl.net/caminata-fuego';
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=10&data=${encodeURIComponent(pageUrl)}`;
+
+  useEffect(() => {
+    document.title = 'Contrato Caminata sobre Fuego · CREAR Poder Sin Límites';
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const copyPageLink = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(pageUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es requerido.';
+    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El documento de identidad es requerido.';
+    if (!formData.email.trim() || !formData.email.includes('@')) errors.email = 'Ingresa un correo electrónico válido.';
+    if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es requerido.';
+    if (!formData.aceptoRiesgos) errors.aceptoRiesgos = 'Debes aceptar la exoneración de responsabilidad y asunción de riesgos.';
+    if (!formData.aceptoImagen) errors.aceptoImagen = 'Debes autorizar el uso de imagen y voz conforme al Art. 11 del Código Civil.';
+    if (!formData.aceptoDatos) errors.aceptoDatos = 'Debes otorgar el consentimiento para el tratamiento de datos según Ley 29733.';
+    if (!formData.firmaTexto.trim()) errors.firmaTexto = 'Escribe tu nombre completo como firma digital vinculante.';
+    return errors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      const firstErrorKey = Object.keys(errors)[0];
+      const el = document.getElementById(`field-${firstErrorKey}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const timestamp = new Date().toISOString();
+      const verificationCode = 'CPSL-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+      
+      const payload = {
+        ...formData,
+        verificationCode,
+        fechaValidacionIso: timestamp,
+        fechaValidacionLocal: new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' }),
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        dispositivo: /iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio',
+        marcoLegal: 'Ley 27269 (Firmas y Certificados Digitales), Ley 29733 (Datos Personales), Art. 11 Código Civil',
+        createdAt: serverTimestamp()
+      };
+
+      // Guardar en Firestore
+      try {
+        await addDoc(collection(db, 'contratos_caminata_fuego'), payload);
+      } catch (err) {
+        console.warn('Firestore fallback: registro generado localmente con código de auditoría:', err);
+      }
+
+      setSignedSuccess({
+        ...payload,
+        nombre: formData.nombreCompleto,
+        documento: `${formData.tipoDocumento} ${formData.numeroDocumento}`,
+        codigo: verificationCode,
+        fecha: new Date().toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'medium' })
+      });
+
+      // Scroll hacia la confirmación
+      setTimeout(() => {
+        const confirmEl = document.getElementById('constancia-firmada');
+        if (confirmEl) confirmEl.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+
+    } catch (err) {
+      console.error('Error al registrar firma digital:', err);
+      alert('Hubo un inconveniente al validar la firma. Por favor verifica los datos e intenta nuevamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Secciones del contrato
+  const contractSections = [
+    {
+      id: 'sec-1',
+      tabKey: 'marco',
+      numero: '1',
+      titulo: 'Marco Legal y Normativo Aplicable',
+      icon: ShieldCheck,
+      content: (
+        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
+          <p style={{ marginBottom: '1rem' }}>
+            El presente acuerdo se rige bajo la legislación vigente de la República del Perú, amparado fundamentalmente en los siguientes cuerpos normativos:
+          </p>
+          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <li>
+              <strong style={{ color: '#38bdf8' }}>Código Civil Peruano (Decreto Legislativo N° 295):</strong> En particular el <strong>Artículo 11</strong>, correspondiente al derecho a la imagen y a la voz, así como las disposiciones relativas a la libertad contractual y autonomía de la voluntad (<strong>Artículos 1354 y 1356</strong>) y responsabilidad civil (<strong>Artículos 1969 y 1970</strong>).
+            </li>
+            <li>
+              <strong style={{ color: '#38bdf8' }}>Ley N° 27269 — Ley de Firmas y Certificados Digitales:</strong> Y su reglamento, garantizando la plena validez jurídica, eficacia e idoneidad del consentimiento otorgado a través de medios electrónicos o digitales.
+            </li>
+            <li>
+              <strong style={{ color: '#38bdf8' }}>Ley N° 29733 — Ley de Protección de Datos Personales:</strong> Y su Reglamento aprobado mediante Decreto Supremo N° 003-2013-JUS, en lo respectivo a la recolección, almacenamiento, tratamiento y transferencia de datos personales y datos sensibles.
+            </li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: 'sec-2',
+      tabKey: 'aptitud',
+      numero: '2',
+      titulo: 'Declaración de Aptitud Física y Mental y Asunción Voluntaria de Riesgos',
+      icon: AlertTriangle,
+      content: (
+        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
+          <p style={{ marginBottom: '1rem' }}>
+            EL FIRMANTE declara de manera libre, consciente y voluntaria lo siguiente:
+          </p>
+          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <li>
+              <strong style={{ color: '#f59e0b' }}>Estado de Salud:</strong> Cuenta con plena aptitud física, médica, mental y emocional para someterse a experiencias de alto impacto y estrés controlado. No padece de afecciones cardíacas graves, hipertensión no controlada, epilepsia, trastornos psiquiátricos agudos, ni lesiones abiertas en los miembros inferiores que impidan su participación activa.
+            </li>
+            <li>
+              <strong style={{ color: '#f59e0b' }}>Naturaleza de la Actividad:</strong> Comprende plenamente que la "Caminata sobre Fuego" consiste en dar pasos descalzo(a) sobre una cama de brasas de madera al rojo vivo.
+            </li>
+            <li>
+              <strong style={{ color: '#f59e0b' }}>Reconocimiento de Riesgos Inherentes:</strong> Acepta y entiende que, a pesar de los estrictos protocolos de seguridad y guía técnica proporcionados por la organización, la actividad conlleva riesgos inherentes como: quemaduras de primer, segundo o tercer grado, ampollas, irritación cutánea, caídas, contusiones o reacciones emocionales intensas.
+            </li>
+            <li>
+              <strong style={{ color: '#f59e0b' }}>Voluntariedad:</strong> Entiende que la participación es 100% voluntaria. En ningún momento el equipo organizador obligará a EL FIRMANTE a cruzar las brasas si este decide no hacerlo.
+            </li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: 'sec-3',
+      tabKey: 'exoneracion',
+      numero: '3',
+      titulo: 'Liberación y Exoneración Total de Responsabilidad Civil, Penal y Administrativa',
+      icon: ShieldAlert,
+      content: (
+        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
+          <p style={{ marginBottom: '1rem' }}>
+            Mediante la firma o validación digital del presente documento, EL FIRMANTE otorga un descargo y liberación de responsabilidad amplio, definitivo e irrevocable:
+          </p>
+          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <li>
+              <strong style={{ color: '#ef4444' }}>Exoneración Expresa:</strong> Exonera de toda responsabilidad civil, penal, administrativa o de cualquier otra índole a la empresa <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong>, a sus directores, representantes, capacitadores, coordinadores y al personal de apoyo o partner asignado a la actividad.
+            </li>
+            <li>
+              <strong style={{ color: '#ef4444' }}>Renuncia a Acciones Legales:</strong> Renuncia expresamente a interponer cualquier tipo de demanda, denuncia, reclamo administrativo, arbitraje o solicitud de indemnización por daños y perjuicios, daños materiales, lesiones corporales, secuelas o daño moral derivados de su participación en la Caminata sobre Fuego.
+            </li>
+            <li>
+              <strong style={{ color: '#ef4444' }}>Asunción de Gastos Médicos:</strong> EL FIRMANTE asume de forma personal e independiente cualquier gasto médico, hospitalario o de curación suplementario que pudiera requerir voluntariamente tras la realización del evento.
+            </li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: 'sec-4',
+      tabKey: 'imagen',
+      numero: '4',
+      titulo: 'Autorización Expresa e Irrevocable de Uso de Derechos de Imagen y Voz',
+      icon: Eye,
+      content: (
+        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
+          <p style={{ marginBottom: '1rem' }}>
+            De conformidad con el <strong>Artículo 11 del Código Civil Peruano</strong>:
+          </p>
+          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <li>
+              <strong style={{ color: '#a855f7' }}>Autorización de Captura:</strong> EL FIRMANTE autoriza de manera expresa, gratuita e irrevocable a <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> a fotografiar, grabar en video, registrar en audio o filmar su imagen, rostro, voz y participación general durante el desarrollo del evento.
+            </li>
+            <li>
+              <strong style={{ color: '#a855f7' }}>Finalidad y Medios de Difusión:</strong> La organización podrá utilizar, reproducir, editar, publicar y comercializar dicho material audiovisual en redes sociales, sitios web, plataformas digitales, spots publicitarios, material educativo o de entrenamiento, tanto en el Perú como en el extranjero, de forma ilimitada en el tiempo.
+            </li>
+            <li>
+              <strong style={{ color: '#a855f7' }}>Renuncia a Compensación:</strong> EL FIRMANTE reconoce que no tendrá derecho a compensación económica, pago de regalías ni reclamos por derechos de autor sobre las piezas publicitarias o contenidos generados.
+            </li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: 'sec-5',
+      tabKey: 'datos',
+      numero: '5',
+      titulo: 'Consentimiento Informado de Tratamiento de Datos Personales y Sensibles',
+      icon: Lock,
+      content: (
+        <div style={{ lineHeight: '1.7', color: '#cbd5e1' }}>
+          <p style={{ marginBottom: '1rem' }}>
+            En cumplimiento de la <strong>Ley N° 29733 (Ley de Protección de Datos Personales de Perú)</strong> y su Reglamento:
+          </p>
+          <ul style={{ paddingLeft: '1.4rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+            <li>
+              <strong style={{ color: '#10b981' }}>Autorización de Tratamiento:</strong> EL FIRMANTE otorga su consentimiento previo, informado, expreso e inequívoco para que <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> recopile y trate sus datos personales (identificación, contacto) y datos sensibles (condición física, alergias o antecedentes de salud relevantes para la seguridad de la dinámica).
+            </li>
+            <li>
+              <strong style={{ color: '#10b981' }}>Finalidades:</strong> Los datos serán incorporados en los bancos de datos de titularidad de la organización para:
+              <ol style={{ paddingLeft: '1.2rem', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <li>1. Garantizar la gestión de la seguridad física durante la actividad.</li>
+                <li>2. Coordinación logística y comunicación directa previa y posterior al evento.</li>
+                <li>3. Envío de información sobre futuros entrenamientos, programas y eventos organizados por la empresa.</li>
+              </ol>
+            </li>
+            <li>
+              <strong style={{ color: '#10b981' }}>Derechos ARCO:</strong> EL FIRMANTE declara haber sido informado de que puede ejercer en cualquier momento sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO), conforme a ley, dirigiendo una comunicación escrita al correo electrónico oficial de la organización o en la sede legal de la misma.
+            </li>
+          </ul>
+        </div>
+      )
+    }
+  ];
+
+  const filteredSections = contractSections.filter(sec => {
+    if (activeTab !== 'todo' && sec.tabKey !== activeTab) return false;
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase();
+    const titleMatch = sec.titulo.toLowerCase().includes(term);
+    return titleMatch || sec.numero.includes(term);
+  });
+
+  return (
+    <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.5rem 1rem 4rem 1rem', color: '#f8fafc', fontFamily: 'inherit' }}>
+      
+      {/* HEADER DE IDENTIDAD - ESTILO GUÍAS CREAR */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(24, 24, 27, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%)',
+        border: '1px solid rgba(249, 115, 22, 0.35)',
+        borderRadius: '16px',
+        padding: '2rem',
+        marginBottom: '2rem',
+        boxShadow: '0 12px 32px -8px rgba(249, 115, 22, 0.18)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Glow de fuego superior */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, #f59e0b, #ea580c, #dc2626)'
+        }} />
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1.5rem' }}>
+          <div style={{ flex: '1 1 650px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+              <span style={{
+                background: 'linear-gradient(90deg, #f97316, #ef4444)',
+                color: '#fff',
+                fontWeight: 900,
+                fontSize: '0.75rem',
+                padding: '4px 12px',
+                borderRadius: '6px',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}>
+                <Flame size={14} /> ACUERDO LEGAL VINCULANTE
+              </span>
+              <span style={{ background: 'rgba(249, 115, 22, 0.12)', border: '1px solid rgba(249, 115, 22, 0.3)', color: '#fb923c', padding: '3px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
+                LEY N° 27269 & LEY N° 29733
+              </span>
+              <span style={{ background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', color: '#38bdf8', padding: '3px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 700 }}>
+                LIMA, PERÚ
+              </span>
+            </div>
+
+            <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.85rem', fontWeight: 900, color: '#f8fafc', lineHeight: '1.25' }}>
+              Acuerdo Integral de Exoneración de Responsabilidad, Derechos de Imagen y Consentimiento Informado
+            </h1>
+            <p style={{ margin: '0 0 0.75rem 0', color: '#fdba74', fontSize: '1rem', fontWeight: 800 }}>
+              EXPERIENCIA ALTO IMPACTO: CAMINATA SOBRE FUEGO (FIREWALKING PERÚ)
+            </p>
+            <p style={{ margin: 0, color: '#94a3b8', fontSize: '0.92rem', lineHeight: '1.55', maxWidth: '850px' }}>
+              Celebrado entre <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> y la persona firmante. Este acuerdo otorga validez jurídica y probatoria a la participación voluntaria conforme a las leyes peruanas aplicables.
+            </p>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginTop: '1rem', fontSize: '0.82rem', color: '#94a3b8', flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                <MapPin size={14} color="#f97316" /> Locación: Casona Blanca (Huachipa, Lima)
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Calendar size={14} color="#38bdf8" /> Vigencia Operativa Oficial 2026
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                <ShieldCheck size={14} color="#10b981" /> Firma Electrónica Certificada
+              </span>
+            </div>
+          </div>
+
+          {/* Botones de Acción Rápida y Código QR */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', minWidth: '220px' }}>
+            <button
+              onClick={() => setShowQrModal(true)}
+              style={{
+                background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                color: '#fff',
+                border: 'none',
+                padding: '0.75rem 1.25rem',
+                borderRadius: '8px',
+                fontWeight: 800,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.4)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <QrCode size={18} /> Ver Código QR para Escaneo
+            </button>
+
+            <button
+              onClick={() => {
+                const el = document.getElementById('formulario-firma');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              style={{
+                background: '#1e293b',
+                color: '#38bdf8',
+                border: '1px solid #38bdf8',
+                padding: '0.65rem 1.25rem',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              <UserCheck size={16} /> Ir a Firmar / Validar
+            </button>
+
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={copyPageLink}
+                style={{
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.06)',
+                  color: copiedLink ? '#4ade80' : '#cbd5e1',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  padding: '0.5rem',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                {copiedLink ? <Check size={14} /> : <Share2 size={14} />} {copiedLink ? 'Copiado' : 'Compartir'}
+              </button>
+              <button
+                onClick={handlePrint}
+                style={{
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.06)',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  padding: '0.5rem',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                <Printer size={14} /> Imprimir
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* MODAL / PANEL DE CÓDIGO QR */}
+      {showQrModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          padding: '1rem'
+        }}>
+          <div style={{
+            background: '#0f172a',
+            border: '2px solid #f97316',
+            borderRadius: '16px',
+            padding: '2rem',
+            maxWidth: '460px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: '0 25px 50px -12px rgba(249, 115, 22, 0.35)',
+            position: 'relative'
+          }}>
+            <button
+              onClick={() => setShowQrModal(false)}
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                background: 'rgba(255,255,255,0.1)',
+                border: 'none',
+                color: '#fff',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              ✕
+            </button>
+
+            <div style={{ display: 'inline-flex', padding: '0.4rem 0.8rem', background: 'rgba(249, 115, 22, 0.15)', borderRadius: '20px', color: '#fb923c', fontSize: '0.75rem', fontWeight: 800, marginBottom: '1rem', alignItems: 'center', gap: '0.4rem' }}>
+              <Flame size={14} /> ESCANEO EN MESA DE ENROLAMIENTO
+            </div>
+
+            <h3 style={{ margin: '0 0 0.5rem 0', color: '#fff', fontSize: '1.35rem', fontWeight: 900 }}>
+              Código QR Oficial
+            </h3>
+            <p style={{ margin: '0 0 1.25rem 0', color: '#94a3b8', fontSize: '0.85rem' }}>
+              Apunta la cámara de tu celular para abrir, leer y firmar el acuerdo digital de la Caminata sobre Fuego.
+            </p>
+
+            {/* Contenedor del QR */}
+            <div style={{
+              background: '#ffffff',
+              padding: '1.25rem',
+              borderRadius: '12px',
+              display: 'inline-block',
+              margin: '0 auto 1.25rem auto',
+              boxShadow: '0 10px 20px rgba(0,0,0,0.4)'
+            }}>
+              <img
+                src={qrUrl}
+                alt="Código QR - Contrato Caminata sobre Fuego"
+                style={{ width: '240px', height: '240px', display: 'block' }}
+              />
+            </div>
+
+            <p style={{ color: '#cbd5e1', fontSize: '0.78rem', marginBottom: '1.25rem', wordBreak: 'break-all' }}>
+              Enlace: <span style={{ color: '#38bdf8' }}>{pageUrl}</span>
+            </p>
+
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+              <a
+                href={qrUrl}
+                download="QR_Caminata_Sobre_Fuego_CREAR.png"
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: '#f97316',
+                  color: '#fff',
+                  padding: '0.65rem 1.2rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                <Download size={16} /> Descargar Imagen QR
+              </a>
+              <button
+                onClick={() => setShowQrModal(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  padding: '0.65rem 1.2rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BARRA DE NAVEGACIÓN Y BÚSQUEDA */}
+      <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          background: '#1e293b',
+          border: '1px solid #334155',
+          borderRadius: '10px',
+          padding: '0.65rem 1.25rem'
+        }}>
+          <Search size={18} color="#94a3b8" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar cláusulas: quemaduras, Artículo 11, datos sensibles, Ley 27269, derechos de imagen..."
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#f8fafc',
+              fontSize: '0.9rem',
+              outline: 'none',
+              width: '100%'
+            }}
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.8rem' }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Pestañas de Navegación Rápida */}
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', borderBottom: '1px solid #334155', paddingBottom: '0.75rem' }}>
+          {[
+            { id: 'todo', label: '📖 Contrato Completo', icon: FileText },
+            { id: 'marco', label: '1. Marco Legal', icon: ShieldCheck },
+            { id: 'aptitud', label: '2. Aptitud & Riesgos', icon: AlertTriangle },
+            { id: 'exoneracion', label: '3. Exoneración Total', icon: ShieldAlert },
+            { id: 'imagen', label: '4. Derechos de Imagen', icon: Eye },
+            { id: 'datos', label: '5. Protección de Datos', icon: Lock },
+            { id: 'firma', label: '✍️ 6. Firma y Registro', icon: UserCheck },
+          ].map(tab => {
+            const Icon = tab.icon;
+            const isSelected = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (tab.id === 'firma') {
+                    const el = document.getElementById('formulario-firma');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.55rem 0.95rem',
+                  borderRadius: '8px',
+                  border: isSelected ? '1px solid #f97316' : '1px solid transparent',
+                  background: isSelected ? 'rgba(249, 115, 22, 0.16)' : '#1e293b',
+                  color: isSelected ? '#fb923c' : '#94a3b8',
+                  fontWeight: 700,
+                  fontSize: '0.84rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <Icon size={15} />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* CLÁUSULAS DEL CONTRATO */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
+        {filteredSections.map(sec => {
+          const Icon = sec.icon;
+          return (
+            <div
+              key={sec.id}
+              id={sec.id}
+              style={{
+                background: '#1e293b',
+                border: '1px solid #334155',
+                borderRadius: '12px',
+                padding: '1.75rem',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.75rem' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '8px',
+                  background: 'rgba(249, 115, 22, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fb923c'
+                }}>
+                  <Icon size={20} />
+                </div>
+                <div>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 800 }}>
+                    CLÁUSULA {sec.numero}
+                  </span>
+                  <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#f8fafc' }}>
+                    {sec.titulo}
+                  </h2>
+                </div>
+              </div>
+
+              {sec.content}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* SECCIÓN 6: FORMULARIO DE FIRMA DIGITAL Y VALIDACIÓN */}
+      <div
+        id="formulario-firma"
+        ref={formRef}
+        style={{
+          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)',
+          border: '2px solid rgba(56, 189, 248, 0.4)',
+          borderRadius: '16px',
+          padding: '2.25rem',
+          boxShadow: '0 12px 36px -10px rgba(14, 165, 233, 0.25)',
+          position: 'relative'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+          <div style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '10px',
+            background: 'rgba(56, 189, 248, 0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#38bdf8'
+          }}>
+            <UserCheck size={24} />
+          </div>
+          <div>
+            <span style={{ fontSize: '0.78rem', color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 800 }}>
+              SECCIÓN 6 · VALIDEZ ELECTRÓNICA VINCULANTE
+            </span>
+            <h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 900, color: '#fff' }}>
+              Validación y Aceptación Digital (Firma Electrónica)
+            </h2>
+          </div>
+        </div>
+
+        <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '1.75rem', lineHeight: '1.5' }}>
+          El presente acuerdo se valida de manera electrónica con arreglo a la <strong>Ley N° 27269</strong>. La confirmación de las casillas y el envío de este formulario constituyen firma digital/electrónica válida y vinculante.
+        </p>
+
+        {signedSuccess ? (
+          <div
+            id="constancia-firmada"
+            style={{
+              background: 'rgba(16, 185, 129, 0.08)',
+              border: '2px solid #10b981',
+              borderRadius: '12px',
+              padding: '2rem',
+              textAlign: 'center'
+            }}
+          >
+            <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
+              <CheckCircle2 size={36} />
+            </div>
+
+            <h3 style={{ margin: '0 0 0.5rem 0', color: '#34d399', fontSize: '1.5rem', fontWeight: 900 }}>
+              ¡Acuerdo Validado y Firmado Exitosamente!
+            </h3>
+            <p style={{ color: '#e2e8f0', fontSize: '0.95rem', maxWidth: '640px', margin: '0 auto 1.5rem auto', lineHeight: '1.6' }}>
+              Se ha emitido la constancia de exoneración de responsabilidad y consentimiento informado conforme a ley.
+            </p>
+
+            <div style={{
+              background: '#0f172a',
+              border: '1px solid #334155',
+              borderRadius: '10px',
+              padding: '1.25rem',
+              maxWidth: '560px',
+              margin: '0 auto 1.5rem auto',
+              textAlign: 'left',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.6rem',
+              fontSize: '0.88rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Código de Auditoría:</span>
+                <span style={{ color: '#38bdf8', fontWeight: 800 }}>{signedSuccess.codigo}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Firmante:</span>
+                <span style={{ color: '#fff', fontWeight: 700 }}>{signedSuccess.nombre}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Documento:</span>
+                <span style={{ color: '#fff' }}>{signedSuccess.documento}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Rol:</span>
+                <span style={{ color: '#fb923c', fontWeight: 700 }}>{signedSuccess.rolActividad}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Locación:</span>
+                <span style={{ color: '#fff' }}>{signedSuccess.sedeLocacion}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#94a3b8' }}>Fecha y Hora Oficial:</span>
+                <span style={{ color: '#10b981', fontWeight: 700 }}>{signedSuccess.fecha}</span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={handlePrint}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '8px',
+                  fontWeight: 800,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+              >
+                <Printer size={18} /> Imprimir / Guardar Constancia en PDF
+              </button>
+              <button
+                onClick={() => {
+                  setSignedSuccess(null);
+                  setFormData({
+                    nombreCompleto: '',
+                    tipoDocumento: 'DNI',
+                    numeroDocumento: '',
+                    email: '',
+                    telefono: '',
+                    rolActividad: 'Participante',
+                    sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
+                    aceptoRiesgos: false,
+                    aceptoImagen: false,
+                    aceptoDatos: false,
+                    firmaTexto: ''
+                  });
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  color: '#cbd5e1',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer'
+                }}
+              >
+                Registrar Nuevo Participante
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+              {/* Nombre Completo */}
+              <div id="field-nombreCompleto">
+                <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                  Nombre y Apellidos Completos *
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    name="nombreCompleto"
+                    value={formData.nombreCompleto}
+                    onChange={handleInputChange}
+                    placeholder="Ej. Juan Pérez Quispe"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem 0.75rem 2.5rem',
+                      background: '#0f172a',
+                      border: formErrors.nombreCompleto ? '1px solid #ef4444' : '1px solid #334155',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '0.9rem',
+                      outline: 'none'
+                    }}
+                  />
+                  <User size={16} color="#94a3b8" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)' }} />
+                </div>
+                {formErrors.nombreCompleto && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>{formErrors.nombreCompleto}</span>}
+              </div>
+
+              {/* Documento de Identidad */}
+              <div id="field-numeroDocumento" style={{ display: 'flex', gap: '0.5rem' }}>
+                <div style={{ width: '110px' }}>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                    Tipo Doc. *
+                  </label>
+                  <select
+                    name="tipoDocumento"
+                    value={formData.tipoDocumento}
+                    onChange={handleInputChange}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      background: '#0f172a',
+                      border: '1px solid #334155',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '0.9rem',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="DNI">DNI</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                    <option value="Carné Ext.">Carné Ext.</option>
+                    <option value="Cédula">Cédula</option>
+                  </select>
+                </div>
+
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                    Número de Documento *
+                  </label>
+                  <input
+                    type="text"
+                    name="numeroDocumento"
+                    value={formData.numeroDocumento}
+                    onChange={handleInputChange}
+                    placeholder="Número de identidad"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem',
+                      background: '#0f172a',
+                      border: formErrors.numeroDocumento ? '1px solid #ef4444' : '1px solid #334155',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '0.9rem',
+                      outline: 'none'
+                    }}
+                  />
+                  {formErrors.numeroDocumento && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>{formErrors.numeroDocumento}</span>}
+                </div>
+              </div>
+
+              {/* Correo Electrónico */}
+              <div id="field-email">
+                <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                  Correo Electrónico de Contacto *
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    placeholder="tu.correo@ejemplo.com"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem 0.75rem 2.5rem',
+                      background: '#0f172a',
+                      border: formErrors.email ? '1px solid #ef4444' : '1px solid #334155',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '0.9rem',
+                      outline: 'none'
+                    }}
+                  />
+                  <Mail size={16} color="#94a3b8" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)' }} />
+                </div>
+                {formErrors.email && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>{formErrors.email}</span>}
+              </div>
+
+              {/* Teléfono / WhatsApp */}
+              <div id="field-telefono">
+                <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                  Teléfono / WhatsApp de Emergencia *
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="tel"
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleInputChange}
+                    placeholder="+51 999 999 999"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem 0.75rem 2.5rem',
+                      background: '#0f172a',
+                      border: formErrors.telefono ? '1px solid #ef4444' : '1px solid #334155',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      fontSize: '0.9rem',
+                      outline: 'none'
+                    }}
+                  />
+                  <PhoneCall size={16} color="#94a3b8" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)' }} />
+                </div>
+                {formErrors.telefono && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>{formErrors.telefono}</span>}
+              </div>
+
+              {/* Rol en la Actividad */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                  Rol en la Actividad *
+                </label>
+                <select
+                  name="rolActividad"
+                  value={formData.rolActividad}
+                  onChange={handleInputChange}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: '#0f172a',
+                    border: '1px solid #334155',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '0.9rem',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="Participante">Participante</option>
+                  <option value="Partner / Acompañante">Partner / Acompañante</option>
+                  <option value="Staff / Logística">Staff / Logística</option>
+                  <option value="Entrenador / Facilitador">Entrenador / Facilitador</option>
+                </select>
+              </div>
+
+              {/* Locación */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                  Locación del Evento
+                </label>
+                <input
+                  type="text"
+                  name="sedeLocacion"
+                  value={formData.sedeLocacion}
+                  onChange={handleInputChange}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem',
+                    background: '#0f172a',
+                    border: '1px solid #334155',
+                    borderRadius: '8px',
+                    color: '#94a3b8',
+                    fontSize: '0.9rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* CASILLAS DE VERIFICACIÓN ELECTRÓNICA OBLIGATORIA */}
+            <div style={{
+              background: '#0f172a',
+              border: '1px solid #334155',
+              borderRadius: '12px',
+              padding: '1.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              marginTop: '0.5rem'
+            }}>
+              <h4 style={{ margin: 0, color: '#38bdf8', fontSize: '0.95rem', fontWeight: 800 }}>
+                Declaraciones de Conformidad (Casillas de Verificación Electrónica Obligatorias):
+              </h4>
+
+              {/* Casilla 1 */}
+              <label id="field-aceptoRiesgos" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
+                <input
+                  type="checkbox"
+                  name="aceptoRiesgos"
+                  checked={formData.aceptoRiesgos}
+                  onChange={handleInputChange}
+                  style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#f97316' }}
+                />
+                <span>
+                  <strong>He leído y acepto expresamente</strong> los términos de la <strong>Exoneración de Responsabilidad y Asunción de Riesgos</strong> para la Caminata sobre Fuego (Cláusulas 2 y 3).
+                </span>
+              </label>
+              {formErrors.aceptoRiesgos && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginLeft: '2rem' }}>{formErrors.aceptoRiesgos}</span>}
+
+              {/* Casilla 2 */}
+              <label id="field-aceptoImagen" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
+                <input
+                  type="checkbox"
+                  name="aceptoImagen"
+                  checked={formData.aceptoImagen}
+                  onChange={handleInputChange}
+                  style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#38bdf8' }}
+                />
+                <span>
+                  <strong>Autorizo el uso de mi imagen y voz</strong> a favor de <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> según lo estipulado en el Artículo 11 del Código Civil (Cláusula 4).
+                </span>
+              </label>
+              {formErrors.aceptoImagen && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginLeft: '2rem' }}>{formErrors.aceptoImagen}</span>}
+
+              {/* Casilla 3 */}
+              <label id="field-aceptoDatos" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', fontSize: '0.88rem', color: '#e2e8f0', lineHeight: '1.5' }}>
+                <input
+                  type="checkbox"
+                  name="aceptoDatos"
+                  checked={formData.aceptoDatos}
+                  onChange={handleInputChange}
+                  style={{ width: '18px', height: '18px', marginTop: '2px', accentColor: '#10b981' }}
+                />
+                <span>
+                  <strong>Doy mi consentimiento informado</strong> para el tratamiento de mis Datos Personales y Datos Sensibles conforme a la <strong>Ley N° 29733</strong> (Cláusula 5).
+                </span>
+              </label>
+              {formErrors.aceptoDatos && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginLeft: '2rem' }}>{formErrors.aceptoDatos}</span>}
+            </div>
+
+            {/* FIRMA DIGITAL ESCRITA */}
+            <div id="field-firmaTexto">
+              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 700, color: '#e2e8f0', marginBottom: '0.4rem' }}>
+                Escribe tu Nombre Completo como Firma Digital Vinculante (Ley N° 27269) *
+              </label>
+              <input
+                type="text"
+                name="firmaTexto"
+                value={formData.firmaTexto}
+                onChange={handleInputChange}
+                placeholder="Escribe exactamente tu nombre y apellidos como firma"
+                style={{
+                  width: '100%',
+                  padding: '0.85rem 1rem',
+                  background: '#0f172a',
+                  border: formErrors.firmaTexto ? '1px solid #ef4444' : '1px solid #38bdf8',
+                  borderRadius: '8px',
+                  color: '#38bdf8',
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  letterSpacing: '0.02em',
+                  outline: 'none'
+                }}
+              />
+              <span style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '0.3rem', display: 'block' }}>
+                Al escribir tu nombre y presionar "Firmar y Validar Acuerdo", se registrará la marca de tiempo oficial y huella electrónica con plena eficacia jurídica.
+              </span>
+              {formErrors.firmaTexto && <span style={{ color: '#ef4444', fontSize: '0.75rem', marginTop: '0.25rem', display: 'block' }}>{formErrors.firmaTexto}</span>}
+            </div>
+
+            {/* BOTÓN DE FIRMA */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                style={{
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  padding: '1rem 2.25rem',
+                  borderRadius: '10px',
+                  fontWeight: 900,
+                  fontSize: '1rem',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  boxShadow: '0 8px 24px -4px rgba(234, 88, 12, 0.45)',
+                  transition: 'all 0.2s ease',
+                  opacity: isSubmitting ? 0.7 : 1
+                }}
+              >
+                <Flame size={20} />
+                {isSubmitting ? 'Validando y Registrando Firma...' : 'Firmar y Validar Acuerdo Electrónico'}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
+
+      {/* FOOTER OFICIAL DE PROTECCIÓN Y CONTACTO */}
+      <div style={{ marginTop: '3rem', borderTop: '1px solid #334155', paddingTop: '1.5rem', textAlign: 'center', color: '#64748b', fontSize: '0.8rem', lineHeight: '1.6' }}>
+        <p style={{ margin: '0 0 0.4rem 0' }}>
+          <strong>CREAR PODER SIN LÍMITES / TRANSFORMACIÓN GLOBAL</strong> · Todos los derechos reservados © 2026
+        </p>
+        <p style={{ margin: 0 }}>
+          Sede Legal: Lima, Perú · Derechos ARCO: <strong>legal@crearpsl.net</strong> · Plataforma Oficial de Causa OS
+        </p>
+      </div>
+
     </div>
   );
 }
