@@ -211,7 +211,7 @@ const OFICIAL_LETTERS = [
       url: '/cartas/carta_andres_gomez_noviembre_2026.html',
       badge: 'Pasaporte BG726399 · PNR FEPVBL',
       fecha: '11 - 16 Noviembre 2026',
-      descripcion: 'Carta oficial para Caminata sobre Fuego (E29-32) y Módulo de Relación E31. Vuelos directos LATAM LA 2393 / LA 2392, hospedaje en Hotel Jose Antonio Deluxe.',
+      descripcion: 'Carta oficial para Caminata sobre Fuego (E29-32) y Segundo FDS: Relación E31 (Maestría del Juego). Vuelos directos LATAM LA 2393 / LA 2392, hospedaje en Hotel Jose Antonio Deluxe.',
       vuelos: ['LA 2393', 'LA 2392']
     },
     {

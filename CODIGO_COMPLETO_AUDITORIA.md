@@ -57905,7 +57905,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     Tu radar logístico de Noviembre y Asignaciones 🧠
                 </p>
 
-                <!-- Triple Countdown Timers: Vuelo, Caminata sobre Fuego y Módulo de Relación -->
+                <!-- Triple Countdown Timers: Vuelo, Caminata sobre Fuego y Segundo FDS: Relación E31 -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 max-w-5xl mx-auto">
                     <!-- Timer Arribo Vuelo -->
                     <div class="glass p-5 rounded-2xl border border-blue-500/30 shadow-[0_0_20px_rgba(56,189,248,0.2)]">
@@ -57931,10 +57931,10 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                         </div>
                     </div>
 
-                    <!-- Timer Módulo de Relación -->
+                    <!-- Timer Segundo FDS: Relación E31 -->
                     <div class="glass p-5 rounded-2xl border border-crear-accent/30 shadow-[0_0_20px_rgba(255,183,3,0.2)]">
-                        <h3 class="text-crear-accent text-xs uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-hands-holding-circle text-amber-400"></i> Módulo de Relación</h3>
-                        <p class="text-xs text-gray-400 mb-3">Equipo 31 en Sala: <strong class="text-white font-mono">Sáb 14/11 · 10:00 AM</strong></p>
+                        <h3 class="text-crear-accent text-xs uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-hands-holding-circle text-amber-400"></i> Relación E31 (2do FDS MJ)</h3>
+                        <p class="text-xs text-gray-400 mb-3">Grounding y Sala: <strong class="text-white font-mono">Vie 13/11 · 16:30 PM</strong></p>
                         <div id="countdown-relation" class="grid grid-cols-4 gap-1 text-center">
                             <div><div class="text-xl sm:text-2xl font-black text-white" id="rel-d">00</div><div class="text-[9px] text-gray-500 uppercase">Días</div></div>
                             <div><div class="text-xl sm:text-2xl font-black text-white" id="rel-h">00</div><div class="text-[9px] text-gray-500 uppercase">Hrs</div></div>
@@ -58052,12 +58052,12 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                             </div>
                         </div>
 
-                        <!-- Módulo de Relación E31 y Salón del Hotel -->
+                        <!-- Segundo FDS: Relación E31 (Maestría del Juego) -->
                         <div class="flex items-start gap-2">
                             <span class="text-amber-400 font-bold">●</span>
                             <div>
-                                <strong class="text-white">Módulo de Relación (Equipo 31) & Entrenamientos de Fin de Semana:</strong>
-                                <span class="block mt-1 text-gray-300">Liderarás el espacio de relación para el E31, enfocado en la ecología del equipo y la construcción de redes conversacionales sólidas. Los entrenamientos de fin de semana (Viernes a Domingo) se realizarán directamente en los salones de eventos del <strong>Hotel José Antonio Deluxe</strong> (Miraflores), al igual que tu hospedaje.</span>
+                                <strong class="text-white">Segundo FDS: Relación (Equipo 31) — Maestría del Juego:</strong>
+                                <span class="block mt-1 text-gray-300">Facilitarás el 2do FDS de Maestría del Juego (Relación) para el E31, enfocado en la ecología del equipo y la construcción de redes conversacionales sólidas. Los entrenamientos de fin de semana (Viernes a Domingo) se realizarán directamente en los salones de eventos del <strong>Hotel José Antonio Deluxe</strong> (Miraflores), al igual que tu hospedaje.</span>
                             </div>
                         </div>
                     </div>
@@ -58478,8 +58478,8 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
             var flightTimestamp = new Date("2026-11-12T02:25:00.000Z").getTime();
             // 2. Caminata sobre Fuego (E29, E30, E31, E32): Jueves 12 Noviembre 2026, 19:00 PM = 2026-11-13T00:00:00.000Z
             var fireTimestamp = new Date("2026-11-13T00:00:00.000Z").getTime();
-            // 3. Módulo de Relación (Equipo 31): Sábado 14 Noviembre 2026, 10:00 AM = 2026-11-14T15:00:00.000Z
-            var relationTimestamp = new Date("2026-11-14T15:00:00.000Z").getTime();
+            // 3. Segundo FDS: Relación E31 (Maestría del Juego) - Grounding: Viernes 13 Noviembre 2026, 16:30 PM = 2026-11-13T21:30:00.000Z
+            var relationTimestamp = new Date("2026-11-13T21:30:00.000Z").getTime();
 
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
@@ -58510,7 +58510,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     document.getElementById("countdown-fire").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-xs py-2'>¡Caminata sobre Fuego Activa!</div>";
                 }
 
-                // 3. Módulo de Relación E31
+                // 3. Segundo FDS: Relación E31
                 var distanceRel = relationTimestamp - now;
                 if (distanceRel > 0) {
                     document.getElementById("rel-d").innerText = String(Math.floor(distanceRel / (1000 * 60 * 60 * 24))).padStart(2, "0");
@@ -58518,7 +58518,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     document.getElementById("rel-m").innerText = String(Math.floor((distanceRel % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("rel-s").innerText = String(Math.floor((distanceRel % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-relation").innerHTML = "<div class='col-span-4 text-crear-accent font-bold tracking-widest uppercase text-xs py-2'>¡Módulo de Relación en Curso!</div>";
+                    document.getElementById("countdown-relation").innerHTML = "<div class='col-span-4 text-crear-accent font-bold tracking-widest uppercase text-xs py-2'>¡Relación E31 en Curso!</div>";
                 }
             }
             setInterval(updateCountdowns, 1000);
@@ -148474,7 +148474,7 @@ const OFICIAL_LETTERS = [
       url: '/cartas/carta_andres_gomez_noviembre_2026.html',
       badge: 'Pasaporte BG726399 · PNR FEPVBL',
       fecha: '11 - 16 Noviembre 2026',
-      descripcion: 'Carta oficial para Caminata sobre Fuego (E29-32) y Módulo de Relación E31. Vuelos directos LATAM LA 2393 / LA 2392, hospedaje en Hotel Jose Antonio Deluxe.',
+      descripcion: 'Carta oficial para Caminata sobre Fuego (E29-32) y Segundo FDS: Relación E31 (Maestría del Juego). Vuelos directos LATAM LA 2393 / LA 2392, hospedaje en Hotel Jose Antonio Deluxe.',
       vuelos: ['LA 2393', 'LA 2392']
     },
     {
