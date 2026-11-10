@@ -189,6 +189,43 @@ const SEDES_LOGISTICA = {
 
 // Catálogo Completo Multi-Sede de Cartas Oficiales y Documentación Migratoria
 const OFICIAL_LETTERS = [
+    // NOVIEMBRE 2026 - SEDE LIMA
+    {
+      id: 'carta-andres-creacion-e32',
+      entrenador: 'Elmer Andrés Idrobo Andrade',
+      rol: 'Líder Creación (Maestría del Juego)',
+      equipo: 'Equipo 32 - Creación E32',
+      sede: 'Lima',
+      url: '/cartas/carta_andres_idrobo_creacion_e32.html',
+      badge: 'Pasaporte A9919241 · PNR DXWUSX',
+      fecha: '12 - 15 Noviembre 2026',
+      descripcion: 'Carta oficial de bienvenida y radar logístico para Creación E32. Vuelos directos LATAM LA 1445 / LA 1444, hospedaje en Hotel Jose Antonio Deluxe con Late Check-out.',
+      vuelos: ['LA 1445', 'LA 1444']
+    },
+    {
+      id: 'carta-andres-gomez-nov-2026',
+      entrenador: 'Carlos Andrés Gómez Gómez',
+      rol: 'Líder Caminata sobre Fuego / Relación E31',
+      equipo: 'Equipos 29, 30, 31, 32 / Relación E31',
+      sede: 'Lima',
+      url: '/cartas/carta_andres_gomez_noviembre_2026.html',
+      badge: 'Pasaporte BG726399 · PNR FEPVBL',
+      fecha: '11 - 16 Noviembre 2026',
+      descripcion: 'Carta oficial para Caminata sobre Fuego (E29-32) y Módulo de Relación E31. Vuelos directos LATAM LA 2393 / LA 2392, hospedaje en Hotel Jose Antonio Deluxe.',
+      vuelos: ['LA 2393', 'LA 2392']
+    },
+    {
+      id: 'carta-alonso-solares-creacion-e30',
+      entrenador: 'Alonso Solares Salazar',
+      rol: 'Líder Creación E30',
+      equipo: 'Equipo 30 - Creación E30',
+      sede: 'Lima',
+      url: '/cartas/carta_alonso_solares_creacion_e30.html',
+      badge: 'Pasaporte N11971541 · PNR CBC92S',
+      fecha: '13 - 16 Noviembre 2026',
+      descripcion: 'Carta oficial de bienvenida y gratitud para Creación E30. Vuelos directos Volaris Y4 3918 / Y4 3919 con arribo de madrugada y hospedaje en Hotel Jose Antonio Deluxe.',
+      vuelos: ['Y4 3918', 'Y4 3919']
+    },
 
     {
       id: 'carta-andres-creacion-e31',
