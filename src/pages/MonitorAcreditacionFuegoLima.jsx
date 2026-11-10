@@ -13,8 +13,10 @@ import {
   Check,
   PhoneCall,
   Clock,
+  MapPin,
+  FileText,
   Sparkles,
-  RefreshCw,
+  Calendar,
   X
 } from 'lucide-react';
 import { collection, onSnapshot } from 'firebase/firestore';
@@ -24,13 +26,20 @@ import padronLima111 from '../data/padron_fuego_lima_111.json';
 export default function MonitorAcreditacionFuegoLima() {
   const [signedContracts, setSignedContracts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [teamFilter, setTeamFilter] = useState('TODOS');
-  const [statusFilter, setStatusFilter] = useState('TODOS');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('REGISTROS'); // 'REGISTROS' | 'PADRON'
+
+  // Filtros Registros
+  const [regSearch, setRegSearch] = useState('');
+  const [regRoleFilter, setRegRoleFilter] = useState('TODOS');
+
+  // Filtros Padrón
+  const [padronSearch, setPadronSearch] = useState('');
+  const [padronTeamFilter, setPadronTeamFilter] = useState('TODOS');
+  const [padronStatusFilter, setPadronStatusFilter] = useState('TODOS');
+
   const [qrModalType, setQrModalType] = useState(null); // 'contract' | 'monitor' | null
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Normalizar strings para búsqueda y matching
   const normalizeStr = (str) => {
     if (!str) return '';
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -52,6 +61,14 @@ export default function MonitorAcreditacionFuegoLima() {
           snapshot.forEach((doc) => {
             list.push({ id: doc.id, ...doc.data() });
           });
+
+          // Ordenar por más reciente primero
+          list.sort((a, b) => {
+            const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+            const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+            return tB - tA;
+          });
+
           setSignedContracts(list);
           setLoading(false);
         },
@@ -69,7 +86,7 @@ export default function MonitorAcreditacionFuegoLima() {
   }, []);
 
   // Matching de firmas contra el padrón oficial de 111 integrantes
-  const enrichedList = useMemo(() => {
+  const enrichedPadron = useMemo(() => {
     return padronLima111.map((person) => {
       const normPersonName = normalizeStr(person.nombre);
       const personTokens = normPersonName.split(/\s+/).filter((t) => t.length > 2);
@@ -91,41 +108,49 @@ export default function MonitorAcreditacionFuegoLima() {
 
   // Contadores KPI
   const stats = useMemo(() => {
-    const total = enrichedList.length;
-    const firmados = enrichedList.filter((p) => p.isSigned).length;
-    const pendientes = total - firmados;
-    const porcentaje = total > 0 ? Math.round((firmados / total) * 100) : 0;
-    return { total, firmados, pendientes, porcentaje };
-  }, [enrichedList]);
+    const totalPadron = enrichedPadron.length;
+    const firmadosPadron = enrichedPadron.filter((p) => p.isSigned).length;
+    const pendientesPadron = totalPadron - firmadosPadron;
+    const porcentaje = totalPadron > 0 ? Math.round((firmadosPadron / totalPadron) * 100) : 0;
+    const totalRegistradosFirestore = signedContracts.length;
+    return { totalPadron, firmadosPadron, pendientesPadron, porcentaje, totalRegistradosFirestore };
+  }, [enrichedPadron, signedContracts]);
 
-  // Filtrado reactivo
-  const filteredList = useMemo(() => {
-    return enrichedList.filter((item) => {
-      if (teamFilter !== 'TODOS' && item.equipo !== teamFilter) {
-        return false;
+  // Lista filtrada de Registros Realizados (Tab 1)
+  const filteredRegistros = useMemo(() => {
+    return signedContracts.filter((item) => {
+      if (regRoleFilter !== 'TODOS') {
+        const itemRole = item.rol || item.rolActividad || '';
+        if (itemRole !== regRoleFilter) return false;
       }
-      if (statusFilter === 'PENDIENTES' && item.isSigned) {
-        return false;
-      }
-      if (statusFilter === 'FIRMADOS' && !item.isSigned) {
-        return false;
-      }
-      if (searchTerm) {
-        const term = normalizeStr(searchTerm);
-        const nameNorm = normalizeStr(item.nombre);
-        const rolNorm = normalizeStr(item.rol);
-        const cohorteNorm = normalizeStr(item.cohorte);
-        const docNum = item.signature ? normalizeStr(item.signature.numeroDocumento || item.signature.doc) : '';
-        return (
-          nameNorm.includes(term) ||
-          rolNorm.includes(term) ||
-          cohorteNorm.includes(term) ||
-          docNum.includes(term)
-        );
+      if (regSearch) {
+        const term = normalizeStr(regSearch);
+        const name = normalizeStr(item.nombre || item.nombreCompleto || '');
+        const doc = normalizeStr(item.numeroDocumento || item.doc || '');
+        const code = normalizeStr(item.code || item.verificationCode || '');
+        const rol = normalizeStr(item.rol || item.rolActividad || '');
+        return name.includes(term) || doc.includes(term) || code.includes(term) || rol.includes(term);
       }
       return true;
     });
-  }, [enrichedList, teamFilter, statusFilter, searchTerm]);
+  }, [signedContracts, regRoleFilter, regSearch]);
+
+  // Lista filtrada de Padrón Oficial (Tab 2)
+  const filteredPadron = useMemo(() => {
+    return enrichedPadron.filter((item) => {
+      if (padronTeamFilter !== 'TODOS' && item.equipo !== padronTeamFilter) return false;
+      if (padronStatusFilter === 'PENDIENTES' && item.isSigned) return false;
+      if (padronStatusFilter === 'FIRMADOS' && !item.isSigned) return false;
+      if (padronSearch) {
+        const term = normalizeStr(padronSearch);
+        const nameNorm = normalizeStr(item.nombre);
+        const rolNorm = normalizeStr(item.rol);
+        const cohorteNorm = normalizeStr(item.cohorte);
+        return nameNorm.includes(term) || rolNorm.includes(term) || cohorteNorm.includes(term);
+      }
+      return true;
+    });
+  }, [enrichedPadron, padronTeamFilter, padronStatusFilter, padronSearch]);
 
   const contractUrl = 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
   const monitorUrl = 'https://cartas.crearpsl.net/monitor_fuego_lima.html';
@@ -141,7 +166,7 @@ export default function MonitorAcreditacionFuegoLima() {
     <div style={{ minHeight: '100vh', background: '#070b13', color: '#f8fafc', padding: '1.25rem 0.75rem' }}>
       <div style={{ maxWidth: '960px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-        {/* Encabezado Operativo */}
+        {/* Encabezado con Branding Oficial CREAR */}
         <div style={{
           position: 'relative',
           overflow: 'hidden',
@@ -182,7 +207,7 @@ export default function MonitorAcreditacionFuegoLima() {
                   padding: '0.25rem 0.6rem',
                   borderRadius: '6px'
                 }}>
-                  🔥 CAUSA OS · LIMA OPERACIONES
+                  🔥 LIMA OPERACIONES · EN VIVO
                 </span>
                 <span style={{
                   background: 'rgba(16, 185, 129, 0.12)',
@@ -197,14 +222,14 @@ export default function MonitorAcreditacionFuegoLima() {
                   gap: '0.35rem'
                 }}>
                   <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-                  EN VIVO
+                  FIRESTORE CONECTADO
                 </span>
               </div>
               <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#fff' }}>
-                Monitor de Acreditación · Caminata sobre Fuego
+                Caminata sobre Fuego · Registro con Fechas y Lugar
               </h1>
               <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.84rem', color: '#94a3b8', fontWeight: 500 }}>
-                📍 Casona Blanca (Calle Las Perdices 1126, Huachipa) · Control de Firmas de Exoneración
+                📍 Casona Blanca (Calle Las Perdices 1126, Huachipa) · Registro Jurídico en Tiempo Real
               </p>
             </div>
 
@@ -260,25 +285,24 @@ export default function MonitorAcreditacionFuegoLima() {
             paddingTop: '1.25rem',
             borderTop: '1px solid rgba(255, 255, 255, 0.08)'
           }}>
-            <div style={{ background: '#0f172a', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid #334155' }}>
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Padrón Lima</span>
-              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', marginTop: '0.15rem' }}>{stats.total}</div>
-            </div>
             <div style={{ background: 'rgba(6, 78, 59, 0.3)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✓ Acreditados</span>
-              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '0.15rem' }}>{stats.firmados}</div>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🔥 Registrados en Vivo</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '0.15rem' }}>{stats.totalRegistradosFirestore}</div>
+            </div>
+            <div style={{ background: '#0f172a', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid #334155' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Padrón Oficial MJ</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', marginTop: '0.15rem' }}>{stats.totalPadron}</div>
             </div>
             <div style={{ background: 'rgba(136, 19, 55, 0.3)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(244, 63, 94, 0.4)' }}>
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Pendientes</span>
-              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.pendientes}</div>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Pendientes Padrón</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.pendientesPadron}</div>
             </div>
             <div style={{ background: 'rgba(120, 53, 15, 0.3)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>% Aceptación</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>% Avance Padrón</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>{stats.porcentaje}%</div>
             </div>
           </div>
 
-          {/* Barra de Progreso */}
           <div style={{ marginTop: '0.85rem' }}>
             <div style={{ width: '100%', height: '8px', background: '#0f172a', borderRadius: '9999px', overflow: 'hidden', padding: '1px', border: '1px solid #334155' }}>
               <div style={{
@@ -292,305 +316,466 @@ export default function MonitorAcreditacionFuegoLima() {
           </div>
         </div>
 
-        {/* Barra de Filtros y Búsqueda */}
-        <div style={{
-          background: 'rgba(15, 23, 42, 0.95)',
-          border: '1px solid #1e293b',
-          borderRadius: '14px',
-          padding: '1rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem',
-          position: 'sticky',
-          top: '0.75rem',
-          zIndex: 20,
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4)'
-        }}>
-          {/* Buscador */}
-          <div style={{ position: 'relative' }}>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="🔍 Buscar por nombre, apellido, DNI o rol..."
-              style={{
-                width: '100%',
-                padding: '0.75rem 1rem 0.75rem 2.6rem',
-                background: '#0b1120',
-                border: '1px solid #334155',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '0.86rem',
-                fontWeight: 600,
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-            />
-            <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm('')}
-                style={{
-                  position: 'absolute',
-                  right: '0.75rem',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#94a3b8',
-                  cursor: 'pointer',
-                  fontSize: '0.8rem',
-                  fontWeight: 800
-                }}
-              >
-                ✕
-              </button>
-            )}
-          </div>
-
-          {/* Filtros por Equipo */}
-          <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
-            {[
-              { id: 'TODOS', label: `Todos (${padronLima111.length})` },
-              { id: 'Equipo 29', label: 'E29 · Phoenix (16)' },
-              { id: 'Equipo 30', label: 'E30 · Tinkuy (34)' },
-              { id: 'Equipo 31', label: 'E31 · Imperio (19)' },
-              { id: 'Equipo 32', label: 'E32 · C2 Lima (42)' }
-            ].map((t) => {
-              const active = teamFilter === t.id;
-              return (
-                <button
-                  key={t.id}
-                  onClick={() => setTeamFilter(t.id)}
-                  style={{
-                    background: active ? '#ea580c' : '#1e293b',
-                    color: active ? '#fff' : '#cbd5e1',
-                    border: active ? 'none' : '1px solid #334155',
-                    borderRadius: '8px',
-                    padding: '0.4rem 0.75rem',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Filtro por Estado */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginRight: '0.25rem' }}>Estado:</span>
-            {[
-              { id: 'TODOS', label: 'Todos' },
-              { id: 'PENDIENTES', label: '🚨 Solo Pendientes' },
-              { id: 'FIRMADOS', label: '✓ Acreditados' }
-            ].map((s) => {
-              const active = statusFilter === s.id;
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => setStatusFilter(s.id)}
-                  style={{
-                    background: active ? (s.id === 'PENDIENTES' ? '#881337' : s.id === 'FIRMADOS' ? '#064e3b' : '#334155') : '#1e293b',
-                    color: active ? '#fff' : '#94a3b8',
-                    border: active ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #334155',
-                    borderRadius: '6px',
-                    padding: '0.3rem 0.65rem',
-                    fontSize: '0.74rem',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {s.label}
-                </button>
-              );
-            })}
-          </div>
+        {/* SELECTOR DE PESTAÑAS PRINCIPALES */}
+        <div style={{ display: 'flex', gap: '0.5rem', background: '#0f172a', padding: '0.4rem', borderRadius: '14px', border: '1px solid #1e293b' }}>
+          <button
+            onClick={() => setActiveTab('REGISTROS')}
+            style={{
+              flex: 1,
+              padding: '0.75rem 1rem',
+              borderRadius: '10px',
+              fontSize: '0.85rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              border: 'none',
+              background: activeTab === 'REGISTROS' ? 'linear-gradient(90deg, #ea580c, #f59e0b)' : '#1e293b',
+              color: activeTab === 'REGISTROS' ? '#fff' : '#94a3b8',
+              boxShadow: activeTab === 'REGISTROS' ? '0 4px 15px rgba(234, 88, 12, 0.25)' : 'none',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            🔥 Personas Registradas ({signedContracts.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('PADRON')}
+            style={{
+              flex: 1,
+              padding: '0.75rem 1rem',
+              borderRadius: '10px',
+              fontSize: '0.85rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              border: 'none',
+              background: activeTab === 'PADRON' ? 'linear-gradient(90deg, #ea580c, #f59e0b)' : '#1e293b',
+              color: activeTab === 'PADRON' ? '#fff' : '#94a3b8',
+              boxShadow: activeTab === 'PADRON' ? '0 4px 15px rgba(234, 88, 12, 0.25)' : 'none',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            👥 Control Padrón Lima ({stats.totalPadron})
+          </button>
         </div>
 
-        {/* Indicador de Conteo */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600 }}>
-          <span>Mostrando <strong>{filteredList.length}</strong> de {enrichedList.length} integrantes</span>
-          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Sincronización en vivo con Firestore</span>
-        </div>
-
-        {/* Lista de Integrantes */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-          {filteredList.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔍</div>
-              <p style={{ margin: 0, fontWeight: 700, color: '#fff' }}>No se encontraron integrantes con este filtro</p>
-              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>Prueba limpiando el buscador o cambiando de equipo.</p>
-            </div>
-          ) : (
-            filteredList.map((item) => {
-              if (item.isSigned) {
-                const sig = item.signature;
-                const docText = sig.tipoDocumento && sig.numeroDocumento
-                  ? `${sig.tipoDocumento}: ${sig.numeroDocumento}`
-                  : (sig.doc || 'Registrado');
-                const time = sig.timestamp || 'Fecha verificada';
-                const code = sig.code || 'CQ-FIRE-VERIFIED';
-                const rolFirmado = sig.rol || item.rol;
-
-                return (
-                  <div
-                    key={item.id}
-                    style={{
-                      background: 'rgba(15, 23, 42, 0.9)',
-                      border: '1px solid rgba(16, 185, 129, 0.4)',
-                      borderRadius: '12px',
-                      padding: '1rem',
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      boxShadow: '0 4px 12px rgba(6, 78, 59, 0.15)'
-                    }}
+        {/* VISTA 1: REGISTROS REALIZADOS (CON LUGAR Y FECHAS) */}
+        {activeTab === 'REGISTROS' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.95)',
+              border: '1px solid #1e293b',
+              borderRadius: '14px',
+              padding: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              position: 'sticky',
+              top: '0.75rem',
+              zIndex: 20,
+              backdropFilter: 'blur(8px)'
+            }}>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={regSearch}
+                  onChange={(e) => setRegSearch(e.target.value)}
+                  placeholder="🔍 Buscar por nombre, documento, rol o código..."
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.6rem',
+                    background: '#0b1120',
+                    border: '1px solid #334155',
+                    borderRadius: '10px',
+                    color: '#fff',
+                    fontSize: '0.86rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                {regSearch && (
+                  <button
+                    onClick={() => setRegSearch('')}
+                    style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
                   >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
-                        <span style={{
-                          background: 'rgba(16, 185, 129, 0.2)',
-                          color: '#34d399',
-                          border: '1px solid rgba(16, 185, 129, 0.4)',
-                          fontSize: '0.65rem',
-                          fontWeight: 900,
-                          padding: '0.15rem 0.45rem',
-                          borderRadius: '4px'
-                        }}>
-                          ✓ ACREDITADO / FIRMADO
-                        </span>
-                        <span style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                          {item.equipo} · {item.cohorte}
-                        </span>
-                        <span style={{ background: 'rgba(249, 115, 22, 0.1)', color: '#fb923c', border: '1px solid rgba(249, 115, 22, 0.25)', fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                          {rolFirmado}
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Filtro por Rol */}
+              <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
+                {['TODOS', 'Participante', 'Entrenador', 'Oficina', 'Manager', 'Capitán', 'Aliados', 'Staff de Caminata', 'Staff de Mesa'].map((r) => {
+                  const active = regRoleFilter === r;
+                  return (
+                    <button
+                      key={r}
+                      onClick={() => setRegRoleFilter(r)}
+                      style={{
+                        background: active ? '#ea580c' : '#1e293b',
+                        color: active ? '#fff' : '#cbd5e1',
+                        border: active ? 'none' : '1px solid #334155',
+                        borderRadius: '8px',
+                        padding: '0.35rem 0.7rem',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {r}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 0.5rem', fontSize: '0.78rem', color: '#94a3b8' }}>
+              <span>Mostrando <strong>{filteredRegistros.length}</strong> de {signedContracts.length} registros</span>
+              <span style={{ color: '#10b981' }}>✓ Actualización automática</span>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {filteredRegistros.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b' }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📋</div>
+                  <p style={{ margin: 0, fontWeight: 700, color: '#fff' }}>No hay registros que coincidan con este filtro</p>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>Los participantes que firmen aparecerán inmediatamente aquí con su lugar y hora.</p>
+                </div>
+              ) : (
+                filteredRegistros.map((item, idx) => {
+                  const nombre = item.nombre || item.nombreCompleto || 'Sin nombre registrado';
+                  const tipoDoc = item.tipoDocumento || 'DNI';
+                  const numDoc = item.numeroDocumento || item.doc || '—';
+                  const rol = item.rol || item.rolActividad || 'Participante';
+                  const lugar = item.lugar || item.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)';
+                  const fecha = item.fecha || item.timestamp || item.fechaValidacionLocal || 'Fecha registrada';
+                  const code = item.code || item.verificationCode || 'CQ-FIRE-VERIFIED';
+                  const aceptoImagen = item.aceptoImagen ? '✓ Autorizado' : '— No seleccionado';
+
+                  return (
+                    <div
+                      key={item.id || idx}
+                      style={{
+                        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        borderRadius: '14px',
+                        padding: '1.25rem',
+                        boxShadow: '0 10px 25px -5px rgba(6, 78, 59, 0.2)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span style={{
+                            background: 'rgba(16, 185, 129, 0.2)',
+                            color: '#34d399',
+                            border: '1px solid rgba(16, 185, 129, 0.4)',
+                            fontSize: '0.65rem',
+                            fontWeight: 900,
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: '4px'
+                          }}>
+                            ✓ EXONERACIÓN FIRMADA Y ACTIVA
+                          </span>
+                          <span style={{ background: 'rgba(249, 115, 22, 0.12)', color: '#fb923c', border: '1px solid rgba(249, 115, 22, 0.3)', fontSize: '0.65rem', fontWeight: 800, padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                            {rol}
+                          </span>
+                        </div>
+                        <span style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#fbbf24', fontWeight: 700 }}>
+                          {code}
                         </span>
                       </div>
-                      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>
-                        <span>🆔 <strong style={{ color: '#e2e8f0' }}>{docText}</strong></span>
-                        <span>🕒 <strong style={{ color: '#cbd5e1' }}>{time}</strong></span>
-                        <span style={{ color: '#fbbf24', fontFamily: 'monospace', fontSize: '0.72rem' }}>{code}</span>
+
+                      <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
+                        {nombre}
+                      </h3>
+
+                      {/* Caja Destacada: Lugar y Fechas */}
+                      <div style={{
+                        background: '#0b1120',
+                        border: '1px solid #334155',
+                        borderRadius: '10px',
+                        padding: '0.75rem 1rem',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '0.5rem',
+                        fontSize: '0.78rem'
+                      }}>
+                        <div>
+                          <span style={{ color: '#94a3b8', fontWeight: 700 }}>🆔 Documento: </span>
+                          <strong style={{ color: '#f8fafc' }}>{tipoDoc}: {numDoc}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: '#94a3b8', fontWeight: 700 }}>🕒 Fecha y Hora: </span>
+                          <strong style={{ color: '#34d399' }}>{fecha}</strong>
+                        </div>
+                        <div style={{ gridColumn: '1 / -1' }}>
+                          <span style={{ color: '#94a3b8', fontWeight: 700 }}>📍 Lugar: </span>
+                          <strong style={{ color: '#fde047' }}>{lugar}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: '#94a3b8', fontWeight: 700 }}>📸 Uso de Imagen: </span>
+                          <span style={{ color: '#cbd5e1' }}>{aceptoImagen}</span>
+                        </div>
                       </div>
                     </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{
-                        background: 'rgba(16, 185, 129, 0.15)',
-                        color: '#34d399',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
+        {/* VISTA 2: PADRÓN OFICIAL LIMA (111 MIEMBROS) */}
+        {activeTab === 'PADRON' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.95)',
+              border: '1px solid #1e293b',
+              borderRadius: '14px',
+              padding: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              position: 'sticky',
+              top: '0.75rem',
+              zIndex: 20,
+              backdropFilter: 'blur(8px)'
+            }}>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={padronSearch}
+                  onChange={(e) => setPadronSearch(e.target.value)}
+                  placeholder="🔍 Buscar en padrón por nombre, equipo o rol..."
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.6rem',
+                    background: '#0b1120',
+                    border: '1px solid #334155',
+                    borderRadius: '10px',
+                    color: '#fff',
+                    fontSize: '0.86rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
+                {[
+                  { id: 'TODOS', label: `Todos (${padronLima111.length})` },
+                  { id: 'Equipo 29', label: 'E29 · Phoenix (16)' },
+                  { id: 'Equipo 30', label: 'E30 · Tinkuy (34)' },
+                  { id: 'Equipo 31', label: 'E31 · Imperio (19)' },
+                  { id: 'Equipo 32', label: 'E32 · C2 Lima (42)' }
+                ].map((t) => {
+                  const active = padronTeamFilter === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setPadronTeamFilter(t.id)}
+                      style={{
+                        background: active ? '#ea580c' : '#1e293b',
+                        color: active ? '#fff' : '#cbd5e1',
+                        border: active ? 'none' : '1px solid #334155',
                         borderRadius: '8px',
                         padding: '0.4rem 0.75rem',
                         fontSize: '0.75rem',
-                        fontWeight: 800,
-                        display: 'inline-flex',
+                        fontWeight: 700,
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Estado:</span>
+                {[
+                  { id: 'TODOS', label: 'Todos' },
+                  { id: 'PENDIENTES', label: '🚨 Solo Pendientes' },
+                  { id: 'FIRMADOS', label: '✓ Acreditados' }
+                ].map((s) => {
+                  const active = padronStatusFilter === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      onClick={() => setPadronStatusFilter(s.id)}
+                      style={{
+                        background: active ? (s.id === 'PENDIENTES' ? '#881337' : s.id === 'FIRMADOS' ? '#064e3b' : '#334155') : '#1e293b',
+                        color: active ? '#fff' : '#94a3b8',
+                        border: active ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #334155',
+                        borderRadius: '6px',
+                        padding: '0.3rem 0.65rem',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              {filteredPadron.map((item) => {
+                if (item.isSigned) {
+                  const sig = item.signature;
+                  const docInfo = sig.tipoDocumento && sig.numeroDocumento
+                    ? `${sig.tipoDocumento}: ${sig.numeroDocumento}`
+                    : (sig.doc || 'Registrado');
+                  const time = sig.fecha || sig.timestamp || 'Fecha verificada';
+                  const lugar = sig.lugar || 'Lima - Casona Blanca (Huachipa)';
+                  const code = sig.code || sig.verificationCode || 'CQ-FIRE-VERIFIED';
+
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        background: 'rgba(15, 23, 42, 0.9)',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        gap: '0.35rem'
-                      }}>
-                        <CheckCircle2 size={15} color="#34d399" /> Listo para Ingreso
-                      </span>
-                    </div>
-                  </div>
-                );
-              } else {
-                // Pendiente de firma
-                const waMessage = encodeURIComponent(
-                  `Hola ${item.nombre}, te escribe el equipo de CREAR PSL Lima. Por favor completa y firma tu exoneración legal obligatoria para la Caminata sobre Fuego en Casona Blanca antes de ingresar aquí: https://cartas.crearpsl.net/contrato_caminata_fuego.html`
-                );
-
-                return (
-                  <div
-                    key={item.id}
-                    style={{
-                      background: 'rgba(15, 23, 42, 0.85)',
-                      border: '1px solid rgba(244, 63, 94, 0.35)',
-                      borderRadius: '12px',
-                      padding: '1rem',
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '0.75rem'
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
-                        <span style={{
-                          background: 'rgba(244, 63, 94, 0.2)',
-                          color: '#fb7185',
-                          border: '1px solid rgba(244, 63, 94, 0.4)',
-                          fontSize: '0.65rem',
-                          fontWeight: 900,
-                          padding: '0.15rem 0.45rem',
-                          borderRadius: '4px'
-                        }}>
-                          🚨 PENDIENTE DE FIRMA
-                        </span>
-                        <span style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                          {item.equipo} · {item.cohorte}
-                        </span>
-                        <span style={{ background: '#1e293b', color: '#94a3b8', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                          {item.rol}
-                        </span>
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                          <span style={{
+                            background: 'rgba(16, 185, 129, 0.2)',
+                            color: '#34d399',
+                            border: '1px solid rgba(16, 185, 129, 0.4)',
+                            fontSize: '0.65rem',
+                            fontWeight: 900,
+                            padding: '0.15rem 0.45rem',
+                            borderRadius: '4px'
+                          }}>
+                            ✓ ACREDITADO / FIRMADO
+                          </span>
+                          <span style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {item.equipo} · {item.cohorte}
+                          </span>
+                          <span style={{ background: 'rgba(249, 115, 22, 0.1)', color: '#fb923c', border: '1px solid rgba(249, 115, 22, 0.25)', fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {sig.rol || item.rol}
+                          </span>
+                        </div>
+                        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>
+                          <span>🆔 <strong style={{ color: '#e2e8f0' }}>{docInfo}</strong></span>
+                          <span>📍 <strong style={{ color: '#fde047' }}>{lugar}</strong></span>
+                          <span>🕒 <strong style={{ color: '#cbd5e1' }}>{time}</strong></span>
+                          <span style={{ color: '#fbbf24', fontFamily: 'monospace', fontSize: '0.72rem' }}>{code}</span>
+                        </div>
                       </div>
-                      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>{item.nombre}</h3>
-                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
-                        {item.detalle || 'Requiere firma digital antes del ingreso a la actividad'}
-                      </p>
-                    </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <a
-                        href={`https://wa.me/?text=${waMessage}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          background: '#16a34a',
-                          color: '#fff',
-                          textDecoration: 'none',
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{
+                          background: 'rgba(16, 185, 129, 0.15)',
+                          color: '#34d399',
+                          border: '1px solid rgba(16, 185, 129, 0.3)',
                           borderRadius: '8px',
-                          padding: '0.5rem 0.85rem',
+                          padding: '0.4rem 0.75rem',
                           fontSize: '0.75rem',
                           fontWeight: 800,
                           display: 'inline-flex',
                           alignItems: 'center',
-                          gap: '0.35rem',
-                          boxShadow: '0 4px 10px rgba(22, 163, 74, 0.25)'
-                        }}
-                      >
-                        <PhoneCall size={14} /> Recordar por WhatsApp
-                      </a>
-                      <button
-                        onClick={() => copyUrl(contractUrl)}
-                        title="Copiar enlace del contrato"
-                        style={{
-                          background: '#1e293b',
-                          color: '#cbd5e1',
-                          border: '1px solid #334155',
-                          borderRadius: '8px',
-                          padding: '0.5rem 0.65rem',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {copiedLink ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
-                      </button>
+                          gap: '0.35rem'
+                        }}>
+                          <CheckCircle2 size={15} color="#34d399" /> Listo para Ingreso
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                );
-              }
-            })
-          )}
-        </div>
+                  );
+                } else {
+                  // Pendiente
+                  const waMessage = encodeURIComponent(
+                    `Hola ${item.nombre}, te escribe el equipo de CREAR PSL Lima. Por favor completa y firma tu exoneración legal obligatoria para la Caminata sobre Fuego en Casona Blanca antes de ingresar aquí: https://cartas.crearpsl.net/contrato_caminata_fuego.html`
+                  );
+
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        background: 'rgba(15, 23, 42, 0.85)',
+                        border: '1px solid rgba(244, 63, 94, 0.35)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                          <span style={{
+                            background: 'rgba(244, 63, 94, 0.2)',
+                            color: '#fb7185',
+                            border: '1px solid rgba(244, 63, 94, 0.4)',
+                            fontSize: '0.65rem',
+                            fontWeight: 900,
+                            padding: '0.15rem 0.45rem',
+                            borderRadius: '4px'
+                          }}>
+                            🚨 PENDIENTE DE FIRMA
+                          </span>
+                          <span style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {item.equipo} · {item.cohorte}
+                          </span>
+                          <span style={{ background: '#1e293b', color: '#94a3b8', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {item.rol}
+                          </span>
+                        </div>
+                        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>{item.nombre}</h3>
+                        <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                          {item.detalle || 'Requiere firma digital antes del ingreso a la actividad'}
+                        </p>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <a
+                          href={`https://wa.me/?text=${waMessage}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            background: '#16a34a',
+                            color: '#fff',
+                            textDecoration: 'none',
+                            borderRadius: '8px',
+                            padding: '0.5rem 0.85rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 800,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            boxShadow: '0 4px 10px rgba(22, 163, 74, 0.25)'
+                          }}
+                        >
+                          <PhoneCall size={14} /> Recordar por WhatsApp
+                        </a>
+                      </div>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Modal QR Code */}
         {qrModalType && (

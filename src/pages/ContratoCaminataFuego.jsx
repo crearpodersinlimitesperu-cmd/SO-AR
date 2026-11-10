@@ -303,17 +303,28 @@ export default function ContratoCaminataFuego() {
     setIsSubmitting(true);
     try {
       const timestamp = new Date().toISOString();
+      const localFecha = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
       const verificationCode = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
       
       const payload = {
         ...formData,
+        nombre: formData.nombreCompleto,
+        nombreCompleto: formData.nombreCompleto,
+        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento}`,
+        rol: formData.rolActividad,
+        lugar: formData.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)',
+        fecha: localFecha,
+        timestamp: localFecha,
+        code: verificationCode,
         verificationCode,
+        sede: 'Lima',
+        source: 'causa-os',
         controlVersion: 'V1.0-2026-FIREWALK-LIMA',
         razonSocial: 'Creación Cuántica E.I.R.L.',
         ruc: '20612592811',
         domicilioFiscal: 'Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú',
         fechaValidacionIso: timestamp,
-        fechaValidacionLocal: new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' }),
+        fechaValidacionLocal: localFecha,
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
         dispositivo: /iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio',
         marcoLegal: 'Ley 27269 (Firmas Digitales), Arts. 141 y 141-A Código Civil, Ley 29733 y D.S. 016-2024-JUS, Arts. 11 y 15 Código Civil',

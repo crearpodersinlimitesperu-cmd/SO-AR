@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitor de Acreditación · Caminata sobre Fuego Lima 2026</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <title>Monitor de Registros y Acreditación · Caminata sobre Fuego Lima 2026</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" href="/logo-crear.png">
   <link rel="icon" type="image/png" href="/logo_crear_oficial.png">
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -57,11 +57,11 @@
 
   <div class="max-w-4xl mx-auto space-y-5">
 
-    <!-- Encabezado Operativo -->
+    <!-- Encabezado Operativo con Logo Oficial CREAR -->
     <header class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-orange-500/30 p-5 sm:p-6 shadow-2xl shadow-orange-950/20">
       <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-600"></div>
       
-            <!-- Branding Oficial CREAR -->
+      <!-- Branding Oficial CREAR -->
       <div class="flex items-center gap-3.5 mb-5 pb-4 border-b border-slate-800/80">
         <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" class="h-10 sm:h-11 w-auto object-contain" onerror="this.src='/logo_crear_oficial.png'">
         <div>
@@ -69,21 +69,22 @@
           <span class="text-[11px] font-bold text-slate-400 block">Sede Lima · Centro de Acreditación y Operaciones</span>
         </div>
       </div>
+
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div class="flex flex-wrap items-center gap-2 mb-2">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-black uppercase tracking-wider bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-sm">
-              🔥 CAUSA OS · LIMA OPERACIONES
+              🔥 LIMA · REGISTRO Y ACREDITACIÓN
             </span>
             <span class="px-2.5 py-1 rounded-md text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> EN VIVO
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SINCRONIZACIÓN EN TIEMPO REAL
             </span>
           </div>
           <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2">
-            Verificación Caminata sobre Fuego
+            Caminata sobre Fuego · Control de Firmas
           </h1>
           <p class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">
-            📍 Casona Blanca (Huachipa) · Control de Aceptación y Firmas Jurídicas
+            📍 Casona Blanca (Calle Las Perdices 1126, Huachipa) · Registro con Fechas, Lugar y Documentos
           </p>
         </div>
 
@@ -100,20 +101,20 @@
 
       <!-- Tarjetas KPI -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-5 border-t border-slate-800">
-        <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60">
-          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Padrón Lima</span>
-          <span class="text-2xl font-black text-white" id="kpiTotal">111</span>
-        </div>
         <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40">
-          <span class="text-[11px] font-bold text-emerald-400 block uppercase tracking-wider">✓ Acreditados</span>
-          <span class="text-2xl font-black text-emerald-300" id="kpiFirmados">0</span>
+          <span class="text-[11px] font-bold text-emerald-400 block uppercase tracking-wider">🔥 Registrados en Vivo</span>
+          <span class="text-2xl font-black text-emerald-300" id="kpiTotalRegistrados">0</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Padrón Oficial MJ</span>
+          <span class="text-2xl font-black text-white" id="kpiTotalPadron">111</span>
         </div>
         <div class="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40">
-          <span class="text-[11px] font-bold text-rose-400 block uppercase tracking-wider">⚠️ Pendientes</span>
-          <span class="text-2xl font-black text-rose-300" id="kpiPendientes">111</span>
+          <span class="text-[11px] font-bold text-rose-400 block uppercase tracking-wider">⚠️ Pendientes Padrón</span>
+          <span class="text-2xl font-black text-rose-300" id="kpiPendientesPadron">111</span>
         </div>
         <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/40">
-          <span class="text-[11px] font-bold text-amber-400 block uppercase tracking-wider">% Cumplimiento</span>
+          <span class="text-[11px] font-bold text-amber-400 block uppercase tracking-wider">% Avance Padrón</span>
           <span class="text-2xl font-black text-amber-300" id="kpiPorcentaje">0%</span>
         </div>
       </div>
@@ -126,66 +127,143 @@
       </div>
     </header>
 
-    <!-- Barra de Filtros y Búsqueda Móvil -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 sticky top-3 z-30 backdrop-blur-md shadow-xl">
-      <!-- Buscador -->
-      <div class="relative">
-        <input 
-          type="text" 
-          id="searchInput" 
-          oninput="handleSearch(event)" 
-          placeholder="🔍 Buscar por nombre, apellido, DNI o rol..." 
-          class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 text-sm font-medium transition shadow-inner"
-        >
-        <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-3 text-slate-400 hover:text-white p-1 text-xs">✕</button>
+    <!-- SELECTOR DE VISTAS PRINCIPALES (PESTAÑAS) -->
+    <div class="flex items-center gap-2 p-1.5 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl">
+      <button 
+        onclick="switchMainTab('REGISTROS')" 
+        id="tabBtnRegistros" 
+        class="flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/20"
+      >
+        <span>🔥</span> Personas Registradas (<span id="tabCountRegistros">0</span>)
+      </button>
+      <button 
+        onclick="switchMainTab('PADRON')" 
+        id="tabBtnPadron" 
+        class="flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 bg-slate-800/80 text-slate-300 hover:text-white"
+      >
+        <span>👥</span> Control Padrón Lima (111)
+      </button>
+    </div>
+
+    <!-- SECCIÓN 1: VISTA DE REGISTROS EN VIVO (CON LUGAR Y FECHAS) -->
+    <div id="viewRegistros" class="space-y-4">
+      <!-- Barra de Filtros y Búsqueda para Registros -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 sticky top-3 z-30 backdrop-blur-md shadow-xl">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="searchRegistrosInput" 
+            oninput="handleSearchRegistros(event)" 
+            placeholder="🔍 Buscar en registros por nombre, DNI, rol o código..." 
+            class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 text-sm font-medium transition shadow-inner"
+          >
+          <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+
+        <!-- Filtros por Rol -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-xs font-bold">
+          <span class="text-slate-400 text-[11px] uppercase tracking-wider mr-1">Rol:</span>
+          <button onclick="filterRegistrosRole('TODOS')" id="btnRegRole-TODOS" class="reg-role-btn px-2.5 py-1 rounded-md bg-orange-600 text-white shadow whitespace-nowrap">
+            Todos
+          </button>
+          <button onclick="filterRegistrosRole('Participante')" id="btnRegRole-Participante" class="reg-role-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 whitespace-nowrap">
+            Participante
+          </button>
+          <button onclick="filterRegistrosRole('Entrenador')" id="btnRegRole-Entrenador" class="reg-role-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 whitespace-nowrap">
+            Entrenador
+          </button>
+          <button onclick="filterRegistrosRole('Oficina')" id="btnRegRole-Oficina" class="reg-role-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 whitespace-nowrap">
+            Oficina
+          </button>
+          <button onclick="filterRegistrosRole('Manager')" id="btnRegRole-Manager" class="reg-role-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 whitespace-nowrap">
+            Manager
+          </button>
+          <button onclick="filterRegistrosRole('Capitán')" id="btnRegRole-Capitán" class="reg-role-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 whitespace-nowrap">
+            Capitán
+          </button>
+          <button onclick="filterRegistrosRole('Aliados')" id="btnRegRole-Aliados" class="reg-role-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 whitespace-nowrap">
+            Aliados
+          </button>
+          <button onclick="filterRegistrosRole('Staff de Caminata')" id="btnRegRole-Staff de Caminata" class="reg-role-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 whitespace-nowrap">
+            Staff Caminata
+          </button>
+          <button onclick="filterRegistrosRole('Staff de Mesa')" id="btnRegRole-Staff de Mesa" class="reg-role-btn px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 whitespace-nowrap">
+            Staff Mesa
+          </button>
+        </div>
       </div>
 
-      <!-- Filtros Rápidos de Equipo -->
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-xs font-bold">
-        <button onclick="filterTeam('TODOS')" id="btnTeam-TODOS" class="team-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white whitespace-nowrap shadow">
-          Todos (111)
-        </button>
-        <button onclick="filterTeam('Equipo 29')" id="btnTeam-Equipo 29" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
-          E29 · Quantum Phoenix (16)
-        </button>
-        <button onclick="filterTeam('Equipo 30')" id="btnTeam-Equipo 30" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
-          E30 · Tinkuy Ruray (34)
-        </button>
-        <button onclick="filterTeam('Equipo 31')" id="btnTeam-Equipo 31" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
-          E31 · Imperio del Éxito (19)
-        </button>
-        <button onclick="filterTeam('Equipo 32')" id="btnTeam-Equipo 32" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
-          E32 · C2 Lima (42)
-        </button>
+      <!-- Conteo de Registros -->
+      <div class="flex items-center justify-between px-2 text-xs text-slate-400 font-semibold">
+        <span id="registrosCounter">Cargando registros...</span>
+        <span class="text-[11px] text-emerald-400 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Conectado a Firestore
+        </span>
       </div>
 
-      <!-- Filtro por Estado -->
-      <div class="flex items-center gap-2 pt-1 border-t border-slate-800/80 text-xs font-bold">
-        <span class="text-slate-400 text-[11px] uppercase tracking-wider mr-1">Estado:</span>
-        <button onclick="filterStatus('TODOS')" id="btnStatus-TODOS" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-700 text-white border border-slate-600">
-          Todos
-        </button>
-        <button onclick="filterStatus('PENDIENTES')" id="btnStatus-PENDIENTES" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-800 text-rose-300 hover:bg-rose-950/40 border border-slate-700">
-          🚨 Solo Pendientes
-        </button>
-        <button onclick="filterStatus('FIRMADOS')" id="btnStatus-FIRMADOS" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-800 text-emerald-300 hover:bg-emerald-950/40 border border-slate-700">
-          ✓ Acreditados
-        </button>
+      <!-- Contenedor de Tarjetas de Registros -->
+      <div id="registrosListContainer" class="space-y-3">
+        <!-- Renderizado por JS -->
       </div>
     </div>
 
-    <!-- Indicador de Resultados -->
-    <div class="flex items-center justify-between px-2 text-xs text-slate-400 font-semibold">
-      <span id="resultsCounter">Mostrando 111 integrantes</span>
-      <span class="text-[11px] text-slate-400">Actualización en vivo vía Firestore</span>
-    </div>
+    <!-- SECCIÓN 2: VISTA DE CONTROL DEL PADRÓN LIMA 111 -->
+    <div id="viewPadron" class="space-y-4 hidden">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 sticky top-3 z-30 backdrop-blur-md shadow-xl">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="searchInputPadron" 
+            oninput="handleSearchPadron(event)" 
+            placeholder="🔍 Buscar en padrón por nombre, equipo o rol..." 
+            class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 text-sm font-medium transition shadow-inner"
+          >
+          <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
 
-    <!-- Lista de Integrantes -->
-    <div id="rosterContainer" class="space-y-3">
-      <!-- Inyectado por JS -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-xs font-bold">
+          <button onclick="filterTeamPadron('TODOS')" id="btnTeam-TODOS" class="team-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white whitespace-nowrap shadow">
+            Todos (111)
+          </button>
+          <button onclick="filterTeamPadron('Equipo 29')" id="btnTeam-Equipo 29" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
+            E29 · Phoenix (16)
+          </button>
+          <button onclick="filterTeamPadron('Equipo 30')" id="btnTeam-Equipo 30" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
+            E30 · Tinkuy (34)
+          </button>
+          <button onclick="filterTeamPadron('Equipo 31')" id="btnTeam-Equipo 31" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
+            E31 · Imperio (19)
+          </button>
+          <button onclick="filterTeamPadron('Equipo 32')" id="btnTeam-Equipo 32" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
+            E32 · C2 Lima (42)
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 pt-1 border-t border-slate-800/80 text-xs font-bold">
+          <span class="text-slate-400 text-[11px] uppercase tracking-wider mr-1">Estado:</span>
+          <button onclick="filterStatusPadron('TODOS')" id="btnStatus-TODOS" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-700 text-white border border-slate-600">
+            Todos
+          </button>
+          <button onclick="filterStatusPadron('PENDIENTES')" id="btnStatus-PENDIENTES" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-800 text-rose-300 hover:bg-rose-950/40 border border-slate-700">
+            🚨 Solo Pendientes
+          </button>
+          <button onclick="filterStatusPadron('FIRMADOS')" id="btnStatus-FIRMADOS" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-800 text-emerald-300 hover:bg-emerald-950/40 border border-slate-700">
+            ✓ Acreditados
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between px-2 text-xs text-slate-400 font-semibold">
+        <span id="padronCounter">Mostrando 111 integrantes</span>
+      </div>
+
+      <div id="padronListContainer" class="space-y-3">
+        <!-- Renderizado por JS -->
+      </div>
     </div>
 
     <!-- Modal QR -->
@@ -194,7 +272,7 @@
         <button onclick="closeQrModalDirect()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold">✕</button>
         
         <h3 id="qrModalTitle" class="text-lg font-black text-white">Escanear para Firmar Contrato</h3>
-        <p id="qrModalSubtitle" class="text-xs text-slate-300">Pide al participante escanear este código con la cámara de su celular para abrir la exoneración oficial.</p>
+        <p id="qrModalSubtitle" class="text-xs text-slate-300">Pide al participante escanear este código con su celular para abrir y firmar su exoneración oficial.</p>
 
         <div class="p-4 bg-white rounded-2xl inline-block shadow-inner mx-auto" id="qrcode"></div>
 
@@ -219,7 +297,7 @@
     // Padrón Oficial 111 Sede Lima
     const OFFICIAL_PADRON = [{"id": 1, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Aldo Leonardo Miranda Huamán", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 2, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Ana Paola Núñez Antezana", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 3, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Angélica Herrera Palomino", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 4, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Cirila Palomino Pariona", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 5, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Daicy López Huamanrayme", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 6, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "David Anthony Celestino", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 7, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Dina Marlene Cornejo Aguirre", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 8, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Godelia Inocenta Colca Julca", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 9, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Jainor Torres Ortiz", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 10, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Janeth Castañeda Tumbalobos", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 11, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Jaqueline Bautista Bolo", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 12, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Jessica Montilla Corrales", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 13, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Jeydy Luz Hancco Mamani", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 14, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Johann Steve Lino Garay", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 15, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Italo Alonso Román Nomura", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 16, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Tania Aurora Sánchez Castro", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 17, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Alexandro Magno Gutiérrez Aguilar", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 18, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Araceli Nahomi Carrasco de la Cruz", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 19, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Bárbara Daniela Rodríguez Bellido", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 20, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Diego Armando Cántaro Herrera", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 21, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Fausto André Chacón Marcilla", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 22, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Hector Luis García Ollarves", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 23, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Iván Crispín Sánchez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 24, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Jean Paul Longa Vélez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 25, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Joel Calderón Mamani", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 26, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Julia Cesárea Romero Alarcón", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 27, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Katty Margarita Espinoza Mendoza", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 28, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Lener Esmelin Rojas Susanibar", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 29, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Martín Armando Temoche Rodríguez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 30, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Milagros Libertad Temoche Rodríguez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 31, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Milene Nicole Díaz Castillo", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 32, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Pierre Valentino Alfaro Peña", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 33, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rey Julián Alfaro Alva", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 34, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rodrigo Fabrizio Dávila Romero", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 35, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rosa Marilú Rodríguez Altamirano", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 36, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rosa Mercedes Peña Julián", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 37, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Roxana Elisabeth Alama Palomino", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 38, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Roy Ernesto Deliot Pareja Madera", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 39, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Scarling Adriana Useche Vivas", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 40, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Silvina Morales Montecinos", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 41, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Yohanny Adriana Dos Santos Martínez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 42, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Ana Luz Enciso Enciso", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 43, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Brigitte Fernanda López López", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 44, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Ruth Yesly Pilco Laura", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 45, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Victoria del Milagro Valdivia Villegas", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 46, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Ariel Enrique Alonso Olarte", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 47, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Karin Portocarrero Perea", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 48, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rhania Shaden Untiveros Requejo", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 49, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Otty Zuley Urteaga Silva", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 50, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Fernando López López", "rol": "Capitán", "estado": "Capitanía Equipo 30", "detalle": "Liderazgo de Cohorte"}, {"id": 51, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Angelo Muñoz", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 52, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Brenda Arana", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 53, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Daniel Espinoza Mendoza", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 54, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Erwin Rosales", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 55, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Fabiola Estacio Pimentel", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 56, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Gerardo Castro", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 57, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Hilary Tarazona Cervantes", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 58, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Jaqueline Caparachin Palpa", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 59, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "José Espinoza", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 60, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Libertad Caballero", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 61, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Lourdes Madera", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 62, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Luz Elizabeth Mamani", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 63, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Naysha Chura", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 64, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Priscila Yopán", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 65, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Rocío Santiago", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 66, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Ruth Rimache", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 67, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Ruth Sandra Quispe Quispe", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 68, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Sally Silva", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 69, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Zorayda Alvarez Neyra", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 70, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Adriana Mard", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 71, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Américo Mendoza", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 72, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Cesia Alondra Torres Tapayuri", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 73, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Charo Aponte", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 74, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Karina Molina Chipana", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 75, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Noelia Apaestegui", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 76, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 07", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Pago Previo / Promesa"}, {"id": 77, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 08", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Pago Previo / Promesa"}, {"id": 78, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 09", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Pago Previo / Promesa"}, {"id": 79, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 10", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Pago Previo / Promesa"}, {"id": 80, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 11", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 81, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 12", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 82, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 13", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 83, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 14", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 84, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 15", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 85, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 16", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 86, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 17", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 87, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 18", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 88, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 19", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 89, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 20", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 90, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 21", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 91, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 22", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 92, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 23", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 93, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 24", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 94, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 01", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 95, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 02", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 96, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 03", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 97, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 04", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 98, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 05", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 99, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 06", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 100, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 07", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 101, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Anita Belén", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Partner Asignado"}, {"id": 102, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Tania", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Partner Asignado"}, {"id": 103, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 03", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 104, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 04", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 105, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 05", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 106, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 06", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 107, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 07", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 108, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Capitana de Cohorte", "rol": "Capitana", "estado": "Capitanía Equipo 32", "detalle": "Liderazgo de Cohorte C2/MJ"}, {"id": 109, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Manager de Soporte 01", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Acompañamiento Transición"}, {"id": 110, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Manager de Soporte 02", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Acompañamiento Transición"}, {"id": 111, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Manager de Soporte 03", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Acompañamiento Transición"}];
 
-    // Firebase Init
+    // Firebase Config
     const firebaseConfig = {
       apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
       authDomain: 'centro-operativo-cpsl.firebaseapp.com',
@@ -230,10 +308,18 @@
     };
 
     let db = null;
-    let signedContracts = [];
-    let currentTeamFilter = 'TODOS';
-    let currentStatusFilter = 'TODOS';
-    let currentSearchTerm = '';
+    let registeredList = [];
+    let activeMainTab = 'REGISTROS'; // 'REGISTROS' | 'PADRON'
+
+    // Filtros de Registros
+    let regSearchTerm = '';
+    let regRoleFilter = 'TODOS';
+
+    // Filtros de Padrón
+    let padronSearchTerm = '';
+    let padronTeamFilter = 'TODOS';
+    let padronStatusFilter = 'TODOS';
+
     let currentQrUrl = 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
 
     function initFirebase() {
@@ -243,7 +329,7 @@
             firebase.initializeApp(firebaseConfig);
           }
           db = firebase.firestore();
-          listenToSignedContracts();
+          listenToFirestoreRegistros();
         }
       } catch(e) {
         console.warn('Firebase error:', e);
@@ -255,44 +341,168 @@
       return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
     }
 
-    function listenToSignedContracts() {
+    // Escucha en tiempo real de la colección contratos_caminata_fuego
+    function listenToFirestoreRegistros() {
       if (!db) return;
       db.collection('contratos_caminata_fuego').onSnapshot(snapshot => {
-        signedContracts = [];
+        const docs = [];
         snapshot.forEach(doc => {
-          signedContracts.push({ id: doc.id, ...doc.data() });
+          docs.push({ id: doc.id, ...doc.data() });
         });
-        renderRoster();
+
+        // Ordenar por fecha más reciente
+        docs.sort((a, b) => {
+          const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+          const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+          return tB - tA;
+        });
+
+        registeredList = docs;
+        document.getElementById('kpiTotalRegistrados').innerText = docs.length;
+        document.getElementById('tabCountRegistros').innerText = docs.length;
+
+        renderRegistros();
+        renderPadron();
       }, err => {
-        console.warn('Error escuchando contratos:', err);
+        console.warn('Error escuchando Firestore:', err);
       });
     }
 
-    // Matching de firma
-    function findSignatureForPerson(person) {
-      if (!signedContracts.length) return null;
-      const normPersonName = normalizeStr(person.nombre);
-      const personTokens = normPersonName.split(/\s+/).filter(t => t.length > 2);
+    // Alternar entre pestañas principales
+    function switchMainTab(tab) {
+      activeMainTab = tab;
+      const btnReg = document.getElementById('tabBtnRegistros');
+      const btnPad = document.getElementById('tabBtnPadron');
+      const viewReg = document.getElementById('viewRegistros');
+      const viewPad = document.getElementById('viewPadron');
 
-      return signedContracts.find(c => {
-        const normSigName = normalizeStr(c.nombre || c.nombreCompleto || '');
-        if (normSigName === normPersonName) return true;
-        // Token match: si al menos 2 tokens clave coinciden (nombre y apellido)
-        const matchTokens = personTokens.filter(t => normSigName.includes(t));
-        return matchTokens.length >= 2;
-      });
+      if (tab === 'REGISTROS') {
+        btnReg.className = 'flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/20';
+        btnPad.className = 'flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 bg-slate-800/80 text-slate-300 hover:text-white';
+        viewReg.classList.remove('hidden');
+        viewPad.classList.add('hidden');
+      } else {
+        btnPad.className = 'flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/20';
+        btnReg.className = 'flex-1 py-3 px-4 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center justify-center gap-2 bg-slate-800/80 text-slate-300 hover:text-white';
+        viewPad.classList.remove('hidden');
+        viewReg.classList.add('hidden');
+      }
     }
 
-    function renderRoster() {
-      const container = document.getElementById('rosterContainer');
-      let totalFirmados = 0;
-      let totalPendientes = 0;
+    // ==========================================
+    // RENDERIZADO DE REGISTROS REALIZADOS (TAB 1)
+    // ==========================================
+    function renderRegistros() {
+      const container = document.getElementById('registrosListContainer');
+      const counterEl = document.getElementById('registrosCounter');
 
-      // Calcular match para cada persona
+      const filtered = registeredList.filter(item => {
+        if (regRoleFilter !== 'TODOS') {
+          const itemRole = item.rol || item.rolActividad || '';
+          if (itemRole !== regRoleFilter) return false;
+        }
+        if (regSearchTerm) {
+          const term = normalizeStr(regSearchTerm);
+          const name = normalizeStr(item.nombre || item.nombreCompleto || '');
+          const doc = normalizeStr(item.numeroDocumento || item.doc || '');
+          const code = normalizeStr(item.code || item.verificationCode || '');
+          const rol = normalizeStr(item.rol || item.rolActividad || '');
+          return name.includes(term) || doc.includes(term) || code.includes(term) || rol.includes(term);
+        }
+        return true;
+      });
+
+      counterEl.innerText = `Mostrando ${filtered.length} de ${registeredList.length} registros confirmados`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+            <div class="text-3xl mb-2">📋</div>
+            <p class="text-white font-bold text-sm">No se encontraron registros con este filtro.</p>
+            <p class="text-xs text-slate-400 mt-1">Los registros que se completen en el formulario aparecerán aquí en vivo.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map((item, idx) => {
+        const nombre = item.nombre || item.nombreCompleto || 'Sin nombre registrado';
+        const tipoDoc = item.tipoDocumento || 'DNI';
+        const numDoc = item.numeroDocumento || item.doc || '—';
+        const docText = `${tipoDoc}: ${numDoc}`;
+        const rol = item.rol || item.rolActividad || 'Participante';
+        const lugar = item.lugar || item.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)';
+        const fecha = item.fecha || item.timestamp || item.fechaValidacionLocal || 'Fecha registrada';
+        const code = item.code || item.verificationCode || 'CQ-FIRE-VERIFIED';
+        const aceptoImagen = item.aceptoImagen ? '✓ Autorizado' : '— No seleccionado';
+
+        return `
+          <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-emerald-500/40 shadow-xl shadow-emerald-950/15 space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
+                  ✓ EXONERACIÓN FIRMADA Y ACTIVA
+                </span>
+                <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-orange-500/10 text-orange-400 border border-orange-500/25">
+                  ${rol}
+                </span>
+                <span class="text-[11px] font-mono text-slate-400">#${registeredList.length - idx}</span>
+              </div>
+              <span class="font-mono text-xs text-amber-400/90 font-bold self-start sm:self-auto">${code}</span>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-black text-white tracking-tight">${nombre}</h3>
+            </div>
+
+            <!-- Datos Específicos: Lugar, Fechas y Documento -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs bg-slate-800/50 p-3 rounded-xl border border-slate-800">
+              <div class="space-y-1">
+                <div><span class="text-slate-400 font-bold">🆔 Documento:</span> <strong class="text-slate-200">${docText}</strong></div>
+                <div><span class="text-slate-400 font-bold">📍 Lugar:</span> <strong class="text-amber-300/90">${lugar}</strong></div>
+              </div>
+              <div class="space-y-1">
+                <div><span class="text-slate-400 font-bold">🕒 Fecha y Hora:</span> <strong class="text-emerald-300 font-medium">${fecha}</strong></div>
+                <div><span class="text-slate-400 font-bold">📸 Uso de Imagen:</span> <span class="text-slate-300 font-medium">${aceptoImagen}</span></div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs pt-1">
+              <span class="text-slate-400 text-[11px]">Sede Oficial: <strong>Lima (Huachipa)</strong></span>
+              <span class="text-emerald-400 font-bold text-[11px] flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Listo para la Caminata
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // RENDERIZADO DEL PADRÓN LIMA 111 (TAB 2)
+    // ==========================================
+    function renderPadron() {
+      const container = document.getElementById('padronListContainer');
+      const counterEl = document.getElementById('padronCounter');
+
+      let firmadosPadronCount = 0;
+      let pendientesPadronCount = 0;
+
       const fullList = OFFICIAL_PADRON.map(person => {
-        const sig = findSignatureForPerson(person);
-        if (sig) totalFirmados++;
-        else totalPendientes++;
+        const normPersonName = normalizeStr(person.nombre);
+        const personTokens = normPersonName.split(/\s+/).filter(t => t.length > 2);
+
+        const sig = registeredList.find(c => {
+          const normSigName = normalizeStr(c.nombre || c.nombreCompleto || '');
+          if (normSigName === normPersonName) return true;
+          const matchTokens = personTokens.filter(t => normSigName.includes(t));
+          return matchTokens.length >= 2;
+        });
+
+        if (sig) firmadosPadronCount++;
+        else pendientesPadronCount++;
+
         return {
           ...person,
           isSigned: !!sig,
@@ -300,52 +510,28 @@
         };
       });
 
-      // Actualizar KPIs
       const total = fullList.length;
-      const pct = total > 0 ? Math.round((totalFirmados / total) * 100) : 0;
-      document.getElementById('kpiTotal').innerText = total;
-      document.getElementById('kpiFirmados').innerText = totalFirmados;
-      document.getElementById('kpiPendientes').innerText = totalPendientes;
+      const pct = total > 0 ? Math.round((firmadosPadronCount / total) * 100) : 0;
+      document.getElementById('kpiTotalPadron').innerText = total;
+      document.getElementById('kpiPendientesPadron').innerText = pendientesPadronCount;
       document.getElementById('kpiPorcentaje').innerText = pct + '%';
       document.getElementById('progressBar').style.width = pct + '%';
 
-      // Filtrar lista
       const filtered = fullList.filter(item => {
-        // Filtro Equipo
-        if (currentTeamFilter !== 'TODOS' && item.equipo !== currentTeamFilter) {
-          return false;
-        }
-        // Filtro Estado
-        if (currentStatusFilter === 'PENDIENTES' && item.isSigned) {
-          return false;
-        }
-        if (currentStatusFilter === 'FIRMADOS' && !item.isSigned) {
-          return false;
-        }
-        // Filtro Búsqueda
-        if (currentSearchTerm) {
-          const term = normalizeStr(currentSearchTerm);
+        if (padronTeamFilter !== 'TODOS' && item.equipo !== padronTeamFilter) return false;
+        if (padronStatusFilter === 'PENDIENTES' && item.isSigned) return false;
+        if (padronStatusFilter === 'FIRMADOS' && !item.isSigned) return false;
+        if (padronSearchTerm) {
+          const term = normalizeStr(padronSearchTerm);
           const nameNorm = normalizeStr(item.nombre);
           const rolNorm = normalizeStr(item.rol);
           const cohorteNorm = normalizeStr(item.cohorte);
-          const docNum = item.signature ? normalizeStr(item.signature.numeroDocumento || item.signature.doc) : '';
-          return nameNorm.includes(term) || rolNorm.includes(term) || cohorteNorm.includes(term) || docNum.includes(term);
+          return nameNorm.includes(term) || rolNorm.includes(term) || cohorteNorm.includes(term);
         }
         return true;
       });
 
-      document.getElementById('resultsCounter').innerText = `Mostrando ${filtered.length} de ${total} integrantes`;
-
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-12 bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
-            <div class="text-3xl mb-2">🔍</div>
-            <p class="text-white font-bold text-sm">No se encontraron personas con este filtro.</p>
-            <p class="text-xs text-slate-400 mt-1">Prueba cambiando los términos de búsqueda o seleccionando otro equipo.</p>
-          </div>
-        `;
-        return;
-      }
+      counterEl.innerText = `Mostrando ${filtered.length} de ${total} integrantes del padrón oficial`;
 
       container.innerHTML = filtered.map(item => {
         if (item.isSigned) {
@@ -353,9 +539,9 @@
           const docInfo = sig.tipoDocumento && sig.numeroDocumento 
             ? `${sig.tipoDocumento}: ${sig.numeroDocumento}` 
             : (sig.doc || 'Registrado');
-          const time = sig.timestamp || 'Fecha verificada';
-          const code = sig.code || 'CQ-FIRE-VERIFIED';
-          const rolFirmado = sig.rol || item.rol;
+          const time = sig.fecha || sig.timestamp || 'Fecha verificada';
+          const lugar = sig.lugar || 'Lima - Casona Blanca (Huachipa)';
+          const code = sig.code || sig.verificationCode || 'CQ-FIRE-VERIFIED';
 
           return `
             <div class="p-4 rounded-xl bg-slate-900/90 border border-emerald-500/40 shadow-lg shadow-emerald-950/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -368,12 +554,13 @@
                     ${item.equipo} · ${item.cohorte}
                   </span>
                   <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                    ${rolFirmado}
+                    ${sig.rol || item.rol}
                   </span>
                 </div>
                 <h4 class="text-base font-black text-white tracking-tight">${item.nombre}</h4>
                 <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-0.5">
                   <span>🆔 <strong class="text-slate-200">${docInfo}</strong></span>
+                  <span>📍 <strong class="text-amber-300/90">${lugar}</strong></span>
                   <span>🕒 <strong class="text-slate-300">${time}</strong></span>
                   <span class="font-mono text-[11px] text-amber-400/90">${code}</span>
                 </div>
@@ -420,13 +607,6 @@
                   <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
                   Recordar por WhatsApp
                 </a>
-                <button 
-                  onclick="copyInviteLink('${item.nombre}')" 
-                  class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition active:scale-95"
-                  title="Copiar enlace oficial"
-                >
-                  📋
-                </button>
               </div>
             </div>
           `;
@@ -434,9 +614,33 @@
       }).join('');
     }
 
-    // Filtros
-    function filterTeam(team) {
-      currentTeamFilter = team;
+    // Controladores de Búsqueda y Filtros
+    function handleSearchRegistros(e) {
+      regSearchTerm = e.target.value;
+      renderRegistros();
+    }
+
+    function filterRegistrosRole(role) {
+      regRoleFilter = role;
+      document.querySelectorAll('.reg-role-btn').forEach(btn => {
+        btn.classList.remove('bg-orange-600', 'text-white', 'shadow');
+        btn.classList.add('bg-slate-800', 'text-slate-300', 'border', 'border-slate-700');
+      });
+      const activeBtn = document.getElementById('btnRegRole-' + role);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-300', 'border', 'border-slate-700');
+        activeBtn.classList.add('bg-orange-600', 'text-white', 'shadow');
+      }
+      renderRegistros();
+    }
+
+    function handleSearchPadron(e) {
+      padronSearchTerm = e.target.value;
+      renderPadron();
+    }
+
+    function filterTeamPadron(team) {
+      padronTeamFilter = team;
       document.querySelectorAll('.team-filter-btn').forEach(btn => {
         btn.classList.remove('bg-orange-600', 'text-white', 'shadow');
         btn.classList.add('bg-slate-800', 'text-slate-300', 'border', 'border-slate-700');
@@ -446,11 +650,11 @@
         activeBtn.classList.remove('bg-slate-800', 'text-slate-300', 'border', 'border-slate-700');
         activeBtn.classList.add('bg-orange-600', 'text-white', 'shadow');
       }
-      renderRoster();
+      renderPadron();
     }
 
-    function filterStatus(status) {
-      currentStatusFilter = status;
+    function filterStatusPadron(status) {
+      padronStatusFilter = status;
       document.querySelectorAll('.status-filter-btn').forEach(btn => {
         btn.classList.remove('bg-slate-700', 'text-white', 'border-slate-600');
         btn.classList.add('bg-slate-800', 'border-slate-700');
@@ -460,34 +664,7 @@
         activeBtn.classList.remove('bg-slate-800', 'border-slate-700');
         activeBtn.classList.add('bg-slate-700', 'text-white', 'border-slate-600');
       }
-      renderRoster();
-    }
-
-    function handleSearch(e) {
-      currentSearchTerm = e.target.value;
-      const clearBtn = document.getElementById('clearSearchBtn');
-      if (currentSearchTerm) {
-        clearBtn.classList.remove('hidden');
-      } else {
-        clearBtn.classList.add('hidden');
-      }
-      renderRoster();
-    }
-
-    function clearSearch() {
-      document.getElementById('searchInput').value = '';
-      currentSearchTerm = '';
-      document.getElementById('clearSearchBtn').classList.add('hidden');
-      renderRoster();
-    }
-
-    function copyInviteLink(nombre) {
-      const url = 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
-      navigator.clipboard.writeText(url).then(() => {
-        alert('Enlace copiado al portapapeles para ' + nombre);
-      }).catch(() => {
-        prompt('Copia este enlace para enviarlo:', url);
-      });
+      renderPadron();
     }
 
     // Modal QR
@@ -542,7 +719,8 @@
 
     // Inicializar
     window.addEventListener('DOMContentLoaded', () => {
-      renderRoster();
+      renderRegistros();
+      renderPadron();
       initFirebase();
     });
   </script>
