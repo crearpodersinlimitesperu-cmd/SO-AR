@@ -61024,8 +61024,21 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
             <input type="text" id="nombreCompleto" required placeholder="Ej. Carlos Mendoza Ríos" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1.5">Tipo y Número de Documento (DNI / CE / Pasaporte) *</label>
-            <input type="text" id="numeroDocumento" required placeholder="Ej. DNI 45892147 o Pasaporte 1092837" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+            <div class="grid grid-cols-3 gap-2">
+              <div class="col-span-1">
+                <label for="tipoDocumento" class="block text-xs font-bold text-slate-300 mb-1.5">Tipo Doc. *</label>
+                <select id="tipoDocumento" name="tipoDocumento" required class="w-full px-2.5 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white font-semibold focus:outline-none focus:border-orange-500 text-sm cursor-pointer">
+                  <option value="DNI" selected>DNI</option>
+                  <option value="CE">CE</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Cédula">Cédula</option>
+                </select>
+              </div>
+              <div class="col-span-2">
+                <label for="numeroDocumento" class="block text-xs font-bold text-slate-300 mb-1.5">N° Documento *</label>
+                <input type="text" id="numeroDocumento" name="numeroDocumento" required placeholder="Ej. 45892147" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+              </div>
+            </div>
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-1.5">Correo Electrónico (Para envío de constancia) *</label>
@@ -61172,7 +61185,9 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
       e.preventDefault();
       
       const nombre = document.getElementById('nombreCompleto').value.trim();
-      const doc = document.getElementById('numeroDocumento').value.trim();
+      const tipoDoc = document.getElementById('tipoDocumento').value;
+      const numeroDoc = document.getElementById('numeroDocumento').value.trim();
+      const doc = `${tipoDoc}: ${numeroDoc}`;
       const email = document.getElementById('email').value.trim();
       const tel = document.getElementById('telefono').value.trim();
       const firma = document.getElementById('firmaTexto').value.trim();
@@ -61185,6 +61200,8 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
       // Guardar localmente
       const signatureData = {
         nombre,
+        tipoDocumento: tipoDoc,
+        numeroDocumento: numeroDoc,
         doc,
         email,
         tel,
