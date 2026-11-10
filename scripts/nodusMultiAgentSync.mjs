@@ -445,44 +445,132 @@ class NodusExtractorAgent {
         });
 
         // Extracción robusta de Capítulo 2 (Tab 2) si el equipo cuenta con cohorte C2 en Nodus
-        const c2Info = await this.page.evaluate(() => {
-          const tableC2 = document.querySelector('#tblReporteC2');
-          let c2Asistieron = 0;
-          let c2Confirmados = 0;
-          let c2Desertores = 0;
-          let c2Total = 0;
-
-          if (tableC2 && window.jQuery?.fn?.dataTable?.isDataTable(tableC2)) {
-            const dt = window.jQuery(tableC2).DataTable();
-            const rows = dt.rows().nodes().toArray();
-            c2Total = rows.length;
-            const headers = Array.from(tableC2.querySelectorAll('thead th')).map(h => (h.textContent || '').trim().toUpperCase());
-            const colAsist = headers.indexOf('ASISTENCIA');
-            const colDes = headers.indexOf('DESERTOR');
-            for (const r of rows) {
-              if (colAsist >= 0 && r.cells[colAsist]) {
-                const chk = r.cells[colAsist].querySelector('input[type="checkbox"]');
-                if (chk?.checked || (r.cells[colAsist].textContent || '').toUpperCase().includes('ASISTI')) c2Asistieron++;
-              }
-              if (colDes >= 0 && r.cells[colDes]) {
-                const chk = r.cells[colDes].querySelector('input[type="checkbox"]');
-                if (chk?.checked || (r.cells[colDes].textContent || '').toUpperCase().includes('SI')) c2Desertores++;
-              }
+        let c2Info = null;
+        try {
+          // Activar tab de Capítulo 2 si existe en la interfaz
+          const hasC2Tab = await this.page.evaluate(() => {
+            const tabs = Array.from(document.querySelectorAll('button, a, [role="tab"], .nav-link'));
+            const c2Tab = tabs.find(t => /Cap[ií]tulo\s*2/i.test(t.textContent));
+            if (c2Tab) {
+              c2Tab.click();
+              return true;
             }
-          }
+            return false;
+          });
 
-          // Fallback a tarjetas superiores visibles si el DataTable estuviese virtualizado
-          const cardNodes = Array.from(document.querySelectorAll('.card, .info-box, [class*="kpi"]'));
-          for (const card of cardNodes) {
-            const text = (card.innerText || '').toUpperCase();
-            if (text.includes('ASISTIERON') && text.includes('CAPÍTULO 2')) {
-              const m = text.match(/(\d+)\s*ASISTIERON/);
-              if (m) c2Asistieron = parseInt(m[1], 10);
-            }
-          }
+          if (hasC2Tab) {
+            // Breve espera para render reactivo del DOM / DataTables / badges
+            await new Promise(r => setTimeout(r, 1200));
 
-          return { c2Total, c2Asistieron, c2Confirmados, c2Desertores };
-        });
+            c2Info = await this.page.evaluate(() => {
+              let c2Total = 0;
+              let c2Asistieron = 0;
+              let c2Confirmados = 0;
+              let c2Desertores = 0;
+              const coordinadoresMap = {};
+
+              // 1. Lectura directa de badges/pills de resumen del tab (e.g. "32 Asistieron", "31 Confirmado", "1 Desertores")
+              const badgeNodes = Array.from(document.querySelectorAll('.badge, .btn, span, div, strong, .card, [class*="badge"]'));
+              for (const b of badgeNodes) {
+                const txt = (b.innerText || '').trim().toUpperCase();
+                const mAsist = txt.match(/^(\d+)\s+ASISTIERON$/);
+                if (mAsist) c2Asistieron = parseInt(mAsist[1], 10);
+                const mConf = txt.match(/^(\d+)\s+CONFIRMADO[S]?$/);
+                if (mConf) c2Confirmados = parseInt(mConf[1], 10);
+                const mDes = txt.match(/^(\d+)\s+DESERTORES?$/);
+                if (mDes) c2Desertores = parseInt(mDes[1], 10);
+              }
+
+              // 2. Total de registros desde el texto del tab ("Capítulo 2 (41)")
+              const tabs = Array.from(document.querySelectorAll('button, a, [role="tab"], .nav-link'));
+              const c2Tab = tabs.find(t => /Cap[ií]tulo\s*2/i.test(t.textContent));
+              if (c2Tab) {
+                const m = c2Tab.textContent.match(/Cap[ií]tulo\s*2\s*\(?(\d+)\)?/i);
+                if (m) c2Total = parseInt(m[1], 10);
+              }
+
+              // 3. Inspección detallada de filas en #tblReporteC2
+              const tableC2 = document.querySelector('#tblReporteC2');
+              if (tableC2) {
+                let rows = [];
+                if (window.jQuery?.fn?.dataTable?.isDataTable(tableC2)) {
+                  try {
+                    rows = window.jQuery(tableC2).DataTable().rows().nodes().toArray();
+                  } catch (e) {
+                    rows = Array.from(tableC2.querySelectorAll('tbody tr'));
+                  }
+                } else {
+                  rows = Array.from(tableC2.querySelectorAll('tbody tr'));
+                }
+
+                if (rows.length > 0) {
+                  if (c2Total === 0) c2Total = rows.length;
+                  const headers = Array.from(tableC2.querySelectorAll('thead th')).map(h => (h.textContent || '').trim().toUpperCase());
+                  const colAsist = headers.findIndex(h => h.includes('ASISTENCIA'));
+                  const colDes = headers.findIndex(h => h.includes('DESERTOR'));
+                  const colCoord = headers.findIndex(h => h.includes('COORDINADOR'));
+                  const colLlam1 = headers.findIndex(h => h.includes('1RA') || h.includes('PRIMERA'));
+                  const colLlam2 = headers.findIndex(h => h.includes('2DA') || h.includes('SEGUNDA'));
+
+                  let rowAsist = 0;
+                  let rowConf = 0;
+                  let rowDes = 0;
+
+                  for (const r of rows) {
+                    if (!r.cells || r.cells.length === 0) continue;
+                    let asist = false;
+                    if (colAsist >= 0 && r.cells[colAsist]) {
+                      const chk = r.cells[colAsist].querySelector('input[type="checkbox"]');
+                      asist = chk ? chk.checked : (r.cells[colAsist].textContent || '').toUpperCase().includes('ASISTI');
+                    }
+                    if (asist) rowAsist++;
+
+                    let des = false;
+                    if (colDes >= 0 && r.cells[colDes]) {
+                      const chk = r.cells[colDes].querySelector('input[type="checkbox"]');
+                      des = chk ? chk.checked : (r.cells[colDes].textContent || '').toUpperCase().includes('SI');
+                    }
+                    if (des) rowDes++;
+
+                    let conf = false;
+                    const l1 = colLlam1 >= 0 && r.cells[colLlam1] ? (r.cells[colLlam1].textContent || '').toUpperCase() : '';
+                    const l2 = colLlam2 >= 0 && r.cells[colLlam2] ? (r.cells[colLlam2].textContent || '').toUpperCase() : '';
+                    if (l1.includes('CONFIRMADO') || l2.includes('CONFIRMADO')) conf = true;
+                    if (conf) rowConf++;
+
+                    const coordRaw = colCoord >= 0 && r.cells[colCoord] ? (r.cells[colCoord].textContent || '').trim().toUpperCase() : '';
+                    if (coordRaw) {
+                      if (!coordinadoresMap[coordRaw]) {
+                        coordinadoresMap[coordRaw] = { asistieron: 0, confirmados: 0, total: 0 };
+                      }
+                      coordinadoresMap[coordRaw].total++;
+                      if (asist) coordinadoresMap[coordRaw].asistieron++;
+                      if (conf) coordinadoresMap[coordRaw].confirmados++;
+                    }
+                  }
+
+                  if (rowAsist > 0 && c2Asistieron === 0) c2Asistieron = rowAsist;
+                  if (rowConf > 0 && c2Confirmados === 0) c2Confirmados = rowConf;
+                  if (rowDes > 0 && c2Desertores === 0) c2Desertores = rowDes;
+                }
+              }
+
+              // Fallback a tarjetas superiores visibles si el DataTable estuviese virtualizado
+              const cardNodes = Array.from(document.querySelectorAll('.card, .info-box, [class*="kpi"]'));
+              for (const card of cardNodes) {
+                const text = (card.innerText || '').toUpperCase();
+                if (text.includes('ASISTIERON') && text.includes('CAPÍTULO 2')) {
+                  const m = text.match(/(\d+)\s*ASISTIERON/);
+                  if (m && c2Asistieron === 0) c2Asistieron = parseInt(m[1], 10);
+                }
+              }
+
+              return { c2Total, c2Asistieron, c2Confirmados, c2Desertores, coordinadoresMap };
+            });
+          }
+        } catch (c2Err) {
+          console.warn(`⚠️ [Agente 1 - Extractor] Aviso C2 para equipo ${eq.id}: ${c2Err.message}`);
+        }
 
         if (c2Info && (c2Info.c2Total > 0 || c2Info.c2Asistieron > 0)) {
           const baseName = (eq.nombre || '').replace(/CICLO 1.*/i, '').replace(/✓/g, '').trim();
@@ -497,7 +585,8 @@ class NodusExtractorAgent {
             confirmadosLlamada: c2Info.c2Confirmados || c2Info.c2Asistieron,
             fase: 'C2',
             capitulo: 'C2',
-            ciclo: 'Ciclo 2'
+            ciclo: 'Ciclo 2',
+            coordinadoresMap: c2Info.coordinadoresMap || {}
           });
         }
       } catch (err) {
@@ -956,6 +1045,58 @@ class NodusNormalizerAgent {
       const gestionesC1 = c1Value ?? ((hasC2 && !hasC1) ? 0 : (gestionesValue ?? 0));
       const gestionesC2 = c2Value ?? ((hasC1 && !hasC2) ? 0 : (gestionesValue ?? 0));
 
+      // Detección e integración matemática de cohorte C2 real si el equipo asignado cuenta con cohorte C2 en Nodus
+      let c2CohortAsist = 0;
+      let c2CohortConf = 0;
+      const c2CohortEntries = [];
+
+      (item.equipos || []).forEach(eq => {
+        const teamNum = (eq.equipo || '').replace(/[^0-9]/g, '');
+        if (!teamNum) return;
+        const c2Match = (rawEquiposReporte || []).find(r => r.fase === 'C2' && (r.equipoNombre || '').replace(/[^0-9]/g, '') === teamNum);
+        if (c2Match) {
+          const upperCoord = nombre.toUpperCase();
+          const matchFromMap = c2Match.coordinadoresMap && Object.entries(c2Match.coordinadoresMap).find(([k]) => k.includes(upperCoord) || upperCoord.includes(k));
+          let coordAsistInC2 = 0;
+          let coordConfInC2 = 0;
+
+          if (matchFromMap && matchFromMap[1].asistieron > 0) {
+            coordAsistInC2 = matchFromMap[1].asistieron;
+            coordConfInC2 = matchFromMap[1].confirmados || 0;
+          } else {
+            // Asignación proporcional rigurosa entre coordinadores asignados al mismo equipo
+            const allC1CoordsForTeam = rawCoordinadores.filter(rc => (rc.equipos || []).some(re => (re.equipo || '').replace(/[^0-9]/g, '') === teamNum));
+            const totalC1AsistTeam = allC1CoordsForTeam.reduce((sum, rc) => {
+              const eqFound = (rc.equipos || []).find(re => (re.equipo || '').replace(/[^0-9]/g, '') === teamNum);
+              return sum + (eqFound?.asistieron || 0);
+            }, 0);
+            const ratio = totalC1AsistTeam > 0 ? ((eq.asistieron || 0) / totalC1AsistTeam) : (1 / Math.max(1, allC1CoordsForTeam.length));
+            coordAsistInC2 = Math.round((c2Match.asistieron || 0) * ratio);
+            coordConfInC2 = Math.round((c2Match.confirmadosLlamada || 0) * ratio);
+          }
+
+          c2CohortAsist += coordAsistInC2;
+          c2CohortConf += coordConfInC2;
+
+          c2CohortEntries.push({
+            equipo: c2Match.equipoNombre,
+            asistieron: coordAsistInC2,
+            confirmado: coordConfInC2,
+            llamadas: 0,
+            fase: 'C2',
+            capitulo: 'C2',
+            ciclo: 'Ciclo 2',
+            sedeInferida: sede,
+            incoherenciaSedes: false
+          });
+        }
+      });
+
+      if (c2CohortAsist > 0 && sentadosC2 === 0) {
+        sentadosC2 = c2CohortAsist;
+        if (c2CohortConf > 0 && confirmadosC2 === 0) confirmadosC2 = c2CohortConf;
+      }
+
       const enrichedEquipos = (item.equipos || []).map(eq => {
         const eqKey = (eq.equipo || '').trim().toLowerCase();
         const sedeInferida = equipoSedeMap[eqKey];
@@ -987,6 +1128,14 @@ class NodusNormalizerAgent {
         };
       });
 
+      // Incorporar las cohortes C2 enriquecidas al desglose de equipos
+      c2CohortEntries.forEach(c2Entry => {
+        const exists = enrichedEquipos.some(e => e.fase === 'C2' && (e.equipo || '').replace(/[^0-9]/g, '') === (c2Entry.equipo || '').replace(/[^0-9]/g, ''));
+        if (!exists) enrichedEquipos.push(c2Entry);
+      });
+
+      const finalTotalAsistieron = (sentadosC1 || 0) + (sentadosC2 || 0);
+
       return {
         id: `coord_${nombre.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${sede.toLowerCase()}`,
         nombre,
@@ -1004,10 +1153,10 @@ class NodusNormalizerAgent {
         coberturaDetalle,
         productividadPct,
         productividadDetalle,
-        asistieron: totalAsistieron,
+        asistieron: finalTotalAsistieron,
         sentadosC1,
         sentadosC2,
-        sentadosTotal: totalAsistieron,
+        sentadosTotal: finalTotalAsistieron,
         gestionesC1,
         gestionesC2,
         gestionesTotal: gestiones,

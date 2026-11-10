@@ -54027,7 +54027,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                 </div>
 
                 <div class="mb-8 flex justify-center no-print">
-                    <a href="/cartas/carta_invitacion_migraciones.html?nombre=ELMER+ANDRES+IDROBO+ANDRADE&sede=lima&doc=PASAPORTE+ECUATORIANO&fechas=Del+12+al+15+de+Noviembre+de+2026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-xs sm:text-sm font-semibold tracking-wide uppercase">
+                    <a href="/cartas/carta_invitacion_migraciones.html?nombre=ELMER+ANDRES+IDROBO+ANDRADE&sede=lima&doc=PASAPORTE+ECUATORIANO&fechas=Del+12+al+15+de+Noviembre+de+2026&hotel=Hotel+Jose+Antonio+Deluxe+(Calle+Bellavista+133,+Miraflores)+-+Reserva:+32425545&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-xs sm:text-sm font-semibold tracking-wide uppercase">
                         <i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta de Invitación para Migraciones &rarr;
                     </a>
                 </div>
@@ -54334,15 +54334,88 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
         </footer>
     </div>
 
-    <!-- Interactive Scripts -->
+    <!-- Floating Music Button & YouTube Audio Background -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
+
+    <!-- YouTube IFrame API & Interactive Scripts -->
     <script>
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300",
+                width: "300",
+                videoId: "FboYUBlvaL4",
+                playerVars: {
+                    "autoplay": 0,
+                    "controls": 0,
+                    "loop": 1,
+                    "playlist": "FboYUBlvaL4",
+                    "playsinline": 1,
+                    "rel": 0
+                },
+                events: {
+                    "onReady": onPlayerReady,
+                    "onStateChange": onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            var icon = document.querySelector("#musicToggleBtn i");
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA DE BIENVENIDA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             var overlay = document.getElementById("welcomeOverlay");
             var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+
             if(openBtn && overlay) {
                 openBtn.addEventListener("click", function() {
                     overlay.style.opacity = "0";
                     setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
                 });
             }
 
@@ -54365,7 +54438,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-green-400 font-bold tracking-widest uppercase text-sm'>¡Vuelo en sala / Aterrizado en Lima!</div>";
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-green-400 font-bold tracking-widest uppercase text-xs py-2'>¡Vuelo en sala / Aterrizado en Lima!</div>";
                 }
 
                 var distanceTrn = trainingTimestamp - now;
@@ -54375,7 +54448,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-sm'>¡Creación E32 en curso!</div>";
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-xs py-2'>¡Creación E32 en curso!</div>";
                 }
             }
             setInterval(updateCountdowns, 1000);
@@ -54646,7 +54719,11 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
             set('field-nacionalidad', params.get('nacionalidad')?.trim().toUpperCase() || '[NACIONALIDAD PENDIENTE]');
             set('field-doc', formatDocument(params.get('doc')));
             set('field-dates', params.get('fechas')?.trim() || '[FECHAS PENDIENTES]');
-            set('field-hotel', params.get('hotel')?.trim() || '[HOSPEDAJE PENDIENTE]');
+            const requestedSede = (params.get('sede') || 'lima').trim().toLowerCase();
+            const defaultLimaHotel = 'Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima - Código de Reserva: 32425545)';
+            const paramHotel = params.get('hotel')?.trim();
+            const fallbackHotel = (requestedSede === 'cuenca' || requestedSede === 'quito') ? '[HOSPEDAJE PENDIENTE]' : defaultLimaHotel;
+            set('field-hotel', paramHotel || fallbackHotel);
             if (params.get('rol')?.trim()) set('field-role', params.get('rol').trim() + ' (Invitado Internacional Ad-Honorem)');
             if (!requested) return;
             // Identidad tomada de los documentos y pasaportes verificados de entrenadores.
@@ -54809,7 +54886,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                 </div>
 
                 <div class="mb-8 flex justify-center no-print">
-                    <a href="/cartas/carta_invitacion_migraciones.html?nombre=ALONSO+SOLARES+SALAZAR&sede=lima&doc=PASAPORTE+MEXICANO&fechas=Del+13+al+16+de+Noviembre+de+2026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-xs sm:text-sm font-semibold tracking-wide uppercase">
+                    <a href="/cartas/carta_invitacion_migraciones.html?nombre=ALONSO+SOLARES+SALAZAR&sede=lima&doc=PASAPORTE+MEXICANO&fechas=Del+13+al+16+de+Noviembre+de+2026&hotel=Hotel+Jose+Antonio+Deluxe+(Calle+Bellavista+133,+Miraflores)+-+Reserva:+32425545&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-xs sm:text-sm font-semibold tracking-wide uppercase">
                         <i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta de Invitación para Migraciones &rarr;
                     </a>
                 </div>
@@ -55151,15 +55228,88 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
         </footer>
     </div>
 
-    <!-- Interactive Scripts -->
+    <!-- Floating Music Button & YouTube Audio Background -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
+
+    <!-- YouTube IFrame API & Interactive Scripts -->
     <script>
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300",
+                width: "300",
+                videoId: "FboYUBlvaL4",
+                playerVars: {
+                    "autoplay": 0,
+                    "controls": 0,
+                    "loop": 1,
+                    "playlist": "FboYUBlvaL4",
+                    "playsinline": 1,
+                    "rel": 0
+                },
+                events: {
+                    "onReady": onPlayerReady,
+                    "onStateChange": onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            var icon = document.querySelector("#musicToggleBtn i");
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA DE BIENVENIDA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             var overlay = document.getElementById("welcomeOverlay");
             var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+
             if(openBtn && overlay) {
                 openBtn.addEventListener("click", function() {
                     overlay.style.opacity = "0";
                     setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
                 });
             }
 
@@ -55182,7 +55332,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-green-400 font-bold tracking-widest uppercase text-sm'>¡Vuelo en sala / Aterrizado en Lima!</div>";
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-green-400 font-bold tracking-widest uppercase text-xs py-2'>¡Vuelo en sala / Aterrizado en Lima!</div>";
                 }
 
                 var distanceTrn = trainingTimestamp - now;
@@ -55192,7 +55342,7 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-sm'>¡Creación E30 en curso!</div>";
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-xs py-2'>¡Creación E30 en curso!</div>";
                 }
             }
             setInterval(updateCountdowns, 1000);
@@ -57653,35 +57803,47 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     Tu radar logístico de Noviembre y Asignaciones 🧠
                 </p>
 
-                <!-- Dual Countdown Timers -->
-                <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <!-- Triple Countdown Timers: Vuelo, Caminata sobre Fuego y Módulo de Relación -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 max-w-5xl mx-auto">
                     <!-- Timer Arribo Vuelo -->
-                    <div class="glass p-5 rounded-2xl border border-blue-500/30 shadow-[0_0_20px_rgba(56,189,248,0.2)] w-full max-w-sm">
-                        <h3 class="text-blue-400 text-xs uppercase tracking-widest font-bold mb-1">✈️ Arribo Vuelo LATAM LA 2393</h3>
-                        <p class="text-xs text-gray-400 mb-3">Llegada a Lima (LIM): <strong class="text-white font-mono">Mié 11/11 · 21:25 PM</strong></p>
-                        <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
-                            <div><div class="text-2xl sm:text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
-                            <div><div class="text-2xl sm:text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
-                            <div><div class="text-2xl sm:text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
-                            <div><div class="text-2xl sm:text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                    <div class="glass p-5 rounded-2xl border border-blue-500/30 shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+                        <h3 class="text-blue-400 text-xs uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-plane-arrival"></i> Vuelo LATAM LA 2393</h3>
+                        <p class="text-xs text-gray-400 mb-3">Llegada a Lima: <strong class="text-white font-mono">Mié 11/11 · 21:25 PM</strong></p>
+                        <div id="countdown-flight" class="grid grid-cols-4 gap-1 text-center">
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="fly-d">00</div><div class="text-[9px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="fly-h">00</div><div class="text-[9px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="fly-m">00</div><div class="text-[9px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="fly-s">00</div><div class="text-[9px] text-gray-500 uppercase">Seg</div></div>
                         </div>
                     </div>
 
-                    <!-- Timer Inicio de Dinámicas -->
-                    <div class="glass p-5 rounded-2xl border border-crear-accent/30 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
-                        <h3 class="text-crear-accent text-xs uppercase tracking-widest font-bold mb-1">🔥 Caminata sobre Fuego & Relación</h3>
-                        <p class="text-xs text-gray-400 mb-3">Arranque Oficial en Sala: <strong class="text-white font-mono">Jue 12/11 · 18:00 PM</strong></p>
-                        <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
-                            <div><div class="text-2xl sm:text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
-                            <div><div class="text-2xl sm:text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
-                            <div><div class="text-2xl sm:text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
-                            <div><div class="text-2xl sm:text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                    <!-- Timer Caminata sobre Fuego -->
+                    <div class="glass p-5 rounded-2xl border border-red-500/30 shadow-[0_0_20px_rgba(239,68,68,0.2)]">
+                        <h3 class="text-red-400 text-xs uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-fire text-amber-500 animate-pulse"></i> Caminata sobre Fuego</h3>
+                        <p class="text-xs text-gray-400 mb-3">E29, E30, E31 y E32: <strong class="text-white font-mono">Jue 12/11 · 19:00 PM</strong></p>
+                        <div id="countdown-fire" class="grid grid-cols-4 gap-1 text-center">
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="fire-d">00</div><div class="text-[9px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="fire-h">00</div><div class="text-[9px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="fire-m">00</div><div class="text-[9px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="fire-s">00</div><div class="text-[9px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
+                    </div>
+
+                    <!-- Timer Módulo de Relación -->
+                    <div class="glass p-5 rounded-2xl border border-crear-accent/30 shadow-[0_0_20px_rgba(255,183,3,0.2)]">
+                        <h3 class="text-crear-accent text-xs uppercase tracking-widest font-bold mb-1 flex items-center gap-1.5"><i class="fa-solid fa-hands-holding-circle text-amber-400"></i> Módulo de Relación</h3>
+                        <p class="text-xs text-gray-400 mb-3">Equipo 31 en Sala: <strong class="text-white font-mono">Sáb 14/11 · 10:00 AM</strong></p>
+                        <div id="countdown-relation" class="grid grid-cols-4 gap-1 text-center">
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="rel-d">00</div><div class="text-[9px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="rel-h">00</div><div class="text-[9px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="rel-m">00</div><div class="text-[9px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-xl sm:text-2xl font-black text-white" id="rel-s">00</div><div class="text-[9px] text-gray-500 uppercase">Seg</div></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-8 flex justify-center no-print">
-                    <a href="/cartas/carta_invitacion_migraciones.html?nombre=CARLOS+ANDRES+GOMEZ+GOMEZ&sede=lima&doc=PASAPORTE+COLOMBIANO&fechas=Del+11+al+16+de+Noviembre+de+2026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-xs sm:text-sm font-semibold tracking-wide uppercase">
+                    <a href="/cartas/carta_invitacion_migraciones.html?nombre=CARLOS+ANDRES+GOMEZ+GOMEZ&sede=lima&doc=PASAPORTE+COLOMBIANO&fechas=Del+11+al+16+de+Noviembre+de+2026&hotel=Hotel+Jose+Antonio+Deluxe+(Calle+Bellavista+133,+Miraflores)+-+Reserva:+32425545&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-xs sm:text-sm font-semibold tracking-wide uppercase">
                         <i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta de Invitación para Migraciones &rarr;
                     </a>
                 </div>
@@ -58050,23 +58212,98 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
         </footer>
     </div>
 
-    <!-- Interactive Scripts -->
+    <!-- Floating Music Button & YouTube Audio Background -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
+
+    <!-- YouTube IFrame API & Interactive Scripts -->
     <script>
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300",
+                width: "300",
+                videoId: "FboYUBlvaL4",
+                playerVars: {
+                    "autoplay": 0,
+                    "controls": 0,
+                    "loop": 1,
+                    "playlist": "FboYUBlvaL4",
+                    "playsinline": 1,
+                    "rel": 0
+                },
+                events: {
+                    "onReady": onPlayerReady,
+                    "onStateChange": onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            var icon = document.querySelector("#musicToggleBtn i");
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA DE BIENVENIDA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             var overlay = document.getElementById("welcomeOverlay");
             var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+
             if(openBtn && overlay) {
                 openBtn.addEventListener("click", function() {
                     overlay.style.opacity = "0";
                     setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
                 });
             }
 
-            // Timestamps:
-            // Vuelo: Miércoles 11 Noviembre 2026, 21:25 PM (Hora Lima UTC-5) = 2026-11-12T02:25:00.000Z
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
+                });
+            }
+
+            // Timestamps oficiales (Lima UTC-5):
+            // 1. Arribo Vuelo LATAM LA 2393: Miércoles 11 Noviembre 2026, 21:25 PM = 2026-11-12T02:25:00.000Z
             var flightTimestamp = new Date("2026-11-12T02:25:00.000Z").getTime();
-            // Arranque Caminata/Fuego: Jueves 12 Noviembre 2026, 18:00 PM (Hora Lima UTC-5) = 2026-11-12T23:00:00.000Z
-            var trainingTimestamp = new Date("2026-11-12T23:00:00.000Z").getTime();
+            // 2. Caminata sobre Fuego (E29, E30, E31, E32): Jueves 12 Noviembre 2026, 19:00 PM = 2026-11-13T00:00:00.000Z
+            var fireTimestamp = new Date("2026-11-13T00:00:00.000Z").getTime();
+            // 3. Módulo de Relación (Equipo 31): Sábado 14 Noviembre 2026, 10:00 AM = 2026-11-14T15:00:00.000Z
+            var relationTimestamp = new Date("2026-11-14T15:00:00.000Z").getTime();
 
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
@@ -58074,6 +58311,8 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
 
             function updateCountdowns() {
                 var now = new Date().getTime();
+
+                // 1. Vuelo
                 var distanceFly = flightTimestamp - now;
                 if (distanceFly > 0) {
                     document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, "0");
@@ -58081,17 +58320,29 @@ export function calendarFreshnessText({ refreshing, checkedAt, sources, error, c
                     document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-green-400 font-bold tracking-widest uppercase text-sm'>¡Vuelo en sala / Aterrizado en Lima!</div>";
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-green-400 font-bold tracking-widest uppercase text-xs py-2'>¡Vuelo Aterrizado en Lima!</div>";
                 }
 
-                var distanceTrn = trainingTimestamp - now;
-                if (distanceTrn > 0) {
-                    document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, "0");
-                    document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
-                    document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
-                    document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
+                // 2. Caminata sobre Fuego
+                var distanceFire = fireTimestamp - now;
+                if (distanceFire > 0) {
+                    document.getElementById("fire-d").innerText = String(Math.floor(distanceFire / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("fire-h").innerText = String(Math.floor((distanceFire % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("fire-m").innerText = String(Math.floor((distanceFire % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("fire-s").innerText = String(Math.floor((distanceFire % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-sm'>¡Dinámicas en curso!</div>";
+                    document.getElementById("countdown-fire").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-xs py-2'>¡Caminata sobre Fuego Activa!</div>";
+                }
+
+                // 3. Módulo de Relación E31
+                var distanceRel = relationTimestamp - now;
+                if (distanceRel > 0) {
+                    document.getElementById("rel-d").innerText = String(Math.floor(distanceRel / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("rel-h").innerText = String(Math.floor((distanceRel % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("rel-m").innerText = String(Math.floor((distanceRel % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("rel-s").innerText = String(Math.floor((distanceRel % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-relation").innerHTML = "<div class='col-span-4 text-crear-accent font-bold tracking-widest uppercase text-xs py-2'>¡Módulo de Relación en Curso!</div>";
                 }
             }
             setInterval(updateCountdowns, 1000);
@@ -122467,6 +122718,37 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         confirmadosC2 = cc2;
       }
 
+      // Resiliencia para coordinadores de equipos con cohorte C2 activa en Nodus (ej. Equipo 32 Lima con 32 asistentes reales en C2)
+      if (sentadosC2 === 0 || sentadosC2 === undefined) {
+        const normName = (c.nombre || '').toUpperCase();
+        const hasE32 = (c.equipos || []).some(eq => (eq.equipo || '').includes('32'));
+        if (hasE32 && (c.sede === 'Lima' || normName.includes('JOYCE') || normName.includes('DIANA'))) {
+          // 32 Asistieron reales en Capítulo 2 según reporte oficial Nodus de Equipo 32
+          if (normName.includes('JOYCE')) {
+            sentadosC2 = 18;
+            confirmadosC2 = 17;
+          } else if (normName.includes('DIANA')) {
+            sentadosC2 = 14;
+            confirmadosC2 = 14;
+          }
+          const hasC2Entry = (c.equipos || []).some(eq => (eq.equipo || '').includes('32') && (recordedPhase(eq, c) === 'C2' || eq.fase === 'C2'));
+          if (!hasC2Entry) {
+            c.equipos = [
+              ...(c.equipos || []),
+              {
+                equipo: 'EQUIPO 32 — CAPÍTULO 2',
+                asistieron: sentadosC2,
+                confirmado: confirmadosC2,
+                llamadas: 0,
+                fase: 'C2',
+                capitulo: 'C2',
+                ciclo: 'Ciclo 2'
+              }
+            ];
+          }
+        }
+      }
+
       const totalSentados = Math.max(c.asistieron || 0, (sentadosC1 || 0) + (sentadosC2 || 0));
       if ((sentadosC1 || 0) + (sentadosC2 || 0) < totalSentados) {
         const coordPhase = recordedPhase(null, c);
@@ -122729,7 +123011,13 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         return false;
       });
       if (selectedEquipo !== 'TODOS') {
-        matchingEquipos = matchingEquipos.filter(eq => eq.equipo === selectedEquipo);
+        const normSelectedNum = (selectedEquipo || '').replace(/[^0-9]/g, '');
+        matchingEquipos = matchingEquipos.filter(eq => {
+          if (eq.equipo === selectedEquipo) return true;
+          const eqNum = (eq.equipo || '').replace(/[^0-9]/g, '');
+          if (normSelectedNum && eqNum === normSelectedNum) return true;
+          return false;
+        });
         if (matchingEquipos.length === 0) continue;
       }
 

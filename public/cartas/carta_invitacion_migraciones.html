@@ -114,7 +114,11 @@
             set('field-nacionalidad', params.get('nacionalidad')?.trim().toUpperCase() || '[NACIONALIDAD PENDIENTE]');
             set('field-doc', formatDocument(params.get('doc')));
             set('field-dates', params.get('fechas')?.trim() || '[FECHAS PENDIENTES]');
-            set('field-hotel', params.get('hotel')?.trim() || '[HOSPEDAJE PENDIENTE]');
+            const requestedSede = (params.get('sede') || 'lima').trim().toLowerCase();
+            const defaultLimaHotel = 'Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima - Código de Reserva: 32425545)';
+            const paramHotel = params.get('hotel')?.trim();
+            const fallbackHotel = (requestedSede === 'cuenca' || requestedSede === 'quito') ? '[HOSPEDAJE PENDIENTE]' : defaultLimaHotel;
+            set('field-hotel', paramHotel || fallbackHotel);
             if (params.get('rol')?.trim()) set('field-role', params.get('rol').trim() + ' (Invitado Internacional Ad-Honorem)');
             if (!requested) return;
             // Identidad tomada de los documentos y pasaportes verificados de entrenadores.

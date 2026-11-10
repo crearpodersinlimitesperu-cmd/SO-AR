@@ -135,7 +135,7 @@
                 </div>
 
                 <div class="mb-8 flex justify-center no-print">
-                    <a href="/cartas/carta_invitacion_migraciones.html?nombre=ALONSO+SOLARES+SALAZAR&sede=lima&doc=PASAPORTE+MEXICANO&fechas=Del+13+al+16+de+Noviembre+de+2026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-xs sm:text-sm font-semibold tracking-wide uppercase">
+                    <a href="/cartas/carta_invitacion_migraciones.html?nombre=ALONSO+SOLARES+SALAZAR&sede=lima&doc=PASAPORTE+MEXICANO&fechas=Del+13+al+16+de+Noviembre+de+2026&hotel=Hotel+Jose+Antonio+Deluxe+(Calle+Bellavista+133,+Miraflores)+-+Reserva:+32425545&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-xs sm:text-sm font-semibold tracking-wide uppercase">
                         <i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta de Invitación para Migraciones &rarr;
                     </a>
                 </div>
@@ -477,15 +477,88 @@
         </footer>
     </div>
 
-    <!-- Interactive Scripts -->
+    <!-- Floating Music Button & YouTube Audio Background -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
+
+    <!-- YouTube IFrame API & Interactive Scripts -->
     <script>
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300",
+                width: "300",
+                videoId: "FboYUBlvaL4",
+                playerVars: {
+                    "autoplay": 0,
+                    "controls": 0,
+                    "loop": 1,
+                    "playlist": "FboYUBlvaL4",
+                    "playsinline": 1,
+                    "rel": 0
+                },
+                events: {
+                    "onReady": onPlayerReady,
+                    "onStateChange": onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            var icon = document.querySelector("#musicToggleBtn i");
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA DE BIENVENIDA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             var overlay = document.getElementById("welcomeOverlay");
             var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+
             if(openBtn && overlay) {
                 openBtn.addEventListener("click", function() {
                     overlay.style.opacity = "0";
                     setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
                 });
             }
 
@@ -508,7 +581,7 @@
                     document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-green-400 font-bold tracking-widest uppercase text-sm'>¡Vuelo en sala / Aterrizado en Lima!</div>";
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-green-400 font-bold tracking-widest uppercase text-xs py-2'>¡Vuelo en sala / Aterrizado en Lima!</div>";
                 }
 
                 var distanceTrn = trainingTimestamp - now;
@@ -518,7 +591,7 @@
                     document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-sm'>¡Creación E30 en curso!</div>";
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-amber-400 font-bold tracking-widest uppercase text-xs py-2'>¡Creación E30 en curso!</div>";
                 }
             }
             setInterval(updateCountdowns, 1000);
