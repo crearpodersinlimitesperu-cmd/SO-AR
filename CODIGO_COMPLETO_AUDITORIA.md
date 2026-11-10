@@ -61134,6 +61134,34 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
         <p class="text-xs text-emerald-400 font-semibold">
           ¡Tu habilitación de sala está completada! Presenta este código en la mesa de acreditación de Casona Blanca.
         </p>
+
+        <!-- Pase Oficial Descargable: SÍ VOY A CAMINAR SOBRE FUEGO -->
+        <div class="mt-6 p-4 sm:p-6 rounded-2xl bg-gradient-to-b from-slate-900 via-orange-950/30 to-black border-2 border-orange-500/60 shadow-2xl shadow-orange-600/20 space-y-4 text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs font-black uppercase tracking-wider">
+            <span>🔥</span> Pase Oficial de Acreditación Celular <span>🔥</span>
+          </div>
+
+          <h4 class="text-xl sm:text-2xl font-black text-white">Tu Pase Oficial para Celular</h4>
+          <p class="text-xs text-slate-300 max-w-sm mx-auto">
+            Descarga esta imagen en la galería de tu celular o compártela en tus historias. Demuestra que tu registro está validado para la Caminata sobre Fuego.
+          </p>
+
+          <!-- Previsualización de la Imagen -->
+          <div class="relative mx-auto max-w-xs sm:max-w-sm rounded-xl overflow-hidden border-2 border-orange-500/60 shadow-2xl shadow-orange-500/30 bg-black">
+            <canvas id="firewalkPassCanvas" width="1080" height="1440" style="display:none;"></canvas>
+            <img id="firewalkPassImg" src="" alt="Pase Caminata sobre Fuego" class="w-full h-auto rounded-xl block">
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-sm mx-auto pt-2">
+            <a id="btnDownloadPass" download="Pase_Caminata_Sobre_Fuego.png" href="#" class="flex-1 py-3.5 px-4 rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-orange-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>📥</span> Descargar Imagen para Celular
+            </a>
+            <button id="btnSharePass" type="button" onclick="sharePass()" class="py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+              <span>📲</span> Guardar / Compartir
+            </button>
+          </div>
+        </div>
       </div>
 
     </section>
@@ -61226,9 +61254,294 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
       document.getElementById('certTimestamp').innerText = timestamp;
       document.getElementById('successSummary').innerHTML = '<strong>' + nombre + '</strong> (' + rol + '), tu instrumento ha sido validado jurídicamente para la Caminata sobre Fuego en Casona Blanca.';
       
+      // Generar Imagen Descargable para Celular: "SÍ VOY A CAMINAR SOBRE FUEGO"
+      generateFirewalkPass(signatureData);
+
       document.getElementById('firewalkForm').style.display = 'none';
       document.getElementById('successCard').style.display = 'block';
       document.getElementById('successCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, r);
+        return;
+      }
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      let curY = y;
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        if (metrics.width > maxWidth && n > 0) {
+          ctx.fillText(line.trim(), x, curY);
+          line = words[n] + ' ';
+          curY += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line.trim(), x, curY);
+    }
+
+    function generateFirewalkPass(data) {
+      const canvas = document.getElementById('firewalkPassCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = 1080;
+      const H = 1440;
+
+      // 1. Fondo base degradado oscuro con destellos de fuego
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#050914');
+      bgGrad.addColorStop(0.3, '#120702');
+      bgGrad.addColorStop(0.65, '#220b02');
+      bgGrad.addColorStop(1, '#050201');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Resplandor radial de brasas en la parte inferior
+      const fireGlow = ctx.createRadialGradient(W / 2, H - 160, 40, W / 2, H - 220, 680);
+      fireGlow.addColorStop(0, 'rgba(255, 115, 0, 0.45)');
+      fireGlow.addColorStop(0.3, 'rgba(234, 88, 12, 0.28)');
+      fireGlow.addColorStop(0.6, 'rgba(185, 28, 28, 0.14)');
+      fireGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = fireGlow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Resplandor superior sutil dorado
+      const topGlow = ctx.createRadialGradient(W / 2, 70, 20, W / 2, 70, 420);
+      topGlow.addColorStop(0, 'rgba(245, 158, 11, 0.22)');
+      topGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = topGlow;
+      ctx.fillRect(0, 0, W, H);
+
+      // 3. Chispas y partículas de brasas
+      const sparks = [
+        {x: 180, y: 1200, r: 4, a: 0.8}, {x: 240, y: 1050, r: 6, a: 0.9}, {x: 320, y: 1280, r: 3, a: 0.7},
+        {x: 450, y: 1150, r: 5, a: 0.85}, {x: 620, y: 1100, r: 6, a: 0.9}, {x: 750, y: 1240, r: 4, a: 0.75},
+        {x: 880, y: 1120, r: 5, a: 0.8}, {x: 920, y: 1290, r: 3, a: 0.6}, {x: 140, y: 880, r: 3, a: 0.5},
+        {x: 290, y: 780, r: 4, a: 0.6}, {x: 820, y: 820, r: 4, a: 0.55}, {x: 940, y: 920, r: 3, a: 0.5},
+        {x: 520, y: 980, r: 7, a: 0.95}, {x: 580, y: 1220, r: 5, a: 0.85}, {x: 410, y: 1330, r: 4, a: 0.7}
+      ];
+      sparks.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 183, 3, ${s.a})`;
+        ctx.shadowColor = '#ea580c';
+        ctx.shadowBlur = 15;
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+
+      // 4. Marco dorado y neón exterior
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(40, 40, W - 80, H - 80);
+
+      ctx.strokeStyle = 'rgba(234, 88, 12, 0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(52, 52, W - 104, H - 104);
+
+      // Esquinas ornamentales
+      const cornerSize = 40;
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(40, 40 + cornerSize); ctx.lineTo(40, 40); ctx.lineTo(40 + cornerSize, 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, 40); ctx.lineTo(W - 40, 40); ctx.lineTo(W - 40, 40 + cornerSize); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(40, H - 40 - cornerSize); ctx.lineTo(40, H - 40); ctx.lineTo(40 + cornerSize, H - 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, H - 40); ctx.lineTo(W - 40, H - 40); ctx.lineTo(W - 40, H - 40 - cornerSize); ctx.stroke();
+
+      // 5. Header / Marca
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '700 24px Montserrat, system-ui, sans-serif';
+      ctx.fillText('CREACIÓN CUÁNTICA • MAESTRÍA DEL JUEGO', W / 2, 105);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SEDE LIMA · HUACHIPA · NOVIEMBRE 2026', W / 2, 136);
+
+      // Línea divisoria decorativa
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(180, 158); ctx.lineTo(W - 180, 158); ctx.stroke();
+
+      // 6. EFIGIE CENTRAL: "SÍ VOY A CAMINAR SOBRE FUEGO"
+      ctx.font = '85px Arial, sans-serif';
+      ctx.fillText('🔥', W / 2, 260);
+
+      // Texto: "SÍ VOY A CAMINAR"
+      const textGrad = ctx.createLinearGradient(150, 0, W - 150, 0);
+      textGrad.addColorStop(0, '#fef08a');
+      textGrad.addColorStop(0.3, '#f59e0b');
+      textGrad.addColorStop(0.7, '#ea580c');
+      textGrad.addColorStop(1, '#dc2626');
+
+      ctx.shadowColor = 'rgba(234, 88, 12, 0.85)';
+      ctx.shadowBlur = 25;
+      ctx.fillStyle = textGrad;
+      ctx.font = '900 62px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SÍ VOY A CAMINAR', W / 2, 345);
+
+      // Texto: "SOBRE FUEGO"
+      ctx.font = '900 76px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SOBRE FUEGO', W / 2, 430);
+      ctx.shadowBlur = 0;
+
+      // Subtítulo de honor
+      ctx.fillStyle = '#fdba74';
+      ctx.font = '700 19px Montserrat, system-ui, sans-serif';
+      ctx.fillText('HABILITACIÓN Y REGISTRO OFICIAL DE FUEGO', W / 2, 480);
+
+      // 7. TARJETA CONTENEDORA DEL TITULAR (Glass Card)
+      const boxX = 80;
+      const boxY = 520;
+      const boxW = W - 160;
+      const boxH = 610;
+
+      ctx.fillStyle = 'rgba(10, 16, 30, 0.88)';
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.55)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, boxX, boxY, boxW, boxH, 24);
+      ctx.fill();
+      ctx.stroke();
+
+      // Etiqueta Superior de la Tarjeta
+      ctx.fillStyle = 'rgba(234, 88, 12, 0.25)';
+      roundRect(ctx, boxX + 30, boxY + 25, 290, 42, 10);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(234, 88, 12, 0.6)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffedd5';
+      ctx.font = '800 16px Montserrat, system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('⚡ ACREDITADO EN SALA', boxX + 48, boxY + 52);
+
+      // Badge de Rol
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fb923c';
+      ctx.font = '900 22px Montserrat, system-ui, sans-serif';
+      ctx.fillText((data.rol || 'PARTICIPANTE').toUpperCase(), boxX + boxW - 35, boxY + 53);
+
+      // Separador interior
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.beginPath(); ctx.moveTo(boxX + 30, boxY + 85); ctx.lineTo(boxX + boxW - 30, boxY + 85); ctx.stroke();
+
+      // NOMBRE DEL TITULAR
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('TITULAR DECLARANTE:', boxX + 35, boxY + 125);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 42px Montserrat, system-ui, sans-serif';
+      const cleanNombre = (data.nombre || 'PARTICIPANTE').toUpperCase();
+      wrapText(ctx, cleanNombre, boxX + 35, boxY + 175, boxW - 70, 50);
+
+      // DOCUMENTO DE IDENTIDAD
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('DOCUMENTO DE IDENTIFICACIÓN:', boxX + 35, boxY + 295);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '900 36px Montserrat, system-ui, sans-serif';
+      const docText = `${(data.tipoDocumento || 'DNI').toUpperCase()}: ${(data.numeroDocumento || '').toUpperCase()}`;
+      ctx.fillText(docText, boxX + 35, boxY + 342);
+
+      // SEDE Y LOCACIÓN
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('LOCACIÓN CONFIRMADA:', boxX + 35, boxY + 415);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 24px Montserrat, system-ui, sans-serif';
+      ctx.fillText('Casona Blanca · Calle Las Perdices 1126, Huachipa (Lima)', boxX + 35, boxY + 452);
+
+      // ESTADO Y JURAMENTO
+      ctx.fillStyle = '#10b981';
+      ctx.font = '800 20px Montserrat, system-ui, sans-serif';
+      ctx.fillText('✓ Instrumento Legal Firmado · Responsabilidad y Salud Aceptadas', boxX + 35, boxY + 530);
+
+      // 8. FRANJA INFERIOR DE SEGURIDAD Y VALIDACIÓN CRIPTOGRÁFICA
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      roundRect(ctx, 80, 1160, W - 160, 150, 16);
+      ctx.fill();
+
+      ctx.fillStyle = '#fdba74';
+      ctx.font = '800 22px "Courier New", monospace';
+      ctx.fillText(`CÓDIGO DIGITAL: ${data.code}`, W / 2, 1205);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
+      ctx.fillText(`Firma Registrada el: ${data.timestamp} (Lima)`, W / 2, 1242);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 14px Montserrat, system-ui, sans-serif';
+      ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1275);
+
+      // 9. Extraer URL de la imagen y fijar en <img> y botón de descarga
+      const dataUrl = canvas.toDataURL('image/png');
+      const imgEl = document.getElementById('firewalkPassImg');
+      if (imgEl) imgEl.src = dataUrl;
+
+      const btnDl = document.getElementById('btnDownloadPass');
+      if (btnDl) {
+        btnDl.href = dataUrl;
+        const safeName = (data.nombre || 'Participante').replace(/[^a-zA-Z0-9]/g, '_');
+        btnDl.download = `Pase_Fuego_${safeName}.png`;
+      }
+    }
+
+    async function sharePass() {
+      const canvas = document.getElementById('firewalkPassCanvas');
+      if (!canvas) return;
+
+      if (navigator.share && canvas.toBlob) {
+        try {
+          canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'Pase_Caminata_Sobre_Fuego.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                title: 'Mi Pase Oficial: Sí voy a caminar sobre fuego',
+                text: 'He firmado y validado mi registro oficial para la Caminata sobre Fuego en Lima.',
+                files: [file]
+              });
+              return;
+            }
+            // Fallback
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/png');
+            a.download = 'Pase_Caminata_Sobre_Fuego.png';
+            a.click();
+          });
+          return;
+        } catch(e) {
+          console.warn('Share fallido, descargando...', e);
+        }
+      }
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'Pase_Caminata_Sobre_Fuego.png';
+      a.click();
     }
   </script>
 </body>
@@ -152651,6 +152964,7 @@ export default function ContratoCaminataFuego() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signedSuccess, setSignedSuccess] = useState(null);
+  const [passDataUrl, setPassDataUrl] = useState(null);
   const [showQrModal, setShowQrModal] = useState(false);
 
   // Formulario de Firma Digital
@@ -152677,6 +152991,198 @@ export default function ContratoCaminataFuego() {
   useEffect(() => {
     document.title = 'Instrumento Integrado Caminata sobre Fuego · Creación Cuántica E.I.R.L.';
   }, []);
+
+  // Generador de Imagen Oficial: "SÍ VOY A CAMINAR SOBRE FUEGO"
+  useEffect(() => {
+    if (!signedSuccess) {
+      setPassDataUrl(null);
+      return;
+    }
+
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1440;
+      const ctx = canvas.getContext('2d');
+      const W = 1080;
+      const H = 1440;
+
+      // 1. Fondo degradado noche & fuego
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#050914');
+      bgGrad.addColorStop(0.3, '#120702');
+      bgGrad.addColorStop(0.65, '#220b02');
+      bgGrad.addColorStop(1, '#050201');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Resplandor radial de brasas
+      const fireGlow = ctx.createRadialGradient(W / 2, H - 160, 40, W / 2, H - 220, 680);
+      fireGlow.addColorStop(0, 'rgba(255, 115, 0, 0.45)');
+      fireGlow.addColorStop(0.3, 'rgba(234, 88, 12, 0.28)');
+      fireGlow.addColorStop(0.6, 'rgba(185, 28, 28, 0.14)');
+      fireGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = fireGlow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Chispas fijas
+      const sparks = [
+        {x: 180, y: 1200, r: 4, a: 0.8}, {x: 240, y: 1050, r: 6, a: 0.9}, {x: 320, y: 1280, r: 3, a: 0.7},
+        {x: 450, y: 1150, r: 5, a: 0.85}, {x: 620, y: 1100, r: 6, a: 0.9}, {x: 750, y: 1240, r: 4, a: 0.75},
+        {x: 880, y: 1120, r: 5, a: 0.8}, {x: 920, y: 1290, r: 3, a: 0.6}, {x: 140, y: 880, r: 3, a: 0.5},
+        {x: 290, y: 780, r: 4, a: 0.6}, {x: 820, y: 820, r: 4, a: 0.55}, {x: 940, y: 920, r: 3, a: 0.5},
+        {x: 520, y: 980, r: 7, a: 0.95}, {x: 580, y: 1220, r: 5, a: 0.85}, {x: 410, y: 1330, r: 4, a: 0.7}
+      ];
+      sparks.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 183, 3, ${s.a})`;
+        ctx.shadowColor = '#ea580c';
+        ctx.shadowBlur = 15;
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+
+      // 3. Marcos
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(40, 40, W - 80, H - 80);
+
+      ctx.strokeStyle = 'rgba(234, 88, 12, 0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(52, 52, W - 104, H - 104);
+
+      // Esquinas
+      const cornerSize = 40;
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(40, 40 + cornerSize); ctx.lineTo(40, 40); ctx.lineTo(40 + cornerSize, 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, 40); ctx.lineTo(W - 40, 40); ctx.lineTo(W - 40, 40 + cornerSize); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(40, H - 40 - cornerSize); ctx.lineTo(40, H - 40); ctx.lineTo(40 + cornerSize, H - 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, H - 40); ctx.lineTo(W - 40, H - 40); ctx.lineTo(W - 40, H - 40 - cornerSize); ctx.stroke();
+
+      // 4. Header
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '700 24px Montserrat, system-ui, sans-serif';
+      ctx.fillText('CREACIÓN CUÁNTICA • MAESTRÍA DEL JUEGO', W / 2, 105);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SEDE LIMA · HUACHIPA · NOVIEMBRE 2026', W / 2, 136);
+
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(180, 158); ctx.lineTo(W - 180, 158); ctx.stroke();
+
+      // 5. TÍTULO PRINCIPAL
+      ctx.font = '85px Arial, sans-serif';
+      ctx.fillText('🔥', W / 2, 260);
+
+      const textGrad = ctx.createLinearGradient(150, 0, W - 150, 0);
+      textGrad.addColorStop(0, '#fef08a');
+      textGrad.addColorStop(0.3, '#f59e0b');
+      textGrad.addColorStop(0.7, '#ea580c');
+      textGrad.addColorStop(1, '#dc2626');
+
+      ctx.shadowColor = 'rgba(234, 88, 12, 0.85)';
+      ctx.shadowBlur = 25;
+      ctx.fillStyle = textGrad;
+      ctx.font = '900 62px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SÍ VOY A CAMINAR', W / 2, 345);
+
+      ctx.font = '900 76px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SOBRE FUEGO', W / 2, 430);
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#fdba74';
+      ctx.font = '700 19px Montserrat, system-ui, sans-serif';
+      ctx.fillText('HABILITACIÓN Y REGISTRO OFICIAL DE FUEGO', W / 2, 480);
+
+      // 6. Tarjeta Titular
+      const boxX = 80;
+      const boxY = 520;
+      const boxW = W - 160;
+      const boxH = 610;
+
+      ctx.fillStyle = 'rgba(10, 16, 30, 0.88)';
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.55)';
+      ctx.lineWidth = 2;
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, boxW, boxH, 24);
+        ctx.fill();
+        ctx.stroke();
+      } else {
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+        ctx.strokeRect(boxX, boxY, boxW, boxH);
+      }
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#ffedd5';
+      ctx.font = '800 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('⚡ ACREDITADO EN SALA', boxX + 40, boxY + 50);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fb923c';
+      ctx.font = '900 22px Montserrat, system-ui, sans-serif';
+      ctx.fillText((signedSuccess.rolActividad || 'PARTICIPANTE').toUpperCase(), boxX + boxW - 40, boxY + 50);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.beginPath(); ctx.moveTo(boxX + 30, boxY + 80); ctx.lineTo(boxX + boxW - 30, boxY + 80); ctx.stroke();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('TITULAR DECLARANTE:', boxX + 40, boxY + 125);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 40px Montserrat, system-ui, sans-serif';
+      const cleanNombre = (signedSuccess.nombre || 'PARTICIPANTE').toUpperCase();
+      ctx.fillText(cleanNombre.slice(0, 32), boxX + 40, boxY + 180);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('DOCUMENTO DE IDENTIFICACIÓN:', boxX + 40, boxY + 290);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '900 36px Montserrat, system-ui, sans-serif';
+      ctx.fillText((signedSuccess.documento || '').toUpperCase(), boxX + 40, boxY + 340);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('LOCACIÓN CONFIRMADA:', boxX + 40, boxY + 415);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 23px Montserrat, system-ui, sans-serif';
+      ctx.fillText('Casona Blanca · Calle Las Perdices 1126, Huachipa (Lima)', boxX + 40, boxY + 452);
+
+      ctx.fillStyle = '#10b981';
+      ctx.font = '800 20px Montserrat, system-ui, sans-serif';
+      ctx.fillText('✓ Instrumento Legal Firmado · Responsabilidad y Salud Aceptadas', boxX + 40, boxY + 530);
+
+      // 7. Footer Criptográfico
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillRect(80, 1160, W - 160, 150);
+
+      ctx.fillStyle = '#fdba74';
+      ctx.font = '800 22px "Courier New", monospace';
+      ctx.fillText(`CÓDIGO DIGITAL: ${signedSuccess.codigo}`, W / 2, 1205);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
+      ctx.fillText(`Firma Registrada el: ${signedSuccess.fecha} (Lima)`, W / 2, 1242);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 14px Montserrat, system-ui, sans-serif';
+      ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1275);
+
+      setPassDataUrl(canvas.toDataURL('image/png'));
+    } catch(err) {
+      console.warn('Error al generar pase de fuego:', err);
+    }
+  }, [signedSuccess]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -153508,6 +154014,55 @@ export default function ContratoCaminataFuego() {
                 <span style={{ color: '#10b981', fontWeight: 700 }}>{signedSuccess.fecha}</span>
               </div>
             </div>
+
+            {/* Pase Oficial para Celular: SÍ VOY A CAMINAR SOBRE FUEGO */}
+            {passDataUrl && (
+              <div style={{
+                margin: '1.5rem 0',
+                padding: '1.2rem',
+                background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(36, 11, 2, 0.4) 100%)',
+                border: '2px solid rgba(249, 115, 22, 0.6)',
+                borderRadius: '16px',
+                textAlign: 'center',
+                boxShadow: '0 10px 30px rgba(234, 88, 12, 0.2)'
+              }}>
+                <div style={{ display: 'inline-block', padding: '0.25rem 0.75rem', background: 'rgba(249, 115, 22, 0.2)', border: '1px solid rgba(249, 115, 22, 0.5)', borderRadius: '20px', color: '#fb923c', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', marginBottom: '0.8rem' }}>
+                  🔥 Pase Oficial de Acreditación Móvil 🔥
+                </div>
+                <h4 style={{ color: '#fff', fontSize: '1.15rem', fontWeight: 900, margin: '0 0 0.4rem 0' }}>
+                  Tu Pase Oficial para Celular
+                </h4>
+                <p style={{ color: '#94a3b8', fontSize: '0.8rem', maxWidth: '400px', margin: '0 auto 1rem auto' }}>
+                  Guarda esta imagen en la galería de tu celular o compártela. Acredita que tu registro está validado para la Caminata sobre Fuego.
+                </p>
+
+                <div style={{ maxWidth: '320px', margin: '0 auto', borderRadius: '12px', overflow: 'hidden', border: '2px solid rgba(249, 115, 22, 0.7)', boxShadow: '0 12px 30px rgba(0,0,0,0.6)' }}>
+                  <img src={passDataUrl} alt="Pase Caminata sobre Fuego" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                </div>
+
+                <div style={{ marginTop: '1.2rem', display: 'flex', gap: '0.8rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <a
+                    href={passDataUrl}
+                    download={`Pase_Fuego_${(signedSuccess.nombre || 'Participante').replace(/[^a-zA-Z0-9]/g, '_')}.png`}
+                    style={{
+                      background: 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)',
+                      color: '#fff',
+                      padding: '0.8rem 1.4rem',
+                      borderRadius: '8px',
+                      fontWeight: 800,
+                      fontSize: '0.85rem',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 6px 16px rgba(234, 88, 12, 0.35)'
+                    }}
+                  >
+                    <span>📥</span> Descargar Pase para Celular
+                  </a>
+                </div>
+              </div>
+            )}
 
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
