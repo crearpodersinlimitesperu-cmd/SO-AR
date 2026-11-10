@@ -160,6 +160,15 @@ export default function MonitorAcreditacionFuegoLima() {
             background: 'linear-gradient(90deg, #f59e0b, #ea580c, #dc2626)'
           }} />
 
+          {/* Logo Oficial CREAR */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/logo-crear.png'; }} />
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#f59e0b', textTransform: 'uppercase', display: 'block' }}>CREAR PODER SIN LÍMITES</span>
+              <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', display: 'block' }}>Causa OS · Centro de Acreditación y Operaciones</span>
+            </div>
+          </div>
+
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>

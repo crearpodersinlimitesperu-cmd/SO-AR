@@ -55,7 +55,7 @@ export default function ContratoCaminataFuego() {
   const [formErrors, setFormErrors] = useState({});
   const formRef = useRef(null);
 
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : 'https://app.crearpsl.net/caminata-fuego';
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=10&data=${encodeURIComponent(pageUrl)}`;
 
   useEffect(() => {
@@ -594,6 +594,15 @@ export default function ContratoCaminataFuego() {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1.5rem' }}>
           <div style={{ flex: '1 1 650px' }}>
+            {/* Branding Oficial CREAR */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" style={{ height: '42px', width: 'auto', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/logo-crear.png'; }} />
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#f59e0b', textTransform: 'uppercase', display: 'block' }}>CREAR PODER SIN LÍMITES</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', display: 'block' }}>Centro de Formación y Liderazgo Transformacional</span>
+              </div>
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
               <span style={{
                 background: 'linear-gradient(90deg, #f97316, #ef4444)',

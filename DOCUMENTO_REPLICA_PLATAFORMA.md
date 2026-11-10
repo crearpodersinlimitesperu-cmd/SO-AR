@@ -1045,9 +1045,13 @@ const regexNames = /export const NOMBRES_LEGALES_ENTRENADORES = ({[\s\S]*?});/
 <!doctype html>
 <html lang="es">
   <head>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" href="/logo-crear.png">
+  <link rel="icon" type="image/png" href="/logo_crear_oficial.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo-crear.png" />
-    <link rel="shortcut icon" type="image/png" href="/logo-crear.png" />
     <link rel="apple-touch-icon" href="/logo-crear.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Causa OS — Centro de Liderazgo y Orquestación" />
@@ -60035,8 +60039,13 @@ aliado2@correo.com`,value:d,onChange:e=>f(e.target.value)}),(0,$.jsx)(`button`,{
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Monitor de Acreditación · Caminata sobre Fuego Lima 2026</title>
-  <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" href="/logo-crear.png">
+  <link rel="icon" type="image/png" href="/logo_crear_oficial.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -60087,6 +60096,14 @@ aliado2@correo.com`,value:d,onChange:e=>f(e.target.value)}),(0,$.jsx)(`button`,{
     <header class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-orange-500/30 p-5 sm:p-6 shadow-2xl shadow-orange-950/20">
       <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-600"></div>
       
+            <!-- Branding Oficial CREAR -->
+      <div class="flex items-center gap-3.5 mb-5 pb-4 border-b border-slate-800/80">
+        <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" class="h-10 sm:h-11 w-auto object-contain" onerror="this.src='/logo_crear_oficial.png'">
+        <div>
+          <span class="text-xs font-black uppercase tracking-widest text-orange-400 block">CREAR PODER SIN LÍMITES · CAUSA OS</span>
+          <span class="text-[11px] font-bold text-slate-400 block">Sede Lima · Centro de Acreditación y Operaciones</span>
+        </div>
+      </div>
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -61389,8 +61406,13 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Instrumento Legal Caminata sobre Fuego · Creación Cuántica E.I.R.L.</title>
-  <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/png" href="/logo-crear.png">
+  <link rel="icon" type="image/png" href="/logo_crear_oficial.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -61437,6 +61459,14 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
     <header class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-orange-500/30 p-6 md:p-8 shadow-2xl shadow-orange-950/20">
       <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-red-600"></div>
       
+            <!-- Branding Oficial CREAR -->
+      <div class="flex items-center gap-3.5 mb-5 pb-4 border-b border-slate-800/80">
+        <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" class="h-10 sm:h-12 w-auto object-contain" onerror="this.src='/logo_crear_oficial.png'">
+        <div>
+          <span class="text-xs font-black uppercase tracking-widest text-amber-400 block">CREAR PODER SIN LÍMITES</span>
+          <span class="text-[11px] font-bold text-slate-400 block">Centro de Formación y Liderazgo Transformacional</span>
+        </div>
+      </div>
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <div class="flex flex-wrap items-center gap-2 mb-3">
@@ -153654,6 +153684,15 @@ export default function MonitorAcreditacionFuegoLima() {
             background: 'linear-gradient(90deg, #f59e0b, #ea580c, #dc2626)'
           }} />
 
+          {/* Logo Oficial CREAR */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/logo-crear.png'; }} />
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#f59e0b', textTransform: 'uppercase', display: 'block' }}>CREAR PODER SIN LÍMITES</span>
+              <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', display: 'block' }}>Causa OS · Centro de Acreditación y Operaciones</span>
+            </div>
+          </div>
+
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
@@ -154253,7 +154292,7 @@ export default function ContratoCaminataFuego() {
   const [formErrors, setFormErrors] = useState({});
   const formRef = useRef(null);
 
-  const pageUrl = typeof window !== 'undefined' ? window.location.href : 'https://app.crearpsl.net/caminata-fuego';
+  const pageUrl = typeof window !== 'undefined' ? window.location.href : 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=10&data=${encodeURIComponent(pageUrl)}`;
 
   useEffect(() => {
@@ -154792,6 +154831,15 @@ export default function ContratoCaminataFuego() {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1.5rem' }}>
           <div style={{ flex: '1 1 650px' }}>
+            {/* Branding Oficial CREAR */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" style={{ height: '42px', width: 'auto', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/logo-crear.png'; }} />
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#f59e0b', textTransform: 'uppercase', display: 'block' }}>CREAR PODER SIN LÍMITES</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', display: 'block' }}>Centro de Formación y Liderazgo Transformacional</span>
+              </div>
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
               <span style={{
                 background: 'linear-gradient(90deg, #f97316, #ef4444)',
