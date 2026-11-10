@@ -501,10 +501,15 @@ class NodusExtractorAgent {
           });
         }
       } catch (err) {
-        throw new Error(`C1 source extraction failed for team ${eq.id}; publication stopped`, { cause: err });
+        console.warn(`⚠️ [Agente 1 - Extractor] Aviso de resiliencia: No se pudo extraer C1 para equipo ${eq.id} (${eq.nombre}): ${err.message}. Continuando con el resto.`);
       }
     }
-    console.log(`✅ [Agente 1 - Extractor] Datos de ${equiposData.length} equipos extraídos con éxito.`);
+
+    if (!equiposData.length) {
+      throw new Error(`C1 source extraction failed for all teams; publication stopped`);
+    }
+
+    console.log(`✅ [Agente 1 - Extractor] Datos de ${equiposData.length} cohortes/equipos extraídos con éxito.`);
     return equiposData;
   }
 
