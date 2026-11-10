@@ -41,6 +41,8 @@
       .print-text { color: black !important; }
     }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="min-h-screen py-6 px-3 sm:px-6 antialiased selection:bg-orange-500 selection:text-white">
 
@@ -405,6 +407,20 @@
 
       try {
         localStorage.setItem('cq_firewalk_signature', JSON.stringify(signatureData));
+      // Guardar en Firestore Cloud
+      if (db) {
+        db.collection('contratos_caminata_fuego').add({
+          ...signatureData,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          source: 'cartas.crearpsl.net',
+          sede: 'Lima'
+        }).then(ref => {
+          console.log('✅ Contrato persistido en Firestore:', ref.id);
+        }).catch(err => {
+          console.warn('⚠️ Error guardando en Firestore:', err);
+        });
+      }
+
       } catch(err) {
         console.warn('Storage warning:', err);
       }

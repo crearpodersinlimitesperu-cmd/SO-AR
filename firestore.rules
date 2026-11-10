@@ -1411,6 +1411,14 @@ service cloud.firestore {
         allow delete: if isSuperAdmin();
       }
     }
+
+    // ============================================================================
+    // CONTRATO CAMINATA SOBRE FUEGO: Registro legal y firma digital pública
+    // ============================================================================
+    match /contratos_caminata_fuego/{contratoId} {
+      allow read, create: if true;
+      allow update, delete: if isSuperAdmin();
+    }
   }
 }
 

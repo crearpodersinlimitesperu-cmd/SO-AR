@@ -1,0 +1,1001 @@
+[
+  {
+    "id": 1,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Aldo Leonardo Miranda Huamán",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 2,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Ana Paola Núñez Antezana",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 3,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Angélica Herrera Palomino",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 4,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Cirila Palomino Pariona",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 5,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Daicy López Huamanrayme",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 6,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "David Anthony Celestino",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 7,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Dina Marlene Cornejo Aguirre",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 8,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Godelia Inocenta Colca Julca",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 9,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Jainor Torres Ortiz",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 10,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Janeth Castañeda Tumbalobos",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 11,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Jaqueline Bautista Bolo",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 12,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Jessica Montilla Corrales",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 13,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Jeydy Luz Hancco Mamani",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 14,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Johann Steve Lino Garay",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Mike Bohada"
+  },
+  {
+    "id": 15,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Italo Alonso Román Nomura",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 16,
+    "equipo": "Equipo 29",
+    "cohorte": "Quantum Phoenix",
+    "nombre": "Tania Aurora Sánchez Castro",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 17,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Alexandro Magno Gutiérrez Aguilar",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 18,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Araceli Nahomi Carrasco de la Cruz",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 19,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Bárbara Daniela Rodríguez Bellido",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 20,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Diego Armando Cántaro Herrera",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 21,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Fausto André Chacón Marcilla",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 22,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Hector Luis García Ollarves",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 23,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Iván Crispín Sánchez",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 24,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Jean Paul Longa Vélez",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 25,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Joel Calderón Mamani",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 26,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Julia Cesárea Romero Alarcón",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 27,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Katty Margarita Espinoza Mendoza",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 28,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Lener Esmelin Rojas Susanibar",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 29,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Martín Armando Temoche Rodríguez",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 30,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Milagros Libertad Temoche Rodríguez",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 31,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Milene Nicole Díaz Castillo",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 32,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Pierre Valentino Alfaro Peña",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 33,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Rey Julián Alfaro Alva",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 34,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Rodrigo Fabrizio Dávila Romero",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 35,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Rosa Marilú Rodríguez Altamirano",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 36,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Rosa Mercedes Peña Julián",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 37,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Roxana Elisabeth Alama Palomino",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 38,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Roy Ernesto Deliot Pareja Madera",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 39,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Scarling Adriana Useche Vivas",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 40,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Silvina Morales Montecinos",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 41,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Yohanny Adriana Dos Santos Martínez",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 42,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Ana Luz Enciso Enciso",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Lourdes Patiño"
+  },
+  {
+    "id": 43,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Brigitte Fernanda López López",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 44,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Ruth Yesly Pilco Laura",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 45,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Victoria del Milagro Valdivia Villegas",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 46,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Ariel Enrique Alonso Olarte",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 47,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Karin Portocarrero Perea",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 48,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Rhania Shaden Untiveros Requejo",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 49,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Otty Zuley Urteaga Silva",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Soporte de Equipo"
+  },
+  {
+    "id": 50,
+    "equipo": "Equipo 30",
+    "cohorte": "Tinkuy Ruray",
+    "nombre": "Fernando López López",
+    "rol": "Capitán",
+    "estado": "Capitanía Equipo 30",
+    "detalle": "Liderazgo de Cohorte"
+  },
+  {
+    "id": 51,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Angelo Muñoz",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 52,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Brenda Arana",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 53,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Daniel Espinoza Mendoza",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 54,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Erwin Rosales",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 55,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Fabiola Estacio Pimentel",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 56,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Gerardo Castro",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 57,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Hilary Tarazona Cervantes",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 58,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Jaqueline Caparachin Palpa",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 59,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "José Espinoza",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 60,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Libertad Caballero",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 61,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Lourdes Madera",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 62,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Luz Elizabeth Mamani",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 63,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Naysha Chura",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 64,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Priscila Yopán",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 65,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Rocío Santiago",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 66,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Ruth Rimache",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 67,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Ruth Sandra Quispe Quispe",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 68,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Sally Silva",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 69,
+    "equipo": "Equipo 31",
+    "cohorte": "Imperio del Éxito",
+    "nombre": "Zorayda Alvarez Neyra",
+    "rol": "Participante",
+    "estado": "Activo MJ",
+    "detalle": "Guía: Andrés Idrobo"
+  },
+  {
+    "id": 70,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Adriana Mard",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre de Inscripción"
+  },
+  {
+    "id": 71,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Américo Mendoza",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre de Inscripción"
+  },
+  {
+    "id": 72,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Cesia Alondra Torres Tapayuri",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre de Inscripción"
+  },
+  {
+    "id": 73,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Charo Aponte",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre de Inscripción"
+  },
+  {
+    "id": 74,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Karina Molina Chipana",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre de Inscripción"
+  },
+  {
+    "id": 75,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Noelia Apaestegui",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre de Inscripción"
+  },
+  {
+    "id": 76,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 07",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Pago Previo / Promesa"
+  },
+  {
+    "id": 77,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 08",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Pago Previo / Promesa"
+  },
+  {
+    "id": 78,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 09",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Pago Previo / Promesa"
+  },
+  {
+    "id": 79,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 10",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Pago Previo / Promesa"
+  },
+  {
+    "id": 80,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 11",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 81,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 12",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 82,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 13",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 83,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 14",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 84,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 15",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 85,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 16",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 86,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 17",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 87,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 18",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 88,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 19",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 89,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 20",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 90,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 21",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 91,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 22",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 92,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 23",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 93,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Confirmado 24",
+    "rol": "Participante",
+    "estado": "Confirmado (Pago MJ)",
+    "detalle": "Cierre Nuevo en Mesa"
+  },
+  {
+    "id": 94,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Pendiente 01",
+    "rol": "Participante",
+    "estado": "Pendiente / Palabra Rota",
+    "detalle": "Sin Pago MJ"
+  },
+  {
+    "id": 95,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Pendiente 02",
+    "rol": "Participante",
+    "estado": "Pendiente / Palabra Rota",
+    "detalle": "Sin Pago MJ"
+  },
+  {
+    "id": 96,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Pendiente 03",
+    "rol": "Participante",
+    "estado": "Pendiente / Palabra Rota",
+    "detalle": "Sin Pago MJ"
+  },
+  {
+    "id": 97,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Pendiente 04",
+    "rol": "Participante",
+    "estado": "Pendiente / Palabra Rota",
+    "detalle": "Sin Pago MJ"
+  },
+  {
+    "id": 98,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Pendiente 05",
+    "rol": "Participante",
+    "estado": "Pendiente / Palabra Rota",
+    "detalle": "Sin Pago MJ"
+  },
+  {
+    "id": 99,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Pendiente 06",
+    "rol": "Participante",
+    "estado": "Pendiente / Palabra Rota",
+    "detalle": "Sin Pago MJ"
+  },
+  {
+    "id": 100,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Participante Pendiente 07",
+    "rol": "Participante",
+    "estado": "Pendiente / Palabra Rota",
+    "detalle": "Sin Pago MJ"
+  },
+  {
+    "id": 101,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Anita Belén",
+    "rol": "Partner de Soporte",
+    "estado": "Staff / Soporte",
+    "detalle": "Partner Asignado"
+  },
+  {
+    "id": 102,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Tania",
+    "rol": "Partner de Soporte",
+    "estado": "Staff / Soporte",
+    "detalle": "Partner Asignado"
+  },
+  {
+    "id": 103,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Partner de Soporte 03",
+    "rol": "Partner de Soporte",
+    "estado": "Staff / Soporte",
+    "detalle": "Acompañamiento en Sala"
+  },
+  {
+    "id": 104,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Partner de Soporte 04",
+    "rol": "Partner de Soporte",
+    "estado": "Staff / Soporte",
+    "detalle": "Acompañamiento en Sala"
+  },
+  {
+    "id": 105,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Partner de Soporte 05",
+    "rol": "Partner de Soporte",
+    "estado": "Staff / Soporte",
+    "detalle": "Acompañamiento en Sala"
+  },
+  {
+    "id": 106,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Partner de Soporte 06",
+    "rol": "Partner de Soporte",
+    "estado": "Staff / Soporte",
+    "detalle": "Acompañamiento en Sala"
+  },
+  {
+    "id": 107,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Partner de Soporte 07",
+    "rol": "Partner de Soporte",
+    "estado": "Staff / Soporte",
+    "detalle": "Acompañamiento en Sala"
+  },
+  {
+    "id": 108,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Capitana de Cohorte",
+    "rol": "Capitana",
+    "estado": "Capitanía Equipo 32",
+    "detalle": "Liderazgo de Cohorte C2/MJ"
+  },
+  {
+    "id": 109,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Manager de Soporte 01",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Acompañamiento Transición"
+  },
+  {
+    "id": 110,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Manager de Soporte 02",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Acompañamiento Transición"
+  },
+  {
+    "id": 111,
+    "equipo": "Equipo 32",
+    "cohorte": "C2 Lima / Ingreso MJ",
+    "nombre": "Manager de Soporte 03",
+    "rol": "Manager",
+    "estado": "Staff / Liderazgo",
+    "detalle": "Acompañamiento Transición"
+  }
+]

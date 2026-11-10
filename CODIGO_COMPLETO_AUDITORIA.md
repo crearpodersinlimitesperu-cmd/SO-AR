@@ -60026,6 +60026,551 @@ aliado2@correo.com`,value:d,onChange:e=>f(e.target.value)}),(0,$.jsx)(`button`,{
 
 ---
 
+## Archivo: public/monitor-fuego-lima/index.html
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor de Acreditación · Caminata sobre Fuego Lima 2026</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="/logo-crear.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            fireOrange: '#f97316',
+            fireRed: '#ef4444',
+            crearDark: '#0b1120',
+            crearCard: '#1e293b',
+            crearGold: '#ffb703'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b1120;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen py-5 px-3 sm:px-6 antialiased selection:bg-orange-500 selection:text-white">
+
+  <div class="max-w-4xl mx-auto space-y-5">
+
+    <!-- Encabezado Operativo -->
+    <header class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-orange-500/30 p-5 sm:p-6 shadow-2xl shadow-orange-950/20">
+      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-red-600"></div>
+      
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-black uppercase tracking-wider bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-sm">
+              🔥 CAUSA OS · LIMA OPERACIONES
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> EN VIVO
+            </span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2">
+            Verificación Caminata sobre Fuego
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-300 mt-1 font-medium">
+            📍 Casona Blanca (Huachipa) · Control de Aceptación y Firmas Jurídicas
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+          <button onclick="openQrModal('contract')" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-black uppercase tracking-wider transition shadow-lg shadow-orange-600/30 active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            QR Contrato
+          </button>
+          <a href="/contrato_caminata_fuego.html" target="_blank" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold transition active:scale-95">
+            Abrir Formulario ↗
+          </a>
+        </div>
+      </div>
+
+      <!-- Tarjetas KPI -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-5 border-t border-slate-800">
+        <div class="p-3 rounded-xl bg-slate-800/80 border border-slate-700/60">
+          <span class="text-[11px] font-bold text-slate-400 block uppercase tracking-wider">Padrón Lima</span>
+          <span class="text-2xl font-black text-white" id="kpiTotal">111</span>
+        </div>
+        <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/40">
+          <span class="text-[11px] font-bold text-emerald-400 block uppercase tracking-wider">✓ Acreditados</span>
+          <span class="text-2xl font-black text-emerald-300" id="kpiFirmados">0</span>
+        </div>
+        <div class="p-3 rounded-xl bg-rose-950/40 border border-rose-500/40">
+          <span class="text-[11px] font-bold text-rose-400 block uppercase tracking-wider">⚠️ Pendientes</span>
+          <span class="text-2xl font-black text-rose-300" id="kpiPendientes">111</span>
+        </div>
+        <div class="p-3 rounded-xl bg-amber-950/40 border border-amber-500/40">
+          <span class="text-[11px] font-bold text-amber-400 block uppercase tracking-wider">% Cumplimiento</span>
+          <span class="text-2xl font-black text-amber-300" id="kpiPorcentaje">0%</span>
+        </div>
+      </div>
+
+      <!-- Barra de Progreso -->
+      <div class="mt-4">
+        <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden p-0.5 border border-slate-700/80">
+          <div id="progressBar" class="bg-gradient-to-r from-amber-400 via-orange-500 to-emerald-500 h-1.5 rounded-full transition-all duration-700" style="width: 0%"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Barra de Filtros y Búsqueda Móvil -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 sticky top-3 z-30 backdrop-blur-md shadow-xl">
+      <!-- Buscador -->
+      <div class="relative">
+        <input 
+          type="text" 
+          id="searchInput" 
+          oninput="handleSearch(event)" 
+          placeholder="🔍 Buscar por nombre, apellido, DNI o rol..." 
+          class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 text-sm font-medium transition shadow-inner"
+        >
+        <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-3 text-slate-400 hover:text-white p-1 text-xs">✕</button>
+      </div>
+
+      <!-- Filtros Rápidos de Equipo -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-xs font-bold">
+        <button onclick="filterTeam('TODOS')" id="btnTeam-TODOS" class="team-filter-btn px-3 py-1.5 rounded-lg bg-orange-600 text-white whitespace-nowrap shadow">
+          Todos (111)
+        </button>
+        <button onclick="filterTeam('Equipo 29')" id="btnTeam-Equipo 29" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
+          E29 · Quantum Phoenix (16)
+        </button>
+        <button onclick="filterTeam('Equipo 30')" id="btnTeam-Equipo 30" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
+          E30 · Tinkuy Ruray (34)
+        </button>
+        <button onclick="filterTeam('Equipo 31')" id="btnTeam-Equipo 31" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
+          E31 · Imperio del Éxito (19)
+        </button>
+        <button onclick="filterTeam('Equipo 32')" id="btnTeam-Equipo 32" class="team-filter-btn px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap border border-slate-700">
+          E32 · C2 Lima (42)
+        </button>
+      </div>
+
+      <!-- Filtro por Estado -->
+      <div class="flex items-center gap-2 pt-1 border-t border-slate-800/80 text-xs font-bold">
+        <span class="text-slate-400 text-[11px] uppercase tracking-wider mr-1">Estado:</span>
+        <button onclick="filterStatus('TODOS')" id="btnStatus-TODOS" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-700 text-white border border-slate-600">
+          Todos
+        </button>
+        <button onclick="filterStatus('PENDIENTES')" id="btnStatus-PENDIENTES" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-800 text-rose-300 hover:bg-rose-950/40 border border-slate-700">
+          🚨 Solo Pendientes
+        </button>
+        <button onclick="filterStatus('FIRMADOS')" id="btnStatus-FIRMADOS" class="status-filter-btn px-2.5 py-1 rounded-md bg-slate-800 text-emerald-300 hover:bg-emerald-950/40 border border-slate-700">
+          ✓ Acreditados
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicador de Resultados -->
+    <div class="flex items-center justify-between px-2 text-xs text-slate-400 font-semibold">
+      <span id="resultsCounter">Mostrando 111 integrantes</span>
+      <span class="text-[11px] text-slate-400">Actualización en vivo vía Firestore</span>
+    </div>
+
+    <!-- Lista de Integrantes -->
+    <div id="rosterContainer" class="space-y-3">
+      <!-- Inyectado por JS -->
+    </div>
+
+    <!-- Modal QR -->
+    <div id="qrModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="closeQrModal(event)">
+      <div class="bg-slate-900 border border-orange-500/40 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl relative" onclick="event.stopPropagation()">
+        <button onclick="closeQrModalDirect()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold">✕</button>
+        
+        <h3 id="qrModalTitle" class="text-lg font-black text-white">Escanear para Firmar Contrato</h3>
+        <p id="qrModalSubtitle" class="text-xs text-slate-300">Pide al participante escanear este código con la cámara de su celular para abrir la exoneración oficial.</p>
+
+        <div class="p-4 bg-white rounded-2xl inline-block shadow-inner mx-auto" id="qrcode"></div>
+
+        <div class="text-xs text-slate-400 font-mono break-all px-2" id="qrUrlText">
+          https://cartas.crearpsl.net/contrato_caminata_fuego.html
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="copyQrUrl()" class="flex-1 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-black uppercase tracking-wider transition">
+            📋 Copiar Enlace
+          </button>
+          <button onclick="closeQrModalDirect()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Padrón Oficial 111 Sede Lima
+    const OFFICIAL_PADRON = [{"id": 1, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Aldo Leonardo Miranda Huamán", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 2, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Ana Paola Núñez Antezana", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 3, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Angélica Herrera Palomino", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 4, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Cirila Palomino Pariona", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 5, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Daicy López Huamanrayme", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 6, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "David Anthony Celestino", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 7, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Dina Marlene Cornejo Aguirre", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 8, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Godelia Inocenta Colca Julca", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 9, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Jainor Torres Ortiz", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 10, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Janeth Castañeda Tumbalobos", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 11, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Jaqueline Bautista Bolo", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 12, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Jessica Montilla Corrales", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 13, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Jeydy Luz Hancco Mamani", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 14, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Johann Steve Lino Garay", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Mike Bohada"}, {"id": 15, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Italo Alonso Román Nomura", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 16, "equipo": "Equipo 29", "cohorte": "Quantum Phoenix", "nombre": "Tania Aurora Sánchez Castro", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 17, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Alexandro Magno Gutiérrez Aguilar", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 18, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Araceli Nahomi Carrasco de la Cruz", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 19, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Bárbara Daniela Rodríguez Bellido", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 20, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Diego Armando Cántaro Herrera", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 21, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Fausto André Chacón Marcilla", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 22, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Hector Luis García Ollarves", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 23, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Iván Crispín Sánchez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 24, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Jean Paul Longa Vélez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 25, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Joel Calderón Mamani", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 26, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Julia Cesárea Romero Alarcón", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 27, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Katty Margarita Espinoza Mendoza", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 28, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Lener Esmelin Rojas Susanibar", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 29, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Martín Armando Temoche Rodríguez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 30, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Milagros Libertad Temoche Rodríguez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 31, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Milene Nicole Díaz Castillo", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 32, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Pierre Valentino Alfaro Peña", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 33, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rey Julián Alfaro Alva", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 34, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rodrigo Fabrizio Dávila Romero", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 35, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rosa Marilú Rodríguez Altamirano", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 36, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rosa Mercedes Peña Julián", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 37, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Roxana Elisabeth Alama Palomino", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 38, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Roy Ernesto Deliot Pareja Madera", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 39, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Scarling Adriana Useche Vivas", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 40, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Silvina Morales Montecinos", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 41, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Yohanny Adriana Dos Santos Martínez", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 42, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Ana Luz Enciso Enciso", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Lourdes Patiño"}, {"id": 43, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Brigitte Fernanda López López", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 44, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Ruth Yesly Pilco Laura", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 45, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Victoria del Milagro Valdivia Villegas", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 46, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Ariel Enrique Alonso Olarte", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 47, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Karin Portocarrero Perea", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 48, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Rhania Shaden Untiveros Requejo", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 49, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Otty Zuley Urteaga Silva", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Soporte de Equipo"}, {"id": 50, "equipo": "Equipo 30", "cohorte": "Tinkuy Ruray", "nombre": "Fernando López López", "rol": "Capitán", "estado": "Capitanía Equipo 30", "detalle": "Liderazgo de Cohorte"}, {"id": 51, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Angelo Muñoz", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 52, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Brenda Arana", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 53, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Daniel Espinoza Mendoza", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 54, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Erwin Rosales", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 55, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Fabiola Estacio Pimentel", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 56, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Gerardo Castro", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 57, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Hilary Tarazona Cervantes", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 58, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Jaqueline Caparachin Palpa", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 59, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "José Espinoza", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 60, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Libertad Caballero", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 61, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Lourdes Madera", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 62, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Luz Elizabeth Mamani", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 63, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Naysha Chura", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 64, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Priscila Yopán", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 65, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Rocío Santiago", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 66, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Ruth Rimache", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 67, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Ruth Sandra Quispe Quispe", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 68, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Sally Silva", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 69, "equipo": "Equipo 31", "cohorte": "Imperio del Éxito", "nombre": "Zorayda Alvarez Neyra", "rol": "Participante", "estado": "Activo MJ", "detalle": "Guía: Andrés Idrobo"}, {"id": 70, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Adriana Mard", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 71, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Américo Mendoza", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 72, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Cesia Alondra Torres Tapayuri", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 73, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Charo Aponte", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 74, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Karina Molina Chipana", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 75, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Noelia Apaestegui", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre de Inscripción"}, {"id": 76, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 07", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Pago Previo / Promesa"}, {"id": 77, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 08", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Pago Previo / Promesa"}, {"id": 78, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 09", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Pago Previo / Promesa"}, {"id": 79, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 10", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Pago Previo / Promesa"}, {"id": 80, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 11", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 81, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 12", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 82, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 13", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 83, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 14", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 84, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 15", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 85, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 16", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 86, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 17", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 87, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 18", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 88, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 19", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 89, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 20", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 90, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 21", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 91, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 22", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 92, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 23", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 93, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Confirmado 24", "rol": "Participante", "estado": "Confirmado (Pago MJ)", "detalle": "Cierre Nuevo en Mesa"}, {"id": 94, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 01", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 95, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 02", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 96, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 03", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 97, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 04", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 98, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 05", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 99, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 06", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 100, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Participante Pendiente 07", "rol": "Participante", "estado": "Pendiente / Palabra Rota", "detalle": "Sin Pago MJ"}, {"id": 101, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Anita Belén", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Partner Asignado"}, {"id": 102, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Tania", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Partner Asignado"}, {"id": 103, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 03", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 104, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 04", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 105, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 05", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 106, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 06", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 107, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Partner de Soporte 07", "rol": "Partner de Soporte", "estado": "Staff / Soporte", "detalle": "Acompañamiento en Sala"}, {"id": 108, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Capitana de Cohorte", "rol": "Capitana", "estado": "Capitanía Equipo 32", "detalle": "Liderazgo de Cohorte C2/MJ"}, {"id": 109, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Manager de Soporte 01", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Acompañamiento Transición"}, {"id": 110, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Manager de Soporte 02", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Acompañamiento Transición"}, {"id": 111, "equipo": "Equipo 32", "cohorte": "C2 Lima / Ingreso MJ", "nombre": "Manager de Soporte 03", "rol": "Manager", "estado": "Staff / Liderazgo", "detalle": "Acompañamiento Transición"}];
+
+    // Firebase Init
+    const firebaseConfig = {
+      apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
+      authDomain: 'centro-operativo-cpsl.firebaseapp.com',
+      projectId: 'centro-operativo-cpsl',
+      storageBucket: 'centro-operativo-cpsl.firebasestorage.app',
+      messagingSenderId: '122588918051',
+      appId: '1:122588918051:web:c85d6835b1b1f920fb1c96',
+    };
+
+    let db = null;
+    let signedContracts = [];
+    let currentTeamFilter = 'TODOS';
+    let currentStatusFilter = 'TODOS';
+    let currentSearchTerm = '';
+    let currentQrUrl = 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
+
+    function initFirebase() {
+      try {
+        if (typeof firebase !== 'undefined') {
+          if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+          }
+          db = firebase.firestore();
+          listenToSignedContracts();
+        }
+      } catch(e) {
+        console.warn('Firebase error:', e);
+      }
+    }
+
+    function normalizeStr(str) {
+      if (!str) return '';
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    }
+
+    function listenToSignedContracts() {
+      if (!db) return;
+      db.collection('contratos_caminata_fuego').onSnapshot(snapshot => {
+        signedContracts = [];
+        snapshot.forEach(doc => {
+          signedContracts.push({ id: doc.id, ...doc.data() });
+        });
+        renderRoster();
+      }, err => {
+        console.warn('Error escuchando contratos:', err);
+      });
+    }
+
+    // Matching de firma
+    function findSignatureForPerson(person) {
+      if (!signedContracts.length) return null;
+      const normPersonName = normalizeStr(person.nombre);
+      const personTokens = normPersonName.split(/\s+/).filter(t => t.length > 2);
+
+      return signedContracts.find(c => {
+        const normSigName = normalizeStr(c.nombre || c.nombreCompleto || '');
+        if (normSigName === normPersonName) return true;
+        // Token match: si al menos 2 tokens clave coinciden (nombre y apellido)
+        const matchTokens = personTokens.filter(t => normSigName.includes(t));
+        return matchTokens.length >= 2;
+      });
+    }
+
+    function renderRoster() {
+      const container = document.getElementById('rosterContainer');
+      let totalFirmados = 0;
+      let totalPendientes = 0;
+
+      // Calcular match para cada persona
+      const fullList = OFFICIAL_PADRON.map(person => {
+        const sig = findSignatureForPerson(person);
+        if (sig) totalFirmados++;
+        else totalPendientes++;
+        return {
+          ...person,
+          isSigned: !!sig,
+          signature: sig
+        };
+      });
+
+      // Actualizar KPIs
+      const total = fullList.length;
+      const pct = total > 0 ? Math.round((totalFirmados / total) * 100) : 0;
+      document.getElementById('kpiTotal').innerText = total;
+      document.getElementById('kpiFirmados').innerText = totalFirmados;
+      document.getElementById('kpiPendientes').innerText = totalPendientes;
+      document.getElementById('kpiPorcentaje').innerText = pct + '%';
+      document.getElementById('progressBar').style.width = pct + '%';
+
+      // Filtrar lista
+      const filtered = fullList.filter(item => {
+        // Filtro Equipo
+        if (currentTeamFilter !== 'TODOS' && item.equipo !== currentTeamFilter) {
+          return false;
+        }
+        // Filtro Estado
+        if (currentStatusFilter === 'PENDIENTES' && item.isSigned) {
+          return false;
+        }
+        if (currentStatusFilter === 'FIRMADOS' && !item.isSigned) {
+          return false;
+        }
+        // Filtro Búsqueda
+        if (currentSearchTerm) {
+          const term = normalizeStr(currentSearchTerm);
+          const nameNorm = normalizeStr(item.nombre);
+          const rolNorm = normalizeStr(item.rol);
+          const cohorteNorm = normalizeStr(item.cohorte);
+          const docNum = item.signature ? normalizeStr(item.signature.numeroDocumento || item.signature.doc) : '';
+          return nameNorm.includes(term) || rolNorm.includes(term) || cohorteNorm.includes(term) || docNum.includes(term);
+        }
+        return true;
+      });
+
+      document.getElementById('resultsCounter').innerText = `Mostrando ${filtered.length} de ${total} integrantes`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 bg-slate-900/60 rounded-2xl border border-slate-800 p-6">
+            <div class="text-3xl mb-2">🔍</div>
+            <p class="text-white font-bold text-sm">No se encontraron personas con este filtro.</p>
+            <p class="text-xs text-slate-400 mt-1">Prueba cambiando los términos de búsqueda o seleccionando otro equipo.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => {
+        if (item.isSigned) {
+          const sig = item.signature;
+          const docInfo = sig.tipoDocumento && sig.numeroDocumento 
+            ? `${sig.tipoDocumento}: ${sig.numeroDocumento}` 
+            : (sig.doc || 'Registrado');
+          const time = sig.timestamp || 'Fecha verificada';
+          const code = sig.code || 'CQ-FIRE-VERIFIED';
+          const rolFirmado = sig.rol || item.rol;
+
+          return `
+            <div class="p-4 rounded-xl bg-slate-900/90 border border-emerald-500/40 shadow-lg shadow-emerald-950/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                    ✓ ACREDITADO / FIRMADO
+                  </span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                    ${item.equipo} · ${item.cohorte}
+                  </span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                    ${rolFirmado}
+                  </span>
+                </div>
+                <h4 class="text-base font-black text-white tracking-tight">${item.nombre}</h4>
+                <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-0.5">
+                  <span>🆔 <strong class="text-slate-200">${docInfo}</strong></span>
+                  <span>🕒 <strong class="text-slate-300">${time}</strong></span>
+                  <span class="font-mono text-[11px] text-amber-400/90">${code}</span>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
+                  <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                  Listo para Ingreso
+                </span>
+              </div>
+            </div>
+          `;
+        } else {
+          // Pendiente
+          const waMessage = encodeURIComponent(
+            `Hola ${item.nombre}, te escribe el equipo de CREAR PSL Lima. Por favor completa y firma tu exoneración legal obligatoria para la Caminata sobre Fuego en Casona Blanca antes de ingresar aquí: https://cartas.crearpsl.net/contrato_caminata_fuego.html`
+          );
+
+          return `
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-rose-500/30 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/40">
+                    🚨 PENDIENTE DE FIRMA
+                  </span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                    ${item.equipo} · ${item.cohorte}
+                  </span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                    ${item.rol}
+                  </span>
+                </div>
+                <h4 class="text-base font-black text-slate-200 tracking-tight">${item.nombre}</h4>
+                <p class="text-xs text-slate-400">${item.detalle || 'Requiere firma antes de la actividad en sala'}</p>
+              </div>
+
+              <div class="flex items-center gap-2 self-stretch sm:self-center shrink-0 pt-2 sm:pt-0">
+                <a 
+                  href="https://wa.me/?text=${waMessage}" 
+                  target="_blank" 
+                  class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition active:scale-95 shadow-md shadow-emerald-950/30"
+                >
+                  <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                  Recordar por WhatsApp
+                </a>
+                <button 
+                  onclick="copyInviteLink('${item.nombre}')" 
+                  class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold transition active:scale-95"
+                  title="Copiar enlace oficial"
+                >
+                  📋
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    // Filtros
+    function filterTeam(team) {
+      currentTeamFilter = team;
+      document.querySelectorAll('.team-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-orange-600', 'text-white', 'shadow');
+        btn.classList.add('bg-slate-800', 'text-slate-300', 'border', 'border-slate-700');
+      });
+      const activeBtn = document.getElementById('btnTeam-' + team);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-300', 'border', 'border-slate-700');
+        activeBtn.classList.add('bg-orange-600', 'text-white', 'shadow');
+      }
+      renderRoster();
+    }
+
+    function filterStatus(status) {
+      currentStatusFilter = status;
+      document.querySelectorAll('.status-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-700', 'text-white', 'border-slate-600');
+        btn.classList.add('bg-slate-800', 'border-slate-700');
+      });
+      const activeBtn = document.getElementById('btnStatus-' + status);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'border-slate-700');
+        activeBtn.classList.add('bg-slate-700', 'text-white', 'border-slate-600');
+      }
+      renderRoster();
+    }
+
+    function handleSearch(e) {
+      currentSearchTerm = e.target.value;
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (currentSearchTerm) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      renderRoster();
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      currentSearchTerm = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      renderRoster();
+    }
+
+    function copyInviteLink(nombre) {
+      const url = 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Enlace copiado al portapapeles para ' + nombre);
+      }).catch(() => {
+        prompt('Copia este enlace para enviarlo:', url);
+      });
+    }
+
+    // Modal QR
+    function openQrModal(type) {
+      const modal = document.getElementById('qrModal');
+      const qrcodeEl = document.getElementById('qrcode');
+      const titleEl = document.getElementById('qrModalTitle');
+      const subEl = document.getElementById('qrModalSubtitle');
+      const urlText = document.getElementById('qrUrlText');
+
+      qrcodeEl.innerHTML = '';
+
+      if (type === 'contract') {
+        currentQrUrl = 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
+        titleEl.innerText = 'Escanear para Firmar Contrato';
+        subEl.innerText = 'Pide al participante o staff escanear con la cámara para abrir y firmar su exoneración oficial en Huachipa.';
+      } else {
+        currentQrUrl = 'https://cartas.crearpsl.net/monitor_fuego_lima.html';
+        titleEl.innerText = 'Escanear para Abrir este Monitor';
+        subEl.innerText = 'Acceso móvil al tablero de verificación en tiempo real para Staff y Capitanía.';
+      }
+
+      urlText.innerText = currentQrUrl;
+
+      new QRCode(qrcodeEl, {
+        text: currentQrUrl,
+        width: 180,
+        height: 180,
+        colorDark: '#0b1120',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeQrModal(e) {
+      document.getElementById('qrModal').classList.add('hidden');
+    }
+
+    function closeQrModalDirect() {
+      document.getElementById('qrModal').classList.add('hidden');
+    }
+
+    function copyQrUrl() {
+      navigator.clipboard.writeText(currentQrUrl).then(() => {
+        alert('Enlace copiado: ' + currentQrUrl);
+      }).catch(() => {
+        prompt('Copia este enlace:', currentQrUrl);
+      });
+    }
+
+    // Inicializar
+    window.addEventListener('DOMContentLoaded', () => {
+      renderRoster();
+      initFirebase();
+    });
+  </script>
+</body>
+</html>
+
+```
+
+---
+
 ## Archivo: public/aliados-c1/index.html
 
 ```html
@@ -60881,6 +61426,8 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
       .print-text { color: black !important; }
     }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 </head>
 <body class="min-h-screen py-6 px-3 sm:px-6 antialiased selection:bg-orange-500 selection:text-white">
 
@@ -61245,6 +61792,20 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
 
       try {
         localStorage.setItem('cq_firewalk_signature', JSON.stringify(signatureData));
+      // Guardar en Firestore Cloud
+      if (db) {
+        db.collection('contratos_caminata_fuego').add({
+          ...signatureData,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          source: 'cartas.crearpsl.net',
+          sede: 'Lima'
+        }).then(ref => {
+          console.log('✅ Contrato persistido en Firestore:', ref.id);
+        }).catch(err => {
+          console.warn('⚠️ Error guardando en Firestore:', err);
+        });
+      }
+
       } catch(err) {
         console.warn('Storage warning:', err);
       }
@@ -76269,6 +76830,7 @@ import GuiaAliadosC1 from './pages/GuiaAliadosC1';
 import ContrasteNodusSheets from './pages/ContrasteNodusSheets';
 
 const ContratoCaminataFuego = lazy(() => import('./pages/ContratoCaminataFuego'));
+const MonitorAcreditacionFuegoLima = lazy(() => import('./pages/MonitorAcreditacionFuegoLima'));
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
@@ -76520,6 +77082,8 @@ function App() {
           <Route path="/caminata-fuego" element={<ContratoCaminataFuego />} />
           <Route path="/contrato-caminata-fuego" element={<ContratoCaminataFuego />} />
           <Route path="/firewalking" element={<Navigate to="/caminata-fuego" replace />} />
+          <Route path="/monitor-fuego-lima" element={<MonitorAcreditacionFuegoLima />} />
+          <Route path="/acreditacion-fuego-lima" element={<Navigate to="/monitor-fuego-lima" replace />} />
           <Route path="/causa-os-task" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio', 'superadmin']}>
               <CausaOSTask />
@@ -152917,6 +153481,710 @@ export default function LearningDashboard() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src/pages/MonitorAcreditacionFuegoLima.jsx
+
+```javascript
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Flame,
+  ShieldCheck,
+  ShieldAlert,
+  Search,
+  CheckCircle2,
+  AlertTriangle,
+  QrCode,
+  ExternalLink,
+  Copy,
+  Users,
+  Check,
+  PhoneCall,
+  Clock,
+  Sparkles,
+  RefreshCw,
+  X
+} from 'lucide-react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import padronLima111 from '../data/padron_fuego_lima_111.json';
+
+export default function MonitorAcreditacionFuegoLima() {
+  const [signedContracts, setSignedContracts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [teamFilter, setTeamFilter] = useState('TODOS');
+  const [statusFilter, setStatusFilter] = useState('TODOS');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [qrModalType, setQrModalType] = useState(null); // 'contract' | 'monitor' | null
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  // Normalizar strings para búsqueda y matching
+  const normalizeStr = (str) => {
+    if (!str) return '';
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  };
+
+  // Escuchar firmas en tiempo real desde Firestore
+  useEffect(() => {
+    if (!db) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const colRef = collection(db, 'contratos_caminata_fuego');
+      const unsubscribe = onSnapshot(
+        colRef,
+        (snapshot) => {
+          const list = [];
+          snapshot.forEach((doc) => {
+            list.push({ id: doc.id, ...doc.data() });
+          });
+          setSignedContracts(list);
+          setLoading(false);
+        },
+        (error) => {
+          console.warn('⚠️ Error en listener Firestore contratos_caminata_fuego:', error);
+          setLoading(false);
+        }
+      );
+
+      return () => unsubscribe();
+    } catch (err) {
+      console.warn('Firestore subscription error:', err);
+      setLoading(false);
+    }
+  }, []);
+
+  // Matching de firmas contra el padrón oficial de 111 integrantes
+  const enrichedList = useMemo(() => {
+    return padronLima111.map((person) => {
+      const normPersonName = normalizeStr(person.nombre);
+      const personTokens = normPersonName.split(/\s+/).filter((t) => t.length > 2);
+
+      const signature = signedContracts.find((c) => {
+        const normSigName = normalizeStr(c.nombre || c.nombreCompleto || '');
+        if (normSigName === normPersonName) return true;
+        const matchTokens = personTokens.filter((t) => normSigName.includes(t));
+        return matchTokens.length >= 2;
+      });
+
+      return {
+        ...person,
+        isSigned: !!signature,
+        signature
+      };
+    });
+  }, [signedContracts]);
+
+  // Contadores KPI
+  const stats = useMemo(() => {
+    const total = enrichedList.length;
+    const firmados = enrichedList.filter((p) => p.isSigned).length;
+    const pendientes = total - firmados;
+    const porcentaje = total > 0 ? Math.round((firmados / total) * 100) : 0;
+    return { total, firmados, pendientes, porcentaje };
+  }, [enrichedList]);
+
+  // Filtrado reactivo
+  const filteredList = useMemo(() => {
+    return enrichedList.filter((item) => {
+      if (teamFilter !== 'TODOS' && item.equipo !== teamFilter) {
+        return false;
+      }
+      if (statusFilter === 'PENDIENTES' && item.isSigned) {
+        return false;
+      }
+      if (statusFilter === 'FIRMADOS' && !item.isSigned) {
+        return false;
+      }
+      if (searchTerm) {
+        const term = normalizeStr(searchTerm);
+        const nameNorm = normalizeStr(item.nombre);
+        const rolNorm = normalizeStr(item.rol);
+        const cohorteNorm = normalizeStr(item.cohorte);
+        const docNum = item.signature ? normalizeStr(item.signature.numeroDocumento || item.signature.doc) : '';
+        return (
+          nameNorm.includes(term) ||
+          rolNorm.includes(term) ||
+          cohorteNorm.includes(term) ||
+          docNum.includes(term)
+        );
+      }
+      return true;
+    });
+  }, [enrichedList, teamFilter, statusFilter, searchTerm]);
+
+  const contractUrl = 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
+  const monitorUrl = 'https://cartas.crearpsl.net/monitor_fuego_lima.html';
+
+  const copyUrl = (url) => {
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    });
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#070b13', color: '#f8fafc', padding: '1.25rem 0.75rem' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+        {/* Encabezado Operativo */}
+        <div style={{
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+          border: '1px solid rgba(249, 115, 22, 0.35)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          boxShadow: '0 20px 40px -15px rgba(249, 115, 22, 0.15)'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #f59e0b, #ea580c, #dc2626)'
+          }} />
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
+                <span style={{
+                  background: 'linear-gradient(90deg, #ea580c, #dc2626)',
+                  color: '#fff',
+                  fontSize: '0.7rem',
+                  fontWeight: 900,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  padding: '0.25rem 0.6rem',
+                  borderRadius: '6px'
+                }}>
+                  🔥 CAUSA OS · LIMA OPERACIONES
+                </span>
+                <span style={{
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  color: '#34d399',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: '6px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+                  EN VIVO
+                </span>
+              </div>
+              <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#fff' }}>
+                Monitor de Acreditación · Caminata sobre Fuego
+              </h1>
+              <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.84rem', color: '#94a3b8', fontWeight: 500 }}>
+                📍 Casona Blanca (Calle Las Perdices 1126, Huachipa) · Control de Firmas de Exoneración
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setQrModalType('contract')}
+                style={{
+                  background: '#ea580c',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '0.65rem 1rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 800,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(234, 88, 12, 0.3)'
+                }}
+              >
+                <QrCode size={16} /> QR Contrato
+              </button>
+              <a
+                href={contractUrl}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  border: '1px solid #334155',
+                  borderRadius: '10px',
+                  padding: '0.65rem 1rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  textDecoration: 'none'
+                }}
+              >
+                Abrir Formulario <ExternalLink size={14} />
+              </a>
+            </div>
+          </div>
+
+          {/* Tarjetas KPI */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+            gap: '0.75rem',
+            marginTop: '1.25rem',
+            paddingTop: '1.25rem',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)'
+          }}>
+            <div style={{ background: '#0f172a', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid #334155' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Padrón Lima</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', marginTop: '0.15rem' }}>{stats.total}</div>
+            </div>
+            <div style={{ background: 'rgba(6, 78, 59, 0.3)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✓ Acreditados</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '0.15rem' }}>{stats.firmados}</div>
+            </div>
+            <div style={{ background: 'rgba(136, 19, 55, 0.3)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(244, 63, 94, 0.4)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Pendientes</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.pendientes}</div>
+            </div>
+            <div style={{ background: 'rgba(120, 53, 15, 0.3)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>% Aceptación</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>{stats.porcentaje}%</div>
+            </div>
+          </div>
+
+          {/* Barra de Progreso */}
+          <div style={{ marginTop: '0.85rem' }}>
+            <div style={{ width: '100%', height: '8px', background: '#0f172a', borderRadius: '9999px', overflow: 'hidden', padding: '1px', border: '1px solid #334155' }}>
+              <div style={{
+                height: '100%',
+                width: `${stats.porcentaje}%`,
+                background: 'linear-gradient(90deg, #f59e0b, #ea580c, #10b981)',
+                borderRadius: '9999px',
+                transition: 'width 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+              }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Barra de Filtros y Búsqueda */}
+        <div style={{
+          background: 'rgba(15, 23, 42, 0.95)',
+          border: '1px solid #1e293b',
+          borderRadius: '14px',
+          padding: '1rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.75rem',
+          position: 'sticky',
+          top: '0.75rem',
+          zIndex: 20,
+          backdropFilter: 'blur(8px)',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.4)'
+        }}>
+          {/* Buscador */}
+          <div style={{ position: 'relative' }}>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="🔍 Buscar por nombre, apellido, DNI o rol..."
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem 0.75rem 2.6rem',
+                background: '#0b1120',
+                border: '1px solid #334155',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '0.86rem',
+                fontWeight: 600,
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
+            <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                style={{
+                  position: 'absolute',
+                  right: '0.75rem',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  fontSize: '0.8rem',
+                  fontWeight: 800
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Filtros por Equipo */}
+          <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
+            {[
+              { id: 'TODOS', label: `Todos (${padronLima111.length})` },
+              { id: 'Equipo 29', label: 'E29 · Phoenix (16)' },
+              { id: 'Equipo 30', label: 'E30 · Tinkuy (34)' },
+              { id: 'Equipo 31', label: 'E31 · Imperio (19)' },
+              { id: 'Equipo 32', label: 'E32 · C2 Lima (42)' }
+            ].map((t) => {
+              const active = teamFilter === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTeamFilter(t.id)}
+                  style={{
+                    background: active ? '#ea580c' : '#1e293b',
+                    color: active ? '#fff' : '#cbd5e1',
+                    border: active ? 'none' : '1px solid #334155',
+                    borderRadius: '8px',
+                    padding: '0.4rem 0.75rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Filtro por Estado */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', marginRight: '0.25rem' }}>Estado:</span>
+            {[
+              { id: 'TODOS', label: 'Todos' },
+              { id: 'PENDIENTES', label: '🚨 Solo Pendientes' },
+              { id: 'FIRMADOS', label: '✓ Acreditados' }
+            ].map((s) => {
+              const active = statusFilter === s.id;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setStatusFilter(s.id)}
+                  style={{
+                    background: active ? (s.id === 'PENDIENTES' ? '#881337' : s.id === 'FIRMADOS' ? '#064e3b' : '#334155') : '#1e293b',
+                    color: active ? '#fff' : '#94a3b8',
+                    border: active ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #334155',
+                    borderRadius: '6px',
+                    padding: '0.3rem 0.65rem',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Indicador de Conteo */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem', fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600 }}>
+          <span>Mostrando <strong>{filteredList.length}</strong> de {enrichedList.length} integrantes</span>
+          <span style={{ fontSize: '0.72rem', color: '#64748b' }}>Sincronización en vivo con Firestore</span>
+        </div>
+
+        {/* Lista de Integrantes */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+          {filteredList.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: '#0f172a', borderRadius: '12px', border: '1px solid #1e293b' }}>
+              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔍</div>
+              <p style={{ margin: 0, fontWeight: 700, color: '#fff' }}>No se encontraron integrantes con este filtro</p>
+              <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.78rem', color: '#94a3b8' }}>Prueba limpiando el buscador o cambiando de equipo.</p>
+            </div>
+          ) : (
+            filteredList.map((item) => {
+              if (item.isSigned) {
+                const sig = item.signature;
+                const docText = sig.tipoDocumento && sig.numeroDocumento
+                  ? `${sig.tipoDocumento}: ${sig.numeroDocumento}`
+                  : (sig.doc || 'Registrado');
+                const time = sig.timestamp || 'Fecha verificada';
+                const code = sig.code || 'CQ-FIRE-VERIFIED';
+                const rolFirmado = sig.rol || item.rol;
+
+                return (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.9)',
+                      border: '1px solid rgba(16, 185, 129, 0.4)',
+                      borderRadius: '12px',
+                      padding: '1rem',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      boxShadow: '0 4px 12px rgba(6, 78, 59, 0.15)'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                        <span style={{
+                          background: 'rgba(16, 185, 129, 0.2)',
+                          color: '#34d399',
+                          border: '1px solid rgba(16, 185, 129, 0.4)',
+                          fontSize: '0.65rem',
+                          fontWeight: 900,
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '4px'
+                        }}>
+                          ✓ ACREDITADO / FIRMADO
+                        </span>
+                        <span style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                          {item.equipo} · {item.cohorte}
+                        </span>
+                        <span style={{ background: 'rgba(249, 115, 22, 0.1)', color: '#fb923c', border: '1px solid rgba(249, 115, 22, 0.25)', fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                          {rolFirmado}
+                        </span>
+                      </div>
+                      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>
+                        <span>🆔 <strong style={{ color: '#e2e8f0' }}>{docText}</strong></span>
+                        <span>🕒 <strong style={{ color: '#cbd5e1' }}>{time}</strong></span>
+                        <span style={{ color: '#fbbf24', fontFamily: 'monospace', fontSize: '0.72rem' }}>{code}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        color: '#34d399',
+                        border: '1px solid rgba(16, 185, 129, 0.3)',
+                        borderRadius: '8px',
+                        padding: '0.4rem 0.75rem',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem'
+                      }}>
+                        <CheckCircle2 size={15} color="#34d399" /> Listo para Ingreso
+                      </span>
+                    </div>
+                  </div>
+                );
+              } else {
+                // Pendiente de firma
+                const waMessage = encodeURIComponent(
+                  `Hola ${item.nombre}, te escribe el equipo de CREAR PSL Lima. Por favor completa y firma tu exoneración legal obligatoria para la Caminata sobre Fuego en Casona Blanca antes de ingresar aquí: https://cartas.crearpsl.net/contrato_caminata_fuego.html`
+                );
+
+                return (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: 'rgba(15, 23, 42, 0.85)',
+                      border: '1px solid rgba(244, 63, 94, 0.35)',
+                      borderRadius: '12px',
+                      padding: '1rem',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '0.75rem'
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                        <span style={{
+                          background: 'rgba(244, 63, 94, 0.2)',
+                          color: '#fb7185',
+                          border: '1px solid rgba(244, 63, 94, 0.4)',
+                          fontSize: '0.65rem',
+                          fontWeight: 900,
+                          padding: '0.15rem 0.45rem',
+                          borderRadius: '4px'
+                        }}>
+                          🚨 PENDIENTE DE FIRMA
+                        </span>
+                        <span style={{ background: '#1e293b', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                          {item.equipo} · {item.cohorte}
+                        </span>
+                        <span style={{ background: '#1e293b', color: '#94a3b8', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                          {item.rol}
+                        </span>
+                      </div>
+                      <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>{item.nombre}</h3>
+                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                        {item.detalle || 'Requiere firma digital antes del ingreso a la actividad'}
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <a
+                        href={`https://wa.me/?text=${waMessage}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          background: '#16a34a',
+                          color: '#fff',
+                          textDecoration: 'none',
+                          borderRadius: '8px',
+                          padding: '0.5rem 0.85rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                          boxShadow: '0 4px 10px rgba(22, 163, 74, 0.25)'
+                        }}
+                      >
+                        <PhoneCall size={14} /> Recordar por WhatsApp
+                      </a>
+                      <button
+                        onClick={() => copyUrl(contractUrl)}
+                        title="Copiar enlace del contrato"
+                        style={{
+                          background: '#1e293b',
+                          color: '#cbd5e1',
+                          border: '1px solid #334155',
+                          borderRadius: '8px',
+                          padding: '0.5rem 0.65rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {copiedLink ? <Check size={14} color="#34d399" /> : <Copy size={14} />}
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+            })
+          )}
+        </div>
+
+        {/* Modal QR Code */}
+        {qrModalType && (
+          <div
+            onClick={() => setQrModalType(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem'
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: '#0f172a',
+                border: '1px solid rgba(249, 115, 22, 0.4)',
+                borderRadius: '16px',
+                padding: '1.75rem',
+                maxWidth: '360px',
+                width: '100%',
+                textAlign: 'center',
+                position: 'relative',
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)'
+              }}
+            >
+              <button
+                onClick={() => setQrModalType(null)}
+                style={{
+                  position: 'absolute',
+                  top: '1rem',
+                  right: '1rem',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#94a3b8',
+                  fontSize: '1.25rem',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕
+              </button>
+
+              <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
+                {qrModalType === 'contract' ? 'Escanear para Firmar Contrato' : 'Escanear para Abrir Monitor'}
+              </h3>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: '#94a3b8' }}>
+                {qrModalType === 'contract'
+                  ? 'Pide al participante o staff escanear este código con su celular para abrir la exoneración oficial.'
+                  : 'Comparte este monitor en vivo con el equipo de staff y capitanía.'}
+              </p>
+
+              <div style={{ background: '#fff', padding: '1rem', borderRadius: '12px', display: 'inline-block', margin: '0 auto 1rem auto' }}>
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                    qrModalType === 'contract' ? contractUrl : monitorUrl
+                  )}`}
+                  alt="QR Code"
+                  style={{ width: '190px', height: '190px', display: 'block' }}
+                />
+              </div>
+
+              <div style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: '#94a3b8', wordBreak: 'break-all', marginBottom: '1rem' }}>
+                {qrModalType === 'contract' ? contractUrl : monitorUrl}
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={() => copyUrl(qrModalType === 'contract' ? contractUrl : monitorUrl)}
+                  style={{
+                    flex: 1,
+                    background: '#ea580c',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.65rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 800,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {copiedLink ? '✓ ¡Copiado!' : '📋 Copiar Enlace'}
+                </button>
+                <button
+                  onClick={() => setQrModalType(null)}
+                  style={{
+                    flex: 1,
+                    background: '#1e293b',
+                    color: '#cbd5e1',
+                    border: '1px solid #334155',
+                    borderRadius: '8px',
+                    padding: '0.65rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
