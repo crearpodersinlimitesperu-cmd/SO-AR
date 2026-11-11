@@ -1060,10 +1060,19 @@ export const isLegalDocsPending = (currentUser, legalSignatures) => {
  * Acceso a los Monitores Oficiales de Oficina Lima (Caminata sobre Fuego y Reglas de Maestría).
  * Habilitado para Dirección/SuperAdmin/Observador Total y para Gerencia, Coordinación y Contabilidad de Lima.
  */
+const collectUserRoles = (currentUser) => {
+  const roles = [
+    currentUser?.appRole,
+    currentUser?.role,
+    ...(Array.isArray(currentUser?.roles) ? currentUser.roles : [])
+  ];
+  return [...new Set(roles.filter(Boolean).map(r => String(r).toLowerCase().trim()))];
+};
+
 export const canAccessMonitorContratoLima = (currentUser) => {
   if (!currentUser || isUserInactive(currentUser)) return false;
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
-  if (isGlobalObserver(currentUser) || isDataAdmin(currentUser) || isDireccionRole(currentUser)) return true;
+  if (isGlobalObserver(currentUser) || isDataAdmin(currentUser)) return true;
   const userRoles = collectUserRoles(currentUser);
   if (userRoles.some(r => ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'director_maestria', 'observador', 'consolidado'].includes(r))) {
     return true;
