@@ -48,7 +48,7 @@ import {
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
-  canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar,
+  canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar, isGlobalObserver,
   PORTFOLIO_FI_REVIEW_EMAILS
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
@@ -842,7 +842,7 @@ export default function Home() {
   // esta en la lista pedida -- exactamente lo que la vista consolidada deberia
   // mostrar ("todo lo que sus roles reales abarcan"), no todo sin excepcion.
   const hasRoleAccess = (allowedRoles) => {
-    if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
+    if ((currentUser?.isSuperAdmin || isGlobalObserver(currentUser)) && !currentUser?.isSimulated) return true;
     return allowedRoles.includes(currentUser?.appRole) ||
            (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   };

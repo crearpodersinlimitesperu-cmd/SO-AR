@@ -79173,7 +79173,7 @@ import { signInWithPopup, reauthenticateWithPopup, GoogleAuthProvider, signOut, 
 import { collection, query, where, or, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail, usersData as allUsersList } from '../data/usersData';
-import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
+import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS, OBSERVER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
 import { recordAuditEvent } from '../services/auditService';
 import { isUserInactive, mergeAuthenticatedRoleProfile, normalizeUserRecord } from '../utils/userNormalizer';
@@ -79538,6 +79538,16 @@ export function AuthProvider({ children }) {
       if (!assignedRoles.includes('observador')) assignedRoles.push('observador');
       if (!assignedRoles.includes('entrenador')) assignedRoles.push('entrenador');
       if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+    }
+
+    // Armando Pilacuán: Acceso de Observador Total en toda la plataforma Causa OS
+    const isArmandoPilacuan = ['armando.pilacuan@gmail.com', 'armando.pilacuan@crearpsl.net', 'armando.pilacuan@crearpsl.com'].includes(normalizedEmail) || ['armando.pilacuan@gmail.com', 'armando.pilacuan@crearpsl.net', 'armando.pilacuan@crearpsl.com'].includes(rawEmail);
+    if (isArmandoPilacuan) {
+      if (!assignedRoles.includes('observador')) assignedRoles.push('observador');
+      if (!assignedRoles.includes('direccion')) assignedRoles.push('direccion');
+      if (!assignedRoles.includes('gerente')) assignedRoles.push('gerente');
+      if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+      if (!canonicalRole || canonicalRole === 'colaborador') canonicalRole = 'observador';
     }
 
     // Ricardo Gavilánez: Gerente (Cuenca) y Quantum Team (Quito)
@@ -79936,12 +79946,12 @@ export function AuthProvider({ children }) {
             }
           }
 
-          if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
+          if (!foundUser && (isSuperAdminEmail(normalizedEmail) || OBSERVER_EMAILS.includes(normalizedEmail) || OBSERVER_EMAILS.includes(rawEmail))) {
             foundUser = {
               id: user.uid,
               uid: user.uid,
-              name: user.displayName || "Administrador",
-              role: "gerente",
+              name: user.displayName || "Observador Global",
+              role: OBSERVER_EMAILS.includes(normalizedEmail) || OBSERVER_EMAILS.includes(rawEmail) ? "observador" : "gerente",
               sede: "Global",
               emails: [normalizedEmail]
             };
@@ -82917,9 +82927,10 @@ import { isUserInactive } from '../utils/userNormalizer.js';
  * gestión de metas, y visibilidad global multi-sede.
  */
 export const SUPER_ADMIN_EMAILS = [
-  'jose.sanchez@crearpsl.net',   // José Sánchez — SuperAdmin + Gerente Lima
-  'armando.pilacuan@gmail.com',  // Armando Pilacuán — SuperAdmin
-  'paul.sosa@crearpsl.net'       // Paul Sosa — SuperAdmin
+  'jose.sanchez@crearpsl.net',      // José Sánchez — SuperAdmin + Gerente Lima
+  'armando.pilacuan@gmail.com',     // Armando Pilacuán — SuperAdmin + Observador Total
+  'armando.pilacuan@crearpsl.net',  // Armando Pilacuán — Correo Corporativo Oficial
+  'paul.sosa@crearpsl.net'          // Paul Sosa — SuperAdmin
 ];
 
 // Mantener sincronizada con isGerenteODireccion() en firestore.rules.
@@ -83172,19 +83183,25 @@ export const canChangeManagerStatus = (currentUser) => {
 };
 
 /**
- * Correos con rol de Observador Global (Jesús Acosta)
- * Habilitado para ver toda la plataforma sin limitaciones (solo lectura en este rol).
+ * Correos con rol de Observador Global / Total (Jesús Acosta, Armando Pilacuán)
+ * Habilitado para ver toda la plataforma sin limitaciones (visibilidad global en Causa OS).
  */
 export const OBSERVER_EMAILS = [
   'jesus.acosta@crearpsl.net',
   'chuyacostar88@gmail.com',
-  'jesusadrianacosta@gmail.com'
+  'jesusadrianacosta@gmail.com',
+  'armando.pilacuan@gmail.com',
+  'armando.pilacuan@crearpsl.net',
+  'armando.pilacuan@crearpsl.com'
 ];
 
 export const isGlobalObserver = (currentUser) => {
   if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').toLowerCase().trim();
   if (OBSERVER_EMAILS.includes(email)) return true;
+  if (Array.isArray(currentUser.emails) && currentUser.emails.some(e => OBSERVER_EMAILS.includes(String(e || '').toLowerCase().trim()))) {
+    return true;
+  }
   const r = (currentUser.appRole || currentUser.role || '').toLowerCase();
   const roles = Array.isArray(currentUser.roles) ? currentUser.roles.map(x => String(x).toLowerCase()) : [];
   return r === 'observador' || roles.includes('observador');
@@ -83346,9 +83363,9 @@ export const canViewKPIsLlamadas = (currentUser) => {
   if (!currentUser || isUserInactive(currentUser)) return false;
   const email = (currentUser.email || '').trim().toLowerCase();
 
-  // "yo" / SuperAdmin
+  // "yo" / SuperAdmin / Observador Global
   if (email === 'jose.sanchez@crearpsl.net') return true;
-  if (currentUser.isSuperAdmin || isSuperAdminEmail(email)) return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(email) || isGlobalObserver(currentUser)) return true;
 
   // "directores"
   if (currentUser.isDireccion) return true;
@@ -83391,6 +83408,7 @@ export const canWriteNotaSeguimiento = (currentUser) => {
  */
 export const canViewAllNotasSeguimiento = (currentUser) => {
   if (!currentUser || isUserInactive(currentUser)) return false;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) return true;
   const role = currentUser.appRole || currentUser.role;
   const roles = currentUser.roles || (role ? [role] : []);
   return role === 'coord_maestria' || role === 'director_maestria' ||
@@ -83738,8 +83756,8 @@ export const OFFICIAL_PERMISSION_MATRIX = {
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser || isUserInactive(currentUser)) return { hasAccess: false, scope: 'NONE' };
 
-  // Super Admin tiene acceso GLOBAL incondicional (salvo simulación explícita de otro usuario)
-  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isSimulated) {
+  // Super Admin y Observador Global tienen acceso GLOBAL incondicional (salvo simulación explícita de otro usuario)
+  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || isGlobalObserver(currentUser)) && !currentUser.isSimulated) {
     return { hasAccess: true, scope: 'GLOBAL' };
   }
 
@@ -185163,7 +185181,7 @@ import {
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
-  canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar,
+  canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar, isGlobalObserver,
   PORTFOLIO_FI_REVIEW_EMAILS
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
@@ -185957,7 +185975,7 @@ export default function Home() {
   // esta en la lista pedida -- exactamente lo que la vista consolidada deberia
   // mostrar ("todo lo que sus roles reales abarcan"), no todo sin excepcion.
   const hasRoleAccess = (allowedRoles) => {
-    if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
+    if ((currentUser?.isSuperAdmin || isGlobalObserver(currentUser)) && !currentUser?.isSimulated) return true;
     return allowedRoles.includes(currentUser?.appRole) ||
            (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   };

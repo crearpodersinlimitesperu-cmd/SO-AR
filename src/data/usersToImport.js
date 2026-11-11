@@ -1458,5 +1458,25 @@ export const USERS_TO_IMPORT = [
     "nodusPassword": "nolaolvidare",
     "nodusSede": "LIMA CICLO 1",
     "nodusStatus": "Activo"
+  },
+  {
+    "id": "observador_armandopilacuan",
+    "name": "Armando Pilacuán",
+    "role": "observador",
+    "roles": [
+      "observador",
+      "direccion",
+      "gerente",
+      "consolidado"
+    ],
+    "sede": "Global",
+    "corporateEmail": "armando.pilacuan@crearpsl.net",
+    "personalEmail": "armando.pilacuan@gmail.com",
+    "emails": [
+      "armando.pilacuan@gmail.com",
+      "armando.pilacuan@crearpsl.net",
+      "armando.pilacuan@crearpsl.com"
+    ],
+    "email": "armando.pilacuan@gmail.com"
   }
 ];

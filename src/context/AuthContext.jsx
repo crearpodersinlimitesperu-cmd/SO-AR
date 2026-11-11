@@ -4,7 +4,7 @@ import { signInWithPopup, reauthenticateWithPopup, GoogleAuthProvider, signOut, 
 import { collection, query, where, or, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail, usersData as allUsersList } from '../data/usersData';
-import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
+import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS, OBSERVER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
 import { recordAuditEvent } from '../services/auditService';
 import { isUserInactive, mergeAuthenticatedRoleProfile, normalizeUserRecord } from '../utils/userNormalizer';
@@ -369,6 +369,16 @@ export function AuthProvider({ children }) {
       if (!assignedRoles.includes('observador')) assignedRoles.push('observador');
       if (!assignedRoles.includes('entrenador')) assignedRoles.push('entrenador');
       if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+    }
+
+    // Armando Pilacuán: Acceso de Observador Total en toda la plataforma Causa OS
+    const isArmandoPilacuan = ['armando.pilacuan@gmail.com', 'armando.pilacuan@crearpsl.net', 'armando.pilacuan@crearpsl.com'].includes(normalizedEmail) || ['armando.pilacuan@gmail.com', 'armando.pilacuan@crearpsl.net', 'armando.pilacuan@crearpsl.com'].includes(rawEmail);
+    if (isArmandoPilacuan) {
+      if (!assignedRoles.includes('observador')) assignedRoles.push('observador');
+      if (!assignedRoles.includes('direccion')) assignedRoles.push('direccion');
+      if (!assignedRoles.includes('gerente')) assignedRoles.push('gerente');
+      if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+      if (!canonicalRole || canonicalRole === 'colaborador') canonicalRole = 'observador';
     }
 
     // Ricardo Gavilánez: Gerente (Cuenca) y Quantum Team (Quito)
@@ -767,12 +777,12 @@ export function AuthProvider({ children }) {
             }
           }
 
-          if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
+          if (!foundUser && (isSuperAdminEmail(normalizedEmail) || OBSERVER_EMAILS.includes(normalizedEmail) || OBSERVER_EMAILS.includes(rawEmail))) {
             foundUser = {
               id: user.uid,
               uid: user.uid,
-              name: user.displayName || "Administrador",
-              role: "gerente",
+              name: user.displayName || "Observador Global",
+              role: OBSERVER_EMAILS.includes(normalizedEmail) || OBSERVER_EMAILS.includes(rawEmail) ? "observador" : "gerente",
               sede: "Global",
               emails: [normalizedEmail]
             };
