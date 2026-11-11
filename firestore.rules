@@ -1419,6 +1419,14 @@ service cloud.firestore {
       allow read, create: if true;
       allow update, delete: if isSuperAdmin();
     }
+
+    // ============================================================================
+    // CONTRATO MAESTRÍA LIMA: Registro legal y firma digital pública
+    // ============================================================================
+    match /contratos_maestria_lima/{contratoId} {
+      allow read, create: if true;
+      allow update, delete: if isSuperAdmin();
+    }
   }
 }
 

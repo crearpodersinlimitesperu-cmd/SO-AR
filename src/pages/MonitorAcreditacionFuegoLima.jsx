@@ -17,11 +17,13 @@ import {
   FileText,
   Sparkles,
   Calendar,
+  Mail,
   X
 } from 'lucide-react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
+import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 
 export default function MonitorAcreditacionFuegoLima() {
   const [signedContracts, setSignedContracts] = useState([]);
@@ -39,6 +41,57 @@ export default function MonitorAcreditacionFuegoLima() {
 
   const [qrModalType, setQrModalType] = useState(null); // 'contract' | 'monitor' | null
   const [copiedLink, setCopiedLink] = useState(false);
+  const [sendingEmailId, setSendingEmailId] = useState(null);
+  const [emailStatusMap, setEmailStatusMap] = useState({});
+
+  const handleResendFirewalkEmail = async (item) => {
+    if (!item.email) {
+      alert('Este registro no cuenta con correo electrónico.');
+      return;
+    }
+    const rowKey = item.id || item.code;
+    setSendingEmailId(rowKey);
+    try {
+      const code = item.code || item.verificationCode || 'CQ-FIRE-VERIFIED';
+      const docDisplay = item.doc || `${item.tipoDocumento || 'DNI'}: ${item.numeroDocumento || ''}`;
+      const passDataUrl = await generateFirewalkPassCanvas({
+        nombre: item.nombre || item.nombreCompleto || 'Participante',
+        documento: docDisplay,
+        rolActividad: item.rol || item.rolActividad || 'Participante',
+        lugar: item.lugar || item.sedeLocacion || 'Lima - Casona Blanca (Huachipa)',
+        fecha: item.fecha || item.timestamp || 'Registrado',
+        codigo: code,
+        ip: item.ip || 'Registrada',
+        geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: item.coordinates || ''
+      });
+
+      const ok = await sendFirewalkConfirmationEmail({
+        db,
+        toEmail: item.email,
+        nombre: item.nombre || item.nombreCompleto,
+        documento: docDisplay,
+        rolActividad: item.rol || item.rolActividad || 'Participante',
+        lugar: item.lugar || item.sedeLocacion || 'Lima - Casona Blanca (Huachipa)',
+        codigo: code,
+        fecha: item.fecha || item.timestamp || 'Registrado',
+        passDataUrl,
+        telefono: item.telefono || '',
+        ip: item.ip || 'Registrada',
+        geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: item.coordinates || '',
+        device: item.dispositivo || '',
+        sha256Hash: item.sha256Hash || ''
+      });
+
+      setEmailStatusMap((prev) => ({ ...prev, [rowKey]: ok ? 'SENT' : 'ERROR' }));
+    } catch (e) {
+      console.error('Error reenviando pase de fuego:', e);
+      setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
 
   const normalizeStr = (str) => {
     if (!str) return '';
@@ -488,11 +541,39 @@ export default function MonitorAcreditacionFuegoLima() {
                         </span>
                       </div>
 
-                      <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
-                        {nombre}
-                      </h3>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
+                          {nombre}
+                        </h3>
+                        {item.email && (
+                          <button
+                            onClick={() => handleResendFirewalkEmail(item)}
+                            disabled={sendingEmailId === (item.id || item.code)}
+                            style={{
+                              background: emailStatusMap[item.id || item.code] === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(249, 115, 22, 0.16)',
+                              color: emailStatusMap[item.id || item.code] === 'SENT' ? '#34d399' : '#fb923c',
+                              border: '1px solid rgba(249, 115, 22, 0.35)',
+                              borderRadius: '8px',
+                              padding: '0.4rem 0.75rem',
+                              fontSize: '0.73rem',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <Mail size={13} />
+                            {sendingEmailId === (item.id || item.code)
+                              ? 'Enviando Pase...'
+                              : emailStatusMap[item.id || item.code] === 'SENT'
+                              ? '✓ Pase Enviado al Correo'
+                              : `Reenviar Pase (${item.email})`}
+                          </button>
+                        )}
+                      </div>
 
-                      {/* Caja Destacada: Lugar y Fechas */}
+                      {/* Caja Destacada: Lugar, Fechas, IP y Geolocalización */}
                       <div style={{
                         background: '#0b1120',
                         border: '1px solid #334155',
@@ -510,6 +591,14 @@ export default function MonitorAcreditacionFuegoLima() {
                         <div>
                           <span style={{ color: '#94a3b8', fontWeight: 700 }}>🕒 Fecha y Hora: </span>
                           <strong style={{ color: '#34d399' }}>{fecha}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: '#94a3b8', fontWeight: 700 }}>🌐 IP Pública: </span>
+                          <strong style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{item.ip || 'Registrada'}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: '#94a3b8', fontWeight: 700 }}>🌎 Geolocalización: </span>
+                          <strong style={{ color: '#fde047' }}>{item.geoLocation || 'Lima, Perú 🇵🇪'} {item.coordinates ? `(${item.coordinates})` : ''}</strong>
                         </div>
                         <div style={{ gridColumn: '1 / -1' }}>
                           <span style={{ color: '#94a3b8', fontWeight: 700 }}>📍 Lugar: </span>

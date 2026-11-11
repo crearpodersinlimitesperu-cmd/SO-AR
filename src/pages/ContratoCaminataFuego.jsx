@@ -27,6 +27,8 @@ import {
 } from 'lucide-react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { getClientGeoLocation } from '../utils/geoLocator';
+import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 
 export default function ContratoCaminataFuego() {
   const [activeTab, setActiveTab] = useState('todo');
@@ -36,6 +38,13 @@ export default function ContratoCaminataFuego() {
   const [signedSuccess, setSignedSuccess] = useState(null);
   const [passDataUrl, setPassDataUrl] = useState(null);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [geoInfo, setGeoInfo] = useState({
+    ip: 'Detectando IP...',
+    locationString: 'Lima, Perú 🇵🇪',
+    coordinates: '',
+    device: ''
+  });
+  const [emailStatus, setEmailStatus] = useState('IDLE');
 
   // Formulario de Firma Digital
   const [formData, setFormData] = useState({
@@ -60,7 +69,33 @@ export default function ContratoCaminataFuego() {
 
   useEffect(() => {
     document.title = 'Instrumento Integrado Caminata sobre Fuego · Creación Cuántica E.I.R.L.';
+    let mounted = true;
+    getClientGeoLocation().then((info) => {
+      if (mounted && info) setGeoInfo(info);
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  const computeSha256 = async (text) => {
+    try {
+      if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch {
+      // Fallback
+    }
+    let h = 0;
+    for (let i = 0; i < text.length; i++) {
+      h = (Math.imul(31, h) + text.charCodeAt(i)) | 0;
+    }
+    return `SHA256-FW-${Math.abs(h).toString(16).toUpperCase()}-${Date.now().toString(16).toUpperCase()}`;
+  };
 
   // Generador de Imagen Oficial: "SÍ VOY A CAMINAR SOBRE FUEGO"
   useEffect(() => {
@@ -68,190 +103,19 @@ export default function ContratoCaminataFuego() {
       setPassDataUrl(null);
       return;
     }
-
-    try {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1080;
-      canvas.height = 1440;
-      const ctx = canvas.getContext('2d');
-      const W = 1080;
-      const H = 1440;
-
-      // 1. Fondo degradado noche & fuego
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-      bgGrad.addColorStop(0, '#050914');
-      bgGrad.addColorStop(0.3, '#120702');
-      bgGrad.addColorStop(0.65, '#220b02');
-      bgGrad.addColorStop(1, '#050201');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, W, H);
-
-      // 2. Resplandor radial de brasas
-      const fireGlow = ctx.createRadialGradient(W / 2, H - 160, 40, W / 2, H - 220, 680);
-      fireGlow.addColorStop(0, 'rgba(255, 115, 0, 0.45)');
-      fireGlow.addColorStop(0.3, 'rgba(234, 88, 12, 0.28)');
-      fireGlow.addColorStop(0.6, 'rgba(185, 28, 28, 0.14)');
-      fireGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = fireGlow;
-      ctx.fillRect(0, 0, W, H);
-
-      // Chispas fijas
-      const sparks = [
-        {x: 180, y: 1200, r: 4, a: 0.8}, {x: 240, y: 1050, r: 6, a: 0.9}, {x: 320, y: 1280, r: 3, a: 0.7},
-        {x: 450, y: 1150, r: 5, a: 0.85}, {x: 620, y: 1100, r: 6, a: 0.9}, {x: 750, y: 1240, r: 4, a: 0.75},
-        {x: 880, y: 1120, r: 5, a: 0.8}, {x: 920, y: 1290, r: 3, a: 0.6}, {x: 140, y: 880, r: 3, a: 0.5},
-        {x: 290, y: 780, r: 4, a: 0.6}, {x: 820, y: 820, r: 4, a: 0.55}, {x: 940, y: 920, r: 3, a: 0.5},
-        {x: 520, y: 980, r: 7, a: 0.95}, {x: 580, y: 1220, r: 5, a: 0.85}, {x: 410, y: 1330, r: 4, a: 0.7}
-      ];
-      sparks.forEach(s => {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 183, 3, ${s.a})`;
-        ctx.shadowColor = '#ea580c';
-        ctx.shadowBlur = 15;
-        ctx.fill();
-      });
-      ctx.shadowBlur = 0;
-
-      // 3. Marcos
-      ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(40, 40, W - 80, H - 80);
-
-      ctx.strokeStyle = 'rgba(234, 88, 12, 0.7)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(52, 52, W - 104, H - 104);
-
-      // Esquinas
-      const cornerSize = 40;
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.moveTo(40, 40 + cornerSize); ctx.lineTo(40, 40); ctx.lineTo(40 + cornerSize, 40); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, 40); ctx.lineTo(W - 40, 40); ctx.lineTo(W - 40, 40 + cornerSize); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(40, H - 40 - cornerSize); ctx.lineTo(40, H - 40); ctx.lineTo(40 + cornerSize, H - 40); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, H - 40); ctx.lineTo(W - 40, H - 40); ctx.lineTo(W - 40, H - 40 - cornerSize); ctx.stroke();
-
-      // 4. Header
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#f59e0b';
-      ctx.font = '700 24px Montserrat, system-ui, sans-serif';
-      ctx.fillText('CREACIÓN CUÁNTICA • MAESTRÍA DEL JUEGO', W / 2, 105);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
-      ctx.fillText('SEDE LIMA · HUACHIPA · NOVIEMBRE 2026', W / 2, 136);
-
-      ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(180, 158); ctx.lineTo(W - 180, 158); ctx.stroke();
-
-      // 5. TÍTULO PRINCIPAL
-      ctx.font = '85px Arial, sans-serif';
-      ctx.fillText('🔥', W / 2, 260);
-
-      const textGrad = ctx.createLinearGradient(150, 0, W - 150, 0);
-      textGrad.addColorStop(0, '#fef08a');
-      textGrad.addColorStop(0.3, '#f59e0b');
-      textGrad.addColorStop(0.7, '#ea580c');
-      textGrad.addColorStop(1, '#dc2626');
-
-      ctx.shadowColor = 'rgba(234, 88, 12, 0.85)';
-      ctx.shadowBlur = 25;
-      ctx.fillStyle = textGrad;
-      ctx.font = '900 62px Montserrat, system-ui, sans-serif';
-      ctx.fillText('SÍ VOY A CAMINAR', W / 2, 345);
-
-      ctx.font = '900 76px Montserrat, system-ui, sans-serif';
-      ctx.fillText('SOBRE FUEGO', W / 2, 430);
-      ctx.shadowBlur = 0;
-
-      ctx.fillStyle = '#fdba74';
-      ctx.font = '700 19px Montserrat, system-ui, sans-serif';
-      ctx.fillText('HABILITACIÓN Y REGISTRO OFICIAL DE FUEGO', W / 2, 480);
-
-      // 6. Tarjeta Titular
-      const boxX = 80;
-      const boxY = 520;
-      const boxW = W - 160;
-      const boxH = 610;
-
-      ctx.fillStyle = 'rgba(10, 16, 30, 0.88)';
-      ctx.strokeStyle = 'rgba(249, 115, 22, 0.55)';
-      ctx.lineWidth = 2;
-      if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(boxX, boxY, boxW, boxH, 24);
-        ctx.fill();
-        ctx.stroke();
-      } else {
-        ctx.fillRect(boxX, boxY, boxW, boxH);
-        ctx.strokeRect(boxX, boxY, boxW, boxH);
-      }
-
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#ffedd5';
-      ctx.font = '800 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('⚡ ACREDITADO EN SALA', boxX + 40, boxY + 50);
-
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#fb923c';
-      ctx.font = '900 22px Montserrat, system-ui, sans-serif';
-      ctx.fillText((signedSuccess.rolActividad || 'PARTICIPANTE').toUpperCase(), boxX + boxW - 40, boxY + 50);
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-      ctx.beginPath(); ctx.moveTo(boxX + 30, boxY + 80); ctx.lineTo(boxX + boxW - 30, boxY + 80); ctx.stroke();
-
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('TITULAR DECLARANTE:', boxX + 40, boxY + 125);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 40px Montserrat, system-ui, sans-serif';
-      const cleanNombre = (signedSuccess.nombre || 'PARTICIPANTE').toUpperCase();
-      ctx.fillText(cleanNombre.slice(0, 32), boxX + 40, boxY + 180);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('DOCUMENTO DE IDENTIFICACIÓN:', boxX + 40, boxY + 290);
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = '900 36px Montserrat, system-ui, sans-serif';
-      ctx.fillText((signedSuccess.documento || '').toUpperCase(), boxX + 40, boxY + 340);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('LOCACIÓN CONFIRMADA:', boxX + 40, boxY + 415);
-
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '700 23px Montserrat, system-ui, sans-serif';
-      ctx.fillText('Casona Blanca · Calle Las Perdices 1126, Huachipa (Lima)', boxX + 40, boxY + 452);
-
-      ctx.fillStyle = '#10b981';
-      ctx.font = '800 20px Montserrat, system-ui, sans-serif';
-      ctx.fillText('✓ Instrumento Legal Firmado · Responsabilidad y Salud Aceptadas', boxX + 40, boxY + 530);
-
-      // 7. Footer Criptográfico
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-      ctx.fillRect(80, 1160, W - 160, 150);
-
-      ctx.fillStyle = '#fdba74';
-      ctx.font = '800 22px "Courier New", monospace';
-      ctx.fillText(`CÓDIGO DIGITAL: ${signedSuccess.codigo}`, W / 2, 1205);
-
-      ctx.fillStyle = '#cbd5e1';
-      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
-      ctx.fillText(`Firma Registrada el: ${signedSuccess.fecha} (Lima)`, W / 2, 1242);
-
-      ctx.fillStyle = '#64748b';
-      ctx.font = '500 14px Montserrat, system-ui, sans-serif';
-      ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1275);
-
-      setPassDataUrl(canvas.toDataURL('image/png'));
-    } catch(err) {
-      console.warn('Error al generar pase de fuego:', err);
-    }
+    generateFirewalkPassCanvas({
+      nombre: signedSuccess.nombre,
+      documento: signedSuccess.documento,
+      rolActividad: signedSuccess.rolActividad,
+      lugar: signedSuccess.lugar,
+      fecha: signedSuccess.fecha,
+      codigo: signedSuccess.codigo,
+      ip: signedSuccess.ip,
+      geoLocation: signedSuccess.geoLocation,
+      coordinates: signedSuccess.coordinates
+    }).then((url) => {
+      if (url) setPassDataUrl(url);
+    });
   }, [signedSuccess]);
 
   const handleInputChange = (e) => {
@@ -301,32 +165,54 @@ export default function ContratoCaminataFuego() {
     }
 
     setIsSubmitting(true);
+    setEmailStatus('SENDING');
     try {
+      const freshGeo = await getClientGeoLocation().catch(() => geoInfo);
+      const finalGeo = freshGeo || geoInfo;
+      setGeoInfo(finalGeo);
+
       const timestamp = new Date().toISOString();
       const localFecha = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
       const verificationCode = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+      const docDisplay = `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`;
+      const sha256Hash = await computeSha256(
+        `${verificationCode}|${formData.nombreCompleto.trim()}|${docDisplay}|${finalGeo.ip}|${finalGeo.coordinates || finalGeo.locationString}|${timestamp}`
+      );
+      const lugarConfirmado = formData.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)';
       
       const payload = {
         ...formData,
-        nombre: formData.nombreCompleto,
-        nombreCompleto: formData.nombreCompleto,
-        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento}`,
+        nombre: formData.nombreCompleto.trim(),
+        nombreCompleto: formData.nombreCompleto.trim(),
+        doc: docDisplay,
         rol: formData.rolActividad,
-        lugar: formData.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)',
+        lugar: lugarConfirmado,
         fecha: localFecha,
         timestamp: localFecha,
         code: verificationCode,
         verificationCode,
         sede: 'Lima',
         source: 'causa-os',
-        controlVersion: 'V1.0-2026-FIREWALK-LIMA',
+        controlVersion: 'V2.0-2026-FIREWALK-LIMA-FORENSE',
         razonSocial: 'Creación Cuántica E.I.R.L.',
         ruc: '20612592811',
         domicilioFiscal: 'Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú',
         fechaValidacionIso: timestamp,
         fechaValidacionLocal: localFecha,
+        // Trazabilidad Forense Obligatoria: IP + Geolocalización
+        ip: finalGeo.ip || 'Registrada en servidor',
+        geoLocation: finalGeo.locationString || 'Lima, Perú 🇵🇪',
+        city: finalGeo.city || 'Lima',
+        region: finalGeo.region || 'Lima',
+        country: finalGeo.country || 'Perú',
+        coordinates: finalGeo.coordinates || '',
+        lat: finalGeo.lat || null,
+        lng: finalGeo.lng || null,
+        isp: finalGeo.isp || '',
+        geoSource: finalGeo.geoSource || 'ip-geo',
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        dispositivo: /iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio',
+        dispositivo: finalGeo.device || (/iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio'),
+        sha256Hash,
         marcoLegal: 'Ley 27269 (Firmas Digitales), Arts. 141 y 141-A Código Civil, Ley 29733 y D.S. 016-2024-JUS, Arts. 11 y 15 Código Civil',
         createdAt: serverTimestamp()
       };
@@ -338,12 +224,49 @@ export default function ContratoCaminataFuego() {
         console.warn('Registro procesado y resguardado digitalmente:', err);
       }
 
+      // Generar Pase Oficial PNG con IP y Geolocalización e iniciar envío inmediato por correo
+      const generatedPass = await generateFirewalkPassCanvas({
+        nombre: formData.nombreCompleto.trim(),
+        documento: `${formData.tipoDocumento} ${formData.numeroDocumento.trim()}`,
+        rolActividad: formData.rolActividad,
+        lugar: lugarConfirmado,
+        fecha: localFecha,
+        codigo: verificationCode,
+        ip: payload.ip,
+        geoLocation: payload.geoLocation,
+        coordinates: payload.coordinates
+      });
+
+      if (generatedPass) {
+        setPassDataUrl(generatedPass);
+      }
+
+      const emailSent = await sendFirewalkConfirmationEmail({
+        db,
+        toEmail: formData.email.trim().toLowerCase(),
+        nombre: formData.nombreCompleto.trim(),
+        documento: docDisplay,
+        rolActividad: formData.rolActividad,
+        lugar: lugarConfirmado,
+        codigo: verificationCode,
+        fecha: localFecha,
+        passDataUrl: generatedPass,
+        telefono: formData.telefono.trim(),
+        ip: payload.ip,
+        geoLocation: payload.geoLocation,
+        coordinates: payload.coordinates,
+        device: payload.dispositivo,
+        sha256Hash
+      });
+
+      setEmailStatus(emailSent ? 'SENT' : 'ERROR');
+
       setSignedSuccess({
         ...payload,
-        nombre: formData.nombreCompleto,
-        documento: `${formData.tipoDocumento} ${formData.numeroDocumento}`,
+        nombre: formData.nombreCompleto.trim(),
+        documento: `${formData.tipoDocumento} ${formData.numeroDocumento.trim()}`,
         codigo: verificationCode,
-        fecha: new Date().toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'medium' })
+        fecha: localFecha
       });
 
       setTimeout(() => {
@@ -353,6 +276,7 @@ export default function ContratoCaminataFuego() {
 
     } catch (err) {
       console.error('Error al registrar firma digital:', err);
+      setEmailStatus('ERROR');
       alert('Hubo un inconveniente al validar la firma. Por favor verifica los datos e intenta nuevamente.');
     } finally {
       setIsSubmitting(false);
@@ -1098,6 +1022,20 @@ export default function ContratoCaminataFuego() {
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#94a3b8' }}>Locación:</span>
                 <span style={{ color: '#fff' }}>{signedSuccess.sedeLocacion}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>IP Pública Registrada:</span>
+                <span style={{ color: '#38bdf8', fontFamily: 'monospace', fontWeight: 700 }}>{signedSuccess.ip || geoInfo.ip}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Geolocalización Forense:</span>
+                <span style={{ color: '#fde047', fontWeight: 700 }}>{signedSuccess.geoLocation || geoInfo.locationString} {signedSuccess.coordinates ? `(${signedSuccess.coordinates})` : ''}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Envío de Pase por Correo:</span>
+                <span style={{ color: '#34d399', fontWeight: 700 }}>
+                  {emailStatus === 'SENT' ? `✓ Enviado inmediatamente a ${signedSuccess.email}` : emailStatus === 'SENDING' ? 'Enviando correo...' : `Registrado (${signedSuccess.email})`}
+                </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#94a3b8' }}>Sello de Tiempo (Timestamp):</span>

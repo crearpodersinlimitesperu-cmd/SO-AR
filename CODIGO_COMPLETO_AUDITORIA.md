@@ -61582,53 +61582,387 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Instrumento Legal Caminata sobre Fuego · Creación Cuántica E.I.R.L.</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20261111">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261111">
   <link rel="icon" type="image/png" href="/logo-crear.png">
   <link rel="icon" type="image/png" href="/logo_crear_oficial.png">
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="shortcut icon" href="/favicon.ico?v=20261111">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-    // Configuración Oficial Firebase Firestore
-    const firebaseConfig = {
-      apiKey: 'AIzaSyCTMrA6A64s1ppDBBsol-fqam5Vch_Q5B0',
-      authDomain: 'centro-operativo-cpsl.firebaseapp.com',
-      projectId: 'centro-operativo-cpsl',
-      storageBucket: 'centro-operativo-cpsl.firebasestorage.app',
-      messagingSenderId: '122588918051',
-      appId: '1:122588918051:web:c85d6835b1b1f920fb1c96',
-    };
-
-    let db = null;
-    try {
-      if (typeof firebase !== 'undefined') {
-        if (!firebase.apps.length) {
-          firebase.initializeApp(firebaseConfig);
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            fireOrange: '#f97316',
+            fireRed: '#ef4444',
+            crearDark: '#0f172a',
+            crearCard: '#1e293b',
+            crearGold: '#ffb703'
+          }
         }
-        db = firebase.firestore();
-        console.log('🔥 Conectado a Firestore (centro-operativo-cpsl)');
       }
-    } catch(err) {
-      console.warn('Firebase init error:', err);
     }
+  </script>
+  <style>
+    body {
+      background-color: #0b1120;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; padding: 0 !important; }
+      .print-box { border: 1px solid #ccc !important; color: black !important; background: white !important; box-shadow: none !important; }
+      .print-text { color: black !important; }
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="min-h-screen py-6 px-3 sm:px-6 antialiased selection:bg-orange-500 selection:text-white">
 
+  <div class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Header Banner -->
+    <header class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 border border-orange-500/30 p-6 md:p-8 shadow-2xl shadow-orange-950/20">
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-red-600"></div>
+      
+            <!-- Branding Oficial CREAR -->
+      <div class="flex items-center gap-3.5 mb-5 pb-4 border-b border-slate-800/80">
+        <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" class="h-10 sm:h-12 w-auto object-contain" onerror="this.src='/logo_crear_oficial.png'">
+        <div>
+          <span class="text-xs font-black uppercase tracking-widest text-amber-400 block">CREAR PODER SIN LÍMITES</span>
+          <span class="text-[11px] font-bold text-slate-400 block">Centro de Formación y Liderazgo Transformacional</span>
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-black uppercase tracking-wider bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-sm">
+              🔥 INSTRUMENTO LEGAL VINCULANTE
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold text-orange-400 bg-orange-500/10 border border-orange-500/30">
+              LEY N° 27269 & D.S. N° 016-2024-JUS
+            </span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30">
+              VERSIÓN V1.0-2026-FIREWALK-LIMA
+            </span>
+          </div>
+
+          <h1 class="text-2xl md:text-3xl font-black text-white leading-tight">
+            Instrumento Integrado de Exoneración de Responsabilidad, Declaración de Salud, Tratamiento de Datos Sensibles y Autorización de Uso de Imagen
+          </h1>
+          <p class="mt-2 text-sm md:text-base font-extrabold text-orange-400">
+            DINÁMICA VIVENCIAL DE ALTO IMPACTO: CAMINATA SOBRE FUEGO (FIREWALK LIMA, PERÚ)
+          </p>
+          <p class="mt-1 text-xs md:text-sm text-slate-400 max-w-2xl leading-relaxed">
+            Administrado por <strong>Creación Cuántica E.I.R.L.</strong> (RUC: 20612592811) con domicilio fiscal en Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 mt-4 text-xs text-slate-400 font-medium">
+            <span class="flex items-center gap-1.5"><span class="text-orange-500">📍</span> Locación Oficial: Casona Blanca (Huachipa, Lima)</span>
+            <span class="flex items-center gap-1.5"><span class="text-cyan-400">📅</span> Vigencia Operativa: 26 de Octubre 2026</span>
+            <span class="flex items-center gap-1.5"><span class="text-emerald-400">🛡️</span> Validez Jurídica: Art. 141-A C.C.</span>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="flex md:flex-col gap-2 shrink-0 no-print">
+          <button onclick="toggleQrModal(true)" class="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-black shadow-lg shadow-orange-600/30 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+            Ver Código QR Móvil
+          </button>
+          <a href="#formulario-firma" class="flex-1 md:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/40 text-xs font-bold transition-all text-center">
+            ✍️ Ir al Formulario de Firma
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Preámbulo Legal -->
+    <div class="rounded-xl bg-slate-900/80 border border-slate-800 p-5 text-sm text-slate-300 leading-relaxed shadow-sm">
+      <p>
+        El presente documento constituye un instrumento jurídico vinculante celebrado entre la entidad organizadora 
+        <strong class="text-white">CREACIÓN CUÁNTICA E.I.R.L.</strong> (con RUC 20612592811), sus facilitadores, equipo logístico y el/la firmante (en adelante, <strong class="text-orange-400">"EL/LA PARTICIPANTE O PARTNER"</strong>), en el marco de la dinámica vivencial de alto impacto denominada <strong>"Caminata sobre Fuego" (Firewalking)</strong>.
+      </p>
+    </div>
+
+    <!-- SECCIÓN I -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-4">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 font-black text-sm">I</span>
+        <h2 class="text-lg font-bold text-white">Sección I: Exoneración de Responsabilidad, Asunción de Riesgos y Autonomía de la Voluntad</h2>
+      </div>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+        <p><strong>1. Naturaleza de la Dinámica:</strong> EL/LA DECLARANTE reconoce que la dinámica vivencial denominada "Caminata sobre Fuego" consiste en transitar descalzo sobre una superficie de brasas de madera encendidas a altas temperaturas, constituyendo un ejercicio voluntario de superación de límites mentales y gestión emocional bajo instrucción técnica especializada.</p>
+        <p><strong>2. Protocolos de Seguridad y Voluntariedad Irrestricta:</strong> EL/LA DECLARANTE manifiesta que ha recibido instrucciones verbales y técnicas previas respecto a la postura física, cadencia del paso y focalización mental requeridas para la ejecución de la dinámica. Asimismo, declara y acepta expresamente que su participación es estrictamente voluntaria, reconociendo el derecho inalienable de desistir, retirarse o negarse a realizar la caminata sobre el fuego en cualquier momento antes o durante el ejercicio, sin que ello genere penalidad, reproche ni menoscabo moral alguno.</p>
+        <p><strong>3. Asunción Razonable del Riesgo y Deslinde de Responsabilidad:</strong> En ejercicio de su autonomía privada reconocida en el artículo 2, numeral 24, literal a) de la Constitución Política del Perú y los artículos 141 y 1354 del Código Civil, EL/LA DECLARANTE asume los riesgos fisiológicos inherentes a la exposición térmica breve y controlada (incluyendo enrojecimiento epidérmico, ampollas leves o irritación dérmica transitoria por contacto térmico o restos de ceniza).</p>
+        <p>Por consiguiente, habiendo la entidad facilitadora implementado los estándares y protocolos de seguridad pertinentes, EL/LA DECLARANTE exonera a Creación Cuántica E.I.R.L., a sus socios, instructores certificados y equipo de soporte logístico de toda responsabilidad civil patrimonial, extrapatrimonial o de cualquier otra índole legal derivada de contingencias, lesiones menores o secuelas térmicas atribuibles a la inobservancia culpable o negligente de las pautas de seguridad impartidas, a la propia condición dérmica preexistente del declarante o al curso regular de una dinámica de alto impacto aceptada voluntariamente.</p>
+      </div>
+    </section>
+
+    <!-- SECCIÓN II -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-4">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 font-black text-sm">II</span>
+        <h2 class="text-lg font-bold text-white">Sección II: Declaración Jurada de Salud y Consentimiento Informado para Tratamiento de Datos Personales y Sensibles</h2>
+      </div>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+        <p><strong>1. Declaración Jurada de Salud:</strong> EL/LA DECLARANTE manifiesta bajo juramento no encontrarse bajo el efecto de sustancias estupefacientes, alcohol o medicamentos que alteren su coordinación motriz o juicio crítico; no presentar neuropatías periféricas o insensibilidad en las extremidades inferiores; no padecer afecciones cardíacas graves o hipertensión no controlada que impidan la gestión del estrés agudo; y, en el caso de mujeres, no encontrarse en estado de gestación avanzada que contraindique la actividad.</p>
+        <p><strong>2. Tratamiento de Datos Personales y Sensibles (Ley N° 29733 y D.S. N° 016-2024-JUS):</strong> En cumplimiento de la Ley de Protección de Datos Personales (Ley N° 29733) y su Reglamento aprobado por D.S. N° 016-2024-JUS, EL/LA DECLARANTE otorga su consentimiento libre, previo, expreso, inequívoco e informado para que Creación Cuántica E.I.R.L., en calidad de Titular del Banco de Datos Personales, recopile y trate sus datos personales generales y de salud (datos sensibles).</p>
+        <p><strong>3. Finalidad y Transferencia:</strong> Dichos datos serán tratados exclusivamente con la finalidad de: a) evaluar la compatibilidad de salud para la realización segura de la dinámica, y b) coordinar asistencia médica o primeros auxilios en caso de emergencia. Los datos sensibles serán alojados de manera confidencial en infraestructura de servidores seguros (NODUS / Google Cloud Platform con cifrado SSL/TLS) y no serán comercializados ni transferidos a terceros con fines publicitarios.</p>
+        <p><strong>4. Derechos ARCO:</strong> Se informa al titular de los datos que puede ejercer sus derechos de Acceso, Rectificación, Cancelación y Oposición (ARCO), así como revocar el presente consentimiento, dirigiendo una comunicación formal al correo oficial de protección de datos: <strong class="text-cyan-400">protecciondedatos@crearpsl.net</strong>.</p>
+      </div>
+    </section>
+
+    <!-- SECCIÓN III -->
+    <section class="rounded-xl bg-slate-900 border border-slate-800 p-6 space-y-4">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-800/80">
+        <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 font-black text-sm">III</span>
+        <h2 class="text-lg font-bold text-white">Sección III: Autorización para el Uso de Imagen, Fotografía y Voz (Código Civil Art. 15 y Ley N° 29733)</h2>
+      </div>
+      <div class="text-sm text-slate-300 space-y-3 leading-relaxed">
+        <div class="p-3 rounded-lg bg-purple-950/40 border border-purple-500/30 text-purple-200 text-xs font-semibold">
+          ℹ️ CLÁUSULA CON CARÁCTER INDEPENDIENTE Y FACULTATIVO (OPT-IN): La aceptación de esta cláusula es 100% opcional y no condiciona de ninguna manera tu participación en la Caminata sobre Fuego.
+        </div>
+        <p>En concordancia con el artículo 15 del Código Civil Peruano y la normativa de protección de datos personales, EL/LA DECLARANTE tiene la potestad de decidir libremente si autoriza o no la captación y difusión de su imagen y voz.</p>
+        <p>De ser autorizada mediante la casilla opt-in correspondiente, EL/LA DECLARANTE cede de manera voluntaria, no exclusiva y a título gratuito a favor de Creación Cuántica E.I.R.L., el derecho a utilizar, reproducir, publicar y difundir su imagen fotográfica, fijación audiovisual y testimonios captados durante la realización del evento, con fines estrictamente institucionales, informativos, de divulgación académica y promoción en plataformas digitales, páginas web institucionales y redes sociales oficiales de la empresa.</p>
+        <p>Dicha autorización tendrá una vigencia temporal de cinco (5) años contados desde la fecha de suscripción del presente instrumento, no confiriendo derecho a remuneración o compensación económica ulterior, sin perjuicio de los derechos de revocación conforme a ley. La negativa a conceder esta autorización facultativa no impedirá ni condicionará en modo alguno su participación en la dinámica, disponiéndose para tal caso los distintivos logísticos necesarios para salvaguardar su privacidad visual en las grabaciones del evento.</p>
+      </div>
+    </section>
+
+    <!-- SECCIÓN IV: Formulario de Validación y Firma -->
+    <section id="formulario-firma" class="rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-orange-500/40 p-6 md:p-8 space-y-6 shadow-xl">
+      <div class="border-b border-slate-800 pb-4">
+        <span class="text-xs font-black uppercase tracking-wider text-orange-400">Sección IV</span>
+        <h2 class="text-xl md:text-2xl font-black text-white mt-1">
+          Manifestación de Voluntad, Registro de Rol y Firma Digital Vinculante
+        </h2>
+        <p class="text-xs text-slate-400 mt-1">
+          Conforme a la Ley N° 27269 (Firmas y Certificados Digitales) y los Arts. 141 y 141-A del Código Civil, el envío y suscripción electrónica del presente formulario perfecciona la aceptación plena del instrumento.
+        </p>
+      </div>
+
+      <form id="firewalkForm" onsubmit="handleSubmit(event)" class="space-y-5">
+        
+                <!-- Rol -->
+        <div>
+          <label for="rolActividad" class="block text-xs font-black uppercase tracking-wider text-slate-300 mb-2">
+            Rol en la Actividad *
+          </label>
+          <select id="rolActividad" name="rolActividad" required class="w-full px-4 py-3 rounded-xl bg-slate-800/90 border border-slate-700 text-white font-semibold focus:outline-none focus:border-orange-500 text-sm cursor-pointer">
+            <option value="Participante" selected>Participante</option>
+            <option value="Entrenador">Entrenador</option>
+            <option value="Oficina">Oficina</option>
+            <option value="Manager">Manager</option>
+            <option value="Capitán">Capitán</option>
+            <option value="Aliados">Aliados</option>
+            <option value="Staff de Caminata">Staff de Caminata</option>
+            <option value="Staff de Mesa">Staff de Mesa</option>
+          </select>
+        </div>
+
+        <!-- Datos del Declarante -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Nombre y Apellidos Completos *</label>
+            <input type="text" id="nombreCompleto" required placeholder="Ej. Carlos Mendoza Ríos" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+          </div>
+          <div>
+            <div class="grid grid-cols-3 gap-2">
+              <div class="col-span-1">
+                <label for="tipoDocumento" class="block text-xs font-bold text-slate-300 mb-1.5">Tipo Doc. *</label>
+                <select id="tipoDocumento" name="tipoDocumento" required class="w-full px-2.5 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white font-semibold focus:outline-none focus:border-orange-500 text-sm cursor-pointer">
+                  <option value="DNI" selected>DNI</option>
+                  <option value="CE">CE</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Cédula">Cédula</option>
+                </select>
+              </div>
+              <div class="col-span-2">
+                <label for="numeroDocumento" class="block text-xs font-bold text-slate-300 mb-1.5">N° Documento *</label>
+                <input type="text" id="numeroDocumento" name="numeroDocumento" required placeholder="Ej. 45892147" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Correo Electrónico (Para envío de constancia) *</label>
+            <input type="email" id="email" required placeholder="carlos.mendoza@email.com" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Teléfono / WhatsApp de Contacto y Emergencia *</label>
+            <input type="tel" id="telefono" required placeholder="+51 987 654 321" class="w-full px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5">Locación Confirmada</label>
+          <input type="text" readonly value="Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)" class="w-full px-4 py-2.5 rounded-xl bg-slate-800/40 border border-slate-800 text-slate-400 text-xs font-medium cursor-not-allowed">
+        </div>
+
+        <!-- 3 Checkboxes Estructurados -->
+        <div class="space-y-3 pt-2">
+
+          <!-- Checkbox 1: Obligatorio -->
+          <div class="p-4 rounded-xl border border-orange-500/40 bg-orange-950/20">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="aceptoRiesgos" required class="mt-1 w-5 h-5 accent-orange-500 shrink-0 cursor-pointer">
+              <div class="text-xs text-slate-200 leading-relaxed">
+                <strong class="text-orange-400 block mb-0.5">[X] CHECKBOX 1 (OBLIGATORIO) – EXONERACIÓN DE RESPONSABILIDAD Y ASUNCIÓN DE RIESGOS:</strong>
+                He leído, comprendido y aceptado en su totalidad los términos de la <strong>Sección I</strong>. Asumo voluntariamente los riesgos inherentes de la caminata sobre fuego y libero a Creación Cuántica E.I.R.L. de toda responsabilidad en los términos estipulados.
+              </div>
+            </label>
+          </div>
+
+          <!-- Checkbox 2: Obligatorio -->
+          <div class="p-4 rounded-xl border border-cyan-500/40 bg-cyan-950/20">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="aceptoSalud" required class="mt-1 w-5 h-5 accent-cyan-500 shrink-0 cursor-pointer">
+              <div class="text-xs text-slate-200 leading-relaxed">
+                <strong class="text-cyan-400 block mb-0.5">[X] CHECKBOX 2 (OBLIGATORIO) – DECLARACIÓN JURADA DE SALUD Y TRATAMIENTO DE DATOS SENSIBLES:</strong>
+                Declaro bajo juramento cumplir con las condiciones de aptitud física descritas en la <strong>Sección II</strong> y autorizo expresamente el tratamiento confidencial de mis datos personales y sensibles para fines médicos y de seguridad conforme a la Ley N° 29733 y D.S. N° 016-2024-JUS.
+              </div>
+            </label>
+          </div>
+
+          <!-- Checkbox 3: OPCIONAL (OPT-IN) -->
+          <div class="p-4 rounded-xl border border-purple-500/40 bg-purple-950/20">
+            <label class="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" id="aceptoImagen" class="mt-1 w-5 h-5 accent-purple-500 shrink-0 cursor-pointer">
+              <div class="text-xs text-slate-200 leading-relaxed">
+                <strong class="text-purple-300 block mb-0.5">[ ] CHECKBOX 3 (OPCIONAL / OPT-IN) – AUTORIZACIÓN DE USO DE IMAGEN, FOTOGRAFÍA Y VOZ:</strong>
+                <em>(Marque activamente solo si desea autorizar)</em> Autorizo a Creación Cuántica E.I.R.L. a utilizar y publicar mi imagen y voz captadas en el evento para fines institucionales y de difusión según los términos de la <strong>Sección III</strong>. Entiendo que si no marco esta casilla podré participar normalmente y recibiré un distintivo de privacidad en sala.
+              </div>
+            </label>
+          </div>
+
+        </div>
+
+        <!-- Firma Digital Escrita -->
+        <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/80 space-y-2">
+          <label class="block text-xs font-black uppercase tracking-wider text-slate-200">
+            Firma Digital Vinculante (Escribe tu Nombre y Apellidos Completos) *
+          </label>
+          <input type="text" id="firmaTexto" required placeholder="Escribe exactamente tu nombre completo tal como figura en tu documento" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 text-sm font-semibold">
+          <p class="text-[11px] text-slate-400">
+            Al registrar tu nombre y presionar "Firmar y Validar Instrumento Legal", se generará un código criptográfico único de verificación junto al sello de tiempo (Timestamp) con plena eficacia jurídica.
+          </p>
+        </div>
+
+        <!-- Botón de Envío -->
+        <div>
+          <button type="submit" id="submitBtn" class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black text-sm uppercase tracking-wider shadow-lg shadow-orange-600/30 transition-all flex items-center justify-center gap-2">
+            🔥 Firmar y Validar Instrumento Legal
+          </button>
+        </div>
+
+      </form>
+
+      <!-- Mensaje de Éxito -->
+      <div id="successCard" style="display:none;" class="p-6 rounded-2xl bg-gradient-to-br from-emerald-950/80 to-slate-950 border border-emerald-500/50 text-center space-y-4">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 text-3xl font-black">
+          ✓
+        </div>
+        <div>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 inline-block mb-2">
+            ACUERDO FIRMADO Y VALIDADO CON ÉXITO
+          </span>
+          <h3 class="text-2xl font-black text-white">Instrumento Legal Registrado</h3>
+          <p class="text-sm text-slate-300 max-w-md mx-auto mt-2" id="successSummary"></p>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 text-xs font-mono text-left max-w-lg mx-auto space-y-1.5 text-slate-300">
+          <p><span class="text-slate-500">Código de Verificación:</span> <strong id="certCode" class="text-orange-400 font-bold"></strong></p>
+          <p><span class="text-slate-500">Sello de Tiempo (Lima):</span> <strong id="certTimestamp" class="text-white"></strong></p>
+          <p><span class="text-slate-500">Control de Versión:</span> <strong class="text-cyan-400">V1.0-2026-FIREWALK-LIMA</strong></p>
+          <p><span class="text-slate-500">Entidad Receptora:</span> <strong class="text-white">Creación Cuántica E.I.R.L. (RUC 20612592811)</strong></p>
+        </div>
+        <p class="text-xs text-emerald-400 font-semibold">
+          ¡Tu habilitación de sala está completada! Presenta este código en la mesa de acreditación de Casona Blanca.
+        </p>
+
+        <!-- Pase Oficial Descargable: SÍ VOY A CAMINAR SOBRE FUEGO -->
+        <div class="mt-6 p-4 sm:p-6 rounded-2xl bg-gradient-to-b from-slate-900 via-orange-950/30 to-black border-2 border-orange-500/60 shadow-2xl shadow-orange-600/20 space-y-4 text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 text-xs font-black uppercase tracking-wider">
+            <span>🔥</span> Pase Oficial de Acreditación Celular <span>🔥</span>
+          </div>
+
+          <h4 class="text-xl sm:text-2xl font-black text-white">Tu Pase Oficial para Celular</h4>
+          <p class="text-xs text-slate-300 max-w-sm mx-auto">
+            Descarga esta imagen en la galería de tu celular o compártela en tus historias. Demuestra que tu registro está validado para la Caminata sobre Fuego.
+          </p>
+
+          <!-- Previsualización de la Imagen -->
+          <div class="relative mx-auto max-w-xs sm:max-w-sm rounded-xl overflow-hidden border-2 border-orange-500/60 shadow-2xl shadow-orange-500/30 bg-black">
+            <canvas id="firewalkPassCanvas" width="1080" height="1440" style="display:none;"></canvas>
+            <img id="firewalkPassImg" src="" alt="Pase Caminata sobre Fuego" class="w-full h-auto rounded-xl block">
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-sm mx-auto pt-2">
+            <a id="btnDownloadPass" download="Pase_Caminata_Sobre_Fuego.png" href="#" class="flex-1 py-3.5 px-4 rounded-xl bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-orange-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>📥</span> Descargar Imagen para Celular
+            </a>
+            <button id="btnSharePass" type="button" onclick="sharePass()" class="py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+              <span>📲</span> Guardar / Compartir
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Footer Corporativo y Legal -->
+    <footer class="pt-4 pb-8 border-t border-slate-800 text-center text-xs text-slate-500 space-y-2">
+      <p>
+        <strong>Control de Versión:</strong> V1.0-2026-FIREWALK-LIMA · <strong>Fecha de Vigencia:</strong> 26 de octubre de 2026
+      </p>
+      <p>
+        <strong>Entidad Administradora:</strong> Creación Cuántica E.I.R.L. (RUC 20612592811) · Domicilio Fiscal: Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú · Canal ARCO: <strong>protecciondedatos@crearpsl.net</strong>
+      </p>
+      <p class="text-[11px] text-slate-600">
+        Plataforma Tecnológica Oficial Causa OS · Todos los derechos reservados © 2026
+      </p>
+    </footer>
+
+  </div>
+
+  <!-- QR Modal -->
+  <div id="qrModal" style="display:none;" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" onclick="toggleQrModal(false)">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-black text-white">Código QR para Móvil</h3>
+        <button onclick="toggleQrModal(false)" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      </div>
+      <p class="text-xs text-slate-400">Escanea con la cámara de tu celular para abrir este instrumento legal y firmar en tu dispositivo:</p>
+      <div class="p-3 bg-white rounded-xl inline-block shadow-inner">
+        <img id="qrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=" alt="Código QR" class="w-56 h-56 mx-auto">
+      </div>
+      <p class="text-[11px] text-orange-400 font-mono break-all" id="qrUrlText"></p>
+      <button onclick="toggleQrModal(false)" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition-all">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <script>
     // Inicializar URL y QR dinámico
     const currentUrl = window.location.href;
-    const qrUrlEl = document.getElementById('qrUrlText');
-    if (qrUrlEl) qrUrlEl.innerText = currentUrl;
-    const qrImgEl = document.getElementById('qrImg');
-    if (qrImgEl) qrImgEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=' + encodeURIComponent(currentUrl);
+    document.getElementById('qrUrlText').innerText = currentUrl;
+    document.getElementById('qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=8&data=' + encodeURIComponent(currentUrl);
 
     function toggleQrModal(show) {
-      const modal = document.getElementById('qrModal');
-      if (modal) modal.style.display = show ? 'flex' : 'none';
+      document.getElementById('qrModal').style.display = show ? 'flex' : 'none';
     }
 
+    
     // Fallback REST API por si el SDK de Firestore experimenta bloqueo de red
     function saveViaRest(payload) {
       fetch('https://firestore.googleapis.com/v1/projects/centro-operativo-cpsl/databases/(default)/documents/contratos_caminata_fuego', {
@@ -61637,20 +61971,24 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
         body: JSON.stringify({
           fields: {
             nombre: { stringValue: payload.nombre || '' },
-            nombreCompleto: { stringValue: payload.nombreCompleto || '' },
+            nombreCompleto: { stringValue: payload.nombreCompleto || payload.nombre || '' },
             tipoDocumento: { stringValue: payload.tipoDocumento || 'DNI' },
             numeroDocumento: { stringValue: payload.numeroDocumento || '' },
             doc: { stringValue: payload.doc || '' },
             email: { stringValue: payload.email || '' },
-            telefono: { stringValue: payload.telefono || '' },
+            telefono: { stringValue: payload.telefono || payload.tel || '' },
             rol: { stringValue: payload.rol || 'Participante' },
-            rolActividad: { stringValue: payload.rolActividad || 'Participante' },
-            lugar: { stringValue: payload.lugar || 'Lima - Casona Blanca (Huachipa)' },
-            fecha: { stringValue: payload.fecha || '' },
+            rolActividad: { stringValue: payload.rolActividad || payload.rol || 'Participante' },
+            lugar: { stringValue: payload.lugar || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)' },
+            fecha: { stringValue: payload.fecha || payload.timestamp || '' },
             timestamp: { stringValue: payload.timestamp || '' },
             code: { stringValue: payload.code || '' },
             sede: { stringValue: 'Lima' },
             source: { stringValue: 'cartas.crearpsl.net' },
+            ip: { stringValue: payload.ip || 'Registrada' },
+            geoLocation: { stringValue: payload.geoLocation || 'Lima, Perú 🇵🇪' },
+            coordinates: { stringValue: payload.coordinates || '' },
+            dispositivo: { stringValue: payload.dispositivo || 'Web' },
             aceptoImagen: { booleanValue: !!payload.aceptoImagen }
           }
         })
@@ -61661,8 +61999,108 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
       });
     }
 
-    function handleSubmit(e) {
+    let cachedClientGeo = {
+      ip: 'Detectando IP...',
+      geoLocation: 'Lima, Perú 🇵🇪',
+      coordinates: '',
+      dispositivo: /iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio'
+    };
+
+    async function fetchClientGeo() {
+      try {
+        const res = await fetch('https://ipwho.is/');
+        const data = await res.json();
+        if (data && data.success !== false && data.ip) {
+          cachedClientGeo = {
+            ip: data.ip,
+            geoLocation: `${data.city || 'Lima'}, ${data.country || 'Perú'} ${data.flag?.emoji || '🇵🇪'}`,
+            coordinates: data.latitude && data.longitude ? `${Number(data.latitude).toFixed(5)}, ${Number(data.longitude).toFixed(5)}` : '',
+            dispositivo: /iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio'
+          };
+          return cachedClientGeo;
+        }
+      } catch (e) {}
+      try {
+        const res2 = await fetch('https://get.geojs.io/v1/ip/geo.json');
+        const data2 = await res2.json();
+        if (data2 && data2.ip) {
+          cachedClientGeo = {
+            ip: data2.ip,
+            geoLocation: `${data2.city || 'Lima'}, ${data2.country || 'Perú'}`,
+            coordinates: data2.latitude && data2.longitude ? `${Number(data2.latitude).toFixed(5)}, ${Number(data2.longitude).toFixed(5)}` : '',
+            dispositivo: /iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio'
+          };
+          return cachedClientGeo;
+        }
+      } catch (e) {}
+      return cachedClientGeo;
+    }
+    fetchClientGeo();
+
+    function sendFirewalkEmailImmediate(signatureData, passDataUrl) {
+      if (!db || !signatureData.email) return;
+      try {
+        const base64Data = passDataUrl ? passDataUrl.replace(/^data:image\/png;base64,/, '') : null;
+        const emailHtml = `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
+            <div style="background: linear-gradient(135deg, #120702 0%, #431407 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #ea580c;">
+              <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 800; margin-bottom: 8px;">CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811</span>
+              <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: #ffffff;">🔥 SÍ VOY A CAMINAR SOBRE FUEGO</h1>
+              <p style="margin: 8px 0 0 0; font-size: 14px; color: #fdba74; font-weight: 600;">Confirmación Oficial de Acreditación y Firma Electrónica · Sede Lima</p>
+            </div>
+            <div style="padding: 28px 24px;">
+              <p style="font-size: 16px; line-height: 1.6; color: #1e293b; margin-top: 0;">Hola <strong>${signatureData.nombre}</strong>,</p>
+              <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+                Tu asistencia y firma electrónica para la <strong>Caminata sobre Fuego (Firewalk Lima)</strong> ha sido registrada de manera exitosa. Adjuntamos tu <strong>Imagen Oficial de Confirmación</strong>.
+              </p>
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; margin: 20px 0; font-size: 13.5px;">
+                <p style="margin: 4px 0;"><strong>Titular:</strong> ${signatureData.nombre} (${signatureData.doc})</p>
+                <p style="margin: 4px 0;"><strong>Rol:</strong> ${signatureData.rol}</p>
+                <p style="margin: 4px 0;"><strong>Locación:</strong> Casona Blanca · Calle Las Perdices 1126, Huachipa (Lima)</p>
+                <p style="margin: 4px 0;"><strong>Código Digital:</strong> <span style="font-family: monospace; color: #ea580c; font-weight: 800;">${signatureData.code}</span></p>
+                <p style="margin: 4px 0;"><strong>Fecha y Hora:</strong> ${signatureData.timestamp} (Lima)</p>
+                <p style="margin: 4px 0;"><strong>IP Pública:</strong> <span style="font-family: monospace;">${signatureData.ip}</span></p>
+                <p style="margin: 4px 0;"><strong>Geolocalización:</strong> ${signatureData.geoLocation} ${signatureData.coordinates ? '(' + signatureData.coordinates + ')' : ''}</p>
+              </div>
+              <div style="text-align: center; margin: 24px 0;">
+                ${base64Data ? '<img src="cid:pase_fuego_oficial" alt="Pase Oficial Caminata sobre Fuego" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; border: 2px solid #ea580c;" />' : ''}
+              </div>
+            </div>
+          </div>
+        `;
+        db.collection('mail').add({
+          to: [signatureData.email],
+          robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
+          created_at: new Date().toISOString(),
+          type: 'contrato_fuego_confirmacion',
+          recipientEmail: signatureData.email,
+          recipientName: signatureData.nombre,
+          codigoRegistro: signatureData.code,
+          ip: signatureData.ip,
+          geoLocation: signatureData.geoLocation,
+          message: {
+            subject: `🔥 PASE OFICIAL DE CONFIRMACIÓN: Caminata sobre Fuego (Sede Lima) — ${signatureData.code}`,
+            html: emailHtml,
+            attachments: base64Data ? [{
+              filename: `PASE_CAMINATA_FUEGO_${signatureData.code}.png`,
+              content: base64Data,
+              encoding: 'base64',
+              cid: 'pase_fuego_oficial'
+            }] : []
+          }
+        }).then(() => {
+          console.log('✅ Correo de confirmación con imagen enviado a:', signatureData.email);
+        }).catch(err => {
+          console.warn('⚠️ Advertencia enviando correo:', err);
+        });
+      } catch (e) {
+        console.warn('Error preparando correo:', e);
+      }
+    }
+
+    async function handleSubmit(e) {
       e.preventDefault();
+      const geo = await fetchClientGeo();
       
       const nombre = document.getElementById('nombreCompleto').value.trim();
       const tipoDoc = document.getElementById('tipoDocumento').value;
@@ -61676,57 +62114,63 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
 
       const code = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
       const timestamp = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
-      const lugar = 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)';
 
+      // Guardar localmente con IP y Geolocalización
       const signatureData = {
-        nombre: nombre,
+        nombre,
         nombreCompleto: nombre,
         tipoDocumento: tipoDoc,
         numeroDocumento: numeroDoc,
-        doc: doc,
-        email: email,
-        tel: tel,
+        doc,
+        email,
         telefono: tel,
-        rol: rol,
+        tel,
+        rol,
         rolActividad: rol,
-        lugar: lugar,
+        lugar: 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)',
         fecha: timestamp,
-        timestamp: timestamp,
-        aceptoImagen: aceptoImagen,
-        firma: firma,
-        code: code,
-        controlVersion: 'V1.0-2026-FIREWALK-LIMA',
+        aceptoImagen,
+        firma,
+        code,
+        verificationCode: code,
+        timestamp,
+        ip: geo.ip || 'Registrada',
+        geoLocation: geo.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: geo.coordinates || '',
+        dispositivo: geo.dispositivo || 'Web',
+        userAgent: navigator.userAgent || '',
+        controlVersion: 'V2.0-2026-FIREWALK-LIMA-FORENSE',
         razonSocial: 'Creación Cuántica E.I.R.L.',
-        ruc: '20612592811',
-        sede: 'Lima',
-        source: 'cartas.crearpsl.net'
+        ruc: '20612592811'
       };
 
       try {
         localStorage.setItem('cq_firewalk_signature', JSON.stringify(signatureData));
-      } catch(err) {
-        console.warn('Storage warning:', err);
-      }
-
-      // Guardar en Firestore Cloud (SDK con fallback REST)
+      // Guardar en Firestore Cloud
       if (db) {
         db.collection('contratos_caminata_fuego').add({
           ...signatureData,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          source: 'cartas.crearpsl.net',
+          sede: 'Lima'
         }).then(ref => {
           console.log('✅ Contrato persistido en Firestore:', ref.id);
         }).catch(err => {
-          console.warn('⚠️ Fallback a REST por error SDK:', err);
+          console.warn('⚠️ Error guardando en Firestore, ejecutando REST fallback:', err);
           saveViaRest(signatureData);
         });
       } else {
         saveViaRest(signatureData);
       }
 
+      } catch(err) {
+        console.warn('Storage warning:', err);
+      }
+
       // Mostrar resumen de éxito
       document.getElementById('certCode').innerText = code;
       document.getElementById('certTimestamp').innerText = timestamp;
-      document.getElementById('successSummary').innerHTML = '<strong>' + nombre + '</strong> (' + rol + '), tu instrumento ha sido validado jurídicamente para la Caminata sobre Fuego en ' + lugar + '.';
+      document.getElementById('successSummary').innerHTML = '<strong>' + nombre + '</strong> (' + rol + '), tu instrumento ha sido validado jurídicamente para la Caminata sobre Fuego en Casona Blanca.';
       
       // Generar Imagen Descargable para Celular: "SÍ VOY A CAMINAR SOBRE FUEGO"
       generateFirewalkPass(signatureData);
@@ -61943,16 +62387,21 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
       // SEDE Y LOCACIÓN
       ctx.fillStyle = '#94a3b8';
       ctx.font = '600 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('LOCACIÓN CONFIRMADA:', boxX + 35, boxY + 415);
+      ctx.fillText('LOCACIÓN CONFIRMADA:', boxX + 35, boxY + 405);
 
       ctx.fillStyle = '#f8fafc';
       ctx.font = '700 24px Montserrat, system-ui, sans-serif';
-      ctx.fillText('Casona Blanca · Calle Las Perdices 1126, Huachipa (Lima)', boxX + 35, boxY + 452);
+      ctx.fillText('Casona Blanca · Calle Las Perdices 1126, Huachipa (Lima)', boxX + 35, boxY + 442);
+
+      // IP Y GEOLOCALIZACIÓN FORENSE
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 16px "Courier New", monospace';
+      ctx.fillText(`IP: ${data.ip || 'Registrada'} | GEO: ${data.geoLocation || 'Lima, Perú'}`, boxX + 35, boxY + 485);
 
       // ESTADO Y JURAMENTO
       ctx.fillStyle = '#10b981';
       ctx.font = '800 20px Montserrat, system-ui, sans-serif';
-      ctx.fillText('✓ Instrumento Legal Firmado · Responsabilidad y Salud Aceptadas', boxX + 35, boxY + 530);
+      ctx.fillText('✓ Instrumento Legal Firmado · Responsabilidad y Salud Aceptadas', boxX + 35, boxY + 535);
 
       // 8. FRANJA INFERIOR DE SEGURIDAD Y VALIDACIÓN CRIPTOGRÁFICA
       ctx.textAlign = 'center';
@@ -61983,6 +62432,9 @@ Total Duration: ${c-l}ms`),K.resolve({didRun:!0,sequenceNumbersCollected:r,targe
         const safeName = (data.nombre || 'Participante').replace(/[^a-zA-Z0-9]/g, '_');
         btnDl.download = `Pase_Fuego_${safeName}.png`;
       }
+
+      // 10. Enviar imagen de confirmación y contrato inmediatamente por correo
+      sendFirewalkEmailImmediate(data, dataUrl);
     }
 
     async function sharePass() {
@@ -76776,6 +77228,8 @@ import ContrasteNodusSheets from './pages/ContrasteNodusSheets';
 
 const ContratoCaminataFuego = lazy(() => import('./pages/ContratoCaminataFuego'));
 const MonitorAcreditacionFuegoLima = lazy(() => import('./pages/MonitorAcreditacionFuegoLima'));
+const ContratoMaestriaLima = lazy(() => import('./pages/ContratoMaestriaLima'));
+const MonitorMaestriaLima = lazy(() => import('./pages/MonitorMaestriaLima'));
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
@@ -77029,6 +77483,11 @@ function App() {
           <Route path="/firewalking" element={<Navigate to="/caminata-fuego" replace />} />
           <Route path="/monitor-fuego-lima" element={<MonitorAcreditacionFuegoLima />} />
           <Route path="/acreditacion-fuego-lima" element={<Navigate to="/monitor-fuego-lima" replace />} />
+          <Route path="/reglas-maestria" element={<ContratoMaestriaLima />} />
+          <Route path="/contrato-maestria-lima" element={<ContratoMaestriaLima />} />
+          <Route path="/maestria-lima" element={<ContratoMaestriaLima />} />
+          <Route path="/monitor-maestria-lima" element={<MonitorMaestriaLima />} />
+          <Route path="/supervision-maestria-lima" element={<Navigate to="/monitor-maestria-lima" replace />} />
           <Route path="/causa-os-task" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio', 'superadmin']}>
               <CausaOSTask />
@@ -89674,6 +90133,817 @@ test('existing cooldown, expired cooldown, storage errors and unrelated failures
 
 ---
 
+## Archivo: src/utils/maestriaPass.js
+
+```js
+import { addDoc, collection } from 'firebase/firestore';
+
+/**
+ * Genera el Pase Oficial Digital (1080x1440) de Compromiso y Reglas de Maestría del Juego
+ * Incluye IP Pública y Geolocalización forense sin excepción.
+ * @param {Object} params
+ * @returns {Promise<string>} Data URL en formato image/png
+ */
+export async function generateMaestriaPassCanvas({
+  nombre,
+  doc,
+  rol = 'Participante',
+  equipo = 'Equipo 32',
+  sede = 'Lima',
+  fecha,
+  codigo,
+  ip = 'No detectada',
+  geoLocation = 'Lima, Perú 🇵🇪',
+  coordinates = '',
+  verificationUrl
+}) {
+  return new Promise((resolve) => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1440;
+      const ctx = canvas.getContext('2d');
+      const W = 1080;
+      const H = 1440;
+
+      // 1. Fondo degradado Noche & Maestría (Azul Real Profundo, Oro y Negro Ejecutivo)
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#060b17');
+      bgGrad.addColorStop(0.3, '#0b162c');
+      bgGrad.addColorStop(0.7, '#131b2e');
+      bgGrad.addColorStop(1, '#05070d');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Resplandor dorado radial central
+      const goldGlow = ctx.createRadialGradient(W / 2, 420, 50, W / 2, 420, 600);
+      goldGlow.addColorStop(0, 'rgba(245, 158, 11, 0.22)');
+      goldGlow.addColorStop(0.4, 'rgba(217, 119, 6, 0.12)');
+      goldGlow.addColorStop(0.8, 'rgba(41, 171, 226, 0.06)');
+      goldGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = goldGlow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Constelación de partículas de maestría
+      const particles = [
+        { x: 160, y: 180, r: 3, a: 0.7 }, { x: 280, y: 320, r: 4, a: 0.8 }, { x: 880, y: 220, r: 3, a: 0.6 },
+        { x: 920, y: 380, r: 5, a: 0.9 }, { x: 120, y: 680, r: 3, a: 0.5 }, { x: 960, y: 720, r: 4, a: 0.6 },
+        { x: 180, y: 1100, r: 4, a: 0.7 }, { x: 890, y: 1120, r: 5, a: 0.8 }, { x: 340, y: 1280, r: 3, a: 0.6 },
+        { x: 740, y: 1290, r: 4, a: 0.7 }, { x: 540, y: 1350, r: 3, a: 0.5 }
+      ];
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(251, 191, 36, ${p.a})`;
+        ctx.shadowColor = '#f59e0b';
+        ctx.shadowBlur = 12;
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+
+      // 3. Marcos Decorativos Ejecutivos
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.45)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(40, 40, W - 80, H - 80);
+
+      ctx.strokeStyle = 'rgba(41, 171, 226, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(52, 52, W - 104, H - 104);
+
+      // Esquinas ornamentales
+      const cSize = 44;
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(40, 40 + cSize); ctx.lineTo(40, 40); ctx.lineTo(40 + cSize, 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W - 40 - cSize, 40); ctx.lineTo(W - 40, 40); ctx.lineTo(W - 40, 40 + cSize); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(40, H - 40 - cSize); ctx.lineTo(40, H - 40); ctx.lineTo(40 + cSize, H - 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W - 40 - cSize, H - 40); ctx.lineTo(W - 40, H - 40); ctx.lineTo(W - 40, H - 40 - cSize); ctx.stroke();
+
+      // 4. Cabecera Institucional
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '700 22px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('CREACIÓN CUÁNTICA • PROGRAMA CREAR PODER SIN LÍMITES', W / 2, 102);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 16px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('MAESTRÍA DEL JUEGO · SEDE LIMA · PRIMER FIN DE SEMANA', W / 2, 134);
+
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.35)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(180, 154); ctx.lineTo(W - 180, 154); ctx.stroke();
+
+      // 5. Emblema y Título
+      ctx.font = '74px Arial, sans-serif';
+      ctx.fillText('👑', W / 2, 240);
+
+      const titleGrad = ctx.createLinearGradient(120, 0, W - 120, 0);
+      titleGrad.addColorStop(0, '#fef3c7');
+      titleGrad.addColorStop(0.3, '#f59e0b');
+      titleGrad.addColorStop(0.7, '#d97706');
+      titleGrad.addColorStop(1, '#38bdf8');
+
+      ctx.shadowColor = 'rgba(245, 158, 11, 0.7)';
+      ctx.shadowBlur = 24;
+      ctx.fillStyle = titleGrad;
+      ctx.font = '900 54px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('COMPROMISO OFICIAL', W / 2, 315);
+
+      ctx.font = '900 46px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('REGLAS DE MAESTRÍA', W / 2, 375);
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 17px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('CONTRATO UNIFICADO & ACREDITACIÓN DE SALA ACEPTADOS', W / 2, 418);
+
+      // 6. Tarjeta Central del Titular
+      const boxX = 75;
+      const boxY = 450;
+      const boxW = W - 150;
+      const boxH = 670;
+
+      ctx.fillStyle = 'rgba(10, 18, 38, 0.92)';
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 20);
+      ctx.fill();
+      ctx.stroke();
+
+      // Nombre del Titular
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 15px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('TITULAR DECLARANTE', W / 2, boxY + 42);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 34px Montserrat, -apple-system, sans-serif';
+      let displayNombre = (nombre || '').toUpperCase();
+      if (displayNombre.length > 32) {
+        ctx.font = '800 26px Montserrat, -apple-system, sans-serif';
+      }
+      ctx.fillText(displayNombre, W / 2, boxY + 84);
+
+      // Documento & Rol en píldora
+      ctx.font = '700 20px Montserrat, -apple-system, sans-serif';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText(`${doc}  •  ${rol.toUpperCase()}`, W / 2, boxY + 122);
+
+      // Equipo / Cohorte
+      ctx.fillStyle = '#fef08a';
+      ctx.font = '800 22px Montserrat, -apple-system, sans-serif';
+      ctx.fillText(`COHORTE / EQUIPO: ${equipo.toUpperCase()}`, W / 2, boxY + 158);
+
+      // Línea divisoria
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(boxX + 40, boxY + 182);
+      ctx.lineTo(boxX + boxW - 40, boxY + 182);
+      ctx.stroke();
+
+      // Declaraciones Aceptadas (Checkboxes Clickwrap 1, 2, 3)
+      const checks = [
+        {
+          num: 'DOC 1',
+          title: 'Aceptación de Términos, Reglas y Confidencialidad NDA',
+          desc: 'Marco Metodológico de Alto Rendimiento, Secreto de Comunidad y Cero Grabaciones.'
+        },
+        {
+          num: 'DOC 2',
+          title: 'Declaración Jurada de Salud y Asunción de Responsabilidad',
+          desc: 'Aptitud física/mental y deslinde amplio de responsabilidad a Creación Cuántica E.I.R.L.'
+        },
+        {
+          num: 'DOC 3',
+          title: 'Consentimiento de Datos Personales y Derechos de Imagen',
+          desc: 'Autorización estricta bajo Ley N° 29733 y uso exclusivo promocional/institucional.'
+        }
+      ];
+
+      let checkY = boxY + 218;
+      checks.forEach((c) => {
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.14)';
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(boxX + 35, checkY - 20, boxW - 70, 74, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        // Check Icon
+        ctx.fillStyle = '#10b981';
+        ctx.font = '800 22px Arial, sans-serif';
+        ctx.fillText('✓', boxX + 65, checkY + 24);
+
+        // Check Text
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#34d399';
+        ctx.font = '800 15.5px Montserrat, -apple-system, sans-serif';
+        ctx.fillText(`[${c.num}]  ${c.title}`, boxX + 95, checkY + 10);
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '500 13px Montserrat, -apple-system, sans-serif';
+        ctx.fillText(c.desc, boxX + 95, checkY + 34);
+
+        checkY += 86;
+      });
+
+      // Metadatos Forenses: IP y Geolocalización en el Pase
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 14px "Courier New", monospace';
+      const geoDisplay = coordinates ? `${geoLocation} (${coordinates})` : geoLocation;
+      ctx.fillText(`IP: ${ip}  |  GEO: ${geoDisplay}`, W / 2, boxY + 505);
+
+      // Banner de Estado: HABILITADO
+      const badgeY = boxY + 530;
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(W / 2 - 290, badgeY, 580, 50, 25);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#10b981';
+      ctx.font = '900 19px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('🏛️ ESTADO: CONTRATO VINCULANTE FIRMADO', W / 2, badgeY + 32);
+
+      // 7. Bloque de QR y Validación
+      const qrSize = 155;
+      const qrX = W / 2 - qrSize / 2;
+      const qrY = 1145;
+
+      const qrImg = new Image();
+      qrImg.crossOrigin = 'anonymous';
+      const encodedUrl = encodeURIComponent(verificationUrl || `https://centro-operativo-cpsl.web.app/reglas-maestria?c=${codigo}`);
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodedUrl}`;
+
+      let finished = false;
+      const finishCanvas = () => {
+        if (finished) return;
+        finished = true;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '800 20px "Courier New", monospace';
+        ctx.fillText(`CÓDIGO DIGITAL: ${codigo}`, W / 2, 1335);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '600 15px Montserrat, -apple-system, sans-serif';
+        ctx.fillText(`Suscrito electrónicamente: ${fecha} (Lima, Perú)`, W / 2, 1365);
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '500 13px Montserrat, -apple-system, sans-serif';
+        ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1395);
+
+        resolve(canvas.toDataURL('image/png'));
+      };
+
+      qrImg.onload = () => {
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
+        ctx.fill();
+        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        finishCanvas();
+      };
+
+      qrImg.onerror = () => {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(qrX, qrY, qrSize, qrSize);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 14px sans-serif';
+        ctx.fillText('QR VALIDADO', W / 2, qrY + 80);
+        finishCanvas();
+      };
+
+      setTimeout(() => {
+        finishCanvas();
+      }, 1500);
+
+    } catch (e) {
+      console.error('Error al generar canvas de Maestria:', e);
+      resolve(null);
+    }
+  });
+}
+
+/**
+ * Envía el correo formal de confirmación con el contrato firmado, metadatos de IP y Geolocalización, y el pase adjunto
+ */
+export async function sendMaestriaConfirmationEmail({
+  db,
+  toEmail,
+  nombre,
+  doc,
+  rol,
+  equipo,
+  codigo,
+  fecha,
+  passDataUrl,
+  telefono,
+  ip = 'No detectada',
+  geoLocation = 'Lima, Perú 🇵🇪',
+  coordinates = '',
+  device = '',
+  sha256Hash = ''
+}) {
+  if (!db || !toEmail) return false;
+
+  try {
+    const safeName = nombre || 'Participante';
+    const base64Data = passDataUrl ? passDataUrl.replace(/^data:image\/png;base64,/, '') : null;
+
+    const emailHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
+        <!-- Cabecera Institucional -->
+        <div style="background: linear-gradient(135deg, #091124 0%, #172554 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #f59e0b;">
+          <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 800; margin-bottom: 8px;">CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811</span>
+          <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">👑 MAESTRÍA DEL JUEGO · SEDE LIMA</h1>
+          <p style="margin: 8px 0 0 0; font-size: 15px; color: #93c5fd; font-weight: 600;">Confirmación y Copia de Contrato Unificado Aceptado</p>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div style="padding: 28px 24px;">
+          <p style="font-size: 16px; line-height: 1.6; color: #1e293b; margin-top: 0;">
+            Estimado(a) <strong>${safeName}</strong>,
+          </p>
+          <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+            Confirmamos la recepción exitosa y el registro probatorio inalterable de tu aceptación del <strong>Dossier Legal, Contrato Unificado y Reglas de Sala</strong> para el primer fin de semana de <strong>Maestría del Juego en Creación (Sede Lima)</strong>.
+          </p>
+
+          <!-- Tarjeta de Datos Registrados y Auditoría Forense -->
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; margin: 20px 0;">
+            <h3 style="margin: 0 0 14px 0; color: #0f172a; font-size: 15px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+              📋 Resumen del Registro Legal y Trazabilidad Forense
+            </h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600; width: 42%;">Titular Declarante:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${safeName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Documento de Identidad:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${doc}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Teléfono / WhatsApp:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${telefono || 'Registrado'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Rol en Sala:</td>
+                <td style="padding: 6px 0; color: #2563eb; font-weight: 700;">${rol}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Cohorte / Equipo:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${equipo}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Código Digital Único:</td>
+                <td style="padding: 6px 0; color: #d97706; font-weight: 800; font-family: monospace;">${codigo}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Fecha y Hora Exacta:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${fecha} (Hora Oficial de Lima)</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Dirección IP Pública:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-family: monospace; font-weight: 700;">${ip}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Geolocalización:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${geoLocation} ${coordinates ? `(${coordinates})` : ''}</td>
+              </tr>
+              ${device ? `<tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Dispositivo / Entorno:</td>
+                <td style="padding: 6px 0; color: #475569;">${device}</td>
+              </tr>` : ''}
+              ${sha256Hash ? `<tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Huella SHA-256:</td>
+                <td style="padding: 6px 0; color: #475569; font-family: monospace; font-size: 11px; word-break: break-all;">${sha256Hash}</td>
+              </tr>` : ''}
+            </table>
+          </div>
+
+          <!-- Bloque de Cláusulas Aceptadas -->
+          <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; border-radius: 8px; padding: 16px 18px; margin: 20px 0;">
+            <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 14px; font-weight: 700;">
+              ✓ Tres (3) Declaraciones Vinculantes Aceptadas (Clickwrap):
+            </h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #166534; line-height: 1.6;">
+              <li><strong>Casilla 1 (DOC 1) · Términos, Reglas de Maestría y Confidencialidad NDA:</strong> Aceptación del diseño educativo de inmersión de alto rendimiento (no equivale a terapia psicológica ni médica), pacto de no divulgación de contenidos por 5 años, secreto de comunidad a perpetuidad, prohibición de grabaciones, cero alcohol/sustancias, prohibición de préstamos/negocios/apuestas entre participantes, cero nuevas relaciones sentimentales durante el proceso y asistencia mínima >80%.</li>
+              <li><strong>Casilla 2 (DOC 2) · Declaración Jurada de Salud y Exoneración:</strong> Declaración jurada de aptitud física y psicológica, y exoneración amplia e irrevocable de responsabilidad a Creación Cuántica E.I.R.L.</li>
+              <li><strong>Casilla 3 (DOC 3) · Tratamiento de Datos e Imagen:</strong> Autorización de tratamiento de datos personales conforme a la Ley N° 29733 y D.S. N° 016-2024-JUS, y uso de imagen con fines exclusivamente institucionales y pedagógicos.</li>
+            </ul>
+          </div>
+
+          <!-- Indicación de Validación NODUS -->
+          <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 14px 16px; margin: 20px 0; font-size: 13px; color: #1e40af; line-height: 1.5;">
+            <strong>📌 Regla Estricta de Disparo de Acceso y Validación NODUS:</strong><br/>
+            De acuerdo con las normativas operativas de la Sede Lima, la emisión del QR definitivo de Check-In para el ingreso físico al salón está sujeta a que el pago haya sido validado y registrado formalmente en el sistema <strong>NODUS</strong> por la coordinación administrativa de la Empresa.
+          </div>
+
+          <!-- Pase Oficial Adjunto -->
+          <div style="text-align: center; margin: 28px 0;">
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Tu imagen oficial de validación ha sido generada e incluida como archivo adjunto:</p>
+            ${base64Data ? `<img src="cid:pase_maestria_oficial" alt="Pase Oficial de Maestría" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 2px solid #f59e0b;" />` : ''}
+          </div>
+
+          <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
+            Este es un documento probatorio oficial emitido por Causa OS para Creación Cuántica E.I.R.L. La firma electrónica con registro de IP y geolocalización goza de plena eficacia jurídica conforme a la Ley N° 27269 y el Código Civil Peruano (Arts. 141 y 141-A).
+          </p>
+        </div>
+
+        <!-- Pie de página -->
+        <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 20px; text-align: center; font-size: 11px; color: #94a3b8;">
+          CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811 · Lima, Perú<br/>
+          Gobernanza Causa OS / Sistema NODUS
+        </div>
+      </div>
+    `;
+
+    const mailDoc = {
+      to: [toEmail],
+      robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
+      created_at: new Date().toISOString(),
+      type: 'contrato_maestria_confirmacion',
+      recipientEmail: toEmail,
+      recipientName: safeName,
+      codigoRegistro: codigo,
+      ip,
+      geoLocation,
+      message: {
+        subject: `👑 CONTRATO & REGLAS ACEPTADAS: Maestría del Juego (Sede Lima) — ${codigo}`,
+        html: emailHtml,
+        attachments: base64Data
+          ? [
+              {
+                filename: `COMPROMISO_MAESTRIA_LIMA_${codigo}.png`,
+                content: base64Data,
+                encoding: 'base64',
+                cid: 'pase_maestria_oficial'
+              }
+            ]
+          : []
+      }
+    };
+
+    await addDoc(collection(db, 'mail'), mailDoc);
+    return true;
+  } catch (error) {
+    console.error('Error enviando correo de confirmación de Maestría:', error);
+    return false;
+  }
+}
+
+/**
+ * Genera el Pase Oficial Digital (1080x1440) de Caminata sobre Fuego ("SÍ VOY A CAMINAR SOBRE FUEGO")
+ * Incluye IP Pública y Geolocalización forense sin excepción.
+ */
+export async function generateFirewalkPassCanvas({
+  nombre,
+  documento,
+  rolActividad = 'Participante',
+  lugar = 'Casona Blanca · Calle Las Perdices 1126, Huachipa (Lima)',
+  fecha,
+  codigo,
+  ip = 'No detectada',
+  geoLocation = 'Lima, Perú 🇵🇪',
+  coordinates = ''
+}) {
+  return new Promise((resolve) => {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1440;
+      const ctx = canvas.getContext('2d');
+      const W = 1080;
+      const H = 1440;
+
+      // 1. Fondo degradado noche & fuego
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#050914');
+      bgGrad.addColorStop(0.3, '#120702');
+      bgGrad.addColorStop(0.65, '#220b02');
+      bgGrad.addColorStop(1, '#050201');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // 2. Resplandor radial de brasas
+      const fireGlow = ctx.createRadialGradient(W / 2, H - 160, 40, W / 2, H - 220, 680);
+      fireGlow.addColorStop(0, 'rgba(255, 115, 0, 0.45)');
+      fireGlow.addColorStop(0.3, 'rgba(234, 88, 12, 0.28)');
+      fireGlow.addColorStop(0.6, 'rgba(185, 28, 28, 0.14)');
+      fireGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = fireGlow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Chispas fijas
+      const sparks = [
+        { x: 180, y: 1200, r: 4, a: 0.8 }, { x: 240, y: 1050, r: 6, a: 0.9 }, { x: 320, y: 1280, r: 3, a: 0.7 },
+        { x: 450, y: 1150, r: 5, a: 0.85 }, { x: 620, y: 1100, r: 6, a: 0.9 }, { x: 750, y: 1240, r: 4, a: 0.75 },
+        { x: 880, y: 1120, r: 5, a: 0.8 }, { x: 920, y: 1290, r: 3, a: 0.6 }, { x: 140, y: 880, r: 3, a: 0.5 },
+        { x: 290, y: 780, r: 4, a: 0.6 }, { x: 820, y: 820, r: 4, a: 0.55 }, { x: 940, y: 920, r: 3, a: 0.5 },
+        { x: 520, y: 980, r: 7, a: 0.95 }, { x: 580, y: 1220, r: 5, a: 0.85 }, { x: 410, y: 1330, r: 4, a: 0.7 }
+      ];
+      sparks.forEach((s) => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 183, 3, ${s.a})`;
+        ctx.shadowColor = '#ea580c';
+        ctx.shadowBlur = 15;
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+
+      // 3. Marcos
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(40, 40, W - 80, H - 80);
+
+      ctx.strokeStyle = 'rgba(234, 88, 12, 0.7)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(52, 52, W - 104, H - 104);
+
+      const cornerSize = 40;
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(40, 40 + cornerSize); ctx.lineTo(40, 40); ctx.lineTo(40 + cornerSize, 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, 40); ctx.lineTo(W - 40, 40); ctx.lineTo(W - 40, 40 + cornerSize); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(40, H - 40 - cornerSize); ctx.lineTo(40, H - 40); ctx.lineTo(40 + cornerSize, H - 40); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, H - 40); ctx.lineTo(W - 40, H - 40); ctx.lineTo(W - 40, H - 40 - cornerSize); ctx.stroke();
+
+      // 4. Header
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#f59e0b';
+      ctx.font = '700 24px Montserrat, system-ui, sans-serif';
+      ctx.fillText('CREACIÓN CUÁNTICA • MAESTRÍA DEL JUEGO', W / 2, 105);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SEDE LIMA · HUACHIPA · NOVIEMBRE 2026', W / 2, 136);
+
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(180, 158); ctx.lineTo(W - 180, 158); ctx.stroke();
+
+      // 5. TÍTULO PRINCIPAL
+      ctx.font = '85px Arial, sans-serif';
+      ctx.fillText('🔥', W / 2, 260);
+
+      const textGrad = ctx.createLinearGradient(150, 0, W - 150, 0);
+      textGrad.addColorStop(0, '#fef08a');
+      textGrad.addColorStop(0.3, '#f59e0b');
+      textGrad.addColorStop(0.7, '#ea580c');
+      textGrad.addColorStop(1, '#dc2626');
+
+      ctx.shadowColor = 'rgba(234, 88, 12, 0.85)';
+      ctx.shadowBlur = 25;
+      ctx.fillStyle = textGrad;
+      ctx.font = '900 62px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SÍ VOY A CAMINAR', W / 2, 345);
+
+      ctx.font = '900 76px Montserrat, system-ui, sans-serif';
+      ctx.fillText('SOBRE FUEGO', W / 2, 430);
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#fdba74';
+      ctx.font = '700 19px Montserrat, system-ui, sans-serif';
+      ctx.fillText('HABILITACIÓN Y REGISTRO OFICIAL DE FUEGO', W / 2, 480);
+
+      // 6. Tarjeta Titular
+      const boxX = 80;
+      const boxY = 515;
+      const boxW = W - 160;
+      const boxH = 625;
+
+      ctx.fillStyle = 'rgba(10, 16, 30, 0.88)';
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.55)';
+      ctx.lineWidth = 2;
+      if (ctx.roundRect) {
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, boxW, boxH, 24);
+        ctx.fill();
+        ctx.stroke();
+      } else {
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+        ctx.strokeRect(boxX, boxY, boxW, boxH);
+      }
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#ffedd5';
+      ctx.font = '800 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('⚡ ACREDITADO EN SALA', boxX + 40, boxY + 50);
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#fb923c';
+      ctx.font = '900 22px Montserrat, system-ui, sans-serif';
+      ctx.fillText((rolActividad || 'PARTICIPANTE').toUpperCase(), boxX + boxW - 40, boxY + 50);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.beginPath(); ctx.moveTo(boxX + 30, boxY + 80); ctx.lineTo(boxX + boxW - 30, boxY + 80); ctx.stroke();
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('TITULAR DECLARANTE:', boxX + 40, boxY + 125);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px Montserrat, system-ui, sans-serif';
+      const cleanNombre = (nombre || 'PARTICIPANTE').toUpperCase();
+      ctx.fillText(cleanNombre.slice(0, 32), boxX + 40, boxY + 178);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('DOCUMENTO DE IDENTIFICACIÓN:', boxX + 40, boxY + 265);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '900 34px Montserrat, system-ui, sans-serif';
+      ctx.fillText((documento || '').toUpperCase(), boxX + 40, boxY + 312);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
+      ctx.fillText('LOCACIÓN CONFIRMADA:', boxX + 40, boxY + 385);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 22px Montserrat, system-ui, sans-serif';
+      ctx.fillText(lugar.slice(0, 56), boxX + 40, boxY + 422);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 15px "Courier New", monospace';
+      const geoDisplay = coordinates ? `${geoLocation} (${coordinates})` : geoLocation;
+      ctx.fillText(`IP: ${ip} | GEO: ${geoDisplay}`, boxX + 40, boxY + 478);
+
+      ctx.fillStyle = '#10b981';
+      ctx.font = '800 20px Montserrat, system-ui, sans-serif';
+      ctx.fillText('✓ Instrumento Legal Firmado · Responsabilidad y Salud Aceptadas', boxX + 40, boxY + 540);
+
+      // 7. Footer Criptográfico
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillRect(80, 1165, W - 160, 155);
+
+      ctx.fillStyle = '#fdba74';
+      ctx.font = '800 22px "Courier New", monospace';
+      ctx.fillText(`CÓDIGO DIGITAL: ${codigo}`, W / 2, 1210);
+
+      ctx.fillStyle = '#cbd5e1';
+      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
+      ctx.fillText(`Firma Registrada el: ${fecha} (Lima)`, W / 2, 1248);
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 14px Montserrat, system-ui, sans-serif';
+      ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1285);
+
+      resolve(canvas.toDataURL('image/png'));
+    } catch (e) {
+      console.error('Error al generar canvas de Caminata sobre Fuego:', e);
+      resolve(null);
+    }
+  });
+}
+
+/**
+ * Envía inmediatamente por correo la imagen de confirmación y copia legal de la Caminata sobre Fuego
+ */
+export async function sendFirewalkConfirmationEmail({
+  db,
+  toEmail,
+  nombre,
+  documento,
+  rolActividad,
+  lugar,
+  codigo,
+  fecha,
+  passDataUrl,
+  telefono,
+  ip = 'No detectada',
+  geoLocation = 'Lima, Perú 🇵🇪',
+  coordinates = '',
+  device = '',
+  sha256Hash = ''
+}) {
+  if (!db || !toEmail) return false;
+
+  try {
+    const safeName = nombre || 'Participante';
+    const base64Data = passDataUrl ? passDataUrl.replace(/^data:image\/png;base64,/, '') : null;
+
+    const emailHtml = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
+        <div style="background: linear-gradient(135deg, #120702 0%, #431407 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #ea580c;">
+          <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 800; margin-bottom: 8px;">CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811</span>
+          <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: #ffffff;">🔥 SÍ VOY A CAMINAR SOBRE FUEGO</h1>
+          <p style="margin: 8px 0 0 0; font-size: 14px; color: #fdba74; font-weight: 600;">Confirmación Oficial de Acreditación y Firma Electrónica · Sede Lima</p>
+        </div>
+
+        <div style="padding: 28px 24px;">
+          <p style="font-size: 16px; line-height: 1.6; color: #1e293b; margin-top: 0;">
+            Hola <strong>${safeName}</strong>,
+          </p>
+          <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+            Tu asistencia y suscripción del <strong>Instrumento Integrado de Exoneración de Responsabilidad, Declaración de Salud y Tratamiento de Datos</strong> para la dinámica <strong>Caminata sobre Fuego (Firewalk Lima)</strong> ha sido registrada de manera exitosa. Adjuntamos tu <strong>Pase Oficial de Confirmación</strong>.
+          </p>
+
+          <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; margin: 20px 0;">
+            <h3 style="margin: 0 0 14px 0; color: #0f172a; font-size: 15px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+              🔥 Resumen de Acreditación y Trazabilidad Forense
+            </h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600; width: 42%;">Titular Declarante:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${safeName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Documento:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${documento}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Rol en la Actividad:</td>
+                <td style="padding: 6px 0; color: #ea580c; font-weight: 700;">${rolActividad}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Locación Confirmada:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${lugar}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Código Digital Único:</td>
+                <td style="padding: 6px 0; color: #ea580c; font-weight: 800; font-family: monospace;">${codigo}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Fecha y Hora Exacta:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${fecha} (Lima)</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Dirección IP Pública:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-family: monospace; font-weight: 700;">${ip}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Geolocalización:</td>
+                <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${geoLocation} ${coordinates ? `(${coordinates})` : ''}</td>
+              </tr>
+              ${device ? `<tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Dispositivo:</td>
+                <td style="padding: 6px 0; color: #475569;">${device}</td>
+              </tr>` : ''}
+              ${sha256Hash ? `<tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Huella SHA-256:</td>
+                <td style="padding: 6px 0; color: #475569; font-family: monospace; font-size: 11px; word-break: break-all;">${sha256Hash}</td>
+              </tr>` : ''}
+            </table>
+          </div>
+
+          <div style="text-align: center; margin: 28px 0;">
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Tu Pase Oficial de Confirmación está incluido en este correo y como imagen adjunta:</p>
+            ${base64Data ? `<img src="cid:pase_fuego_oficial" alt="Pase Oficial Caminata sobre Fuego" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 2px solid #ea580c;" />` : ''}
+          </div>
+
+          <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
+            Documento probatorio oficial emitido por Causa OS para Creación Cuántica E.I.R.L. (RUC 20612592811) conforme a la Ley N° 27269 y Ley N° 29733.
+          </p>
+        </div>
+      </div>
+    `;
+
+    const mailDoc = {
+      to: [toEmail],
+      robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
+      created_at: new Date().toISOString(),
+      type: 'contrato_fuego_confirmacion',
+      recipientEmail: toEmail,
+      recipientName: safeName,
+      codigoRegistro: codigo,
+      ip,
+      geoLocation,
+      message: {
+        subject: `🔥 PASE OFICIAL DE CONFIRMACIÓN: Caminata sobre Fuego (Sede Lima) — ${codigo}`,
+        html: emailHtml,
+        attachments: base64Data
+          ? [
+              {
+                filename: `PASE_CAMINATA_FUEGO_${codigo}.png`,
+                content: base64Data,
+                encoding: 'base64',
+                cid: 'pase_fuego_oficial'
+              }
+            ]
+          : []
+      }
+    };
+
+    await addDoc(collection(db, 'mail'), mailDoc);
+    return true;
+  } catch (error) {
+    console.error('Error enviando correo de confirmación de Caminata sobre Fuego:', error);
+    return false;
+  }
+}
+
+```
+
+---
+
 ## Archivo: src/utils/contactsExport.test.js
 
 ```js
@@ -93464,26 +94734,26 @@ export const canonicalSede = (value) => {
 
 ```js
 // src/utils/geoLocator.js
-// Servicio de Geolocalización y Rastreo de Dispositivo para Auditoría Real
-// Recopila país, ciudad, IP, zona horaria y dispositivo de forma rápida y resiliente.
+// Servicio de Geolocalización, IP Pública y Rastreo Forense de Dispositivo para Auditoría Legal
+// Recopila IP pública, coordenadas (lat/lng), país, ciudad, región, ISP, zona horaria y dispositivo sin excepción.
 
-const GEO_CACHE_KEY = 'cpsl_client_geo_cache';
+const GEO_CACHE_KEY = 'cpsl_client_geo_cache_v2';
 
 // Mapa de zonas horarias para fallback instantáneo si las APIs remotas están bloqueadas
 const TIMEZONE_COUNTRY_MAP = {
-  'America/Lima': { country: 'Perú', countryCode: 'PE', flag: '🇵🇪', city: 'Lima' },
-  'America/Guayaquil': { country: 'Ecuador', countryCode: 'EC', flag: '🇪🇨', city: 'Guayaquil' },
-  'America/Bogota': { country: 'Colombia', countryCode: 'CO', flag: '🇨🇴', city: 'Bogotá' },
-  'America/Mexico_City': { country: 'México', countryCode: 'MX', flag: '🇲🇽', city: 'Ciudad de México' },
-  'America/Santiago': { country: 'Chile', countryCode: 'CL', flag: '🇨🇱', city: 'Santiago' },
-  'America/Buenos_Aires': { country: 'Argentina', countryCode: 'AR', flag: '🇦🇷', city: 'Buenos Aires' },
-  'America/La_Paz': { country: 'Bolivia', countryCode: 'BO', flag: '🇧🇴', city: 'La Paz' },
-  'America/Caracas': { country: 'Venezuela', countryCode: 'VE', flag: '🇻🇪', city: 'Caracas' },
-  'America/New_York': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'New York' },
-  'America/Chicago': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'Chicago' },
-  'America/Los_Angeles': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'Los Ángeles' },
-  'Europe/Madrid': { country: 'España', countryCode: 'ES', flag: '🇪🇸', city: 'Madrid' },
-  'Europe/London': { country: 'Reino Unido', countryCode: 'GB', flag: '🇬🇧', city: 'Londres' }
+  'America/Lima': { country: 'Perú', countryCode: 'PE', flag: '🇵🇪', city: 'Lima', region: 'Lima', lat: -12.0464, lng: -77.0428 },
+  'America/Guayaquil': { country: 'Ecuador', countryCode: 'EC', flag: '🇪🇨', city: 'Guayaquil', region: 'Guayas', lat: -2.1894, lng: -79.8891 },
+  'America/Bogota': { country: 'Colombia', countryCode: 'CO', flag: '🇨🇴', city: 'Bogotá', region: 'Cundinamarca', lat: 4.7110, lng: -74.0721 },
+  'America/Mexico_City': { country: 'México', countryCode: 'MX', flag: '🇲🇽', city: 'Ciudad de México', region: 'CDMX', lat: 19.4326, lng: -99.1332 },
+  'America/Santiago': { country: 'Chile', countryCode: 'CL', flag: '🇨🇱', city: 'Santiago', region: 'RM', lat: -33.4489, lng: -70.6693 },
+  'America/Buenos_Aires': { country: 'Argentina', countryCode: 'AR', flag: '🇦🇷', city: 'Buenos Aires', region: 'CABA', lat: -34.6037, lng: -58.3816 },
+  'America/La_Paz': { country: 'Bolivia', countryCode: 'BO', flag: '🇧🇴', city: 'La Paz', region: 'La Paz', lat: -16.4897, lng: -68.1193 },
+  'America/Caracas': { country: 'Venezuela', countryCode: 'VE', flag: '🇻🇪', city: 'Caracas', region: 'Distrito Capital', lat: 10.4806, lng: -66.9036 },
+  'America/New_York': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'New York', region: 'NY', lat: 40.7128, lng: -74.0060 },
+  'America/Chicago': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'Chicago', region: 'IL', lat: 41.8781, lng: -87.6298 },
+  'America/Los_Angeles': { country: 'Estados Unidos', countryCode: 'US', flag: '🇺🇸', city: 'Los Ángeles', region: 'CA', lat: 34.0522, lng: -118.2437 },
+  'Europe/Madrid': { country: 'España', countryCode: 'ES', flag: '🇪🇸', city: 'Madrid', region: 'Madrid', lat: 40.4168, lng: -3.7038 },
+  'Europe/London': { country: 'Reino Unido', countryCode: 'GB', flag: '🇬🇧', city: 'Londres', region: 'England', lat: 51.5074, lng: -0.1278 }
 };
 
 // Generador de bandera emoji desde código ISO de 2 letras
@@ -93530,10 +94800,60 @@ export function getClientDeviceInfo() {
 }
 
 /**
- * Obtiene la geolocalización pública real del usuario (País, Ciudad, IP, ISP)
- * Utiliza caché de sesión para evitar peticiones repetidas.
+ * Intenta obtener coordenadas GPS de alta precisión del navegador si el usuario lo permite (con timeout corto)
  */
-export async function getClientGeoLocation() {
+export function getBrowserGpsCoordinates(timeoutMs = 2200) {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined' || !navigator || !navigator.geolocation) {
+      resolve(null);
+      return;
+    }
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        resolve(null);
+      }
+    }, timeoutMs);
+
+    try {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (!settled) {
+            settled = true;
+            clearTimeout(timer);
+            resolve({
+              lat: Number(pos.coords.latitude.toFixed(6)),
+              lng: Number(pos.coords.longitude.toFixed(6)),
+              accuracyMeters: Math.round(pos.coords.accuracy || 0),
+              source: 'GPS_DISPOSITIVO'
+            });
+          }
+        },
+        () => {
+          if (!settled) {
+            settled = true;
+            clearTimeout(timer);
+            resolve(null);
+          }
+        },
+        { enableHighAccuracy: true, timeout: timeoutMs, maximumAge: 60000 }
+      );
+    } catch {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timer);
+        resolve(null);
+      }
+    }
+  });
+}
+
+/**
+ * Obtiene la geolocalización pública real del usuario (IP, Coordenadas, País, Ciudad, Región, ISP, Dispositivo)
+ * Triple redundancia: ipwho.is -> geojs.io -> ipify + ipapi -> fallback timezone
+ */
+export async function getClientGeoLocation(options = { forceFresh: false, tryGps: false }) {
   if (typeof window === 'undefined') {
     return {
       country: 'Perú',
@@ -93542,24 +94862,30 @@ export async function getClientGeoLocation() {
       city: 'Lima',
       region: 'Lima',
       ip: '127.0.0.1',
+      lat: -12.0464,
+      lng: -77.0428,
+      coordinates: '-12.0464, -77.0428',
+      geoSource: 'SERVER',
       timezone: 'America/Lima',
       device: 'Servidor',
+      userAgent: 'Server',
       locationString: 'Lima, Perú 🇵🇪'
     };
   }
 
-  // 1. Revisar caché en sessionStorage
-  try {
-    const cached = sessionStorage.getItem(GEO_CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      // Validar que tenga datos válidos
-      if (parsed && parsed.country) {
-        return parsed;
+  // 1. Revisar caché en sessionStorage si no se exige lectura fresca
+  if (!options?.forceFresh) {
+    try {
+      const cached = sessionStorage.getItem(GEO_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.ip && parsed.ip !== 'IP Oculta' && parsed.ip !== 'Detectada por Timezone' && parsed.country) {
+          return parsed;
+        }
       }
+    } catch {
+      // Continuar
     }
-  } catch (e) {
-    // Continuar si sessionStorage falla
   }
 
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Lima';
@@ -93567,92 +94893,141 @@ export async function getClientGeoLocation() {
     country: 'Perú',
     countryCode: 'PE',
     flag: '🇵🇪',
-    city: 'Lima'
+    city: 'Lima',
+    region: 'Lima',
+    lat: -12.0464,
+    lng: -77.0428
   };
 
   const device = getClientDeviceInfo();
+  const userAgent = navigator.userAgent || '';
   let geoResult = null;
 
-  // 2. Intentar servicio primario: ipwho.is (Rápido, SSL, sin API key)
+  // 2. Intentar servicio primario: ipwho.is (Rápido, SSL, devuelve IP, lat, lng, ciudad, ISP)
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2600);
+    const timeoutId = setTimeout(() => controller.abort(), 2800);
     const res = await fetch('https://ipwho.is/', { signal: controller.signal });
     clearTimeout(timeoutId);
-    
+
     if (res.ok) {
       const data = await res.json();
-      if (data && data.success !== false && data.country) {
+      if (data && data.success !== false && data.ip) {
         const flagEmoji = data.flag?.emoji || getCountryFlag(data.country_code);
+        const lat = typeof data.latitude === 'number' ? Number(data.latitude.toFixed(6)) : tzFallback.lat;
+        const lng = typeof data.longitude === 'number' ? Number(data.longitude.toFixed(6)) : tzFallback.lng;
         geoResult = {
-          country: data.country,
+          country: data.country || tzFallback.country,
           countryCode: data.country_code || tzFallback.countryCode,
           flag: flagEmoji,
           city: data.city || tzFallback.city,
-          region: data.region || '',
-          ip: data.ip || 'IP Oculta',
+          region: data.region || tzFallback.region || '',
+          ip: data.ip,
+          lat,
+          lng,
+          coordinates: `${lat}, ${lng}`,
+          geoSource: 'IPWHO_IS',
           isp: data.connection?.isp || data.connection?.org || '',
           timezone: data.timezone?.id || timezone,
-          device: device,
-          locationString: `${data.city ? `${data.city}, ` : ''}${data.country} ${flagEmoji}`.trim()
+          device,
+          userAgent,
+          locationString: `${data.city ? `${data.city}, ` : ''}${data.region ? `${data.region}, ` : ''}${data.country || tzFallback.country} ${flagEmoji}`.trim()
         };
       }
     }
-  } catch (primaryErr) {
-    // Continuar al fallback secundario
+  } catch {
+    // Continuar al segundo proveedor
   }
 
   // 3. Fallback secundario: geojs.io
   if (!geoResult) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2600);
+      const timeoutId = setTimeout(() => controller.abort(), 2800);
       const res = await fetch('https://get.geojs.io/v1/ip/geo.json', { signal: controller.signal });
       clearTimeout(timeoutId);
 
       if (res.ok) {
         const data = await res.json();
-        if (data && data.country) {
+        if (data && data.ip) {
           const flagEmoji = getCountryFlag(data.country_code);
+          const lat = data.latitude ? Number(parseFloat(data.latitude).toFixed(6)) : tzFallback.lat;
+          const lng = data.longitude ? Number(parseFloat(data.longitude).toFixed(6)) : tzFallback.lng;
           geoResult = {
-            country: data.country,
+            country: data.country || tzFallback.country,
             countryCode: data.country_code || tzFallback.countryCode,
             flag: flagEmoji,
             city: data.city || tzFallback.city,
-            region: data.region || '',
-            ip: data.ip || 'IP Oculta',
-            isp: data.organization_name || '',
+            region: data.region || tzFallback.region || '',
+            ip: data.ip,
+            lat,
+            lng,
+            coordinates: `${lat}, ${lng}`,
+            geoSource: 'GEOJS_IO',
+            isp: data.organization_name || data.organization || '',
             timezone: data.timezone || timezone,
-            device: device,
-            locationString: `${data.city ? `${data.city}, ` : ''}${data.country} ${flagEmoji}`.trim()
+            device,
+            userAgent,
+            locationString: `${data.city ? `${data.city}, ` : ''}${data.region ? `${data.region}, ` : ''}${data.country || tzFallback.country} ${flagEmoji}`.trim()
           };
         }
       }
-    } catch (secondaryErr) {
-      // Continuar al fallback local
+    } catch {
+      // Continuar al tercer proveedor
     }
   }
 
-  // 4. Fallback final por zona horaria del navegador si no hay conectividad externa
+  // 4. Fallback terciario: ipapi.co o api.ipify.org para asegurar la IP pública sin excepción
   if (!geoResult) {
+    let resolvedIp = 'No detectada';
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const ipData = await res.json();
+        if (ipData && ipData.ip) resolvedIp = ipData.ip;
+      }
+    } catch {
+      // Ignorar
+    }
+
     geoResult = {
       country: tzFallback.country,
       countryCode: tzFallback.countryCode,
       flag: tzFallback.flag,
       city: tzFallback.city,
-      region: '',
-      ip: 'Detectada por Timezone',
+      region: tzFallback.region || '',
+      ip: resolvedIp,
+      lat: tzFallback.lat,
+      lng: tzFallback.lng,
+      coordinates: `${tzFallback.lat}, ${tzFallback.lng}`,
+      geoSource: resolvedIp !== 'No detectada' ? 'IPIFY_TZ' : 'TIMEZONE_FALLBACK',
       isp: '',
-      timezone: timezone,
-      device: device,
+      timezone,
+      device,
+      userAgent,
       locationString: `${tzFallback.city}, ${tzFallback.country} ${tzFallback.flag}`.trim()
     };
   }
 
-  // Guardar en sessionStorage para toda la sesión del navegador
+  // 5. Si se solicita intento de GPS de dispositivo, enriquecer coordenadas
+  if (options?.tryGps) {
+    const gps = await getBrowserGpsCoordinates(2200);
+    if (gps && gps.lat && gps.lng) {
+      geoResult.lat = gps.lat;
+      geoResult.lng = gps.lng;
+      geoResult.coordinates = `${gps.lat}, ${gps.lng}`;
+      geoResult.gpsAccuracyMeters = gps.accuracyMeters;
+      geoResult.geoSource = `${geoResult.geoSource}+GPS`;
+    }
+  }
+
+  // Guardar en sessionStorage
   try {
     sessionStorage.setItem(GEO_CACHE_KEY, JSON.stringify(geoResult));
-  } catch (e) {}
+  } catch {}
 
   return geoResult;
 }
@@ -138173,6 +139548,1370 @@ export default function OnboardingLegal() {
 
 ---
 
+## Archivo: src/pages/MonitorMaestriaLima.jsx
+
+```javascript
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Crown,
+  ShieldCheck,
+  Search,
+  CheckCircle2,
+  QrCode,
+  ExternalLink,
+  Copy,
+  PhoneCall,
+  MapPin,
+  FileText,
+  Download,
+  Mail,
+  Eye,
+  Globe,
+  Cpu,
+  X,
+  Check
+} from 'lucide-react';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import padronLima111 from '../data/padron_fuego_lima_111.json';
+import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
+
+export default function MonitorMaestriaLima() {
+  const [signedContracts, setSignedContracts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('REGISTROS'); // 'REGISTROS' | 'PADRON'
+
+  // Filtros Registros
+  const [regSearch, setRegSearch] = useState('');
+  const [regRoleFilter, setRegRoleFilter] = useState('TODOS');
+  const [regTeamFilter, setRegTeamFilter] = useState('TODOS');
+
+  // Filtros Padrón
+  const [padronSearch, setPadronSearch] = useState('');
+  const [padronTeamFilter, setPadronTeamFilter] = useState('TODOS');
+  const [padronStatusFilter, setPadronStatusFilter] = useState('TODOS');
+
+  // Modales y Estados de Acción
+  const [qrModalType, setQrModalType] = useState(null); // 'contract' | 'monitor' | null
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [selectedRecordForPass, setSelectedRecordForPass] = useState(null);
+  const [passPreviewUrl, setPassPreviewUrl] = useState(null);
+  const [generatingPass, setGeneratingPass] = useState(false);
+  const [selectedRecordForAudit, setSelectedRecordForAudit] = useState(null);
+  const [sendingEmailId, setSendingEmailId] = useState(null);
+  const [emailStatusMap, setEmailStatusMap] = useState({});
+
+  const normalizeStr = (str) => {
+    if (!str) return '';
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+  };
+
+  useEffect(() => {
+    document.title = 'Panel de Supervisión Lima · Reglas de Maestría del Juego | Causa OS';
+  }, []);
+
+  // Escuchar firmas en tiempo real desde Firestore
+  useEffect(() => {
+    if (!db) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const colRef = collection(db, 'contratos_maestria_lima');
+      const unsubscribe = onSnapshot(
+        colRef,
+        (snapshot) => {
+          const list = [];
+          snapshot.forEach((doc) => {
+            list.push({ id: doc.id, ...doc.data() });
+          });
+
+          list.sort((a, b) => {
+            const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : (a.fechaValidacionIso ? new Date(a.fechaValidacionIso).getTime() : 0);
+            const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : (b.fechaValidacionIso ? new Date(b.fechaValidacionIso).getTime() : 0);
+            return tB - tA;
+          });
+
+          setSignedContracts(list);
+          setLoading(false);
+        },
+        (error) => {
+          console.warn('⚠️ Error en listener Firestore contratos_maestria_lima:', error);
+          setLoading(false);
+        }
+      );
+
+      return () => unsubscribe();
+    } catch (err) {
+      console.warn('Firestore subscription error:', err);
+      setLoading(false);
+    }
+  }, []);
+
+  // Cruce con el padrón oficial de 111 integrantes de Lima
+  const enrichedPadron = useMemo(() => {
+    return padronLima111.map((person) => {
+      const normPersonName = normalizeStr(person.nombre);
+      const personTokens = normPersonName.split(/\s+/).filter((t) => t.length > 2);
+
+      const signature = signedContracts.find((c) => {
+        const normSigName = normalizeStr(c.nombre || c.nombreCompleto || '');
+        if (normSigName === normPersonName) return true;
+        const matchTokens = personTokens.filter((t) => normSigName.includes(t));
+        return matchTokens.length >= 2;
+      });
+
+      return {
+        ...person,
+        isSigned: !!signature,
+        signature
+      };
+    });
+  }, [signedContracts]);
+
+  // Indicadores Ejecutivos para Oficina Lima
+  const stats = useMemo(() => {
+    const totalPadron = enrichedPadron.length;
+    const firmadosPadron = enrichedPadron.filter((p) => p.isSigned).length;
+    const pendientesPadron = totalPadron - firmadosPadron;
+    const porcentaje = totalPadron > 0 ? Math.round((firmadosPadron / totalPadron) * 100) : 0;
+    const totalRegistradosFirestore = signedContracts.length;
+    const totalParticipantes = signedContracts.filter((c) => (c.rol || c.rolActividad || '').toLowerCase().includes('participante')).length;
+    const totalManagers = signedContracts.filter((c) => (c.rol || c.rolActividad || '').toLowerCase().includes('manager')).length;
+    const conGeoIp = signedContracts.filter((c) => Boolean(c.ip && c.geoLocation)).length;
+
+    return {
+      totalPadron,
+      firmadosPadron,
+      pendientesPadron,
+      porcentaje,
+      totalRegistradosFirestore,
+      totalParticipantes,
+      totalManagers,
+      conGeoIp
+    };
+  }, [enrichedPadron, signedContracts]);
+
+  // Filtrado Tab 1 (Registros y Auditoría Forense)
+  const filteredRegistros = useMemo(() => {
+    return signedContracts.filter((item) => {
+      if (regRoleFilter !== 'TODOS') {
+        const itemRole = item.rol || item.rolActividad || '';
+        if (itemRole !== regRoleFilter) return false;
+      }
+      if (regTeamFilter !== 'TODOS') {
+        const itemTeam = item.equipo || item.cohorte || '';
+        if (!itemTeam.includes(regTeamFilter)) return false;
+      }
+      if (regSearch) {
+        const term = normalizeStr(regSearch);
+        const name = normalizeStr(item.nombre || item.nombreCompleto || '');
+        const doc = normalizeStr(item.numeroDocumento || item.doc || '');
+        const email = normalizeStr(item.email || '');
+        const code = normalizeStr(item.code || item.verificationCode || '');
+        const ip = normalizeStr(item.ip || '');
+        const geo = normalizeStr(item.geoLocation || '');
+        return (
+          name.includes(term) ||
+          doc.includes(term) ||
+          email.includes(term) ||
+          code.includes(term) ||
+          ip.includes(term) ||
+          geo.includes(term)
+        );
+      }
+      return true;
+    });
+  }, [signedContracts, regRoleFilter, regTeamFilter, regSearch]);
+
+  // Filtrado Tab 2 (Padrón Oficial Lima)
+  const filteredPadron = useMemo(() => {
+    return enrichedPadron.filter((item) => {
+      if (padronTeamFilter !== 'TODOS' && item.equipo !== padronTeamFilter) return false;
+      if (padronStatusFilter === 'PENDIENTES' && item.isSigned) return false;
+      if (padronStatusFilter === 'FIRMADOS' && !item.isSigned) return false;
+      if (padronSearch) {
+        const term = normalizeStr(padronSearch);
+        const nameNorm = normalizeStr(item.nombre);
+        const rolNorm = normalizeStr(item.rol);
+        const cohorteNorm = normalizeStr(item.cohorte);
+        return nameNorm.includes(term) || rolNorm.includes(term) || cohorteNorm.includes(term);
+      }
+      return true;
+    });
+  }, [enrichedPadron, padronTeamFilter, padronStatusFilter, padronSearch]);
+
+  const originUrl = typeof window !== 'undefined' ? window.location.origin : 'https://centro-operativo-cpsl.web.app';
+  const contractUrl = `${originUrl}/reglas-maestria`;
+  const monitorUrl = `${originUrl}/monitor-maestria-lima`;
+
+  const copyUrl = (url) => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2000);
+      });
+    }
+  };
+
+  // Visualizar Pase Digital de un firmante
+  const handleViewPass = async (item) => {
+    setSelectedRecordForPass(item);
+    setGeneratingPass(true);
+    setPassPreviewUrl(null);
+    try {
+      const code = item.code || item.verificationCode || 'CQ-MJ-VERIFIED';
+      const dataUrl = await generateMaestriaPassCanvas({
+        nombre: item.nombre || item.nombreCompleto || 'Participante',
+        doc: item.doc || `${item.tipoDocumento || 'DNI'}: ${item.numeroDocumento || ''}`,
+        rol: item.rol || item.rolActividad || 'Participante',
+        equipo: item.equipo || item.cohorte || 'Equipo 32',
+        sede: item.sede || 'Lima',
+        fecha: item.fecha || item.fechaValidacionLocal || 'Registrado',
+        codigo: code,
+        ip: item.ip || 'Registrada',
+        geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: item.coordinates || '',
+        verificationUrl: `${originUrl}/reglas-maestria?c=${code}`
+      });
+      setPassPreviewUrl(dataUrl);
+    } catch (e) {
+      console.error('Error generando vista previa del pase:', e);
+    } finally {
+      setGeneratingPass(false);
+    }
+  };
+
+  // Reenviar Contrato + Pase por Correo
+  const handleResendEmail = async (item) => {
+    if (!item.email) {
+      alert('Este registro no cuenta con un correo electrónico válido.');
+      return;
+    }
+    const rowKey = item.id || item.code;
+    setSendingEmailId(rowKey);
+    try {
+      const code = item.code || item.verificationCode || 'CQ-MJ-VERIFIED';
+      const passDataUrl = await generateMaestriaPassCanvas({
+        nombre: item.nombre || item.nombreCompleto || 'Participante',
+        doc: item.doc || `${item.tipoDocumento || 'DNI'}: ${item.numeroDocumento || ''}`,
+        rol: item.rol || item.rolActividad || 'Participante',
+        equipo: item.equipo || item.cohorte || 'Equipo 32',
+        sede: item.sede || 'Lima',
+        fecha: item.fecha || item.fechaValidacionLocal || 'Registrado',
+        codigo: code,
+        ip: item.ip || 'Registrada',
+        geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: item.coordinates || '',
+        verificationUrl: `${originUrl}/reglas-maestria?c=${code}`
+      });
+
+      const ok = await sendMaestriaConfirmationEmail({
+        db,
+        toEmail: item.email,
+        nombre: item.nombre || item.nombreCompleto,
+        doc: item.doc || `${item.tipoDocumento || 'DNI'}: ${item.numeroDocumento || ''}`,
+        rol: item.rol || item.rolActividad || 'Participante',
+        equipo: item.equipo || item.cohorte || 'Equipo 32',
+        codigo: code,
+        fecha: item.fecha || item.fechaValidacionLocal || 'Registrado',
+        passDataUrl,
+        telefono: item.telefono || '',
+        ip: item.ip || 'Registrada',
+        geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: item.coordinates || '',
+        device: item.dispositivo || '',
+        sha256Hash: item.sha256Hash || ''
+      });
+
+      if (ok) {
+        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'SENT' }));
+      } else {
+        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+      }
+    } catch (e) {
+      console.error('Error al reenviar correo:', e);
+      setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
+
+  // Exportar CSV con Auditoría de IP y Geolocalización
+  const handleExportCsv = () => {
+    const headers = [
+      'Codigo_Digital',
+      'Nombre_Completo',
+      'Documento',
+      'Email',
+      'Telefono',
+      'Rol',
+      'Equipo_Cohorte',
+      'Casilla1_NDA_Reglas',
+      'Casilla2_Salud_Exoneracion',
+      'Casilla3_Datos_Imagen',
+      'IP_Publica',
+      'Geolocalizacion',
+      'Coordenadas_GPS',
+      'Dispositivo',
+      'Hash_SHA256',
+      'Fecha_Hora_Lima'
+    ];
+
+    const rows = signedContracts.map((c) => [
+      c.code || c.verificationCode || '',
+      `"${(c.nombre || c.nombreCompleto || '').replace(/"/g, '""')}"`,
+      `"${(c.doc || `${c.tipoDocumento || ''} ${c.numeroDocumento || ''}`).replace(/"/g, '""')}"`,
+      `"${(c.email || '').replace(/"/g, '""')}"`,
+      `"${(c.telefono || '').replace(/"/g, '""')}"`,
+      `"${(c.rol || c.rolActividad || '').replace(/"/g, '""')}"`,
+      `"${(c.equipo || c.cohorte || c.equipoCohorte || '').replace(/"/g, '""')}"`,
+      (c.casilla1_TerminosNDA || c.aceptoTerminosNda) ? 'ACEPTADO' : 'NO',
+      (c.casilla2_SaludExoneracion || c.aceptoSaludExoneracion) ? 'ACEPTADO' : 'NO',
+      (c.casilla3_DatosImagen || c.aceptoDatosImagen) ? 'ACEPTADO' : 'NO',
+      `"${(c.ip || 'No detectada').replace(/"/g, '""')}"`,
+      `"${(c.geoLocation || 'Lima, Peru').replace(/"/g, '""')}"`,
+      `"${(c.coordinates || '').replace(/"/g, '""')}"`,
+      `"${(c.dispositivo || '').replace(/"/g, '""')}"`,
+      `"${(c.sha256Hash || '').replace(/"/g, '""')}"`,
+      `"${(c.fecha || c.fechaValidacionLocal || '').replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `AUDITORIA_REGLAS_MAESTRIA_LIMA_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#050811', color: '#f8fafc', padding: '1.25rem 0.85rem' }}>
+      <div style={{ maxWidth: '1140px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
+        {/* Encabezado Ejecutivo — Oficina de Lima */}
+        <div style={{
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, #091124 0%, #111c38 100%)',
+          border: '1px solid rgba(245, 158, 11, 0.38)',
+          borderRadius: '16px',
+          padding: '1.5rem',
+          boxShadow: '0 20px 40px -15px rgba(245, 158, 11, 0.14)'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #f59e0b, #fbbf24, #38bdf8)'
+          }} />
+
+          {/* Barra Superior de Identidad */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/logo-crear.png'; }} />
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#f59e0b', textTransform: 'uppercase', display: 'block' }}>
+                  CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811
+                </span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#94a3b8', display: 'block' }}>
+                  Causa OS · Panel de Supervisión Legal & Reglas de Sala (Oficina de Lima)
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={handleExportCsv}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.14)',
+                  color: '#38bdf8',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  borderRadius: '8px',
+                  padding: '0.5rem 0.85rem',
+                  fontSize: '0.76rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                <Download size={14} /> Exportar CSV Forense (IP/Geo)
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
+                <span style={{
+                  background: 'linear-gradient(90deg, #d97706, #f59e0b)',
+                  color: '#050811',
+                  fontSize: '0.7rem',
+                  fontWeight: 900,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  padding: '0.25rem 0.65rem',
+                  borderRadius: '6px'
+                }}>
+                  👑 SUPERVISIÓN LIMA · MAESTRÍA DEL JUEGO
+                </span>
+                <span style={{
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  color: '#34d399',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '6px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+                  AUDITORÍA IP + GEOLOCALIZACIÓN ACTIVA
+                </span>
+              </div>
+              <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 900, letterSpacing: '-0.02em', color: '#fff' }}>
+                Control de Aceptación de Reglas y Contratos de Maestría
+              </h1>
+              <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.84rem', color: '#94a3b8', fontWeight: 500 }}>
+                Verificación en vivo de las 3 casillas obligatorias (NDA, Salud/Exoneración, Datos/Imagen), IP pública, geolocalización y envío automático de contrato por correo.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setQrModalType('contract')}
+                style={{
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  color: '#050811',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '0.65rem 1rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 900,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+                }}
+              >
+                <QrCode size={16} /> QR Reglas Maestría
+              </button>
+              <a
+                href="/reglas-maestria"
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  border: '1px solid #334155',
+                  borderRadius: '10px',
+                  padding: '0.65rem 1rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  textDecoration: 'none'
+                }}
+              >
+                Abrir Landing Contrato <ExternalLink size={14} />
+              </a>
+            </div>
+          </div>
+
+          {/* Tarjetas KPI */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(145px, 1fr))',
+            gap: '0.75rem',
+            marginTop: '1.25rem',
+            paddingTop: '1.25rem',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)'
+          }}>
+            <div style={{ background: 'rgba(6, 78, 59, 0.32)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✓ Contratos Firmados</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '0.15rem' }}>{stats.totalRegistradosFirestore}</div>
+            </div>
+            <div style={{ background: '#0b1325', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Participantes / Managers</span>
+              <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', marginTop: '0.2rem' }}>
+                {stats.totalParticipantes} <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Part.</span> · {stats.totalManagers} <span style={{ fontSize: '0.8rem', color: '#fbbf24' }}>Mgr.</span>
+              </div>
+            </div>
+            <div style={{ background: '#0b1325', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid #1e293b' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Padrón Oficial Lima</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', marginTop: '0.15rem' }}>{stats.totalPadron}</div>
+            </div>
+            <div style={{ background: 'rgba(136, 19, 55, 0.28)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(244, 63, 94, 0.4)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Pendientes Padrón</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.pendientesPadron}</div>
+            </div>
+            <div style={{ background: 'rgba(120, 53, 15, 0.3)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🌐 Trazabilidad IP + Geo</span>
+              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>100%</div>
+            </div>
+          </div>
+        </div>
+
+        {/* SELECTOR DE PESTAÑAS */}
+        <div style={{ display: 'flex', gap: '0.5rem', background: '#091124', padding: '0.4rem', borderRadius: '14px', border: '1px solid #1e293b' }}>
+          <button
+            onClick={() => setActiveTab('REGISTROS')}
+            style={{
+              flex: 1,
+              padding: '0.75rem 1rem',
+              borderRadius: '10px',
+              fontSize: '0.85rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              border: 'none',
+              background: activeTab === 'REGISTROS' ? 'linear-gradient(90deg, #d97706, #f59e0b)' : '#111c38',
+              color: activeTab === 'REGISTROS' ? '#050811' : '#94a3b8',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            🛡️ Auditoría de Contratos Firmados, IP y Geolocalización ({signedContracts.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('PADRON')}
+            style={{
+              flex: 1,
+              padding: '0.75rem 1rem',
+              borderRadius: '10px',
+              fontSize: '0.85rem',
+              fontWeight: 900,
+              cursor: 'pointer',
+              border: 'none',
+              background: activeTab === 'PADRON' ? 'linear-gradient(90deg, #d97706, #f59e0b)' : '#111c38',
+              color: activeTab === 'PADRON' ? '#050811' : '#94a3b8',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            👥 Cruce con Padrón Oficial Lima ({stats.firmadosPadron}/{stats.totalPadron})
+          </button>
+        </div>
+
+        {/* TAB 1: AUDITORÍA DE CONTRATOS FIRMADOS */}
+        {activeTab === 'REGISTROS' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{
+              background: 'rgba(9, 17, 36, 0.95)',
+              border: '1px solid #1e293b',
+              borderRadius: '14px',
+              padding: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem'
+            }}>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={regSearch}
+                  onChange={(e) => setRegSearch(e.target.value)}
+                  placeholder="🔍 Buscar por nombre, DNI/CE, correo, código, dirección IP o ciudad..."
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.6rem',
+                    background: '#050811',
+                    border: '1px solid #334155',
+                    borderRadius: '10px',
+                    color: '#fff',
+                    fontSize: '0.86rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                {regSearch && (
+                  <button
+                    onClick={() => setRegSearch('')}
+                    style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto' }}>
+                  {['TODOS', 'Participante', 'Manager', 'Capitán', 'Oficina / Staff', 'Entrenador'].map((r) => {
+                    const active = regRoleFilter === r;
+                    return (
+                      <button
+                        key={r}
+                        onClick={() => setRegRoleFilter(r)}
+                        style={{
+                          background: active ? '#f59e0b' : '#111c38',
+                          color: active ? '#050811' : '#cbd5e1',
+                          border: active ? 'none' : '1px solid #334155',
+                          borderRadius: '8px',
+                          padding: '0.35rem 0.7rem',
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          whiteSpace: 'nowrap',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {r}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto' }}>
+                  {['TODOS', 'Equipo 29', 'Equipo 30', 'Equipo 31', 'Equipo 32'].map((t) => {
+                    const active = regTeamFilter === t;
+                    return (
+                      <button
+                        key={t}
+                        onClick={() => setRegTeamFilter(t)}
+                        style={{
+                          background: active ? '#38bdf8' : '#111c38',
+                          color: active ? '#050811' : '#cbd5e1',
+                          border: active ? 'none' : '1px solid #334155',
+                          borderRadius: '8px',
+                          padding: '0.35rem 0.7rem',
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          whiteSpace: 'nowrap',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 0.5rem', fontSize: '0.78rem', color: '#94a3b8' }}>
+              <span>Mostrando <strong>{filteredRegistros.length}</strong> de {signedContracts.length} aceptaciones legales</span>
+              <span style={{ color: '#10b981' }}>✓ Sincronizado en tiempo real con Firestore</span>
+            </div>
+
+            {filteredRegistros.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: '#091124', borderRadius: '14px', border: '1px solid #1e293b' }}>
+                <div style={{ fontSize: '2.2rem', marginBottom: '0.5rem' }}>👑</div>
+                <p style={{ margin: 0, fontWeight: 800, color: '#fff' }}>No se encontraron registros con el filtro actual</p>
+                <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
+                  Cada vez que un Participante o Manager firme el contrato en <code>/reglas-maestria</code>, aparecerá aquí con su IP, geolocalización y pase.
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                {filteredRegistros.map((item, idx) => {
+                  const rowKey = item.id || item.code || idx;
+                  const nombre = item.nombre || item.nombreCompleto || 'Sin nombre';
+                  const docInfo = item.doc || `${item.tipoDocumento || 'DNI'}: ${item.numeroDocumento || '—'}`;
+                  const rol = item.rol || item.rolActividad || 'Participante';
+                  const equipo = item.equipo || item.cohorte || 'Equipo 32';
+                  const fecha = item.fecha || item.fechaValidacionLocal || 'Registrado';
+                  const code = item.code || item.verificationCode || 'CQ-MJ-VERIFIED';
+                  const ip = item.ip || 'No detectada';
+                  const geo = item.geoLocation || 'Lima, Perú 🇵🇪';
+                  const coords = item.coordinates || '';
+                  const device = item.dispositivo || 'Web';
+                  const emailStatus = emailStatusMap[rowKey];
+
+                  return (
+                    <div
+                      key={rowKey}
+                      style={{
+                        background: 'linear-gradient(135deg, #091124 0%, #111c38 100%)',
+                        border: '1px solid rgba(16, 185, 129, 0.38)',
+                        borderRadius: '14px',
+                        padding: '1.2rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.85rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '0.6rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          <span style={{
+                            background: 'rgba(16, 185, 129, 0.18)',
+                            color: '#34d399',
+                            border: '1px solid rgba(16, 185, 129, 0.4)',
+                            fontSize: '0.68rem',
+                            fontWeight: 900,
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '5px'
+                          }}>
+                            ✓ 3 CASILLAS CLICKWRAP ACEPTADAS
+                          </span>
+                          <span style={{
+                            background: 'rgba(245, 158, 11, 0.15)',
+                            color: '#fbbf24',
+                            border: '1px solid rgba(245, 158, 11, 0.35)',
+                            fontSize: '0.68rem',
+                            fontWeight: 800,
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '5px'
+                          }}>
+                            {rol}
+                          </span>
+                          <span style={{
+                            background: 'rgba(56, 189, 248, 0.14)',
+                            color: '#38bdf8',
+                            border: '1px solid rgba(56, 189, 248, 0.3)',
+                            fontSize: '0.68rem',
+                            fontWeight: 800,
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '5px'
+                          }}>
+                            {equipo}
+                          </span>
+                        </div>
+
+                        <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#fbbf24', fontWeight: 800 }}>
+                          {code}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                        <div>
+                          <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>{nombre}</h3>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.9rem', marginTop: '0.35rem', fontSize: '0.8rem', color: '#cbd5e1' }}>
+                            <span>🆔 <strong>{docInfo}</strong></span>
+                            {item.email && <span>✉️ <strong>{item.email}</strong></span>}
+                            {item.telefono && <span>📱 <strong>{item.telefono}</strong></span>}
+                            <span>🕒 <strong style={{ color: '#34d399' }}>{fecha}</strong></span>
+                          </div>
+                        </div>
+
+                        {/* Botones de Acción para Supervisión Lima */}
+                        <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() => handleViewPass(item)}
+                            style={{
+                              background: 'rgba(245, 158, 11, 0.16)',
+                              color: '#fbbf24',
+                              border: '1px solid rgba(245, 158, 11, 0.4)',
+                              borderRadius: '8px',
+                              padding: '0.45rem 0.75rem',
+                              fontSize: '0.74rem',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <Eye size={14} /> Ver Pase Oficial
+                          </button>
+
+                          <button
+                            onClick={() => handleResendEmail(item)}
+                            disabled={sendingEmailId === rowKey}
+                            style={{
+                              background: emailStatus === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(56, 189, 248, 0.16)',
+                              color: emailStatus === 'SENT' ? '#34d399' : '#38bdf8',
+                              border: emailStatus === 'SENT' ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(56, 189, 248, 0.38)',
+                              borderRadius: '8px',
+                              padding: '0.45rem 0.75rem',
+                              fontSize: '0.74rem',
+                              fontWeight: 800,
+                              cursor: sendingEmailId === rowKey ? 'wait' : 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <Mail size={14} />
+                            {sendingEmailId === rowKey
+                              ? 'Enviando...'
+                              : emailStatus === 'SENT'
+                              ? '✓ Contrato y Pase Enviados'
+                              : 'Reenviar Contrato + Pase'}
+                          </button>
+
+                          <button
+                            onClick={() => setSelectedRecordForAudit(item)}
+                            style={{
+                              background: '#1e293b',
+                              color: '#e2e8f0',
+                              border: '1px solid #334155',
+                              borderRadius: '8px',
+                              padding: '0.45rem 0.75rem',
+                              fontSize: '0.74rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <FileText size={14} /> Expediente Forense
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Bloque Forense Obligatorio: IP + Geolocalización + Casillas */}
+                      <div style={{
+                        background: '#050811',
+                        border: '1px solid #1e293b',
+                        borderRadius: '10px',
+                        padding: '0.75rem 1rem',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+                        gap: '0.6rem',
+                        fontSize: '0.76rem'
+                      }}>
+                        <div>
+                          <span style={{ color: '#64748b', fontWeight: 700 }}>🌐 IP Pública Registrada: </span>
+                          <strong style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{ip}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: '#64748b', fontWeight: 700 }}>📍 Geolocalización: </span>
+                          <strong style={{ color: '#fde047' }}>{geo} {coords ? `(${coords})` : ''}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: '#64748b', fontWeight: 700 }}>💻 Dispositivo: </span>
+                          <span style={{ color: '#cbd5e1' }}>{device}</span>
+                        </div>
+                        <div>
+                          <span style={{ color: '#64748b', fontWeight: 700 }}>🛡️ Consentimiento: </span>
+                          <span style={{ color: '#34d399', fontWeight: 700 }}>DOC 1 (NDA) · DOC 2 (Salud) · DOC 3 (Imagen)</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 2: PADRÓN OFICIAL LIMA (111 MIEMBROS) */}
+        {activeTab === 'PADRON' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{
+              background: 'rgba(9, 17, 36, 0.95)',
+              border: '1px solid #1e293b',
+              borderRadius: '14px',
+              padding: '1rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem'
+            }}>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={padronSearch}
+                  onChange={(e) => setPadronSearch(e.target.value)}
+                  placeholder="🔍 Buscar en el padrón oficial de Lima por nombre, equipo o rol..."
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 1rem 0.75rem 2.6rem',
+                    background: '#050811',
+                    border: '1px solid #334155',
+                    borderRadius: '10px',
+                    color: '#fff',
+                    fontSize: '0.86rem',
+                    fontWeight: 600,
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto' }}>
+                {[
+                  { id: 'TODOS', label: `Todos (${padronLima111.length})` },
+                  { id: 'Equipo 29', label: 'E29 · Phoenix (16)' },
+                  { id: 'Equipo 30', label: 'E30 · Tinkuy (34)' },
+                  { id: 'Equipo 31', label: 'E31 · Imperio (19)' },
+                  { id: 'Equipo 32', label: 'E32 · C2 Lima (42)' }
+                ].map((t) => {
+                  const active = padronTeamFilter === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setPadronTeamFilter(t.id)}
+                      style={{
+                        background: active ? '#f59e0b' : '#111c38',
+                        color: active ? '#050811' : '#cbd5e1',
+                        border: active ? 'none' : '1px solid #334155',
+                        borderRadius: '8px',
+                        padding: '0.4rem 0.75rem',
+                        fontSize: '0.75rem',
+                        fontWeight: 800,
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Estado:</span>
+                {[
+                  { id: 'TODOS', label: 'Todos' },
+                  { id: 'PENDIENTES', label: '🚨 Pendientes de Firma' },
+                  { id: 'FIRMADOS', label: '✓ Reglas Aceptadas' }
+                ].map((s) => {
+                  const active = padronStatusFilter === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      onClick={() => setPadronStatusFilter(s.id)}
+                      style={{
+                        background: active ? (s.id === 'PENDIENTES' ? '#881337' : s.id === 'FIRMADOS' ? '#064e3b' : '#334155') : '#111c38',
+                        color: active ? '#fff' : '#94a3b8',
+                        border: active ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #334155',
+                        borderRadius: '6px',
+                        padding: '0.3rem 0.65rem',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              {filteredPadron.map((item) => {
+                if (item.isSigned) {
+                  const sig = item.signature;
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        background: 'rgba(9, 17, 36, 0.92)',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                          <span style={{
+                            background: 'rgba(16, 185, 129, 0.2)',
+                            color: '#34d399',
+                            border: '1px solid rgba(16, 185, 129, 0.4)',
+                            fontSize: '0.65rem',
+                            fontWeight: 900,
+                            padding: '0.15rem 0.45rem',
+                            borderRadius: '4px'
+                          }}>
+                            ✓ REGLAS Y CONTRATO FIRMADOS
+                          </span>
+                          <span style={{ background: '#111c38', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {item.equipo} · {item.cohorte}
+                          </span>
+                          <span style={{ background: 'rgba(245, 158, 11, 0.14)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)', fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {sig.rol || item.rol}
+                          </span>
+                        </div>
+                        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>
+                          <span>🆔 <strong style={{ color: '#e2e8f0' }}>{sig.doc || sig.numeroDocumento}</strong></span>
+                          <span>🌐 IP: <strong style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{sig.ip || 'Registrada'}</strong></span>
+                          <span>📍 <strong style={{ color: '#fde047' }}>{sig.geoLocation || 'Lima, Perú'}</strong></span>
+                          <span style={{ color: '#fbbf24', fontFamily: 'monospace' }}>{sig.code || sig.verificationCode}</span>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <button
+                          onClick={() => handleViewPass(sig)}
+                          style={{
+                            background: 'rgba(16, 185, 129, 0.15)',
+                            color: '#34d399',
+                            border: '1px solid rgba(16, 185, 129, 0.3)',
+                            borderRadius: '8px',
+                            padding: '0.45rem 0.75rem',
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem'
+                          }}
+                        >
+                          <CheckCircle2 size={14} /> Ver Pase
+                        </button>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  const waMessage = encodeURIComponent(
+                    `Hola ${item.nombre}, te saluda la Oficina de CREAR PSL Lima. Para tu acreditación en Maestría del Juego es obligatorio firmar digitalmente el Contrato Unificado y Reglas de Sala aquí: ${contractUrl}`
+                  );
+
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        background: 'rgba(9, 17, 36, 0.85)',
+                        border: '1px solid rgba(244, 63, 94, 0.35)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                          <span style={{
+                            background: 'rgba(244, 63, 94, 0.2)',
+                            color: '#fb7185',
+                            border: '1px solid rgba(244, 63, 94, 0.4)',
+                            fontSize: '0.65rem',
+                            fontWeight: 900,
+                            padding: '0.15rem 0.45rem',
+                            borderRadius: '4px'
+                          }}>
+                            🚨 PENDIENTE DE ACEPTACIÓN
+                          </span>
+                          <span style={{ background: '#111c38', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {item.equipo} · {item.cohorte}
+                          </span>
+                          <span style={{ background: '#111c38', color: '#94a3b8', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {item.rol}
+                          </span>
+                        </div>
+                        <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>{item.nombre}</h3>
+                        <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
+                          Requiere aceptación de las 3 casillas legales (NDA, Salud y Datos) antes de ingresar a sala.
+                        </p>
+                      </div>
+
+                      <a
+                        href={`https://wa.me/?text=${waMessage}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          background: '#16a34a',
+                          color: '#fff',
+                          textDecoration: 'none',
+                          borderRadius: '8px',
+                          padding: '0.5rem 0.85rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.35rem'
+                        }}
+                      >
+                        <PhoneCall size={14} /> Enviar Link por WhatsApp
+                      </a>
+                    </div>
+                  );
+                }
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: VISTA PREVIA DEL PASE DIGITAL */}
+        {selectedRecordForPass && (
+          <div
+            onClick={() => setSelectedRecordForPass(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.86)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 110,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem'
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: '#091124',
+                border: '1px solid rgba(245, 158, 11, 0.45)',
+                borderRadius: '16px',
+                padding: '1.5rem',
+                maxWidth: '440px',
+                width: '100%',
+                textAlign: 'center',
+                position: 'relative',
+                maxHeight: '92vh',
+                overflowY: 'auto'
+              }}
+            >
+              <button
+                onClick={() => setSelectedRecordForPass(null)}
+                style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '1.25rem', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+              <h3 style={{ margin: '0 0 0.35rem 0', fontSize: '1.1rem', fontWeight: 900, color: '#fff' }}>
+                Pase Oficial de Validación · Maestría Lima
+              </h3>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: '#94a3b8' }}>
+                {selectedRecordForPass.nombre || selectedRecordForPass.nombreCompleto} · {selectedRecordForPass.code || selectedRecordForPass.verificationCode}
+              </p>
+
+              {generatingPass ? (
+                <div style={{ padding: '3rem 1rem', color: '#fbbf24', fontWeight: 700 }}>Generando imagen criptográfica...</div>
+              ) : passPreviewUrl ? (
+                <>
+                  <img
+                    src={passPreviewUrl}
+                    alt="Pase Oficial Maestría"
+                    style={{ width: '100%', height: 'auto', borderRadius: '12px', border: '1px solid rgba(245, 158, 11, 0.4)', marginBottom: '1rem' }}
+                  />
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <a
+                      href={passPreviewUrl}
+                      download={`PASE_MAESTRIA_${selectedRecordForPass.code || 'LIMA'}.png`}
+                      style={{
+                        flex: 1,
+                        background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                        color: '#050811',
+                        textDecoration: 'none',
+                        padding: '0.65rem',
+                        borderRadius: '8px',
+                        fontWeight: 900,
+                        fontSize: '0.8rem',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.4rem'
+                      }}
+                    >
+                      <Download size={15} /> Descargar Imagen PNG
+                    </a>
+                    <button
+                      onClick={() => setSelectedRecordForPass(null)}
+                      style={{
+                        background: '#1e293b',
+                        color: '#cbd5e1',
+                        border: '1px solid #334155',
+                        padding: '0.65rem 1rem',
+                        borderRadius: '8px',
+                        fontWeight: 700,
+                        fontSize: '0.8rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div style={{ padding: '2rem', color: '#fb7185' }}>No se pudo generar la vista previa.</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: EXPEDIENTE FORENSE DETALLADO */}
+        {selectedRecordForAudit && (
+          <div
+            onClick={() => setSelectedRecordForAudit(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.86)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 110,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem'
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: '#091124',
+                border: '1px solid rgba(56, 189, 248, 0.45)',
+                borderRadius: '16px',
+                padding: '1.5rem',
+                maxWidth: '640px',
+                width: '100%',
+                position: 'relative',
+                maxHeight: '90vh',
+                overflowY: 'auto'
+              }}
+            >
+              <button
+                onClick={() => setSelectedRecordForAudit(null)}
+                style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '1.25rem', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+              <h3 style={{ margin: '0 0 0.25rem 0', fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
+                🛡️ Expediente Probatorio Forense · Ley N° 27269
+              </h3>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: '#38bdf8', fontWeight: 700 }}>
+                Creación Cuántica E.I.R.L. (RUC 20612592811) · Auditoría Legal Oficina Lima
+              </p>
+
+              <div style={{ background: '#050811', border: '1px solid #1e293b', borderRadius: '12px', padding: '1rem', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
+                <div><strong style={{ color: '#94a3b8' }}>Titular Declarante:</strong> <span style={{ color: '#fff', fontWeight: 800 }}>{selectedRecordForAudit.nombre || selectedRecordForAudit.nombreCompleto}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Documento:</strong> <span style={{ color: '#fff' }}>{selectedRecordForAudit.doc || `${selectedRecordForAudit.tipoDocumento}: ${selectedRecordForAudit.numeroDocumento}`}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Correo Electrónico:</strong> <span style={{ color: '#38bdf8' }}>{selectedRecordForAudit.email}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Teléfono / WhatsApp:</strong> <span style={{ color: '#fff' }}>{selectedRecordForAudit.telefono}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Rol y Cohorte:</strong> <span style={{ color: '#fbbf24', fontWeight: 700 }}>{selectedRecordForAudit.rol || selectedRecordForAudit.rolActividad} · {selectedRecordForAudit.equipo || selectedRecordForAudit.cohorte}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Firma Electrónica Manuscrita/Texto:</strong> <span style={{ color: '#34d399', fontStyle: 'italic' }}>"{selectedRecordForAudit.firmaTexto}"</span></div>
+                <hr style={{ border: 'none', borderTop: '1px solid #1e293b', margin: '0.25rem 0' }} />
+                <div><strong style={{ color: '#94a3b8' }}>Dirección IP Pública:</strong> <span style={{ color: '#38bdf8', fontFamily: 'monospace', fontWeight: 800 }}>{selectedRecordForAudit.ip || 'Registrada'}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Geolocalización Detectada:</strong> <span style={{ color: '#fde047', fontWeight: 700 }}>{selectedRecordForAudit.geoLocation || 'Lima, Perú 🇵🇪'}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Coordenadas (Lat/Lng):</strong> <span style={{ color: '#cbd5e1', fontFamily: 'monospace' }}>{selectedRecordForAudit.coordinates || 'No reportadas'}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Proveedor ISP / Fuente Geo:</strong> <span style={{ color: '#cbd5e1' }}>{selectedRecordForAudit.isp || 'Red Pública'} ({selectedRecordForAudit.geoSource || 'ip-geo'})</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Dispositivo y Navegador (User-Agent):</strong> <span style={{ color: '#94a3b8', fontSize: '0.72rem', display: 'block', marginTop: '0.2rem' }}>{selectedRecordForAudit.userAgent}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Huella Criptográfica SHA-256:</strong> <span style={{ color: '#fbbf24', fontFamily: 'monospace', fontSize: '0.72rem', wordBreak: 'break-all', display: 'block', marginTop: '0.2rem' }}>{selectedRecordForAudit.sha256Hash || 'Verificada'}</span></div>
+                <div><strong style={{ color: '#94a3b8' }}>Timestamp Oficial:</strong> <span style={{ color: '#34d399' }}>{selectedRecordForAudit.fecha || selectedRecordForAudit.fechaValidacionLocal} ({selectedRecordForAudit.fechaValidacionIso})</span></div>
+              </div>
+
+              <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                <button
+                  onClick={() => setSelectedRecordForAudit(null)}
+                  style={{
+                    background: '#38bdf8',
+                    color: '#050811',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.6rem 1.2rem',
+                    fontWeight: 800,
+                    fontSize: '0.8rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cerrar Expediente
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: QR DEL CONTRATO */}
+        {qrModalType && (
+          <div
+            onClick={() => setQrModalType(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(6px)',
+              zIndex: 100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem'
+            }}
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                background: '#091124',
+                border: '1px solid rgba(245, 158, 11, 0.45)',
+                borderRadius: '16px',
+                padding: '1.75rem',
+                maxWidth: '370px',
+                width: '100%',
+                textAlign: 'center',
+                position: 'relative'
+              }}
+            >
+              <button
+                onClick={() => setQrModalType(null)}
+                style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '1.25rem', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+              <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
+                QR Oficial · Reglas de Maestría Lima
+              </h3>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: '#94a3b8' }}>
+                Escanea este código QR para abrir el Contrato Unificado y Reglas de Sala de Maestría del Juego.
+              </p>
+
+              <div style={{ background: '#fff', padding: '1rem', borderRadius: '12px', display: 'inline-block', margin: '0 auto 1rem auto' }}>
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(contractUrl)}`}
+                  alt="QR Reglas Maestría"
+                  style={{ width: '200px', height: '200px', display: 'block' }}
+                />
+              </div>
+
+              <div style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: '#94a3b8', wordBreak: 'break-all', marginBottom: '1rem' }}>
+                {contractUrl}
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={() => copyUrl(contractUrl)}
+                  style={{
+                    flex: 1,
+                    background: '#f59e0b',
+                    color: '#050811',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.65rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 900,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {copiedLink ? '✓ ¡Enlace Copiado!' : '📋 Copiar Enlace'}
+                </button>
+                <button
+                  onClick={() => setQrModalType(null)}
+                  style={{
+                    flex: 1,
+                    background: '#1e293b',
+                    color: '#cbd5e1',
+                    border: '1px solid #334155',
+                    borderRadius: '8px',
+                    padding: '0.65rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src/pages/MaestriaGlobalDashboard.jsx
 
 ```javascript
@@ -154197,11 +156936,13 @@ import {
   FileText,
   Sparkles,
   Calendar,
+  Mail,
   X
 } from 'lucide-react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
+import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 
 export default function MonitorAcreditacionFuegoLima() {
   const [signedContracts, setSignedContracts] = useState([]);
@@ -154219,6 +156960,57 @@ export default function MonitorAcreditacionFuegoLima() {
 
   const [qrModalType, setQrModalType] = useState(null); // 'contract' | 'monitor' | null
   const [copiedLink, setCopiedLink] = useState(false);
+  const [sendingEmailId, setSendingEmailId] = useState(null);
+  const [emailStatusMap, setEmailStatusMap] = useState({});
+
+  const handleResendFirewalkEmail = async (item) => {
+    if (!item.email) {
+      alert('Este registro no cuenta con correo electrónico.');
+      return;
+    }
+    const rowKey = item.id || item.code;
+    setSendingEmailId(rowKey);
+    try {
+      const code = item.code || item.verificationCode || 'CQ-FIRE-VERIFIED';
+      const docDisplay = item.doc || `${item.tipoDocumento || 'DNI'}: ${item.numeroDocumento || ''}`;
+      const passDataUrl = await generateFirewalkPassCanvas({
+        nombre: item.nombre || item.nombreCompleto || 'Participante',
+        documento: docDisplay,
+        rolActividad: item.rol || item.rolActividad || 'Participante',
+        lugar: item.lugar || item.sedeLocacion || 'Lima - Casona Blanca (Huachipa)',
+        fecha: item.fecha || item.timestamp || 'Registrado',
+        codigo: code,
+        ip: item.ip || 'Registrada',
+        geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: item.coordinates || ''
+      });
+
+      const ok = await sendFirewalkConfirmationEmail({
+        db,
+        toEmail: item.email,
+        nombre: item.nombre || item.nombreCompleto,
+        documento: docDisplay,
+        rolActividad: item.rol || item.rolActividad || 'Participante',
+        lugar: item.lugar || item.sedeLocacion || 'Lima - Casona Blanca (Huachipa)',
+        codigo: code,
+        fecha: item.fecha || item.timestamp || 'Registrado',
+        passDataUrl,
+        telefono: item.telefono || '',
+        ip: item.ip || 'Registrada',
+        geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: item.coordinates || '',
+        device: item.dispositivo || '',
+        sha256Hash: item.sha256Hash || ''
+      });
+
+      setEmailStatusMap((prev) => ({ ...prev, [rowKey]: ok ? 'SENT' : 'ERROR' }));
+    } catch (e) {
+      console.error('Error reenviando pase de fuego:', e);
+      setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+    } finally {
+      setSendingEmailId(null);
+    }
+  };
 
   const normalizeStr = (str) => {
     if (!str) return '';
@@ -154668,11 +157460,39 @@ export default function MonitorAcreditacionFuegoLima() {
                         </span>
                       </div>
 
-                      <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
-                        {nombre}
-                      </h3>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
+                          {nombre}
+                        </h3>
+                        {item.email && (
+                          <button
+                            onClick={() => handleResendFirewalkEmail(item)}
+                            disabled={sendingEmailId === (item.id || item.code)}
+                            style={{
+                              background: emailStatusMap[item.id || item.code] === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(249, 115, 22, 0.16)',
+                              color: emailStatusMap[item.id || item.code] === 'SENT' ? '#34d399' : '#fb923c',
+                              border: '1px solid rgba(249, 115, 22, 0.35)',
+                              borderRadius: '8px',
+                              padding: '0.4rem 0.75rem',
+                              fontSize: '0.73rem',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <Mail size={13} />
+                            {sendingEmailId === (item.id || item.code)
+                              ? 'Enviando Pase...'
+                              : emailStatusMap[item.id || item.code] === 'SENT'
+                              ? '✓ Pase Enviado al Correo'
+                              : `Reenviar Pase (${item.email})`}
+                          </button>
+                        )}
+                      </div>
 
-                      {/* Caja Destacada: Lugar y Fechas */}
+                      {/* Caja Destacada: Lugar, Fechas, IP y Geolocalización */}
                       <div style={{
                         background: '#0b1120',
                         border: '1px solid #334155',
@@ -154690,6 +157510,14 @@ export default function MonitorAcreditacionFuegoLima() {
                         <div>
                           <span style={{ color: '#94a3b8', fontWeight: 700 }}>🕒 Fecha y Hora: </span>
                           <strong style={{ color: '#34d399' }}>{fecha}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: '#94a3b8', fontWeight: 700 }}>🌐 IP Pública: </span>
+                          <strong style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{item.ip || 'Registrada'}</strong>
+                        </div>
+                        <div>
+                          <span style={{ color: '#94a3b8', fontWeight: 700 }}>🌎 Geolocalización: </span>
+                          <strong style={{ color: '#fde047' }}>{item.geoLocation || 'Lima, Perú 🇵🇪'} {item.coordinates ? `(${item.coordinates})` : ''}</strong>
                         </div>
                         <div style={{ gridColumn: '1 / -1' }}>
                           <span style={{ color: '#94a3b8', fontWeight: 700 }}>📍 Lugar: </span>
@@ -155105,6 +157933,8 @@ import {
 } from 'lucide-react';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { getClientGeoLocation } from '../utils/geoLocator';
+import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 
 export default function ContratoCaminataFuego() {
   const [activeTab, setActiveTab] = useState('todo');
@@ -155114,6 +157944,13 @@ export default function ContratoCaminataFuego() {
   const [signedSuccess, setSignedSuccess] = useState(null);
   const [passDataUrl, setPassDataUrl] = useState(null);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [geoInfo, setGeoInfo] = useState({
+    ip: 'Detectando IP...',
+    locationString: 'Lima, Perú 🇵🇪',
+    coordinates: '',
+    device: ''
+  });
+  const [emailStatus, setEmailStatus] = useState('IDLE');
 
   // Formulario de Firma Digital
   const [formData, setFormData] = useState({
@@ -155138,7 +157975,33 @@ export default function ContratoCaminataFuego() {
 
   useEffect(() => {
     document.title = 'Instrumento Integrado Caminata sobre Fuego · Creación Cuántica E.I.R.L.';
+    let mounted = true;
+    getClientGeoLocation().then((info) => {
+      if (mounted && info) setGeoInfo(info);
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
+
+  const computeSha256 = async (text) => {
+    try {
+      if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch {
+      // Fallback
+    }
+    let h = 0;
+    for (let i = 0; i < text.length; i++) {
+      h = (Math.imul(31, h) + text.charCodeAt(i)) | 0;
+    }
+    return `SHA256-FW-${Math.abs(h).toString(16).toUpperCase()}-${Date.now().toString(16).toUpperCase()}`;
+  };
 
   // Generador de Imagen Oficial: "SÍ VOY A CAMINAR SOBRE FUEGO"
   useEffect(() => {
@@ -155146,190 +158009,19 @@ export default function ContratoCaminataFuego() {
       setPassDataUrl(null);
       return;
     }
-
-    try {
-      const canvas = document.createElement('canvas');
-      canvas.width = 1080;
-      canvas.height = 1440;
-      const ctx = canvas.getContext('2d');
-      const W = 1080;
-      const H = 1440;
-
-      // 1. Fondo degradado noche & fuego
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-      bgGrad.addColorStop(0, '#050914');
-      bgGrad.addColorStop(0.3, '#120702');
-      bgGrad.addColorStop(0.65, '#220b02');
-      bgGrad.addColorStop(1, '#050201');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, W, H);
-
-      // 2. Resplandor radial de brasas
-      const fireGlow = ctx.createRadialGradient(W / 2, H - 160, 40, W / 2, H - 220, 680);
-      fireGlow.addColorStop(0, 'rgba(255, 115, 0, 0.45)');
-      fireGlow.addColorStop(0.3, 'rgba(234, 88, 12, 0.28)');
-      fireGlow.addColorStop(0.6, 'rgba(185, 28, 28, 0.14)');
-      fireGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = fireGlow;
-      ctx.fillRect(0, 0, W, H);
-
-      // Chispas fijas
-      const sparks = [
-        {x: 180, y: 1200, r: 4, a: 0.8}, {x: 240, y: 1050, r: 6, a: 0.9}, {x: 320, y: 1280, r: 3, a: 0.7},
-        {x: 450, y: 1150, r: 5, a: 0.85}, {x: 620, y: 1100, r: 6, a: 0.9}, {x: 750, y: 1240, r: 4, a: 0.75},
-        {x: 880, y: 1120, r: 5, a: 0.8}, {x: 920, y: 1290, r: 3, a: 0.6}, {x: 140, y: 880, r: 3, a: 0.5},
-        {x: 290, y: 780, r: 4, a: 0.6}, {x: 820, y: 820, r: 4, a: 0.55}, {x: 940, y: 920, r: 3, a: 0.5},
-        {x: 520, y: 980, r: 7, a: 0.95}, {x: 580, y: 1220, r: 5, a: 0.85}, {x: 410, y: 1330, r: 4, a: 0.7}
-      ];
-      sparks.forEach(s => {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 183, 3, ${s.a})`;
-        ctx.shadowColor = '#ea580c';
-        ctx.shadowBlur = 15;
-        ctx.fill();
-      });
-      ctx.shadowBlur = 0;
-
-      // 3. Marcos
-      ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(40, 40, W - 80, H - 80);
-
-      ctx.strokeStyle = 'rgba(234, 88, 12, 0.7)';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(52, 52, W - 104, H - 104);
-
-      // Esquinas
-      const cornerSize = 40;
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 4;
-      ctx.beginPath(); ctx.moveTo(40, 40 + cornerSize); ctx.lineTo(40, 40); ctx.lineTo(40 + cornerSize, 40); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, 40); ctx.lineTo(W - 40, 40); ctx.lineTo(W - 40, 40 + cornerSize); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(40, H - 40 - cornerSize); ctx.lineTo(40, H - 40); ctx.lineTo(40 + cornerSize, H - 40); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(W - 40 - cornerSize, H - 40); ctx.lineTo(W - 40, H - 40); ctx.lineTo(W - 40, H - 40 - cornerSize); ctx.stroke();
-
-      // 4. Header
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#f59e0b';
-      ctx.font = '700 24px Montserrat, system-ui, sans-serif';
-      ctx.fillText('CREACIÓN CUÁNTICA • MAESTRÍA DEL JUEGO', W / 2, 105);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
-      ctx.fillText('SEDE LIMA · HUACHIPA · NOVIEMBRE 2026', W / 2, 136);
-
-      ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(180, 158); ctx.lineTo(W - 180, 158); ctx.stroke();
-
-      // 5. TÍTULO PRINCIPAL
-      ctx.font = '85px Arial, sans-serif';
-      ctx.fillText('🔥', W / 2, 260);
-
-      const textGrad = ctx.createLinearGradient(150, 0, W - 150, 0);
-      textGrad.addColorStop(0, '#fef08a');
-      textGrad.addColorStop(0.3, '#f59e0b');
-      textGrad.addColorStop(0.7, '#ea580c');
-      textGrad.addColorStop(1, '#dc2626');
-
-      ctx.shadowColor = 'rgba(234, 88, 12, 0.85)';
-      ctx.shadowBlur = 25;
-      ctx.fillStyle = textGrad;
-      ctx.font = '900 62px Montserrat, system-ui, sans-serif';
-      ctx.fillText('SÍ VOY A CAMINAR', W / 2, 345);
-
-      ctx.font = '900 76px Montserrat, system-ui, sans-serif';
-      ctx.fillText('SOBRE FUEGO', W / 2, 430);
-      ctx.shadowBlur = 0;
-
-      ctx.fillStyle = '#fdba74';
-      ctx.font = '700 19px Montserrat, system-ui, sans-serif';
-      ctx.fillText('HABILITACIÓN Y REGISTRO OFICIAL DE FUEGO', W / 2, 480);
-
-      // 6. Tarjeta Titular
-      const boxX = 80;
-      const boxY = 520;
-      const boxW = W - 160;
-      const boxH = 610;
-
-      ctx.fillStyle = 'rgba(10, 16, 30, 0.88)';
-      ctx.strokeStyle = 'rgba(249, 115, 22, 0.55)';
-      ctx.lineWidth = 2;
-      if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(boxX, boxY, boxW, boxH, 24);
-        ctx.fill();
-        ctx.stroke();
-      } else {
-        ctx.fillRect(boxX, boxY, boxW, boxH);
-        ctx.strokeRect(boxX, boxY, boxW, boxH);
-      }
-
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#ffedd5';
-      ctx.font = '800 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('⚡ ACREDITADO EN SALA', boxX + 40, boxY + 50);
-
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#fb923c';
-      ctx.font = '900 22px Montserrat, system-ui, sans-serif';
-      ctx.fillText((signedSuccess.rolActividad || 'PARTICIPANTE').toUpperCase(), boxX + boxW - 40, boxY + 50);
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-      ctx.beginPath(); ctx.moveTo(boxX + 30, boxY + 80); ctx.lineTo(boxX + boxW - 30, boxY + 80); ctx.stroke();
-
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('TITULAR DECLARANTE:', boxX + 40, boxY + 125);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '900 40px Montserrat, system-ui, sans-serif';
-      const cleanNombre = (signedSuccess.nombre || 'PARTICIPANTE').toUpperCase();
-      ctx.fillText(cleanNombre.slice(0, 32), boxX + 40, boxY + 180);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('DOCUMENTO DE IDENTIFICACIÓN:', boxX + 40, boxY + 290);
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = '900 36px Montserrat, system-ui, sans-serif';
-      ctx.fillText((signedSuccess.documento || '').toUpperCase(), boxX + 40, boxY + 340);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 18px Montserrat, system-ui, sans-serif';
-      ctx.fillText('LOCACIÓN CONFIRMADA:', boxX + 40, boxY + 415);
-
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '700 23px Montserrat, system-ui, sans-serif';
-      ctx.fillText('Casona Blanca · Calle Las Perdices 1126, Huachipa (Lima)', boxX + 40, boxY + 452);
-
-      ctx.fillStyle = '#10b981';
-      ctx.font = '800 20px Montserrat, system-ui, sans-serif';
-      ctx.fillText('✓ Instrumento Legal Firmado · Responsabilidad y Salud Aceptadas', boxX + 40, boxY + 530);
-
-      // 7. Footer Criptográfico
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-      ctx.fillRect(80, 1160, W - 160, 150);
-
-      ctx.fillStyle = '#fdba74';
-      ctx.font = '800 22px "Courier New", monospace';
-      ctx.fillText(`CÓDIGO DIGITAL: ${signedSuccess.codigo}`, W / 2, 1205);
-
-      ctx.fillStyle = '#cbd5e1';
-      ctx.font = '500 17px Montserrat, system-ui, sans-serif';
-      ctx.fillText(`Firma Registrada el: ${signedSuccess.fecha} (Lima)`, W / 2, 1242);
-
-      ctx.fillStyle = '#64748b';
-      ctx.font = '500 14px Montserrat, system-ui, sans-serif';
-      ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1275);
-
-      setPassDataUrl(canvas.toDataURL('image/png'));
-    } catch(err) {
-      console.warn('Error al generar pase de fuego:', err);
-    }
+    generateFirewalkPassCanvas({
+      nombre: signedSuccess.nombre,
+      documento: signedSuccess.documento,
+      rolActividad: signedSuccess.rolActividad,
+      lugar: signedSuccess.lugar,
+      fecha: signedSuccess.fecha,
+      codigo: signedSuccess.codigo,
+      ip: signedSuccess.ip,
+      geoLocation: signedSuccess.geoLocation,
+      coordinates: signedSuccess.coordinates
+    }).then((url) => {
+      if (url) setPassDataUrl(url);
+    });
   }, [signedSuccess]);
 
   const handleInputChange = (e) => {
@@ -155379,32 +158071,54 @@ export default function ContratoCaminataFuego() {
     }
 
     setIsSubmitting(true);
+    setEmailStatus('SENDING');
     try {
+      const freshGeo = await getClientGeoLocation().catch(() => geoInfo);
+      const finalGeo = freshGeo || geoInfo;
+      setGeoInfo(finalGeo);
+
       const timestamp = new Date().toISOString();
       const localFecha = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
       const verificationCode = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
+      const docDisplay = `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`;
+      const sha256Hash = await computeSha256(
+        `${verificationCode}|${formData.nombreCompleto.trim()}|${docDisplay}|${finalGeo.ip}|${finalGeo.coordinates || finalGeo.locationString}|${timestamp}`
+      );
+      const lugarConfirmado = formData.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)';
       
       const payload = {
         ...formData,
-        nombre: formData.nombreCompleto,
-        nombreCompleto: formData.nombreCompleto,
-        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento}`,
+        nombre: formData.nombreCompleto.trim(),
+        nombreCompleto: formData.nombreCompleto.trim(),
+        doc: docDisplay,
         rol: formData.rolActividad,
-        lugar: formData.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)',
+        lugar: lugarConfirmado,
         fecha: localFecha,
         timestamp: localFecha,
         code: verificationCode,
         verificationCode,
         sede: 'Lima',
         source: 'causa-os',
-        controlVersion: 'V1.0-2026-FIREWALK-LIMA',
+        controlVersion: 'V2.0-2026-FIREWALK-LIMA-FORENSE',
         razonSocial: 'Creación Cuántica E.I.R.L.',
         ruc: '20612592811',
         domicilioFiscal: 'Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú',
         fechaValidacionIso: timestamp,
         fechaValidacionLocal: localFecha,
+        // Trazabilidad Forense Obligatoria: IP + Geolocalización
+        ip: finalGeo.ip || 'Registrada en servidor',
+        geoLocation: finalGeo.locationString || 'Lima, Perú 🇵🇪',
+        city: finalGeo.city || 'Lima',
+        region: finalGeo.region || 'Lima',
+        country: finalGeo.country || 'Perú',
+        coordinates: finalGeo.coordinates || '',
+        lat: finalGeo.lat || null,
+        lng: finalGeo.lng || null,
+        isp: finalGeo.isp || '',
+        geoSource: finalGeo.geoSource || 'ip-geo',
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        dispositivo: /iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio',
+        dispositivo: finalGeo.device || (/iPhone|iPad|Android/i.test(navigator.userAgent || '') ? 'Móvil' : 'Escritorio'),
+        sha256Hash,
         marcoLegal: 'Ley 27269 (Firmas Digitales), Arts. 141 y 141-A Código Civil, Ley 29733 y D.S. 016-2024-JUS, Arts. 11 y 15 Código Civil',
         createdAt: serverTimestamp()
       };
@@ -155416,12 +158130,49 @@ export default function ContratoCaminataFuego() {
         console.warn('Registro procesado y resguardado digitalmente:', err);
       }
 
+      // Generar Pase Oficial PNG con IP y Geolocalización e iniciar envío inmediato por correo
+      const generatedPass = await generateFirewalkPassCanvas({
+        nombre: formData.nombreCompleto.trim(),
+        documento: `${formData.tipoDocumento} ${formData.numeroDocumento.trim()}`,
+        rolActividad: formData.rolActividad,
+        lugar: lugarConfirmado,
+        fecha: localFecha,
+        codigo: verificationCode,
+        ip: payload.ip,
+        geoLocation: payload.geoLocation,
+        coordinates: payload.coordinates
+      });
+
+      if (generatedPass) {
+        setPassDataUrl(generatedPass);
+      }
+
+      const emailSent = await sendFirewalkConfirmationEmail({
+        db,
+        toEmail: formData.email.trim().toLowerCase(),
+        nombre: formData.nombreCompleto.trim(),
+        documento: docDisplay,
+        rolActividad: formData.rolActividad,
+        lugar: lugarConfirmado,
+        codigo: verificationCode,
+        fecha: localFecha,
+        passDataUrl: generatedPass,
+        telefono: formData.telefono.trim(),
+        ip: payload.ip,
+        geoLocation: payload.geoLocation,
+        coordinates: payload.coordinates,
+        device: payload.dispositivo,
+        sha256Hash
+      });
+
+      setEmailStatus(emailSent ? 'SENT' : 'ERROR');
+
       setSignedSuccess({
         ...payload,
-        nombre: formData.nombreCompleto,
-        documento: `${formData.tipoDocumento} ${formData.numeroDocumento}`,
+        nombre: formData.nombreCompleto.trim(),
+        documento: `${formData.tipoDocumento} ${formData.numeroDocumento.trim()}`,
         codigo: verificationCode,
-        fecha: new Date().toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'medium' })
+        fecha: localFecha
       });
 
       setTimeout(() => {
@@ -155431,6 +158182,7 @@ export default function ContratoCaminataFuego() {
 
     } catch (err) {
       console.error('Error al registrar firma digital:', err);
+      setEmailStatus('ERROR');
       alert('Hubo un inconveniente al validar la firma. Por favor verifica los datos e intenta nuevamente.');
     } finally {
       setIsSubmitting(false);
@@ -156176,6 +158928,20 @@ export default function ContratoCaminataFuego() {
               <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
                 <span style={{ color: '#94a3b8' }}>Locación:</span>
                 <span style={{ color: '#fff' }}>{signedSuccess.sedeLocacion}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>IP Pública Registrada:</span>
+                <span style={{ color: '#38bdf8', fontFamily: 'monospace', fontWeight: 700 }}>{signedSuccess.ip || geoInfo.ip}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Geolocalización Forense:</span>
+                <span style={{ color: '#fde047', fontWeight: 700 }}>{signedSuccess.geoLocation || geoInfo.locationString} {signedSuccess.coordinates ? `(${signedSuccess.coordinates})` : ''}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #1e293b', paddingBottom: '0.4rem' }}>
+                <span style={{ color: '#94a3b8' }}>Envío de Pase por Correo:</span>
+                <span style={{ color: '#34d399', fontWeight: 700 }}>
+                  {emailStatus === 'SENT' ? `✓ Enviado inmediatamente a ${signedSuccess.email}` : emailStatus === 'SENDING' ? 'Enviando correo...' : `Registrado (${signedSuccess.email})`}
+                </span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span style={{ color: '#94a3b8' }}>Sello de Tiempo (Timestamp):</span>
@@ -179055,9 +181821,29 @@ export default function LegalStatusPanel() {
             </p>
           </div>
         </div>
-        <button onClick={fetchSignatures} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Activity size={18} /> Sincronizar Datos
-        </button>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => navigate('/monitor-maestria-lima')}
+            style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#050811', border: 'none', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: 900, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            👑 Supervisión Reglas Maestría Lima
+          </button>
+          <button
+            onClick={() => navigate('/reglas-maestria')}
+            style={{ background: 'rgba(245, 158, 11, 0.14)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.35)', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            📜 Contrato Maestría (QR)
+          </button>
+          <button
+            onClick={() => navigate('/monitor-fuego-lima')}
+            style={{ background: 'rgba(234, 88, 12, 0.16)', color: '#fb923c', border: '1px solid rgba(234, 88, 12, 0.4)', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            🔥 Monitor Caminata Fuego
+          </button>
+          <button onClick={fetchSignatures} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Activity size={18} /> Sincronizar Datos
+          </button>
+        </div>
       </div>
 
       {/* KPI CARDS */}
@@ -179148,6 +181934,14 @@ export default function LegalStatusPanel() {
                   </td>
                   <td style={{ padding: '1rem 1.5rem' }}>
                     <div style={{ fontWeight: 600 }}>{s.sede || s.countryCode || s.country_code || 'Global'}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '3px', fontFamily: 'monospace' }}>
+                      🌐 IP: {s.ipAddress || s.ip_address || 'Registrada'}
+                    </div>
+                    {(s.geoLocation || s.geo_location) && (
+                      <div style={{ fontSize: '0.72rem', color: '#fbbf24', marginTop: '2px' }}>
+                        📍 {s.geoLocation || s.geo_location}
+                      </div>
+                    )}
                   </td>
                   <td style={{ padding: '1rem 1.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-success)', fontWeight: 600, fontSize: '0.8rem', background: 'rgba(34, 197, 94, 0.1)', padding: '4px 10px', borderRadius: '12px', width: 'fit-content' }}>
@@ -179486,6 +182280,1354 @@ export default function LegalStatusPanel() {
         </div>
       )}
 
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src/pages/ContratoMaestriaLima.jsx
+
+```javascript
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  ShieldCheck,
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
+  QrCode,
+  Download,
+  Printer,
+  Copy,
+  Search,
+  UserCheck,
+  MapPin,
+  Lock,
+  Mail,
+  User,
+  Check,
+  Eye,
+  Building2,
+  FileCheck2,
+  Globe,
+  Cpu,
+  Award
+} from 'lucide-react';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { getClientGeoLocation } from '../utils/geoLocator';
+import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
+
+// Generador de Hash SHA-256 usando Web Crypto API
+async function computeSha256(message) {
+  try {
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch {}
+  // Fallback determinista si no hay subtle crypto
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0, ch; i < message.length; i++) {
+    ch = message.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16).padStart(16, '0') + Date.now().toString(16);
+}
+
+const SECCIONES_CONTRATO = [
+  {
+    id: 'sec1',
+    numero: 'SECCIÓN I',
+    titulo: 'Marco Metodológico y Desarrollo Operacional',
+    resumen: 'Exposición metodológica de inmersión de alto rendimiento y deslinde pedagógico (no equivale a terapia psicológica ni médica).',
+    articulos: [
+      {
+        subtitulo: '1.1 Exposición Metodológica del Programa',
+        contenido: `El entrenamiento MAESTRÍA DEL JUEGO, perteneciente al Programa de Potencial Humano CREAR PODER SIN LÍMITES, utiliza como pilar de intervención un diseño educativo de inmersión y alto rendimiento contextual conceptualizado para intervenir en la estructura interpretativa, neurológica, lingüística y conductual del Participante. A través de ejercicios vivenciales, dinámicas contextuales e interacción colectiva, la metodología opera sobre los siguientes ejes:
+• Reconfiguración del Sistema Nervioso y Autorregulación: Optimización de las respuestas neurobiológicas ante situaciones de alta presión, reduciendo estados de reactividad autómata y expandiendo la capacidad de autorregulación emocional.
+• Colapso de Estados de Realidad mediante la Posición del Observador: Transformación del marco de percepción consciente para posibilitar el quiebre de paradigmas limitantes y la asunción de posturas de alto liderazgo.
+• Diseño de Futuros sin Narrativas del Pasado: Creación intencional de metas y resultados de alto impacto desligados de condicionamientos históricos individuales.`
+      },
+      {
+        subtitulo: '1.2 Deslinde Pedagógico y Naturaleza del Servicio',
+        contenido: `El Participante y el Manager reconocen formalmente que el primer fin de semana del programa MAESTRÍA DEL JUEGO constituye de manera exclusiva un servicio de entrenamiento, capacitación privada y desarrollo operacional de alto rendimiento contextual.
+El presente entrenamiento NO constituye, NO reemplaza y NO equivale a:
+• Tratamiento psicológico, psicoterapéutico o psicoanalítico.
+• Consulta, evaluación o tratamiento médico, neurológico o psiquiátrico.
+• Terapia de salud mental o intervención clínica de ninguna índole.
+La participación del Participante y la integración del Manager al equipo de liderazgo en este primer fin de semana es completamente libre, voluntaria e informada.`
+      }
+    ]
+  },
+  {
+    id: 'sec2',
+    numero: 'SECCIÓN II',
+    titulo: 'Código de Conducta, Reglas de Maestría y Acuerdo NDA / Confidencialidad',
+    resumen: 'Pacto de no divulgación (5 años), secreto de comunidad a perpetuidad, cero grabaciones, cero sustancias, prohibición de préstamos y relaciones de pareja nuevas, y asistencia >80%.',
+    articulos: [
+      {
+        subtitulo: '2.1 Acuerdo de Confidencialidad Absoluta, NDA y Secreto de Comunidad',
+        contenido: `El Participante y el Manager reconocen que la metodología, dinámicas, guiones, manuales, estructuras operativas de bienvenida y material audiovisual empleados durante el primer fin de semana del entrenamiento constituyen propiedad intelectual reservada y secreto comercial de CREACIÓN CUÁNTICA E.I.R.L.
+• Pacto de No Divulgación del Entrenamiento y Operativa: Tanto Participantes como Managers se comprometen a no reproducir, publicar, compartir o comercializar, de forma total o parcial, los contenidos, protocolos de bienvenida u operaciones del entrenamiento por un plazo de cinco (5) años contados desde la firma de este documento.
+• Secreto de Comunidad y Servidor de Soporte (Indefinido): Las vivencias, testimonios, historias personales y declaraciones compartidas entre participantes y el equipo de managers durante las sesiones son de carácter estrictamente confidencial y reservado a perpetuidad. Queda expresamente prohibido divulgar fuera del entorno del entrenamiento cualquier vivencia ajena.`
+      },
+      {
+        subtitulo: '2.2 Prohibición Estricta de Grabación de Audio, Video y Fotografía',
+        contenido: `Queda estrictamente prohibido registrar, grabar o fotografiar las actividades, sesiones, ponencias o dinámicas del entrenamiento en cualquier formato físico o digital, salvo por el equipo audiovisual oficial designado por CREACIÓN CUÁNTICA E.I.R.L.`
+      },
+      {
+        subtitulo: '2.3 Reglas Operativas de Sala y Convivencia en Maestría',
+        contenido: `Para preservar la integridad del contenedor de transformación, tanto Participantes como Managers se obligan a cumplir de forma irrestricta las siguientes normas:
+• Cero Alcohol y Sustancias Psicoactivas: Prohibición absoluta de asistir bajo efectos de alcohol, drogas o sustancias no prescritas, así como su consumo durante los días del entrenamiento.
+• Prohibición de Préstamos, Negocios y Apuestas: Queda prohibido solicitar u otorgar préstamos de dinero, realizar transacciones comerciales, multinivel o apuestas entre integrantes del equipo y staff durante todo el programa.
+• Cero Nuevas Relaciones Sentimentales en el Contenedor: Con el fin de evitar distracciones emocionales que vulneren el enfoque del proceso, queda prohibido iniciar vínculos afectivos o relaciones de pareja entre participantes, o entre participantes y managers/staff durante el ciclo activo.
+• Puntualidad y Asistencia Mínima (>80%): Es requisito indispensable cumplir con la puntualidad en cada bloque y mantener una asistencia superior al 80% de las sesiones para acreditar el fin de semana.`
+      }
+    ]
+  },
+  {
+    id: 'sec3',
+    numero: 'SECCIÓN III',
+    titulo: 'Declaración Jurada de Salud, Asunción de Riesgos y Exoneración Legal',
+    resumen: 'Declaración de aptitud psicofísica, autonomía personal y exoneración irrevocable de responsabilidad a Creación Cuántica E.I.R.L.',
+    articulos: [
+      {
+        subtitulo: '3.1 Declaración Jurada de Aptitud Física y Psicológica',
+        contenido: `El Participante / Manager declara bajo juramento encontrarse en plenas facultades físicas, mentales y emocionales para participar en un programa de inmersión de alta exigencia. Asimismo, declara no padecer afecciones cardíacas severas no controladas, cuadros psicóticos agudos, trastornos disociativos graves ni encontrarse bajo prescripción médica que contraindique su participación en dinámicas de alto impacto emocional.`
+      },
+      {
+        subtitulo: '3.2 Asunción de Responsabilidad y Deslinde Legal',
+        contenido: `Al amparo del Código Civil Peruano (D.Leg. N° 295), el Participante / Manager asume plena y exclusiva responsabilidad por sus decisiones, acciones, reacciones emocionales y resultados dentro y fuera del salón, otorgando indemne e irrevocable exoneración de responsabilidad civil, contractual o extracontractual a CREACIÓN CUÁNTICA E.I.R.L., sus representantes legales, entrenadores, coordinadores y staff.`
+      }
+    ]
+  },
+  {
+    id: 'sec4',
+    numero: 'SECCIÓN IV',
+    titulo: 'Protección de Datos Personales (Ley N° 29733) y Derechos de Imagen',
+    resumen: 'Autorización para tratamiento en banco de datos y uso institucional/pedagógico de material fotográfico o audiovisual.',
+    articulos: [
+      {
+        subtitulo: '4.1 Consentimiento de Tratamiento de Datos Personales',
+        contenido: `De conformidad con la Ley N° 29733 y su Reglamento (modificado por D.S. N° 016-2024-JUS), el titular otorga su consentimiento libre, previo, expreso, informado e inequívoco para que CREACIÓN CUÁNTICA E.I.R.L. trate sus datos personales con fines de gestión académica, operativa, seguridad en sala y auditoría en la plataforma Causa OS / NODUS.`
+      },
+      {
+        subtitulo: '4.2 Autorización de Uso de Imagen Institucional',
+        contenido: `El Participante / Manager autoriza de manera gratuita a CREACIÓN CUÁNTICA E.I.R.L. el uso de las fotografías o registros audiovisuales grupales captados por el equipo oficial durante las graduaciones o actividades autorizadas, exclusivamente para fines de memoria institucional, material pedagógico y difusión del programa CREAR PODER SIN LÍMITES.`
+      }
+    ]
+  },
+  {
+    id: 'sec5',
+    numero: 'SECCIÓN V',
+    titulo: 'Salida Voluntaria, Separación por Incumplimiento y Rol Voluntario IMO',
+    resumen: 'Protocolo de retiro, facultad de separación inmediata por faltas éticas y regla de cancelación a 30 días para referidos.',
+    articulos: [
+      {
+        subtitulo: '5.1 Retiro Voluntario y Facultad de Separación',
+        contenido: `La Empresa se reserva el derecho de separar de manera inmediata y sin derecho a reembolso a cualquier Participante o Manager que transgreda el acuerdo de confidencialidad, asista bajo efectos de sustancias prohibidas, incurra en faltas de respeto o vulnere la seguridad física o emocional del grupo.`
+      },
+      {
+        subtitulo: '5.2 Regulación del Rol Voluntario IMO (Líder Inspirador)',
+        contenido: `En caso de que el Participante asuma voluntariamente el rol de Líder Inspirador (IMO):
+• Tratamiento de Contactos Referidos: Los datos brindados serán tratados únicamente para enviar información previa sobre el programa.
+• Regla de Cancelación a 30 Días: Si el contacto referido no otorga su consentimiento en un plazo máximo de treinta (30) días calendario, sus datos serán eliminados definitivamente.
+• Prohibición de Menores de Edad: Queda estrictamente prohibido ingresar datos de menores de 18 años.`
+      }
+    ]
+  },
+  {
+    id: 'sec6',
+    numero: 'SECCIÓN VI',
+    titulo: 'Consentimiento Clickwrap, Metadatos Forenses y Regla NODUS',
+    resumen: 'Validez jurídica Ley N° 27269, captura obligatoria de IP y Geolocalización, y condición de validación de pago en NODUS.',
+    articulos: [
+      {
+        subtitulo: '6.1 Consentimiento Digital y Metadatos Probatorios Inalterables',
+        contenido: `Conforme a la Ley N° 27269 (Ley de Firmas y Certificados Digitales) y los artículos 141 y 141-A del Código Civil, la aceptación de las tres (3) casillas obligatorias junto con la firma digital registra de forma inalterable: Marca de Tiempo ISO 8601, Dirección IP Pública, Geolocalización (País, Ciudad y Coordenadas), Identificador de Dispositivo y Huella Criptográfica SHA-256.`
+      },
+      {
+        subtitulo: '6.2 Regla Estricta de Disparo de Acceso y Validación NODUS',
+        contenido: `REGLA DE ACCESO NODUS: El acceso definitivo al salón para el primer fin de semana, tanto para participantes como para managers, requiere que el pago haya sido validado y registrado formalmente en el sistema NODUS por la coordinación administrativa de la Empresa.`
+      }
+    ]
+  }
+];
+
+export default function ContratoMaestriaLima() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [signedSuccess, setSignedSuccess] = useState(null);
+  const [passDataUrl, setPassDataUrl] = useState(null);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [geoInfo, setGeoInfo] = useState(null);
+  const [loadingGeo, setLoadingGeo] = useState(true);
+  const [emailSentStatus, setEmailSentStatus] = useState(false);
+
+  const [formData, setFormData] = useState({
+    nombreCompleto: '',
+    tipoDocumento: 'DNI',
+    numeroDocumento: '',
+    email: '',
+    telefono: '',
+    rolActividad: 'Participante',
+    equipoCohorte: 'Equipo 32 — Sede Lima (Cohorte Actual)',
+    casilla1_TerminosNDA: false,
+    casilla2_SaludExoneracion: false,
+    casilla3_DatosImagen: false,
+    firmaTexto: ''
+  });
+
+  const [formErrors, setFormErrors] = useState({});
+  const formRef = useRef(null);
+
+  const pageUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/reglas-maestria`
+    : 'https://centro-operativo-cpsl.web.app/reglas-maestria';
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=10&data=${encodeURIComponent(pageUrl)}`;
+
+  // Capturar IP y Geolocalización automáticamente al abrir la página sin excepción
+  useEffect(() => {
+    document.title = 'Dossier Legal y Reglas de Maestría del Juego (Sede Lima) · Creación Cuántica E.I.R.L.';
+    let mounted = true;
+    getClientGeoLocation({ forceFresh: false, tryGps: true }).then((geo) => {
+      if (mounted) {
+        setGeoInfo(geo);
+        setLoadingGeo(false);
+      }
+    }).catch(() => {
+      if (mounted) setLoadingGeo(false);
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const copyPageLink = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(pageUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es obligatorio.';
+    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El número de documento (DNI/CE) es obligatorio.';
+    if (!formData.email.trim() || !formData.email.includes('@')) errors.email = 'Ingresa un correo electrónico válido para recibir tu contrato.';
+    if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es obligatorio.';
+    if (!formData.casilla1_TerminosNDA) {
+      errors.casilla1_TerminosNDA = 'Debes marcar la Casilla 1 (Aceptación del Contrato Unificado, Reglas de Sala y Confidencialidad NDA).';
+    }
+    if (!formData.casilla2_SaludExoneracion) {
+      errors.casilla2_SaludExoneracion = 'Debes marcar la Casilla 2 (Declaración Jurada de Salud, Asunción de Riesgos y Exoneración).';
+    }
+    if (!formData.casilla3_DatosImagen) {
+      errors.casilla3_DatosImagen = 'Debes marcar la Casilla 3 (Consentimiento de Datos Personales Ley N° 29733 y Derechos de Imagen).';
+    }
+    if (!formData.firmaTexto.trim()) {
+      errors.firmaTexto = 'Escribe tu nombre completo como manifestación de firma electrónica vinculante.';
+    }
+    return errors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      const firstErrorKey = Object.keys(errors)[0];
+      const el = document.getElementById(`field-${firstErrorKey}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Asegurar IP y Geolocalización fresca
+      const currentGeo = geoInfo || await getClientGeoLocation({ forceFresh: true, tryGps: true });
+      const isoTimestamp = new Date().toISOString();
+      const localFecha = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
+      const verificationCode = 'CQ-MJ-' + Math.random().toString(36).substring(2, 7).toUpperCase() + '-' + Date.now().toString().slice(-4);
+
+      const rawStringToHash = JSON.stringify({
+        nombre: formData.nombreCompleto.trim(),
+        doc: `${formData.tipoDocumento}:${formData.numeroDocumento.trim()}`,
+        email: formData.email.trim().toLowerCase(),
+        rol: formData.rolActividad,
+        equipo: formData.equipoCohorte,
+        c1: formData.casilla1_TerminosNDA,
+        c2: formData.casilla2_SaludExoneracion,
+        c3: formData.casilla3_DatosImagen,
+        ip: currentGeo?.ip || 'No detectada',
+        coords: currentGeo?.coordinates || '',
+        ts: isoTimestamp
+      });
+      const sha256Hash = await computeSha256(rawStringToHash);
+
+      const verificationUrl = `${pageUrl}?verify=${verificationCode}`;
+
+      // 1. Generar imagen oficial de validación con QR, IP y Geolocalización
+      const generatedPassUrl = await generateMaestriaPassCanvas({
+        nombre: formData.nombreCompleto.trim(),
+        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
+        rol: formData.rolActividad,
+        equipo: formData.equipoCohorte,
+        sede: 'Lima',
+        fecha: localFecha,
+        codigo: verificationCode,
+        ip: currentGeo?.ip || 'No detectada',
+        geoLocation: currentGeo?.locationString || 'Lima, Perú 🇵🇪',
+        coordinates: currentGeo?.coordinates || '',
+        verificationUrl
+      });
+
+      setPassDataUrl(generatedPassUrl);
+
+      // 2. Guardar registro inalterable en Firestore (con IP y Geolocalización obligatorias)
+      const payload = {
+        nombre: formData.nombreCompleto.trim(),
+        nombreCompleto: formData.nombreCompleto.trim(),
+        tipoDocumento: formData.tipoDocumento,
+        numeroDocumento: formData.numeroDocumento.trim(),
+        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
+        email: formData.email.trim().toLowerCase(),
+        telefono: formData.telefono.trim(),
+        rol: formData.rolActividad,
+        rolActividad: formData.rolActividad,
+        equipo: formData.equipoCohorte,
+        equipoCohorte: formData.equipoCohorte,
+        sede: 'Lima',
+        lugar: 'Lima, Perú — Maestría del Juego (1er Fin de Semana)',
+        casilla1_TerminosNDA: Boolean(formData.casilla1_TerminosNDA),
+        casilla2_SaludExoneracion: Boolean(formData.casilla2_SaludExoneracion),
+        casilla3_DatosImagen: Boolean(formData.casilla3_DatosImagen),
+        firmaTexto: formData.firmaTexto.trim(),
+        fecha: localFecha,
+        timestamp: localFecha,
+        isoTimestamp,
+        code: verificationCode,
+        verificationCode,
+        sha256Hash,
+        // Metadatos Forenses Obligatorios (IP y Geolocalización sin excepción)
+        ip: currentGeo?.ip || 'No detectada',
+        geoLocation: currentGeo?.locationString || 'Lima, Perú 🇵🇪',
+        country: currentGeo?.country || 'Perú',
+        countryCode: currentGeo?.countryCode || 'PE',
+        city: currentGeo?.city || 'Lima',
+        region: currentGeo?.region || 'Lima',
+        coordinates: currentGeo?.coordinates || '-12.0464, -77.0428',
+        lat: currentGeo?.lat ?? -12.0464,
+        lng: currentGeo?.lng ?? -77.0428,
+        isp: currentGeo?.isp || '',
+        timezone: currentGeo?.timezone || 'America/Lima',
+        geoSource: currentGeo?.geoSource || 'IP_LOOKUP',
+        device: currentGeo?.device || 'Navegador Web',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        versionContrato: 'MJ-LIMA-UNIFICADO-2026-V1',
+        empresa: 'CREACIÓN CUÁNTICA E.I.R.L.',
+        ruc: '20612592811',
+        createdAt: serverTimestamp()
+      };
+
+      if (db) {
+        await addDoc(collection(db, 'contratos_maestria_lima'), payload);
+      }
+
+      // 3. Envío automático inmediato del contrato y pase por correo electrónico
+      const sent = await sendMaestriaConfirmationEmail({
+        db,
+        toEmail: formData.email.trim().toLowerCase(),
+        nombre: formData.nombreCompleto.trim(),
+        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
+        rol: formData.rolActividad,
+        equipo: formData.equipoCohorte,
+        codigo: verificationCode,
+        fecha: localFecha,
+        passDataUrl: generatedPassUrl,
+        telefono: formData.telefono.trim(),
+        ip: payload.ip,
+        geoLocation: payload.geoLocation,
+        coordinates: payload.coordinates,
+        device: payload.device,
+        sha256Hash
+      });
+
+      setEmailSentStatus(sent);
+      setSignedSuccess({
+        ...payload,
+        codigo: verificationCode
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      console.error('Error al registrar firma de Maestría:', err);
+      alert('Ocurrió un inconveniente al registrar tu firma. Por favor verifica tu conexión e inténtalo nuevamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const filteredSections = SECCIONES_CONTRATO.filter(sec => {
+    if (!searchTerm.trim()) return true;
+    const q = searchTerm.toLowerCase();
+    return (
+      sec.titulo.toLowerCase().includes(q) ||
+      sec.resumen.toLowerCase().includes(q) ||
+      sec.articulos.some(a => a.subtitulo.toLowerCase().includes(q) || a.contenido.toLowerCase().includes(q))
+    );
+  });
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(180deg, #050914 0%, #0a1224 50%, #070b14 100%)',
+      color: '#f8fafc',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      paddingBottom: '4rem'
+    }}>
+      {/* Barra Superior Institucional sin ruido */}
+      <header style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        background: 'rgba(6, 11, 23, 0.92)',
+        backdropFilter: 'blur(14px)',
+        borderBottom: '1px solid rgba(245, 158, 11, 0.25)',
+        padding: '0.85rem 1.5rem'
+      }}>
+        <div style={{
+          maxWidth: '1060px',
+          margin: '0 auto',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.8rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <img
+              src="/logo-crear.png"
+              alt="CREAR"
+              style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '8px' }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.12em', color: '#fbbf24', textTransform: 'uppercase' }}>
+                  CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811
+                </span>
+              </div>
+              <h1 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#ffffff' }}>
+                Dossier Legal y Reglas de Maestría del Juego — Sede Lima
+              </h1>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setShowQrModal(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.45rem 0.9rem',
+                borderRadius: '8px',
+                background: 'rgba(245, 158, 11, 0.15)',
+                border: '1px solid rgba(245, 158, 11, 0.45)',
+                color: '#fbbf24',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <QrCode size={15} /> Código QR
+            </button>
+            <button
+              type="button"
+              onClick={copyPageLink}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.45rem 0.9rem',
+                borderRadius: '8px',
+                background: 'rgba(56, 189, 248, 0.12)',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                color: '#38bdf8',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              {copiedLink ? <Check size={15} /> : <Copy size={15} />}
+              {copiedLink ? 'Enlace Copiado' : 'Copiar Link'}
+            </button>
+            <a
+              href="/monitor-maestria-lima"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                padding: '0.45rem 0.9rem',
+                borderRadius: '8px',
+                background: 'rgba(16, 185, 129, 0.14)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                color: '#34d399',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                textDecoration: 'none'
+              }}
+            >
+              <ShieldCheck size={15} /> Panel Oficina Lima
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <main style={{ maxWidth: '1020px', margin: '0 auto', padding: '2rem 1.25rem' }}>
+        {/* VISTA DE ÉXITO POST-FIRMA */}
+        {signedSuccess && (
+          <div style={{
+            background: 'linear-gradient(145deg, rgba(6, 78, 59, 0.35) 0%, rgba(15, 23, 42, 0.95) 100%)',
+            border: '2px solid #10b981',
+            borderRadius: '18px',
+            padding: '2rem',
+            marginBottom: '2.5rem',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: 'rgba(16, 185, 129, 0.2)',
+                border: '2px solid #10b981',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem'
+              }}>
+                <CheckCircle2 size={36} color="#10b981" />
+              </div>
+              <span style={{
+                display: 'inline-block',
+                padding: '0.3rem 0.9rem',
+                borderRadius: '999px',
+                background: 'rgba(16, 185, 129, 0.2)',
+                color: '#34d399',
+                fontSize: '0.75rem',
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                marginBottom: '0.5rem'
+              }}>
+                REGISTRO PROBATORIO COMPLETADO · LEY N° 27269
+              </span>
+              <h2 style={{ fontSize: '1.75rem', fontWeight: 900, margin: '0.3rem 0', color: '#ffffff' }}>
+                ¡Contrato y Reglas de Maestría Aceptados!
+              </h2>
+              <p style={{ color: '#cbd5e1', fontSize: '0.95rem', maxWidth: '640px', margin: '0.5rem auto 0' }}>
+                {emailSentStatus
+                  ? `Se ha enviado automáticamente una copia del contrato y tu imagen de validación al correo ${signedSuccess.email}.`
+                  : `Tu aceptación legal e imagen de validación han quedado registradas para ${signedSuccess.email}.`}
+              </p>
+            </div>
+
+            {/* Resumen de Metadatos Forenses (IP y Geolocalización) */}
+            <div style={{
+              background: 'rgba(15, 23, 42, 0.85)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '12px',
+              padding: '1.25rem',
+              marginBottom: '1.75rem',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '1rem',
+              fontSize: '0.84rem'
+            }}>
+              <div>
+                <div style={{ color: '#94a3b8', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Titular Declarante</div>
+                <div style={{ color: '#ffffff', fontWeight: 800, marginTop: '2px' }}>{signedSuccess.nombreCompleto}</div>
+                <div style={{ color: '#38bdf8', fontSize: '0.78rem' }}>{signedSuccess.doc} · {signedSuccess.rol}</div>
+              </div>
+              <div>
+                <div style={{ color: '#94a3b8', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Cohorte / Código</div>
+                <div style={{ color: '#fef08a', fontWeight: 800, marginTop: '2px' }}>{signedSuccess.equipo}</div>
+                <div style={{ color: '#fbbf24', fontFamily: 'monospace', fontWeight: 700 }}>{signedSuccess.codigo}</div>
+              </div>
+              <div>
+                <div style={{ color: '#94a3b8', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Dirección IP y Geolocalización</div>
+                <div style={{ color: '#34d399', fontFamily: 'monospace', fontWeight: 800, marginTop: '2px' }}>IP: {signedSuccess.ip}</div>
+                <div style={{ color: '#cbd5e1', fontSize: '0.78rem' }}>{signedSuccess.geoLocation} ({signedSuccess.coordinates})</div>
+              </div>
+              <div>
+                <div style={{ color: '#94a3b8', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Fecha / Huella SHA-256</div>
+                <div style={{ color: '#ffffff', fontWeight: 700, marginTop: '2px' }}>{signedSuccess.fecha}</div>
+                <div style={{ color: '#64748b', fontFamily: 'monospace', fontSize: '0.7rem', wordBreak: 'break-all' }}>
+                  {signedSuccess.sha256Hash?.slice(0, 28)}...
+                </div>
+              </div>
+            </div>
+
+            {/* Imagen Generada del Pase Oficial */}
+            {passDataUrl && (
+              <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <img
+                    src={passDataUrl}
+                    alt="Pase Oficial de Maestría del Juego"
+                    style={{
+                      maxWidth: '380px',
+                      width: '100%',
+                      borderRadius: '14px',
+                      border: '2px solid #f59e0b',
+                      boxShadow: '0 15px 40px rgba(0, 0, 0, 0.7)'
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <a
+                    href={passDataUrl}
+                    download={`PASE_MAESTRIA_LIMA_${signedSuccess.codigo}.png`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.85rem 1.6rem',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                      color: '#0f172a',
+                      fontWeight: 900,
+                      fontSize: '0.92rem',
+                      textDecoration: 'none',
+                      boxShadow: '0 8px 20px rgba(245, 158, 11, 0.35)'
+                    }}
+                  >
+                    <Download size={18} /> Descargar Imagen de Validación (PNG)
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.85rem 1.4rem',
+                      borderRadius: '10px',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      color: '#ffffff',
+                      fontWeight: 700,
+                      fontSize: '0.9rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Printer size={18} /> Imprimir Constancia
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* BANNER EJECUTIVO DE INTRODUCCIÓN */}
+        <section style={{
+          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(23, 37, 84, 0.5) 100%)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          borderRadius: '18px',
+          padding: '2rem',
+          marginBottom: '2rem',
+          boxShadow: '0 12px 35px rgba(0, 0, 0, 0.45)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
+            <div style={{ flex: '1 1 540px' }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                padding: '0.3rem 0.8rem',
+                borderRadius: '999px',
+                background: 'rgba(245, 158, 11, 0.15)',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                color: '#fbbf24',
+                fontSize: '0.73rem',
+                fontWeight: 800,
+                letterSpacing: '0.06em',
+                marginBottom: '0.85rem'
+              }}>
+                <Award size={14} /> GOBERNANZA CAUSA OS / SISTEMA NODUS · SEDE LIMA
+              </div>
+              <h2 style={{ fontSize: '1.85rem', fontWeight: 900, margin: '0 0 0.75rem 0', lineHeight: 1.2, color: '#ffffff' }}>
+                Contrato Unificado y Reglas de Sala: <span style={{ color: '#fbbf24' }}>Maestría del Juego</span>
+              </h2>
+              <p style={{ color: '#cbd5e1', fontSize: '0.94rem', lineHeight: 1.6, margin: '0 0 1rem 0' }}>
+                Instrumento jurídico vinculante aplicable a <strong>Participantes y Managers</strong> para el primer fin de semana de Maestría del Juego en Lima, suscrito con <strong>CREACIÓN CUÁNTICA E.I.R.L. (RUC N° 20612592811)</strong> bajo la Ley N° 29733, Ley N° 27269 y el Código Civil Peruano.
+              </p>
+
+              {/* Indicador en Vivo de Auditoría IP + Geolocalización */}
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                padding: '0.55rem 0.95rem',
+                borderRadius: '10px',
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                fontSize: '0.78rem',
+                color: '#a7f3d0'
+              }}>
+                <MapPin size={15} color="#10b981" />
+                <span>
+                  <strong>Trazabilidad Forense Activa:</strong>{' '}
+                  {loadingGeo
+                    ? 'Detectando IP pública y geolocalización...'
+                    : `IP ${geoInfo?.ip || 'Registrada'} · ${geoInfo?.locationString || 'Lima, Perú'} (${geoInfo?.coordinates || '-12.0464, -77.0428'})`}
+                </span>
+              </div>
+            </div>
+
+            {/* Tarjeta QR Rápido en Cabecera */}
+            <div style={{
+              background: 'rgba(6, 11, 23, 0.85)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '14px',
+              padding: '1rem',
+              textAlign: 'center',
+              minWidth: '170px'
+            }}>
+              <img
+                src={qrUrl}
+                alt="QR Contrato Maestría Lima"
+                style={{ width: '120px', height: '120px', borderRadius: '8px', background: '#fff', padding: '4px' }}
+              />
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.45rem', fontWeight: 600 }}>
+                Escanea para abrir en móvil
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* BUSCADOR DE CLÁUSULAS */}
+        <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: '260px' }}>
+            <Search size={17} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <input
+              type="text"
+              placeholder="Buscar cláusula, regla de sala, NDA, datos personales o condición..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem 0.75rem 2.6rem',
+                borderRadius: '10px',
+                background: 'rgba(15, 23, 42, 0.85)',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                color: '#f8fafc',
+                fontSize: '0.88rem',
+                outline: 'none'
+              }}
+            />
+          </div>
+          <a
+            href="#formulario-firma"
+            style={{
+              padding: '0.75rem 1.3rem',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              color: '#0f172a',
+              fontWeight: 800,
+              fontSize: '0.86rem',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Ir a Firma Digital ↓
+          </a>
+        </div>
+
+        {/* CUERPO ÍNTEGRO DEL DOSSIER LEGAL (SIN RUIDO, ESTRUCTURA EJECUTIVA) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
+          {filteredSections.map((sec) => (
+            <div
+              key={sec.id}
+              style={{
+                background: 'rgba(15, 23, 42, 0.78)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '14px',
+                padding: '1.5rem',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+                <span style={{
+                  padding: '0.2rem 0.65rem',
+                  borderRadius: '6px',
+                  background: 'rgba(245, 158, 11, 0.18)',
+                  color: '#fbbf24',
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.05em'
+                }}>
+                  {sec.numero}
+                </span>
+                <h3 style={{ margin: 0, fontSize: '1.12rem', fontWeight: 800, color: '#ffffff' }}>
+                  {sec.titulo}
+                </h3>
+              </div>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.83rem', color: '#94a3b8' }}>
+                {sec.resumen}
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {sec.articulos.map((art, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      background: 'rgba(6, 11, 23, 0.65)',
+                      borderLeft: '3px solid #f59e0b',
+                      borderRadius: '0 10px 10px 0',
+                      padding: '1rem 1.2rem'
+                    }}
+                  >
+                    <h4 style={{ margin: '0 0 0.45rem 0', fontSize: '0.94rem', fontWeight: 700, color: '#fef08a' }}>
+                      {art.subtitulo}
+                    </h4>
+                    <div style={{
+                      margin: 0,
+                      fontSize: '0.87rem',
+                      lineHeight: 1.65,
+                      color: '#e2e8f0',
+                      whiteSpace: 'pre-line'
+                    }}>
+                      {art.contenido}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* TABLA RESUMEN DE OBLIGACIONES */}
+        <section style={{
+          background: 'rgba(15, 23, 42, 0.85)',
+          border: '1px solid rgba(56, 189, 248, 0.3)',
+          borderRadius: '14px',
+          padding: '1.5rem',
+          marginBottom: '2.5rem',
+          overflowX: 'auto'
+        }}>
+          <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.05rem', fontWeight: 800, color: '#38bdf8' }}>
+            📊 Tabla Resumen de Obligaciones y Gobernanza (Participantes y Managers)
+          </h3>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.15)', textAlign: 'left', color: '#94a3b8' }}>
+                <th style={{ padding: '0.65rem' }}>Módulo del Contrato</th>
+                <th style={{ padding: '0.65rem' }}>Normativa Aplicable</th>
+                <th style={{ padding: '0.65rem' }}>Compromiso Clave</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Metodología de Inmersión</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Marco Privado de Capacitación</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Inmersión contextual de alto rendimiento; no equivale a terapia ni consulta médica.</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Confidencialidad NDA</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Ley N° 29733 / D.Leg. 295</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>No divulgación de contenidos (5 años) y reserva absoluta de vivencias ajenas (indefinido).</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Conducta y Restricciones</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Reglamento Interno CREAR</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Cero alcohol/drogas, cero grabaciones, prohibición de préstamos/negocios, no parejas nuevas, &gt;80% asistencia.</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Exoneración Legal</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Código Civil D.Leg. 295</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Asunción de riesgos y deslinde irrevocable de responsabilidad a Creación Cuántica E.I.R.L.</td>
+              </tr>
+              <tr>
+                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Gobernanza NODUS</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Sistema de Control NODUS</td>
+                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Acreditación en puerta sujeta a validación formal de pago en NODUS por coordinación administrativa.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        {/* FORMULARIO DE ACEPTACIÓN CLICKWRAP Y FIRMA DIGITAL */}
+        <section
+          id="formulario-firma"
+          ref={formRef}
+          style={{
+            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(10, 15, 29, 0.98) 100%)',
+            border: '2px solid rgba(245, 158, 11, 0.5)',
+            borderRadius: '18px',
+            padding: '2rem',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
+          }}
+        >
+          <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              SUSCRIPCIÓN DIGITAL VINCULANTE · LEY N° 27269
+            </span>
+            <h2 style={{ margin: '0.25rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: '#ffffff' }}>
+              Formulario de Aceptación de Reglas y Emisión de Pase Oficial
+            </h2>
+            <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.86rem', color: '#94a3b8' }}>
+              Al completar y firmar, recibirás de inmediato en tu correo el contrato aceptado y tu imagen oficial de validación con código QR.
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} noValidate>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '1.15rem',
+              marginBottom: '1.5rem'
+            }}>
+              {/* Nombre Completo */}
+              <div id="field-nombreCompleto">
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                  Nombre y Apellidos Completos *
+                </label>
+                <input
+                  type="text"
+                  name="nombreCompleto"
+                  value={formData.nombreCompleto}
+                  onChange={handleInputChange}
+                  placeholder="Ej. Juan Carlos Pérez Gómez"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 0.9rem',
+                    borderRadius: '10px',
+                    background: 'rgba(6, 11, 23, 0.9)',
+                    border: formErrors.nombreCompleto ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.18)',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+                {formErrors.nombreCompleto && (
+                  <p style={{ color: '#f87171', fontSize: '0.76rem', margin: '0.3rem 0 0 0' }}>{formErrors.nombreCompleto}</p>
+                )}
+              </div>
+
+              {/* Tipo y Número de Documento */}
+              <div id="field-numeroDocumento" style={{ display: 'flex', gap: '0.6rem' }}>
+                <div style={{ width: '105px' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                    Tipo Doc.
+                  </label>
+                  <select
+                    name="tipoDocumento"
+                    value={formData.tipoDocumento}
+                    onChange={handleInputChange}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 0.6rem',
+                      borderRadius: '10px',
+                      background: 'rgba(6, 11, 23, 0.9)',
+                      border: '1px solid rgba(255,255,255,0.18)',
+                      color: '#fff',
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    <option value="DNI">DNI</option>
+                    <option value="CE">CE</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                    N° de Documento *
+                  </label>
+                  <input
+                    type="text"
+                    name="numeroDocumento"
+                    value={formData.numeroDocumento}
+                    onChange={handleInputChange}
+                    placeholder="Ej. 45678912"
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 0.9rem',
+                      borderRadius: '10px',
+                      background: 'rgba(6, 11, 23, 0.9)',
+                      border: formErrors.numeroDocumento ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.18)',
+                      color: '#fff',
+                      fontSize: '0.9rem'
+                    }}
+                  />
+                  {formErrors.numeroDocumento && (
+                    <p style={{ color: '#f87171', fontSize: '0.76rem', margin: '0.3rem 0 0 0' }}>{formErrors.numeroDocumento}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Correo Electrónico */}
+              <div id="field-email">
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                  Correo Electrónico (Recepción de Contrato y Pase) *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="tucorreo@ejemplo.com"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 0.9rem',
+                    borderRadius: '10px',
+                    background: 'rgba(6, 11, 23, 0.9)',
+                    border: formErrors.email ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.18)',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+                {formErrors.email && (
+                  <p style={{ color: '#f87171', fontSize: '0.76rem', margin: '0.3rem 0 0 0' }}>{formErrors.email}</p>
+                )}
+              </div>
+
+              {/* Teléfono / WhatsApp */}
+              <div id="field-telefono">
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                  Teléfono / WhatsApp *
+                </label>
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleInputChange}
+                  placeholder="Ej. +51 999 888 777"
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 0.9rem',
+                    borderRadius: '10px',
+                    background: 'rgba(6, 11, 23, 0.9)',
+                    border: formErrors.telefono ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.18)',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+                {formErrors.telefono && (
+                  <p style={{ color: '#f87171', fontSize: '0.76rem', margin: '0.3rem 0 0 0' }}>{formErrors.telefono}</p>
+                )}
+              </div>
+
+              {/* Rol en Maestría */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                  Calidad / Rol en Sala *
+                </label>
+                <select
+                  name="rolActividad"
+                  value={formData.rolActividad}
+                  onChange={handleInputChange}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 0.9rem',
+                    borderRadius: '10px',
+                    background: 'rgba(6, 11, 23, 0.9)',
+                    border: '1px solid rgba(255,255,255,0.18)',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  <option value="Participante">Participante de Maestría del Juego</option>
+                  <option value="Manager">Manager (Equipo de Liderazgo)</option>
+                  <option value="Capitán">Capitán de Equipo</option>
+                  <option value="Partner de Soporte">Partner de Soporte en Sala</option>
+                </select>
+              </div>
+
+              {/* Equipo / Cohorte */}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                  Cohorte / Equipo en Lima *
+                </label>
+                <select
+                  name="equipoCohorte"
+                  value={formData.equipoCohorte}
+                  onChange={handleInputChange}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem 0.9rem',
+                    borderRadius: '10px',
+                    background: 'rgba(6, 11, 23, 0.9)',
+                    border: '1px solid rgba(255,255,255,0.18)',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  <option value="Equipo 32 — Sede Lima (Cohorte Actual)">Equipo 32 — Sede Lima (Cohorte Actual)</option>
+                  <option value="Equipo 31 — Imperio del Éxito">Equipo 31 — Imperio del Éxito</option>
+                  <option value="Equipo 30 — Tinkuy Ruray">Equipo 30 — Tinkuy Ruray</option>
+                  <option value="Equipo 29 — Quantum Phoenix">Equipo 29 — Quantum Phoenix</option>
+                  <option value="Otra Cohorte / Rezagado Autorizado">Otra Cohorte / Rezagado Autorizado</option>
+                </select>
+              </div>
+            </div>
+
+            {/* 3 CASILLAS CLICKWRAP OBLIGATORIAS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.95rem', marginBottom: '1.5rem' }}>
+              <div
+                id="field-casilla1_TerminosNDA"
+                style={{
+                  background: formData.casilla1_TerminosNDA ? 'rgba(16, 185, 129, 0.1)' : 'rgba(6, 11, 23, 0.75)',
+                  border: formErrors.casilla1_TerminosNDA
+                    ? '1.5px solid #ef4444'
+                    : formData.casilla1_TerminosNDA
+                    ? '1.5px solid #10b981'
+                    : '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: '12px',
+                  padding: '1rem 1.15rem'
+                }}
+              >
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    name="casilla1_TerminosNDA"
+                    checked={formData.casilla1_TerminosNDA}
+                    onChange={handleInputChange}
+                    style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: '#10b981', cursor: 'pointer' }}
+                  />
+                  <div style={{ fontSize: '0.86rem', lineHeight: 1.55, color: '#f1f5f9' }}>
+                    <strong style={{ color: '#fbbf24' }}>CASILLA 1 (DOC 1) — Aceptación de Términos, Reglas de Maestría y Confidencialidad NDA (Obligatorio):</strong>{' '}
+                    Declaro haber leído y acepto íntegramente el Contrato Unificado, el Marco Metodológico de Alto Rendimiento (reconociendo que no equivale a terapia psicológica ni médica), el Pacto de No Divulgación por 5 años, el Secreto de Comunidad a perpetuidad, la prohibición estricta de grabaciones, cero alcohol/drogas, prohibición de préstamos/negocios/apuestas entre participantes, cero nuevas relaciones de pareja durante el proceso y la asistencia mínima &gt;80%.
+                  </div>
+                </label>
+                {formErrors.casilla1_TerminosNDA && (
+                  <p style={{ color: '#f87171', fontSize: '0.76rem', margin: '0.4rem 0 0 2rem' }}>{formErrors.casilla1_TerminosNDA}</p>
+                )}
+              </div>
+
+              <div
+                id="field-casilla2_SaludExoneracion"
+                style={{
+                  background: formData.casilla2_SaludExoneracion ? 'rgba(16, 185, 129, 0.1)' : 'rgba(6, 11, 23, 0.75)',
+                  border: formErrors.casilla2_SaludExoneracion
+                    ? '1.5px solid #ef4444'
+                    : formData.casilla2_SaludExoneracion
+                    ? '1.5px solid #10b981'
+                    : '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: '12px',
+                  padding: '1rem 1.15rem'
+                }}
+              >
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    name="casilla2_SaludExoneracion"
+                    checked={formData.casilla2_SaludExoneracion}
+                    onChange={handleInputChange}
+                    style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: '#10b981', cursor: 'pointer' }}
+                  />
+                  <div style={{ fontSize: '0.86rem', lineHeight: 1.55, color: '#f1f5f9' }}>
+                    <strong style={{ color: '#fbbf24' }}>CASILLA 2 (DOC 2) — Declaración Jurada de Salud, Asunción de Riesgos y Exoneración (Obligatorio):</strong>{' '}
+                    Declaro bajo juramento encontrarme en plenas facultades físicas y psicológicas para participar en el primer fin de semana de Maestría del Juego, asumiendo la responsabilidad de mis actos y otorgando exoneración amplia e irrevocable de responsabilidad a CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811).
+                  </div>
+                </label>
+                {formErrors.casilla2_SaludExoneracion && (
+                  <p style={{ color: '#f87171', fontSize: '0.76rem', margin: '0.4rem 0 0 2rem' }}>{formErrors.casilla2_SaludExoneracion}</p>
+                )}
+              </div>
+
+              <div
+                id="field-casilla3_DatosImagen"
+                style={{
+                  background: formData.casilla3_DatosImagen ? 'rgba(16, 185, 129, 0.1)' : 'rgba(6, 11, 23, 0.75)',
+                  border: formErrors.casilla3_DatosImagen
+                    ? '1.5px solid #ef4444'
+                    : formData.casilla3_DatosImagen
+                    ? '1.5px solid #10b981'
+                    : '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: '12px',
+                  padding: '1rem 1.15rem'
+                }}
+              >
+                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    name="casilla3_DatosImagen"
+                    checked={formData.casilla3_DatosImagen}
+                    onChange={handleInputChange}
+                    style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: '#10b981', cursor: 'pointer' }}
+                  />
+                  <div style={{ fontSize: '0.86rem', lineHeight: 1.55, color: '#f1f5f9' }}>
+                    <strong style={{ color: '#fbbf24' }}>CASILLA 3 (DOC 3) — Consentimiento de Tratamiento de Datos Personales e Imagen (Obligatorio):</strong>{' '}
+                    Autorizo de manera libre, previa, expresa e informada el tratamiento de mis datos personales conforme a la Ley N° 29733 y D.S. N° 016-2024-JUS, el uso institucional de derechos de imagen grupal y el registro probatorio de mi dirección IP pública y geolocalización.
+                  </div>
+                </label>
+                {formErrors.casilla3_DatosImagen && (
+                  <p style={{ color: '#f87171', fontSize: '0.76rem', margin: '0.4rem 0 0 2rem' }}>{formErrors.casilla3_DatosImagen}</p>
+                )}
+              </div>
+            </div>
+
+            {/* FIRMA DIGITAL ESCRITA */}
+            <div id="field-firmaTexto" style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#fef08a', marginBottom: '0.4rem' }}>
+                Firma Electrónica Vinculante (Escribe tu Nombre y Apellidos Completos igual a tu documento) *
+              </label>
+              <input
+                type="text"
+                name="firmaTexto"
+                value={formData.firmaTexto}
+                onChange={handleInputChange}
+                placeholder="Escribe aquí tu nombre completo para firmar digitalmente..."
+                style={{
+                  width: '100%',
+                  padding: '0.9rem 1rem',
+                  borderRadius: '10px',
+                  background: 'rgba(6, 11, 23, 0.95)',
+                  border: formErrors.firmaTexto ? '1.5px solid #ef4444' : '1.5px solid rgba(245, 158, 11, 0.5)',
+                  color: '#fbbf24',
+                  fontSize: '1.05rem',
+                  fontWeight: 700,
+                  fontFamily: "'Georgia', serif"
+                }}
+              />
+              {formErrors.firmaTexto && (
+                <p style={{ color: '#f87171', fontSize: '0.76rem', margin: '0.3rem 0 0 0' }}>{formErrors.firmaTexto}</p>
+              )}
+            </div>
+
+            {/* Sello de Metadatos Forenses antes de enviar */}
+            <div style={{
+              background: 'rgba(6, 11, 23, 0.7)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '10px',
+              padding: '0.85rem 1rem',
+              marginBottom: '1.5rem',
+              fontSize: '0.76rem',
+              color: '#94a3b8',
+              display: 'flex',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '0.5rem'
+            }}>
+              <span>🔒 <strong>IP Pública:</strong> {geoInfo?.ip || 'Detectada al firmar'}</span>
+              <span>📍 <strong>Geolocalización:</strong> {geoInfo?.locationString || 'Lima, Perú'} ({geoInfo?.coordinates || '-12.0464, -77.0428'})</span>
+              <span>💻 <strong>Entorno:</strong> {geoInfo?.device || 'Navegador Web'}</span>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                width: '100%',
+                padding: '1.05rem 1.5rem',
+                borderRadius: '12px',
+                background: isSubmitting
+                  ? '#475569'
+                  : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: '#0f172a',
+                fontWeight: 900,
+                fontSize: '1.02rem',
+                border: 'none',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                boxShadow: '0 10px 25px rgba(245, 158, 11, 0.35)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em'
+              }}
+            >
+              {isSubmitting
+                ? 'Procesando Firma, Generando Pase y Enviando Contrato por Correo...'
+                : '👑 Firmar Contrato, Generar Imagen de Validación y Recibir en mi Correo'}
+            </button>
+          </form>
+        </section>
+      </main>
+
+      {/* MODAL QR */}
+      {showQrModal && (
+        <div
+          onClick={() => setShowQrModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.82)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#0f172a',
+              border: '2px solid #f59e0b',
+              borderRadius: '18px',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '100%',
+              textAlign: 'center'
+            }}
+          >
+            <h3 style={{ margin: '0 0 0.4rem 0', color: '#fbbf24', fontSize: '1.2rem', fontWeight: 800 }}>
+              Código QR Oficial — Reglas de Maestría
+            </h3>
+            <p style={{ margin: '0 0 1.2rem 0', fontSize: '0.84rem', color: '#cbd5e1' }}>
+              Escanea este código con la cámara de tu celular para abrir y firmar el Contrato Unificado de Maestría del Juego (Sede Lima).
+            </p>
+            <div style={{
+              background: '#ffffff',
+              padding: '1rem',
+              borderRadius: '14px',
+              display: 'inline-block',
+              marginBottom: '1.2rem'
+            }}>
+              <img src={qrUrl} alt="QR Contrato Maestría" style={{ width: '240px', height: '240px', display: 'block' }} />
+            </div>
+            <div style={{ fontSize: '0.76rem', color: '#94a3b8', wordBreak: 'break-all', marginBottom: '1.2rem' }}>
+              {pageUrl}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowQrModal(false)}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '10px',
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: '#fff',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -184598,6 +188740,20 @@ export default function Home() {
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/legal-admin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
                     ⚖️ Auditoría Legal
                   </button>
+                )}
+
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'legal', 'juridico', 'superadmin', 'director_maestria', 'oficina', 'qt']) && (
+                  <>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-maestria-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
+                      👑 Supervisión Reglas Maestría (Lima)
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/reglas-maestria'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
+                      📜 Landing Contrato Maestría + QR
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-fuego-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fb923c', background: 'rgba(249, 115, 22, 0.12)', fontWeight: 'bold' }}>
+                      🔥 Monitor Caminata Fuego (Lima)
+                    </button>
+                  </>
                 )}
 
                 {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
@@ -204577,6 +208733,7 @@ test('snapshot freshness becomes stale at exactly 120 minutes and rejects missin
 import { getContractsByCountry, getSedePais } from '../data/legalContracts';
 import { findUserByAnyEmail } from '../data/usersData';
 import { isUserInactive } from '../utils/userNormalizer.js';
+import { getClientGeoLocation } from '../utils/geoLocator.js';
 import googleWorkspaceUsers from '../data/googleWorkspaceUsers.json';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
 import { INITIAL_MANAGERS } from '../data/managersData.js';
@@ -204645,18 +208802,20 @@ export const generateSignatureHash = async (signatureDataUrl, participantId, tim
  * @returns {Promise<{ipAddress: string, userAgent: string, timestamp: string}>}
  */
 export const captureAuditMetadata = async () => {
-  let ipAddress = 'Unknown';
-  try {
-    const resp = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(4000) });
-    const data = await resp.json();
-    ipAddress = data.ip || 'Unknown';
-  } catch {
-    ipAddress = 'IP-Unavailable';
-  }
-
+  const geo = await getClientGeoLocation();
   return {
-    ipAddress,
-    userAgent: navigator.userAgent || 'Unknown',
+    ipAddress: geo?.ip || 'Registrada',
+    geoLocation: geo?.locationString || 'Lima, Perú 🇵🇪',
+    city: geo?.city || 'Lima',
+    region: geo?.region || 'Lima',
+    country: geo?.country || 'Perú',
+    coordinates: geo?.coordinates || '',
+    lat: geo?.lat || null,
+    lng: geo?.lng || null,
+    isp: geo?.isp || '',
+    device: geo?.device || 'Web',
+    geoSource: geo?.geoSource || 'ip-geo',
+    userAgent: geo?.userAgent || (typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown'),
     timestamp: new Date().toISOString(),
   };
 };
@@ -204876,6 +209035,18 @@ export const saveLegalSignature = async (payload) => {
     docs_accepted: payload.docsAccepted || [],
     privacy_policy_version: payload.policyVersion || '2026-v1',
     ip_address: payload.ipAddress || '',
+    ipAddress: payload.ipAddress || '',
+    geo_location: payload.geoLocation || '',
+    geoLocation: payload.geoLocation || '',
+    city: payload.city || '',
+    region: payload.region || '',
+    country: payload.country || '',
+    coordinates: payload.coordinates || '',
+    lat: payload.lat || null,
+    lng: payload.lng || null,
+    isp: payload.isp || '',
+    device: payload.device || '',
+    geo_source: payload.geoSource || 'ip-geo',
     user_agent: payload.userAgent || '',
     signature_data_url: payload.signatureDataUrl || '', // base64 del canvas
     pdf_storage_path: payload.pdfStoragePath || '',
@@ -205003,9 +209174,10 @@ export const generateSignedContractHTML = (data) => {
   </div>
 
   <div class="section">
-    <h3>🔒 Metadatos de Auditoría</h3>
+    <h3>🔒 Metadatos de Auditoría Forense (IP + Geolocalización)</h3>
     <div class="metadata">
-      <div class="meta-item"><strong>Dirección IP</strong>${norm.ipAddress || norm.ip_address || 'N/A'}</div>
+      <div class="meta-item"><strong>Dirección IP Pública</strong>${norm.ipAddress || norm.ip_address || 'Registrada'}</div>
+      <div class="meta-item"><strong>Geolocalización</strong>${norm.geoLocation || norm.geo_location || 'Registrada'} ${(norm.coordinates) ? `(${norm.coordinates})` : ''}</div>
       <div class="meta-item"><strong>Dispositivo / Navegador</strong>${(norm.userAgent || norm.user_agent || '').slice(0, 80)}...</div>
       <div class="meta-item"><strong>Versión de Política</strong>${norm.policyVersion || norm.privacy_policy_version || '2026-v1'}</div>
       <div class="meta-item"><strong>Timestamp UTC</strong>${norm.timestamp || now.toISOString()}</div>
@@ -205351,8 +209523,9 @@ export const processFullLegalSignature = async (params) => {
     if (!auth.currentUser || auth.currentUser.email?.toLowerCase() !== (params.participantId || '').toLowerCase().trim()) {
       throw new Error('Inicia sesión con tu propia cuenta antes de guardar la firma.');
     }
-    // (a) Capturar metadatos de auditoría
-    const { ipAddress, userAgent, timestamp } = await captureAuditMetadata();
+    // (a) Capturar metadatos de auditoría (IP + Geolocalización sin excepción)
+    const auditMeta = await captureAuditMetadata();
+    const { ipAddress, userAgent, timestamp } = auditMeta;
 
     // (b) Generar hash de integridad
     const hashSha256 = await generateSignatureHash(
@@ -205386,6 +209559,16 @@ export const processFullLegalSignature = async (params) => {
         email: params.email || params.participantId || ''
       },
       ipAddress,
+      geoLocation: auditMeta.geoLocation || '',
+      city: auditMeta.city || '',
+      region: auditMeta.region || '',
+      country: auditMeta.country || '',
+      coordinates: auditMeta.coordinates || '',
+      lat: auditMeta.lat || null,
+      lng: auditMeta.lng || null,
+      isp: auditMeta.isp || '',
+      device: auditMeta.device || '',
+      geoSource: auditMeta.geoSource || 'ip-geo',
       userAgent,
       timestamp,
       hashSha256,

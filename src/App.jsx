@@ -24,6 +24,8 @@ import ContrasteNodusSheets from './pages/ContrasteNodusSheets';
 
 const ContratoCaminataFuego = lazy(() => import('./pages/ContratoCaminataFuego'));
 const MonitorAcreditacionFuegoLima = lazy(() => import('./pages/MonitorAcreditacionFuegoLima'));
+const ContratoMaestriaLima = lazy(() => import('./pages/ContratoMaestriaLima'));
+const MonitorMaestriaLima = lazy(() => import('./pages/MonitorMaestriaLima'));
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
@@ -277,6 +279,11 @@ function App() {
           <Route path="/firewalking" element={<Navigate to="/caminata-fuego" replace />} />
           <Route path="/monitor-fuego-lima" element={<MonitorAcreditacionFuegoLima />} />
           <Route path="/acreditacion-fuego-lima" element={<Navigate to="/monitor-fuego-lima" replace />} />
+          <Route path="/reglas-maestria" element={<ContratoMaestriaLima />} />
+          <Route path="/contrato-maestria-lima" element={<ContratoMaestriaLima />} />
+          <Route path="/maestria-lima" element={<ContratoMaestriaLima />} />
+          <Route path="/monitor-maestria-lima" element={<MonitorMaestriaLima />} />
+          <Route path="/supervision-maestria-lima" element={<Navigate to="/monitor-maestria-lima" replace />} />
           <Route path="/causa-os-task" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio', 'superadmin']}>
               <CausaOSTask />

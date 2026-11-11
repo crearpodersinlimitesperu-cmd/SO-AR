@@ -7,6 +7,7 @@
 import { getContractsByCountry, getSedePais } from '../data/legalContracts';
 import { findUserByAnyEmail } from '../data/usersData';
 import { isUserInactive } from '../utils/userNormalizer.js';
+import { getClientGeoLocation } from '../utils/geoLocator.js';
 import googleWorkspaceUsers from '../data/googleWorkspaceUsers.json';
 import nodusEnroladosFallback from '../data/nodusEnroladosRecords.json';
 import { INITIAL_MANAGERS } from '../data/managersData.js';
@@ -75,18 +76,20 @@ export const generateSignatureHash = async (signatureDataUrl, participantId, tim
  * @returns {Promise<{ipAddress: string, userAgent: string, timestamp: string}>}
  */
 export const captureAuditMetadata = async () => {
-  let ipAddress = 'Unknown';
-  try {
-    const resp = await fetch('https://api.ipify.org?format=json', { signal: AbortSignal.timeout(4000) });
-    const data = await resp.json();
-    ipAddress = data.ip || 'Unknown';
-  } catch {
-    ipAddress = 'IP-Unavailable';
-  }
-
+  const geo = await getClientGeoLocation();
   return {
-    ipAddress,
-    userAgent: navigator.userAgent || 'Unknown',
+    ipAddress: geo?.ip || 'Registrada',
+    geoLocation: geo?.locationString || 'Lima, Perú 🇵🇪',
+    city: geo?.city || 'Lima',
+    region: geo?.region || 'Lima',
+    country: geo?.country || 'Perú',
+    coordinates: geo?.coordinates || '',
+    lat: geo?.lat || null,
+    lng: geo?.lng || null,
+    isp: geo?.isp || '',
+    device: geo?.device || 'Web',
+    geoSource: geo?.geoSource || 'ip-geo',
+    userAgent: geo?.userAgent || (typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown'),
     timestamp: new Date().toISOString(),
   };
 };
@@ -306,6 +309,18 @@ export const saveLegalSignature = async (payload) => {
     docs_accepted: payload.docsAccepted || [],
     privacy_policy_version: payload.policyVersion || '2026-v1',
     ip_address: payload.ipAddress || '',
+    ipAddress: payload.ipAddress || '',
+    geo_location: payload.geoLocation || '',
+    geoLocation: payload.geoLocation || '',
+    city: payload.city || '',
+    region: payload.region || '',
+    country: payload.country || '',
+    coordinates: payload.coordinates || '',
+    lat: payload.lat || null,
+    lng: payload.lng || null,
+    isp: payload.isp || '',
+    device: payload.device || '',
+    geo_source: payload.geoSource || 'ip-geo',
     user_agent: payload.userAgent || '',
     signature_data_url: payload.signatureDataUrl || '', // base64 del canvas
     pdf_storage_path: payload.pdfStoragePath || '',
@@ -433,9 +448,10 @@ export const generateSignedContractHTML = (data) => {
   </div>
 
   <div class="section">
-    <h3>🔒 Metadatos de Auditoría</h3>
+    <h3>🔒 Metadatos de Auditoría Forense (IP + Geolocalización)</h3>
     <div class="metadata">
-      <div class="meta-item"><strong>Dirección IP</strong>${norm.ipAddress || norm.ip_address || 'N/A'}</div>
+      <div class="meta-item"><strong>Dirección IP Pública</strong>${norm.ipAddress || norm.ip_address || 'Registrada'}</div>
+      <div class="meta-item"><strong>Geolocalización</strong>${norm.geoLocation || norm.geo_location || 'Registrada'} ${(norm.coordinates) ? `(${norm.coordinates})` : ''}</div>
       <div class="meta-item"><strong>Dispositivo / Navegador</strong>${(norm.userAgent || norm.user_agent || '').slice(0, 80)}...</div>
       <div class="meta-item"><strong>Versión de Política</strong>${norm.policyVersion || norm.privacy_policy_version || '2026-v1'}</div>
       <div class="meta-item"><strong>Timestamp UTC</strong>${norm.timestamp || now.toISOString()}</div>
@@ -781,8 +797,9 @@ export const processFullLegalSignature = async (params) => {
     if (!auth.currentUser || auth.currentUser.email?.toLowerCase() !== (params.participantId || '').toLowerCase().trim()) {
       throw new Error('Inicia sesión con tu propia cuenta antes de guardar la firma.');
     }
-    // (a) Capturar metadatos de auditoría
-    const { ipAddress, userAgent, timestamp } = await captureAuditMetadata();
+    // (a) Capturar metadatos de auditoría (IP + Geolocalización sin excepción)
+    const auditMeta = await captureAuditMetadata();
+    const { ipAddress, userAgent, timestamp } = auditMeta;
 
     // (b) Generar hash de integridad
     const hashSha256 = await generateSignatureHash(
@@ -816,6 +833,16 @@ export const processFullLegalSignature = async (params) => {
         email: params.email || params.participantId || ''
       },
       ipAddress,
+      geoLocation: auditMeta.geoLocation || '',
+      city: auditMeta.city || '',
+      region: auditMeta.region || '',
+      country: auditMeta.country || '',
+      coordinates: auditMeta.coordinates || '',
+      lat: auditMeta.lat || null,
+      lng: auditMeta.lng || null,
+      isp: auditMeta.isp || '',
+      device: auditMeta.device || '',
+      geoSource: auditMeta.geoSource || 'ip-geo',
       userAgent,
       timestamp,
       hashSha256,

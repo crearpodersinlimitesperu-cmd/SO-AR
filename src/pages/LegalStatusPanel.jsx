@@ -220,9 +220,29 @@ export default function LegalStatusPanel() {
             </p>
           </div>
         </div>
-        <button onClick={fetchSignatures} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Activity size={18} /> Sincronizar Datos
-        </button>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => navigate('/monitor-maestria-lima')}
+            style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#050811', border: 'none', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: 900, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            👑 Supervisión Reglas Maestría Lima
+          </button>
+          <button
+            onClick={() => navigate('/reglas-maestria')}
+            style={{ background: 'rgba(245, 158, 11, 0.14)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.35)', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            📜 Contrato Maestría (QR)
+          </button>
+          <button
+            onClick={() => navigate('/monitor-fuego-lima')}
+            style={{ background: 'rgba(234, 88, 12, 0.16)', color: '#fb923c', border: '1px solid rgba(234, 88, 12, 0.4)', padding: '0.6rem 1rem', borderRadius: '8px', fontWeight: 800, fontSize: '0.82rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            🔥 Monitor Caminata Fuego
+          </button>
+          <button onClick={fetchSignatures} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Activity size={18} /> Sincronizar Datos
+          </button>
+        </div>
       </div>
 
       {/* KPI CARDS */}
@@ -313,6 +333,14 @@ export default function LegalStatusPanel() {
                   </td>
                   <td style={{ padding: '1rem 1.5rem' }}>
                     <div style={{ fontWeight: 600 }}>{s.sede || s.countryCode || s.country_code || 'Global'}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '3px', fontFamily: 'monospace' }}>
+                      🌐 IP: {s.ipAddress || s.ip_address || 'Registrada'}
+                    </div>
+                    {(s.geoLocation || s.geo_location) && (
+                      <div style={{ fontSize: '0.72rem', color: '#fbbf24', marginTop: '2px' }}>
+                        📍 {s.geoLocation || s.geo_location}
+                      </div>
+                    )}
                   </td>
                   <td style={{ padding: '1rem 1.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--color-success)', fontWeight: 600, fontSize: '0.8rem', background: 'rgba(34, 197, 94, 0.1)', padding: '4px 10px', borderRadius: '12px', width: 'fit-content' }}>

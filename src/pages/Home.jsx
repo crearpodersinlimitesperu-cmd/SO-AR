@@ -2477,6 +2477,20 @@ export default function Home() {
                   </button>
                 )}
 
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'legal', 'juridico', 'superadmin', 'director_maestria', 'oficina', 'qt']) && (
+                  <>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-maestria-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
+                      👑 Supervisión Reglas Maestría (Lima)
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/reglas-maestria'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
+                      📜 Landing Contrato Maestría + QR
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-fuego-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fb923c', background: 'rgba(249, 115, 22, 0.12)', fontWeight: 'bold' }}>
+                      🔥 Monitor Caminata Fuego (Lima)
+                    </button>
+                  </>
+                )}
+
                 {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📅 Calendario Global Maestro ↗
