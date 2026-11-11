@@ -18,7 +18,7 @@ import {
   skipTaskMailIfClosed,
   STALE_REASON
 } from '../scripts/mailQueue.js';
-import { SUPER_ADMIN_EMAILS } from '../src/config/permissions.js';
+import { SUPER_ADMIN_EMAILS, OBSERVER_EMAILS } from '../src/config/permissions.js';
 
 const now = Date.parse('2026-10-09T15:00:00Z');
 const cutoff = now - 48 * 60 * 60 * 1000;
@@ -557,7 +557,7 @@ test('the actual daemon sender passes only open recipients to mocked sendMail an
     });
     const deliveries = [];
     const sendClaimedMail = runInNewContext(`(${source.slice(start, end)})`, {
-      db, skipTaskMailIfClosed, recordMailSuccess, recordMailFailure, recordMailUnknown,
+      db, skipTaskMailIfClosed, recordMailSuccess, recordMailFailure, recordMailUnknown, SUPER_ADMIN_EMAILS, OBSERVER_EMAILS,
       sanitizeHtml: html => html, buildIcsAttachment: () => null,
       transporter: { sendMail: async options => { deliveries.push(structuredClone(options)); } },
       limaTransporter: null, process: { env: { GMAIL_SERVER_EMAIL: 'sender@example.test' } },
