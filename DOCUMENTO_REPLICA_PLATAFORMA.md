@@ -1049,11 +1049,11 @@ const regexNames = /export const NOMBRES_LEGALES_ENTRENADORES = ({[\s\S]*?});/
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Causa OS — Centro Operativo</title>
     <meta name="description" content="Causa OS — Centro de Liderazgo y Orquestación" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20261111c" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261111c" />
-    <link rel="icon" type="image/png" href="/logo-crear.png?v=20261111c" />
-    <link rel="shortcut icon" href="/favicon.ico?v=20261111c" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261111c" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20261111d" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261111d" />
+    <link rel="icon" type="image/png" href="/logo-crear.png?v=20261111d" />
+    <link rel="shortcut icon" href="/favicon.ico?v=20261111d" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261111d" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
@@ -76652,6 +76652,38 @@ import { AuthProvider } from './context/AuthContext'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { UIProvider } from './context/UIContext'
 import { ThemeProvider } from './context/ThemeContext'
+
+// Asegurar que la pestaña del navegador siempre cargue el favicon oficial dual (CREAR + Causa OS)
+if (typeof document !== 'undefined') {
+  const ensureOfficialFavicon = () => {
+    try {
+      const v = '20261111d';
+      const head = document.head || document.getElementsByTagName('head')[0];
+      if (!head) return;
+      const links = document.querySelectorAll("link[rel*='icon'], link[rel='apple-touch-icon']");
+      links.forEach(l => l.remove());
+      
+      const p = document.createElement('link');
+      p.rel = 'icon'; p.type = 'image/png'; p.sizes = '32x32'; p.href = `/favicon.png?v=${v}`;
+      head.appendChild(p);
+
+      const s = document.createElement('link');
+      s.rel = 'icon'; s.type = 'image/svg+xml'; s.href = `/favicon.svg?v=${v}`;
+      head.appendChild(s);
+
+      const i = document.createElement('link');
+      i.rel = 'shortcut icon'; i.href = `/favicon.ico?v=${v}`;
+      head.appendChild(i);
+
+      const a = document.createElement('link');
+      a.rel = 'apple-touch-icon'; a.href = `/apple-touch-icon.png?v=${v}`;
+      head.appendChild(a);
+    } catch (e) {
+      console.warn('[Branding] No se pudo reinyectar favicon:', e);
+    }
+  };
+  ensureOfficialFavicon();
+}
 
 // Manejar recarga transparente ante nuevas versiones de la app o desincronización de chunks de Vite
 if (typeof window !== 'undefined') {
@@ -187793,6 +187825,35 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
   return false;
 };
 
+// Obtiene el valor numérico de un equipo para ordenamiento numérico estricto (#79, #80, #81, #91, #92...)
+export const getTeamNumericValue = (item) => {
+  if (!item) return 999999;
+  if (item.numEquipo !== undefined && item.numEquipo !== null && String(item.numEquipo).trim() !== '') {
+    const parsed = parseInt(String(item.numEquipo).replace(/\D/g, ''), 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  const match = String(item.equipo || '').match(/\d+/);
+  if (match) {
+    const parsed = parseInt(match[0], 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return 999999;
+};
+
+// Umbrales de cohorte activa vigente por sede (noviembre 2026):
+// Cualquier cohorte estrictamente anterior ya concluyó su ciclo y su estado es Graduado.
+export const ACTIVE_COHORTE_THRESHOLDS = {
+  lima: 32,
+  guayaquil: 37,
+  cuenca: 24,
+  medellin: 19,
+  medellín: 19,
+  mexico: 8,
+  méxico: 8,
+  cdmx: 8,
+  quito: 127
+};
+
 // Resuelve deterministamente el estado efectivo de un manager considerando su ciclo de vida y eventos de graduación
 export const resolveManagerEstado = (m, eventsList = null) => {
   if (!m) return 'Activo';
@@ -187807,16 +187868,24 @@ export const resolveManagerEstado = (m, eventsList = null) => {
     return 'Graduado';
   }
 
+  // Umbral de ciclo activo por sede: si el equipo es de una cohorte anterior ya cerrada (ej. Lima E26, E31), su estado es Graduado
+  const mSedeKey = String(m.sede || '').trim().toLowerCase();
+  const mSedeNorm = typeof normalizeSede === 'function' ? normalizeSede(m.sede).toLowerCase() : mSedeKey;
+  const minActive = ACTIVE_COHORTE_THRESHOLDS[mSedeKey] || ACTIVE_COHORTE_THRESHOLDS[mSedeNorm];
+  const mNum = getTeamNumericValue(m);
+  if (minActive && mNum !== 999999 && mNum < minActive) {
+    return 'Graduado';
+  }
+
   // Si se dispone de eventos de calendario y el evento "EL VIAJE" (graduación) ya ocurrió, está Graduado
   if (eventsList && Array.isArray(eventsList) && eventsList.length > 0) {
-    const mSede = normalizeSede(m.sede);
-    const mNum = getTeamNumericValue(m);
+    const mSede = typeof normalizeSede === 'function' ? normalizeSede(m.sede) : m.sede;
     if (mNum !== 999999) {
       const today = Date.now();
       const viajeEvent = eventsList.find(e => {
         const eNombre = String(e.nombre || e.name || '').toUpperCase();
         if (!eNombre.includes('VIAJE') && !eNombre.includes('FIN DE SEMANA') && !eNombre.includes('RETIRO')) return false;
-        const eSede = normalizeSede(e.sede || e.sedeTag);
+        const eSede = typeof normalizeSede === 'function' ? normalizeSede(e.sede || e.sedeTag) : (e.sede || e.sedeTag);
         if (eSede !== mSede) return false;
         const eNum = getTeamNumericValue({ equipo: e.equipo || e.team || '', numEquipo: e.equipo || e.numEquipo });
         return eNum === mNum && eNum !== 999999;
@@ -187844,21 +187913,6 @@ export const normalizeManagerEstado = (estado, m = null, eventsList = null) => {
   if (s.includes('ARCHIV')) return 'Archivado';
   if (s.includes('ACTIV') || s.includes('EN_JUEGO') || s === 'SI') return 'Activo';
   return estado ? String(estado).trim() : 'Activo';
-};
-
-// Obtiene el valor numérico de un equipo para ordenamiento numérico estricto (#79, #80, #81, #91, #92...)
-export const getTeamNumericValue = (item) => {
-  if (!item) return 999999;
-  if (item.numEquipo !== undefined && item.numEquipo !== null && String(item.numEquipo).trim() !== '') {
-    const parsed = parseInt(String(item.numEquipo).replace(/\D/g, ''), 10);
-    if (!isNaN(parsed)) return parsed;
-  }
-  const match = String(item.equipo || '').match(/\d+/);
-  if (match) {
-    const parsed = parseInt(match[0], 10);
-    if (!isNaN(parsed)) return parsed;
-  }
-  return 999999;
 };
 
 // Formatea el nombre de equipo anteponiendo el número de equipo de forma destacada (ej: "#91 · HAMSA TADAKATSU" o "Equipos #9 · #8 · #7")

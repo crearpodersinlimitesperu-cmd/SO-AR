@@ -7,6 +7,38 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { UIProvider } from './context/UIContext'
 import { ThemeProvider } from './context/ThemeContext'
 
+// Asegurar que la pestaña del navegador siempre cargue el favicon oficial dual (CREAR + Causa OS)
+if (typeof document !== 'undefined') {
+  const ensureOfficialFavicon = () => {
+    try {
+      const v = '20261111d';
+      const head = document.head || document.getElementsByTagName('head')[0];
+      if (!head) return;
+      const links = document.querySelectorAll("link[rel*='icon'], link[rel='apple-touch-icon']");
+      links.forEach(l => l.remove());
+      
+      const p = document.createElement('link');
+      p.rel = 'icon'; p.type = 'image/png'; p.sizes = '32x32'; p.href = `/favicon.png?v=${v}`;
+      head.appendChild(p);
+
+      const s = document.createElement('link');
+      s.rel = 'icon'; s.type = 'image/svg+xml'; s.href = `/favicon.svg?v=${v}`;
+      head.appendChild(s);
+
+      const i = document.createElement('link');
+      i.rel = 'shortcut icon'; i.href = `/favicon.ico?v=${v}`;
+      head.appendChild(i);
+
+      const a = document.createElement('link');
+      a.rel = 'apple-touch-icon'; a.href = `/apple-touch-icon.png?v=${v}`;
+      head.appendChild(a);
+    } catch (e) {
+      console.warn('[Branding] No se pudo reinyectar favicon:', e);
+    }
+  };
+  ensureOfficialFavicon();
+}
+
 // Manejar recarga transparente ante nuevas versiones de la app o desincronización de chunks de Vite
 if (typeof window !== 'undefined') {
   window.addEventListener('vite:preloadError', (event) => {

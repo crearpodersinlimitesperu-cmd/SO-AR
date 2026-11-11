@@ -154,6 +154,35 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
   return false;
 };
 
+// Obtiene el valor numérico de un equipo para ordenamiento numérico estricto (#79, #80, #81, #91, #92...)
+export const getTeamNumericValue = (item) => {
+  if (!item) return 999999;
+  if (item.numEquipo !== undefined && item.numEquipo !== null && String(item.numEquipo).trim() !== '') {
+    const parsed = parseInt(String(item.numEquipo).replace(/\D/g, ''), 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  const match = String(item.equipo || '').match(/\d+/);
+  if (match) {
+    const parsed = parseInt(match[0], 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return 999999;
+};
+
+// Umbrales de cohorte activa vigente por sede (noviembre 2026):
+// Cualquier cohorte estrictamente anterior ya concluyó su ciclo y su estado es Graduado.
+export const ACTIVE_COHORTE_THRESHOLDS = {
+  lima: 32,
+  guayaquil: 37,
+  cuenca: 24,
+  medellin: 19,
+  medellín: 19,
+  mexico: 8,
+  méxico: 8,
+  cdmx: 8,
+  quito: 127
+};
+
 // Resuelve deterministamente el estado efectivo de un manager considerando su ciclo de vida y eventos de graduación
 export const resolveManagerEstado = (m, eventsList = null) => {
   if (!m) return 'Activo';
@@ -168,16 +197,24 @@ export const resolveManagerEstado = (m, eventsList = null) => {
     return 'Graduado';
   }
 
+  // Umbral de ciclo activo por sede: si el equipo es de una cohorte anterior ya cerrada (ej. Lima E26, E31), su estado es Graduado
+  const mSedeKey = String(m.sede || '').trim().toLowerCase();
+  const mSedeNorm = typeof normalizeSede === 'function' ? normalizeSede(m.sede).toLowerCase() : mSedeKey;
+  const minActive = ACTIVE_COHORTE_THRESHOLDS[mSedeKey] || ACTIVE_COHORTE_THRESHOLDS[mSedeNorm];
+  const mNum = getTeamNumericValue(m);
+  if (minActive && mNum !== 999999 && mNum < minActive) {
+    return 'Graduado';
+  }
+
   // Si se dispone de eventos de calendario y el evento "EL VIAJE" (graduación) ya ocurrió, está Graduado
   if (eventsList && Array.isArray(eventsList) && eventsList.length > 0) {
-    const mSede = normalizeSede(m.sede);
-    const mNum = getTeamNumericValue(m);
+    const mSede = typeof normalizeSede === 'function' ? normalizeSede(m.sede) : m.sede;
     if (mNum !== 999999) {
       const today = Date.now();
       const viajeEvent = eventsList.find(e => {
         const eNombre = String(e.nombre || e.name || '').toUpperCase();
         if (!eNombre.includes('VIAJE') && !eNombre.includes('FIN DE SEMANA') && !eNombre.includes('RETIRO')) return false;
-        const eSede = normalizeSede(e.sede || e.sedeTag);
+        const eSede = typeof normalizeSede === 'function' ? normalizeSede(e.sede || e.sedeTag) : (e.sede || e.sedeTag);
         if (eSede !== mSede) return false;
         const eNum = getTeamNumericValue({ equipo: e.equipo || e.team || '', numEquipo: e.equipo || e.numEquipo });
         return eNum === mNum && eNum !== 999999;
@@ -205,21 +242,6 @@ export const normalizeManagerEstado = (estado, m = null, eventsList = null) => {
   if (s.includes('ARCHIV')) return 'Archivado';
   if (s.includes('ACTIV') || s.includes('EN_JUEGO') || s === 'SI') return 'Activo';
   return estado ? String(estado).trim() : 'Activo';
-};
-
-// Obtiene el valor numérico de un equipo para ordenamiento numérico estricto (#79, #80, #81, #91, #92...)
-export const getTeamNumericValue = (item) => {
-  if (!item) return 999999;
-  if (item.numEquipo !== undefined && item.numEquipo !== null && String(item.numEquipo).trim() !== '') {
-    const parsed = parseInt(String(item.numEquipo).replace(/\D/g, ''), 10);
-    if (!isNaN(parsed)) return parsed;
-  }
-  const match = String(item.equipo || '').match(/\d+/);
-  if (match) {
-    const parsed = parseInt(match[0], 10);
-    if (!isNaN(parsed)) return parsed;
-  }
-  return 999999;
 };
 
 // Formatea el nombre de equipo anteponiendo el número de equipo de forma destacada (ej: "#91 · HAMSA TADAKATSU" o "Equipos #9 · #8 · #7")
