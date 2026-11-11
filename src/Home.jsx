@@ -1488,59 +1488,71 @@ export default function Home() {
                     </button>
                   </div>
                   <div style={{ maxHeight: '380px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.4rem' }}>
-                    {notifications?.length > 0 ? notifications.map(n => (
-                      <div 
-                        key={n.id} 
-                        onClick={() => handleNotificationClick(n)}
-                        style={{
-                          fontSize: '0.8rem',
-                          padding: '0.75rem 0.85rem',
-                          background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.08)',
-                          borderLeft: n.read ? '2px solid rgba(255, 255, 255, 0.2)' : '3px solid var(--crear-cyan)',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(41, 171, 226, 0.22)';
-                          e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)';
-                          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }}
-                        title="Haz clic para abrir directamente los detalles y gestionar esta tarea"
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                          <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', fontSize: '0.86rem', lineHeight: 1.3 }}>
-                            {n.title || 'Alerta'}
-                          </strong>
-                          <span style={{ fontSize: '0.68rem', color: 'var(--crear-cyan)', opacity: 0.9, whiteSpace: 'nowrap', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'rgba(41, 171, 226, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
-                            Abrir ↗
-                          </span>
-                        </div>
-                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
-                          {n.message}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                          {n.created_at && (
-                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                              {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {(() => {
+                      const userEmailNorm = (currentUser?.email || '').toLowerCase().trim();
+                      const activeUserNotifications = (notifications || []).filter(n => {
+                        const notifUserNorm = (n.userId || '').toLowerCase().trim();
+                        return notifUserNorm === userEmailNorm;
+                      });
+
+                      if (activeUserNotifications.length === 0) {
+                        return (
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
+                            No tienes notificaciones recientes.
+                          </p>
+                        );
+                      }
+
+                      return activeUserNotifications.map(n => (
+                        <div 
+                          key={n.id} 
+                          onClick={() => handleNotificationClick(n)}
+                          style={{
+                            fontSize: '0.8rem',
+                            padding: '0.75rem 0.85rem',
+                            background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderLeft: n.read ? '2px solid rgba(255, 255, 255, 0.2)' : '3px solid var(--crear-cyan)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(41, 171, 226, 0.22)';
+                            e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                          }}
+                          title="Haz clic para abrir directamente los detalles y gestionar esta tarea"
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                            <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', fontSize: '0.86rem', lineHeight: 1.3 }}>
+                              {n.title || 'Alerta'}
+                            </strong>
+                            <span style={{ fontSize: '0.68rem', color: 'var(--crear-cyan)', opacity: 0.9, whiteSpace: 'nowrap', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'rgba(41, 171, 226, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                              Abrir ↗
                             </span>
-                          )}
-                          <span style={{ fontSize: '0.7rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
-                            Ver tarea →
-                          </span>
+                          </div>
+                          <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
+                            {n.message}
+                          </p>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                            {n.created_at && (
+                              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                                {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            )}
+                            <span style={{ fontSize: '0.7rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
+                              Ver tarea →
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    )) : (
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
-                        No tienes notificaciones recientes.
-                      </p>
-                    )}
+                      ));
+                    })()}
                   </div>
                 </div>
               )}

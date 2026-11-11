@@ -19,14 +19,13 @@ test('propiedad por correo ignora mayúsculas', () => {
   assert.ok(!isOwnNotification(null, 'a@b.com'));
 });
 
-test('reglas: lectura de notificaciones solo del dueño', () => {
+test('reglas: lectura de notificaciones para dueño o superadmin', () => {
   const rules = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8');
-  const block = rules.slice(rules.indexOf('match /notifications/{notifId}'));
-  const end = block.indexOf('\n    }');
-  const body = block.slice(0, end);
-  assert.match(body, /allow read: if isAuthenticated\(\) && resource\.data\.userId == email\(\);/);
-  assert.doesNotMatch(body, /allow read: if isAuthenticated\(\);/);
-  assert.match(body, /request\.resource\.data\.read == false/);
-  assert.match(body, /hasOnly\(/);
-  assert.match(body, /userId\.matches\(/);
+  const helper = rules.slice(rules.indexOf('function isValidNotificationData()'));
+  const notifSection = helper.slice(0, helper.indexOf('// VENUES'));
+  assert.match(notifSection, /allow read: if isAuthenticated\(\) && \(resource\.data\.userId == email\(\) \|\| isSuperAdmin\(\)\);/);
+  assert.doesNotMatch(notifSection, /allow read: if isAuthenticated\(\);/);
+  assert.match(notifSection, /data\.read == false/);
+  assert.match(notifSection, /hasOnly\(/);
+  assert.match(notifSection, /userId\.matches\(/);
 });

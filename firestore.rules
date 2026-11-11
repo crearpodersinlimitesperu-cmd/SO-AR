@@ -649,7 +649,7 @@ service cloud.firestore {
 
     // NOTIFICATIONS (userId siempre es el correo, nunca el uid)
     match /notifications/{notifId} {
-      allow read: if isAuthenticated() && resource.data.userId == email();
+      allow read: if isAuthenticated() && (resource.data.userId == email() || isSuperAdmin());
       // TRADEOFF: los productores (ChecklistContext, PortfolioBoard, ComunicadosOperativos,
       // scheduleGovernanceAgent, ExcellenceService) escriben desde el cliente a OTROS
       // destinatarios y no registran remitente verificable, así que Rules no puede validar

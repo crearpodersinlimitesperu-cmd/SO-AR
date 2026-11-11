@@ -79021,59 +79021,71 @@ export default function Home() {
                     </button>
                   </div>
                   <div style={{ maxHeight: '380px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.4rem' }}>
-                    {notifications?.length > 0 ? notifications.map(n => (
-                      <div 
-                        key={n.id} 
-                        onClick={() => handleNotificationClick(n)}
-                        style={{
-                          fontSize: '0.8rem',
-                          padding: '0.75rem 0.85rem',
-                          background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.08)',
-                          borderLeft: n.read ? '2px solid rgba(255, 255, 255, 0.2)' : '3px solid var(--crear-cyan)',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(41, 171, 226, 0.22)';
-                          e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)';
-                          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }}
-                        title="Haz clic para abrir directamente los detalles y gestionar esta tarea"
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                          <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', fontSize: '0.86rem', lineHeight: 1.3 }}>
-                            {n.title || 'Alerta'}
-                          </strong>
-                          <span style={{ fontSize: '0.68rem', color: 'var(--crear-cyan)', opacity: 0.9, whiteSpace: 'nowrap', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'rgba(41, 171, 226, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
-                            Abrir ↗
-                          </span>
-                        </div>
-                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
-                          {n.message}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                          {n.created_at && (
-                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                              {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {(() => {
+                      const userEmailNorm = (currentUser?.email || '').toLowerCase().trim();
+                      const activeUserNotifications = (notifications || []).filter(n => {
+                        const notifUserNorm = (n.userId || '').toLowerCase().trim();
+                        return notifUserNorm === userEmailNorm;
+                      });
+
+                      if (activeUserNotifications.length === 0) {
+                        return (
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
+                            No tienes notificaciones recientes.
+                          </p>
+                        );
+                      }
+
+                      return activeUserNotifications.map(n => (
+                        <div 
+                          key={n.id} 
+                          onClick={() => handleNotificationClick(n)}
+                          style={{
+                            fontSize: '0.8rem',
+                            padding: '0.75rem 0.85rem',
+                            background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderLeft: n.read ? '2px solid rgba(255, 255, 255, 0.2)' : '3px solid var(--crear-cyan)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(41, 171, 226, 0.22)';
+                            e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                          }}
+                          title="Haz clic para abrir directamente los detalles y gestionar esta tarea"
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                            <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', fontSize: '0.86rem', lineHeight: 1.3 }}>
+                              {n.title || 'Alerta'}
+                            </strong>
+                            <span style={{ fontSize: '0.68rem', color: 'var(--crear-cyan)', opacity: 0.9, whiteSpace: 'nowrap', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'rgba(41, 171, 226, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                              Abrir ↗
                             </span>
-                          )}
-                          <span style={{ fontSize: '0.7rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
-                            Ver tarea →
-                          </span>
+                          </div>
+                          <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
+                            {n.message}
+                          </p>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                            {n.created_at && (
+                              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                                {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            )}
+                            <span style={{ fontSize: '0.7rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
+                              Ver tarea →
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    )) : (
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
-                        No tienes notificaciones recientes.
-                      </p>
-                    )}
+                      ));
+                    })()}
                   </div>
                 </div>
               )}
@@ -81929,15 +81941,20 @@ export function NotificationProvider({ children }) {
   };
 
   useEffect(() => {
-    if (!currentUser?.email) {
-      setNotifications([]);
-      setUnreadCount(0);
+    // 🔒 AISLAMIENTO ESTRICTO DE PRIVACIDAD ENTRE USUARIOS Y SIMULACIONES:
+    // Limpiar inmediatamente notificaciones previas en memoria para evitar cualquier
+    // cruce visual de alertas entre José Sánchez, Josué Vera o cualquier otro perfil.
+    setNotifications([]);
+    setUnreadCount(0);
+
+    const targetEmail = normalizeEmail(currentUser?.email);
+    if (!targetEmail) {
       return;
     }
 
     const q = query(
       collection(db, 'notifications'),
-      where('userId', '==', normalizeEmail(currentUser.email))
+      where('userId', '==', targetEmail)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -81948,8 +81965,8 @@ export function NotificationProvider({ children }) {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           const data = change.doc.data();
-          if (!data.read && data.created_at) {
-             // Only alert if it was created in the last 10 seconds to avoid spam on initial load
+          // Solo notificar si pertenece exactamente al usuario activo
+          if (normalizeEmail(data.userId) === targetEmail && !data.read && data.created_at) {
              const isRecent = (new Date() - new Date(data.created_at)) < 10000;
              if (isRecent) {
                  hasNew = true;
@@ -81961,11 +81978,15 @@ export function NotificationProvider({ children }) {
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        notifs.push({ id: doc.id, ...data });
-        if (!data.read) newUnreadCount++;
+        // FILTRADO DETERMINISTA DE SEGURIDAD:
+        // Asegurar que bajo ninguna circunstancia se incorpore una notificación que no sea del targetEmail
+        if (normalizeEmail(data.userId) === targetEmail) {
+          notifs.push({ id: doc.id, ...data });
+          if (!data.read) newUnreadCount++;
+        }
       });
 
-      // Sort descending by date
+      // Orden descendente por fecha
       notifs.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
       setNotifications(notifs);
@@ -81975,11 +81996,18 @@ export function NotificationProvider({ children }) {
         playNotificationSound();
       }
     }, (error) => {
-      console.error("Error fetching notifications:", error);
+      console.error("Error fetching notifications for", targetEmail, error);
+      // En caso de error o permiso denegado (ej. durante simulación), garantizar aislamiento total
+      setNotifications([]);
+      setUnreadCount(0);
     });
 
-    return () => unsubscribe();
-  }, [currentUser]);
+    return () => {
+      unsubscribe();
+      setNotifications([]);
+      setUnreadCount(0);
+    };
+  }, [currentUser?.email, currentUser?.isSimulated]);
 
   const markAsRead = async (notificationId) => {
     try {
@@ -184220,59 +184248,71 @@ export default function Home() {
                     </button>
                   </div>
                   <div style={{ maxHeight: '380px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.4rem' }}>
-                    {notifications?.length > 0 ? notifications.map(n => (
-                      <div 
-                        key={n.id} 
-                        onClick={() => handleNotificationClick(n)}
-                        style={{
-                          fontSize: '0.8rem',
-                          padding: '0.75rem 0.85rem',
-                          background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(255, 255, 255, 0.08)',
-                          borderLeft: n.read ? '2px solid rgba(255, 255, 255, 0.2)' : '3px solid var(--crear-cyan)',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s ease',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'rgba(41, 171, 226, 0.22)';
-                          e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
-                          e.currentTarget.style.transform = 'translateY(-1px)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)';
-                          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }}
-                        title="Haz clic para abrir directamente los detalles y gestionar esta tarea"
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                          <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', fontSize: '0.86rem', lineHeight: 1.3 }}>
-                            {n.title || 'Alerta'}
-                          </strong>
-                          <span style={{ fontSize: '0.68rem', color: 'var(--crear-cyan)', opacity: 0.9, whiteSpace: 'nowrap', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'rgba(41, 171, 226, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
-                            Abrir ↗
-                          </span>
-                        </div>
-                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
-                          {n.message}
-                        </p>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                          {n.created_at && (
-                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                              {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {(() => {
+                      const userEmailNorm = (currentUser?.email || '').toLowerCase().trim();
+                      const activeUserNotifications = (notifications || []).filter(n => {
+                        const notifUserNorm = (n.userId || '').toLowerCase().trim();
+                        return notifUserNorm === userEmailNorm;
+                      });
+
+                      if (activeUserNotifications.length === 0) {
+                        return (
+                          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
+                            No tienes notificaciones recientes.
+                          </p>
+                        );
+                      }
+
+                      return activeUserNotifications.map(n => (
+                        <div 
+                          key={n.id} 
+                          onClick={() => handleNotificationClick(n)}
+                          style={{
+                            fontSize: '0.8rem',
+                            padding: '0.75rem 0.85rem',
+                            background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            borderLeft: n.read ? '2px solid rgba(255, 255, 255, 0.2)' : '3px solid var(--crear-cyan)',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(41, 171, 226, 0.22)';
+                            e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
+                            e.currentTarget.style.transform = 'translateY(-1px)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)';
+                            e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                          }}
+                          title="Haz clic para abrir directamente los detalles y gestionar esta tarea"
+                        >
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                            <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', fontSize: '0.86rem', lineHeight: 1.3 }}>
+                              {n.title || 'Alerta'}
+                            </strong>
+                            <span style={{ fontSize: '0.68rem', color: 'var(--crear-cyan)', opacity: 0.9, whiteSpace: 'nowrap', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'rgba(41, 171, 226, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                              Abrir ↗
                             </span>
-                          )}
-                          <span style={{ fontSize: '0.7rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
-                            Ver tarea →
-                          </span>
+                          </div>
+                          <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
+                            {n.message}
+                          </p>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                            {n.created_at && (
+                              <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                                {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                              </span>
+                            )}
+                            <span style={{ fontSize: '0.7rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
+                              Ver tarea →
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    )) : (
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
-                        No tienes notificaciones recientes.
-                      </p>
-                    )}
+                      ));
+                    })()}
                   </div>
                 </div>
               )}

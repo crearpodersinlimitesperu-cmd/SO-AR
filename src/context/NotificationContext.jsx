@@ -39,15 +39,20 @@ export function NotificationProvider({ children }) {
   };
 
   useEffect(() => {
-    if (!currentUser?.email) {
-      setNotifications([]);
-      setUnreadCount(0);
+    // 🔒 AISLAMIENTO ESTRICTO DE PRIVACIDAD ENTRE USUARIOS Y SIMULACIONES:
+    // Limpiar inmediatamente notificaciones previas en memoria para evitar cualquier
+    // cruce visual de alertas entre José Sánchez, Josué Vera o cualquier otro perfil.
+    setNotifications([]);
+    setUnreadCount(0);
+
+    const targetEmail = normalizeEmail(currentUser?.email);
+    if (!targetEmail) {
       return;
     }
 
     const q = query(
       collection(db, 'notifications'),
-      where('userId', '==', normalizeEmail(currentUser.email))
+      where('userId', '==', targetEmail)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -58,8 +63,8 @@ export function NotificationProvider({ children }) {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'added') {
           const data = change.doc.data();
-          if (!data.read && data.created_at) {
-             // Only alert if it was created in the last 10 seconds to avoid spam on initial load
+          // Solo notificar si pertenece exactamente al usuario activo
+          if (normalizeEmail(data.userId) === targetEmail && !data.read && data.created_at) {
              const isRecent = (new Date() - new Date(data.created_at)) < 10000;
              if (isRecent) {
                  hasNew = true;
@@ -71,11 +76,15 @@ export function NotificationProvider({ children }) {
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        notifs.push({ id: doc.id, ...data });
-        if (!data.read) newUnreadCount++;
+        // FILTRADO DETERMINISTA DE SEGURIDAD:
+        // Asegurar que bajo ninguna circunstancia se incorpore una notificación que no sea del targetEmail
+        if (normalizeEmail(data.userId) === targetEmail) {
+          notifs.push({ id: doc.id, ...data });
+          if (!data.read) newUnreadCount++;
+        }
       });
 
-      // Sort descending by date
+      // Orden descendente por fecha
       notifs.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
 
       setNotifications(notifs);
@@ -85,11 +94,18 @@ export function NotificationProvider({ children }) {
         playNotificationSound();
       }
     }, (error) => {
-      console.error("Error fetching notifications:", error);
+      console.error("Error fetching notifications for", targetEmail, error);
+      // En caso de error o permiso denegado (ej. durante simulación), garantizar aislamiento total
+      setNotifications([]);
+      setUnreadCount(0);
     });
 
-    return () => unsubscribe();
-  }, [currentUser]);
+    return () => {
+      unsubscribe();
+      setNotifications([]);
+      setUnreadCount(0);
+    };
+  }, [currentUser?.email, currentUser?.isSimulated]);
 
   const markAsRead = async (notificationId) => {
     try {
