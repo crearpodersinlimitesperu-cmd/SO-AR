@@ -5,13 +5,14 @@ import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
 import { collection, getDocs, getDoc, updateDoc, doc, query, orderBy, limit } from 'firebase/firestore';
 import { db, auth, getDocResilient } from '../services/firebase';
-import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target, PhoneCall } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target, PhoneCall, Award } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
 import { recordAuditEvent } from '../services/auditService';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import DriveDashboard from '../components/DriveDashboard';
 import CMJDashboard from '../components/CMJDashboard';
 import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
+import EvaluacionCoordinadoresNodus from '../components/EvaluacionCoordinadoresNodus';
 import ThemeSelector from '../components/ThemeSelector';
 import ZenModeSelector from '../components/ZenModeSelector';
 import OperationalReview from '../components/OperationalReview';
@@ -830,6 +831,18 @@ export default function AuditoriaKPIs({ defaultTab }) {
         {/* Dashboards Integrados Tabs */}
         <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem', flexWrap: 'wrap' }}>
           <button
+            onClick={() => setActiveTab('evaluacion_trimestral')}
+            style={{
+              padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
+              background: activeTab === 'evaluacion_trimestral' ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+              color: activeTab === 'evaluacion_trimestral' ? 'var(--crear-gold)' : 'var(--text-muted)',
+              borderBottom: activeTab === 'evaluacion_trimestral' ? '2px solid var(--crear-gold)' : '2px solid transparent'
+            }}
+          >
+            <Award size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
+            🏆 Evaluación Trimestral (Ciclo de Oro)
+          </button>
+          <button
             onClick={() => setActiveTab('coordinadores_nodus')}
             style={{
               padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
@@ -868,6 +881,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
         </div>
 
         {/* Dashboards Content */}
+        {activeTab === 'evaluacion_trimestral' && <EvaluacionCoordinadoresNodus globalFilterSede={filterSede} />}
         <button type="button" className="btn-secondary" onClick={() => setActiveTab('six_teams')}>
           Revisar últimos 6 equipos por sede
         </button>

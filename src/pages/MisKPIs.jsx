@@ -8,7 +8,7 @@ import { db } from '../services/firebase';
 import { 
   CheckCircle2, TrendingUp, AlertCircle, ArrowLeft, Users, Target, PhoneCall, 
   Award, ShieldCheck, RefreshCw, Database,
-  Settings, Save, X, Search, BarChart2, Info
+  Settings, Save, X, Search, BarChart2, Info, Sparkles
 } from 'lucide-react';
 import { recordAuditEvent } from '../services/auditService';
 import { USERS_TO_IMPORT } from '../data/usersToImport';
@@ -16,6 +16,7 @@ import { findFreshNodusMetrics, extractNodusMetrics } from '../services/nodusMet
 import { operationalRole, resolveCoordinatorKpiAssignment } from '../services/nodusKpiDirectory.js';
 import { snapshotFreshness } from '../utils/nodusIntegrity.js';
 import OperationalReview from '../components/OperationalReview';
+import EvaluacionCoordinadoresNodus from '../components/EvaluacionCoordinadoresNodus';
 export { extractNodusMetrics };
 
 // Metas base por defecto por rol (cuando la persona aún no tiene metas personalizadas)
@@ -983,6 +984,13 @@ export default function MisKPIs() {
 
         {/* PESTAÑAS DE ROLES OPERATIVOS */}
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+          <button 
+            type="button" 
+            onClick={() => setActiveTab('evaluacion_trimestral')}
+            style={{ padding: '0.6rem 1.1rem', borderRadius: '8px', border: activeTab === 'evaluacion_trimestral' ? '1px solid var(--crear-gold)' : '1px solid rgba(255,255,255,0.1)', background: activeTab === 'evaluacion_trimestral' ? 'rgba(212, 175, 55, 0.2)' : 'rgba(255,255,255,0.03)', color: activeTab === 'evaluacion_trimestral' ? 'var(--crear-gold)' : '#94a3b8', fontWeight: activeTab === 'evaluacion_trimestral' ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+          >
+            <Sparkles size={16} /> 🏆 Rúbrica Ciclo de Oro (Trimestral)
+          </button>
           <button type="button" className="btn-secondary" onClick={() => setActiveTab('ejecutivo')}>
             Dirección CEO / CCO · evidencia por sede
           </button>
@@ -1026,6 +1034,11 @@ export default function MisKPIs() {
             <ShieldCheck size={16} /> Gerencia de Sede
           </button>
         </div>
+
+        {/* 0. EVALUACIÓN INTEGRAL Y RÚBRICA CICLO DE ORO */}
+        {activeTab === 'evaluacion_trimestral' && (
+          <EvaluacionCoordinadoresNodus globalFilterSede={currentUser?.sede} />
+        )}
 
         {/* 1. FORMULARIO C1 / C2 */}
         {selectedPerson?.tabCategory !== 'ejecutivo' && activeTab === 'c1' && (

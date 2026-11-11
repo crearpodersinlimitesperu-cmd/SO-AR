@@ -144,13 +144,12 @@ export default function ChecklistBoard() {
   const effectiveStage = (isMultiTeamQuitoView && selectedQuitoTeam !== 'all')
     ? (quitoCyclesList.find(qc => qc.equipo === selectedQuitoTeam)?.stage || currentStage)
     : currentStage;
-  const role = roles.find(r => r.id === roleId) || {
-    id: roleId,
-    name: (roleId && roleId !== 'undefined' && roleId !== 'null' && roleId !== 'miembro')
-      ? getRoleDisplayName(roleId)
-      : 'Checklist Operativo'
-  };
-  const roleDisplayName = (role?.name && role.name !== 'Undefined' && role.name !== 'undefined') ? role.name : 'Checklist Operativo';
+  const foundRole = roles.find(r => r.id === roleId);
+  const rawRoleName = foundRole?.name || (roleId ? getRoleDisplayName(roleId) : null);
+  const roleDisplayName = (!rawRoleName || rawRoleName.trim().toLowerCase() === 'undefined' || rawRoleName.trim().toLowerCase() === 'null')
+    ? 'Checklist Operativo'
+    : rawRoleName;
+  const role = foundRole || { id: roleId || 'operativo', name: roleDisplayName };
 
   // Verificación de Autorización por Rol (N7)
   const isAuthorized = currentUser?.canAccessRole ? currentUser.canAccessRole(roleId) : true;
