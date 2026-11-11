@@ -34120,8 +34120,33 @@ const ROLES_GERENCIA = [
 const SUPER_ADMIN_EMAILS_WORKER = [
   'jose.sanchez@crearpsl.net',
   'armando.pilacuan@gmail.com',
+  'armando.pilacuan@crearpsl.net',
   'paul.sosa@crearpsl.net'
 ];
+
+const CAUSA_MANAGERS_SYNC_API_KEY = 'CAUSA_NODUS_MANAGERS_API_2026_KEY_9F8A7B6C5D4E3F2A1B';
+
+const ACTIVE_COHORTE_THRESHOLDS_WORKER = {
+  lima: 32,
+  guayaquil: 37,
+  cuenca: 24,
+  medellin: 19,
+  mexico: 8,
+  cdmx: 8,
+  quito: 127
+};
+
+const TRAINER_ALIASES_WORKER = {
+  'julio narvaez': 'Julio Cesar Narvaez',
+  'julio cesar narvaez': 'Julio Cesar Narvaez',
+  'julo cersar navaez': 'Julio Cesar Narvaez',
+  'julio cersar narvaez': 'Julio Cesar Narvaez',
+  'julio cesar navaez': 'Julio Cesar Narvaez',
+  'chuy acosta': 'Chuy Acosta',
+  'jesus acosta': 'Chuy Acosta',
+  'liliana cubillo': 'Lili Cubillo',
+  'lili cubillo': 'Lili Cubillo'
+};
 
 const GERENCIA_EMAILS_WORKER = [
   'emely.leon@crearpsl.net',
@@ -34141,8 +34166,8 @@ const GERENCIA_EMAILS_WORKER = [
 function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Api-Key',
     'Access-Control-Max-Age': '86400'
   };
 }
@@ -34190,25 +34215,30 @@ async function getServiceAccountAccessToken(env) {
   return data.access_token;
 }
 
+function firestoreValueToPlain(val) {
+  if (!val || typeof val !== 'object') return null;
+  if (val.stringValue !== undefined) return val.stringValue;
+  if (val.booleanValue !== undefined) return val.booleanValue;
+  if (val.integerValue !== undefined) return Number(val.integerValue);
+  if (val.doubleValue !== undefined) return val.doubleValue;
+  if (val.timestampValue !== undefined) return val.timestampValue;
+  if (val.nullValue !== undefined) return null;
+  if (val.arrayValue !== undefined) {
+    return (val.arrayValue.values || []).map((v) => firestoreValueToPlain(v));
+  }
+  if (val.mapValue !== undefined) {
+    return firestoreFieldsToPlain(val.mapValue.fields);
+  }
+  return null;
+}
+
 // Convierte el formato de campos de Firestore REST (fields: {campo: {stringValue: "x"}})
-// a un objeto plano de JS. Solo soporta los tipos que realmente usa esta app.
+// a un objeto plano de JS con soporte recursivo para arrays y mapas anidados.
 function firestoreFieldsToPlain(fields) {
   const out = {};
   if (!fields) return out;
   for (const [key, val] of Object.entries(fields)) {
-    if (val.stringValue !== undefined) out[key] = val.stringValue;
-    else if (val.booleanValue !== undefined) out[key] = val.booleanValue;
-    else if (val.integerValue !== undefined) out[key] = Number(val.integerValue);
-    else if (val.doubleValue !== undefined) out[key] = val.doubleValue;
-    else if (val.arrayValue !== undefined) {
-      out[key] = (val.arrayValue.values || []).map((v) =>
-        v.stringValue !== undefined ? v.stringValue : v
-      );
-    } else if (val.mapValue !== undefined) {
-      out[key] = firestoreFieldsToPlain(val.mapValue.fields);
-    } else {
-      out[key] = null;
-    }
+    out[key] = firestoreValueToPlain(val);
   }
   return out;
 }
@@ -34897,6 +34927,547 @@ function seleccionarContextoNotebook(preguntaUsuario) {
   return elegidas.map((s) => s.texto).join('\n\n');
 }
 
+function normalizeWorkerText(str) {
+  return String(str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeTrainerNameWorker(rawName) {
+  const clean = String(rawName || '').trim();
+  if (!clean) return 'Sin asignar';
+  const norm = normalizeWorkerText(clean);
+  if (TRAINER_ALIASES_WORKER[norm]) return TRAINER_ALIASES_WORKER[norm];
+  if (
+    norm.includes('julio') &&
+    (norm.includes('narvaez') || norm.includes('navaez') || norm.includes('cesar') || norm.includes('cersar'))
+  ) {
+    return 'Julio Cesar Narvaez';
+  }
+  return clean;
+}
+
+function extractTeamNumberWorker(equipoStr, numEquipoField) {
+  if (typeof numEquipoField === 'number' && !Number.isNaN(numEquipoField) && numEquipoField > 0) {
+    return numEquipoField;
+  }
+  const parsedField = parseInt(String(numEquipoField || ''), 10);
+  if (!Number.isNaN(parsedField) && parsedField > 0) return parsedField;
+  const match = String(equipoStr || '').match(/\d+/);
+  return match ? parseInt(match[0], 10) : null;
+}
+
+function normalizeSedeWorker(rawSede) {
+  const s = normalizeWorkerText(rawSede);
+  if (!s || s === 'sin sede' || s === 'sede global' || s === 'global') return 'Global';
+  if (s.includes('lima') || s.includes('peru')) return 'Lima';
+  if (s.includes('guayaquil') || s === 'gye') return 'Guayaquil';
+  if (s.includes('quito') || s === 'uio') return 'Quito';
+  if (s.includes('cuenca')) return 'Cuenca';
+  if (s.includes('medellin')) return 'Medellín';
+  if (s.includes('mexico') || s.includes('cdmx')) return 'México';
+  return String(rawSede || 'Global').trim();
+}
+
+function isGraduatedCohortWorker(sede, numEquipo) {
+  if (!numEquipo || Number.isNaN(numEquipo)) return false;
+  const canonicalSede = normalizeSedeWorker(sede);
+  const normSede = normalizeWorkerText(canonicalSede);
+  const threshold = ACTIVE_COHORTE_THRESHOLDS_WORKER[normSede];
+  if (!threshold) return false;
+  return numEquipo < threshold;
+}
+
+async function authenticateCentroManagersRequest(request, env, url, bodyParams) {
+  const headerApiKey = (request.headers.get('X-Api-Key') || request.headers.get('x-api-key') || '').trim();
+  const authHeader = (request.headers.get('Authorization') || '').trim();
+  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+  const queryApiKey = (url.searchParams.get('api_key') || url.searchParams.get('apiKey') || '').trim();
+  const bodyApiKey = bodyParams && typeof bodyParams.api_key === 'string' ? bodyParams.api_key.trim() : '';
+
+  const candidateKeys = [headerApiKey, bearerToken, queryApiKey, bodyApiKey].filter(Boolean);
+  const validApiKeys = [
+    CAUSA_MANAGERS_SYNC_API_KEY,
+    env.CAUSA_MANAGERS_API_KEY,
+    env.NODUS_API_KEY
+  ]
+    .map((k) => String(k || '').trim())
+    .filter(Boolean);
+
+  for (const candidate of candidateKeys) {
+    if (validApiKeys.includes(candidate)) {
+      return { authorized: true, authMethod: 'api_key', actor: 'nodus-sync-api' };
+    }
+  }
+
+  if (bearerToken) {
+    try {
+      const payload = await verifyFirebaseToken(bearerToken);
+      const uid = payload.sub;
+      const email = String(payload.email || '').toLowerCase().trim();
+      if (
+        SUPER_ADMIN_EMAILS_WORKER.includes(email) ||
+        GERENCIA_EMAILS_WORKER.includes(email)
+      ) {
+        return { authorized: true, authMethod: 'firebase_token', actor: email, uid };
+      }
+      const accessToken = await getServiceAccountAccessToken(env);
+      const userData = await firestoreGet(`users/${uid}`, accessToken);
+      const role = String(userData?.role || userData?.appRole || '').toLowerCase().trim();
+      if (
+        userData?.isSuperAdmin === true ||
+        ROLES_GERENCIA.includes(role) ||
+        role === 'observador' ||
+        role === 'coordinador'
+      ) {
+        return { authorized: true, authMethod: 'firebase_token', actor: email || uid, uid, accessToken };
+      }
+      return { authorized: false, status: 403, message: 'Tu rol no tiene permisos para consultar la API de Centro de Managers.' };
+    } catch {
+      return { authorized: false, status: 401, message: 'API Key o Bearer Token inválido.' };
+    }
+  }
+
+  return {
+    authorized: false,
+    status: 401,
+    message: 'Autenticación requerida. Envía el header X-Api-Key, Authorization: Bearer <API_KEY>, o ?api_key=<API_KEY>.'
+  };
+}
+
+async function handleCentroManagersApi(request, env, origin, url) {
+  let bodyParams = {};
+  if (request.method === 'POST') {
+    try {
+      bodyParams = await request.json();
+    } catch {
+      bodyParams = {};
+    }
+  }
+
+  const auth = await authenticateCentroManagersRequest(request, env, url, bodyParams);
+  if (!auth.authorized) {
+    return json({ ok: false, error: 'unauthorized', message: auth.message }, auth.status || 401, origin);
+  }
+
+  let accessToken = auth.accessToken;
+  if (!accessToken) {
+    try {
+      accessToken = await getServiceAccountAccessToken(env);
+    } catch (err) {
+      console.error('[centro-managers-api] Error obteniendo token de Firestore:', err);
+      return json({ ok: false, error: 'internal', message: 'Error autenticando con Firestore.' }, 500, origin);
+    }
+  }
+
+  const filterSede = normalizeWorkerText(url.searchParams.get('sede') || bodyParams.sede || '');
+  const filterEstado = normalizeWorkerText(url.searchParams.get('estado') || bodyParams.estado || '');
+  const filterEquipo = normalizeWorkerText(url.searchParams.get('equipo') || bodyParams.equipo || '');
+  const filterEntrenador = normalizeWorkerText(url.searchParams.get('entrenador') || bodyParams.entrenador || '');
+
+  try {
+    const [rawManagers, rawLlamadasGrupales, rawNotas] = await Promise.all([
+      firestoreListCollection('managers_directory', accessToken),
+      firestoreListCollection('llamadas_grupales_historial', accessToken),
+      firestoreListCollection('notas_seguimiento', accessToken)
+    ]);
+
+    const allManagers = rawManagers.map(({ id, data }) => {
+      const sedeRaw = String(data.sede || 'Global').trim();
+      const sede = normalizeSedeWorker(sedeRaw);
+      const equipo = String(data.equipo || 'Sin equipo').trim();
+      const numEquipo = extractTeamNumberWorker(equipo, data.numEquipo);
+      const estadoRaw = String(data.estado || 'Activo').trim();
+      const estadoRawUpper = estadoRaw.toUpperCase();
+      const esCohorteGraduada = isGraduatedCohortWorker(sede, numEquipo);
+      const estadoEfectivo = estadoRawUpper.includes('DESERT')
+        ? 'Desertor'
+        : estadoRawUpper.includes('ARCHIV')
+        ? 'Archivado'
+        : estadoRawUpper.includes('GRADUA') ||
+          Boolean(data.cierreLiquidacionActivo) ||
+          Boolean(data.isGraduado) ||
+          esCohorteGraduada
+        ? 'Graduado'
+        : 'Activo';
+
+      const entrenadorRaw = String(data.entrenador || 'Sin asignar').trim();
+      const entrenador = normalizeTrainerNameWorker(entrenadorRaw);
+      const historial = Array.isArray(data.llamadasHistorial)
+        ? data.llamadasHistorial.map((slot, idx) => ({
+            numero: slot?.numero || idx + 1,
+            fecha: slot?.fecha || '',
+            asistio: slot?.asistio === true ? true : slot?.asistio === false ? false : null,
+            nota: slot?.nota || ''
+          }))
+        : [];
+
+      const realizadas = historial.filter((h) => h.asistio === true || h.asistio === false);
+      const asistidas = historial.filter((h) => h.asistio === true);
+      const noAsistidas = historial.filter((h) => h.asistio === false);
+      const porcentajeAsistenciaIndividual =
+        realizadas.length > 0 ? Math.round((asistidas.length / realizadas.length) * 100) : 0;
+
+      return {
+        id,
+        nombre: String(data.nombre || '').trim(),
+        rol: String(data.rol || 'Manager').trim(),
+        telefono: String(data.telefono || '').trim(),
+        email: String(data.email || '').trim(),
+        sede,
+        sedeRaw,
+        equipo,
+        numEquipo,
+        entrenador,
+        entrenadorRaw,
+        coordinador: String(data.coordinador || '').trim(),
+        estado: estadoEfectivo,
+        estadoEfectivo,
+        estadoRaw,
+        esCohorteGraduada,
+        ultimaLlamadaFecha: data.ultimaLlamadaFecha || '',
+        ultimaLlamadaAsistio:
+          data.ultimaLlamadaAsistio === true ? true : data.ultimaLlamadaAsistio === false ? false : null,
+        llamadasRealizadasCount: realizadas.length,
+        llamadasAsistidasCount: asistidas.length,
+        llamadasNoAsistidasCount: noAsistidas.length,
+        porcentajeAsistenciaIndividual,
+        llamadasHistorial: historial,
+        cierreLiquidacionActivo: Boolean(data.cierreLiquidacionActivo),
+        updatedAt: data.updatedAt || data.fechaActualizacion || ''
+      };
+    });
+
+    const allLlamadasGrupales = rawLlamadasGrupales
+      .map(({ id, data }) => ({
+        id,
+        equipo: String(data.equipo || '').trim(),
+        equipoKey: String(data.equipoKey || '').trim(),
+        sede: String(data.sede || '').trim(),
+        fecha: String(data.fecha || '').trim(),
+        entrenador: normalizeTrainerNameWorker(data.entrenador),
+        entrenadorRaw: String(data.entrenador || '').trim(),
+        asistentesCount: Number(data.asistentesCount || 0),
+        totalMiembros: Number(data.totalMiembros || 0),
+        asistencia: data.asistencia && typeof data.asistencia === 'object' ? data.asistencia : {},
+        meetUrl: String(data.meetUrl || '').trim(),
+        nota: String(data.nota || '').trim(),
+        esQuiebre: Boolean(data.esQuiebre),
+        creadoPor: String(data.creadoPor || data.autorEmail || '').trim(),
+        createdAt: data.createdAt || data.timestamp || ''
+      }))
+      .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+
+    const allNotasSeguimiento = rawNotas
+      .map(({ id, data }) => ({
+        id,
+        managerId: String(data.managerId || '').trim(),
+        managerNombre: String(data.managerNombre || '').trim(),
+        equipo: String(data.equipo || '').trim(),
+        sede: String(data.sede || '').trim(),
+        autorNombre: String(data.autorNombre || '').trim(),
+        autorEmail: String(data.autorEmail || '').trim(),
+        texto: String(data.texto || '').trim(),
+        esQuiebre: Boolean(data.esQuiebre),
+        categoriaQuiebre: String(data.categoriaQuiebre || '').trim(),
+        estadoQuiebre: String(data.estadoQuiebre || '').trim(),
+        fecha: String(data.fecha || data.createdAt || '').trim(),
+        respuestas: Array.isArray(data.respuestas) ? data.respuestas : []
+      }))
+      .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+
+    // Aplicar filtros opcionales
+    const filteredManagers = allManagers.filter((m) => {
+      if (filterSede && filterSede !== 'todas' && filterSede !== 'global') {
+        if (!normalizeWorkerText(m.sede).includes(filterSede)) return false;
+      }
+      if (filterEstado && filterEstado !== 'todos' && filterEstado !== 'all') {
+        if (normalizeWorkerText(m.estadoEfectivo) !== filterEstado) return false;
+      }
+      if (filterEquipo) {
+        const matchEquipo =
+          normalizeWorkerText(m.equipo).includes(filterEquipo) ||
+          String(m.numEquipo || '') === filterEquipo.replace(/\D+/g, '');
+        if (!matchEquipo) return false;
+      }
+      if (filterEntrenador) {
+        const normTrainerFilter = normalizeWorkerText(normalizeTrainerNameWorker(filterEntrenador));
+        if (!normalizeWorkerText(m.entrenador).includes(normTrainerFilter)) return false;
+      }
+      return true;
+    });
+
+    const filteredLlamadasGrupales = allLlamadasGrupales.filter((l) => {
+      if (filterSede && filterSede !== 'todas' && filterSede !== 'global') {
+        if (l.sede && !normalizeWorkerText(l.sede).includes(filterSede)) return false;
+      }
+      if (filterEquipo) {
+        if (!normalizeWorkerText(l.equipo).includes(filterEquipo)) return false;
+      }
+      if (filterEntrenador) {
+        const normTrainerFilter = normalizeWorkerText(normalizeTrainerNameWorker(filterEntrenador));
+        if (!normalizeWorkerText(l.entrenador).includes(normTrainerFilter)) return false;
+      }
+      return true;
+    });
+
+    const filteredNotas = allNotasSeguimiento.filter((n) => {
+      if (filterSede && filterSede !== 'todas' && filterSede !== 'global') {
+        if (n.sede && !normalizeWorkerText(n.sede).includes(filterSede)) return false;
+      }
+      if (filterEquipo) {
+        if (!normalizeWorkerText(n.equipo).includes(filterEquipo)) return false;
+      }
+      return true;
+    });
+
+    // Resumen por Sede
+    const sedesMap = {};
+    for (const m of filteredManagers) {
+      const sKey = m.sede || 'Global';
+      if (!sedesMap[sKey]) {
+        sedesMap[sKey] = {
+          sede: sKey,
+          cohorteActivaMinima: ACTIVE_COHORTE_THRESHOLDS_WORKER[normalizeWorkerText(sKey)] || null,
+          totalMiembros: 0,
+          activos: 0,
+          graduados: 0,
+          desertores: 0,
+          capitanes: 0,
+          managers: 0,
+          equiposSet: new Set()
+        };
+      }
+      const bucket = sedesMap[sKey];
+      bucket.totalMiembros++;
+      if (m.estadoEfectivo === 'Activo') bucket.activos++;
+      else if (m.estadoEfectivo === 'Graduado') bucket.graduados++;
+      else if (m.estadoEfectivo === 'Desertor') bucket.desertores++;
+      if (normalizeWorkerText(m.rol).includes('capitan')) bucket.capitanes++;
+      else bucket.managers++;
+      if (m.equipo) bucket.equiposSet.add(m.equipo);
+    }
+    const sedesSummary = Object.values(sedesMap).map((b) => ({
+      sede: b.sede,
+      cohorteActivaMinima: b.cohorteActivaMinima,
+      totalMiembros: b.totalMiembros,
+      activos: b.activos,
+      graduados: b.graduados,
+      desertores: b.desertores,
+      capitanes: b.capitanes,
+      managers: b.managers,
+      totalEquipos: b.equiposSet.size,
+      equipos: Array.from(b.equiposSet).sort()
+    }));
+
+    // Resumen por Equipo
+    const equiposMap = {};
+    for (const m of filteredManagers) {
+      const eqKey = `${m.sede}::${m.equipo}`;
+      if (!equiposMap[eqKey]) {
+        equiposMap[eqKey] = {
+          sede: m.sede,
+          equipo: m.equipo,
+          numEquipo: m.numEquipo,
+          esCohorteGraduada: m.esCohorteGraduada,
+          entrenadoresCounts: {},
+          coordinadoresCounts: {},
+          totalMiembros: 0,
+          activos: 0,
+          graduados: 0,
+          desertores: 0,
+          capitanes: 0
+        };
+      }
+      const eq = equiposMap[eqKey];
+      eq.totalMiembros++;
+      if (m.estadoEfectivo === 'Activo') eq.activos++;
+      else if (m.estadoEfectivo === 'Graduado') eq.graduados++;
+      else if (m.estadoEfectivo === 'Desertor') eq.desertores++;
+      if (normalizeWorkerText(m.rol).includes('capitan')) eq.capitanes++;
+      if (m.entrenador && m.entrenador !== 'Sin asignar') {
+        eq.entrenadoresCounts[m.entrenador] = (eq.entrenadoresCounts[m.entrenador] || 0) + 1;
+      }
+      if (m.coordinador) {
+        eq.coordinadoresCounts[m.coordinador] = (eq.coordinadoresCounts[m.coordinador] || 0) + 1;
+      }
+    }
+
+    const equiposSummary = Object.values(equiposMap)
+      .map((eq) => {
+        const topEntrenador =
+          Object.entries(eq.entrenadoresCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Sin asignar';
+        const topCoordinador =
+          Object.entries(eq.coordinadoresCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+        const groupCalls = filteredLlamadasGrupales.filter(
+          (g) =>
+            normalizeWorkerText(g.equipo) === normalizeWorkerText(eq.equipo) &&
+            (!g.sede || normalizeWorkerText(g.sede) === normalizeWorkerText(eq.sede))
+        );
+        return {
+          sede: eq.sede,
+          equipo: eq.equipo,
+          numEquipo: eq.numEquipo,
+          esCohorteGraduada: eq.esCohorteGraduada,
+          estadoCohorte: eq.esCohorteGraduada ? 'Graduado' : 'Activo',
+          entrenador: topEntrenador,
+          coordinador: topCoordinador,
+          totalMiembros: eq.totalMiembros,
+          activos: eq.activos,
+          graduados: eq.graduados,
+          desertores: eq.desertores,
+          capitanes: eq.capitanes,
+          llamadasGrupalesCount: groupCalls.length,
+          ultimaLlamadaGrupalFecha: groupCalls[0]?.fecha || ''
+        };
+      })
+      .sort((a, b) => {
+        if (a.sede !== b.sede) return a.sede.localeCompare(b.sede);
+        return (b.numEquipo || 0) - (a.numEquipo || 0);
+      });
+
+    // Resumen por Entrenador
+    const entrenadoresMap = {};
+    for (const m of filteredManagers) {
+      const trName = m.entrenador || 'Sin asignar';
+      if (!entrenadoresMap[trName]) {
+        entrenadoresMap[trName] = {
+          entrenador: trName,
+          sedesSet: new Set(),
+          equiposActivosSet: new Set(),
+          equiposGraduadosSet: new Set(),
+          totalAsignados: 0,
+          activos: 0,
+          graduados: 0,
+          desertores: 0,
+          llamadasIndividualesRealizadas: 0,
+          llamadasIndividualesAsistidas: 0
+        };
+      }
+      const tr = entrenadoresMap[trName];
+      tr.totalAsignados++;
+      if (m.sede) tr.sedesSet.add(m.sede);
+      if (m.estadoEfectivo === 'Activo') {
+        tr.activos++;
+        if (m.equipo) tr.equiposActivosSet.add(`${m.sede} - ${m.equipo}`);
+      } else if (m.estadoEfectivo === 'Graduado') {
+        tr.graduados++;
+        if (m.equipo) tr.equiposGraduadosSet.add(`${m.sede} - ${m.equipo}`);
+      } else if (m.estadoEfectivo === 'Desertor') {
+        tr.desertores++;
+      }
+      tr.llamadasIndividualesRealizadas += m.llamadasRealizadasCount;
+      tr.llamadasIndividualesAsistidas += m.llamadasAsistidasCount;
+    }
+
+    const entrenadoresSummary = Object.values(entrenadoresMap)
+      .map((tr) => {
+        const groupCallsCount = filteredLlamadasGrupales.filter(
+          (g) => normalizeWorkerText(g.entrenador) === normalizeWorkerText(tr.entrenador)
+        ).length;
+        return {
+          entrenador: tr.entrenador,
+          sedes: Array.from(tr.sedesSet).sort(),
+          equiposActivos: Array.from(tr.equiposActivosSet).sort(),
+          equiposGraduados: Array.from(tr.equiposGraduadosSet).sort(),
+          totalAsignados: tr.totalAsignados,
+          activos: tr.activos,
+          graduados: tr.graduados,
+          desertores: tr.desertores,
+          llamadasIndividualesRealizadas: tr.llamadasIndividualesRealizadas,
+          llamadasIndividualesAsistidas: tr.llamadasIndividualesAsistidas,
+          porcentajeAsistenciaIndividual:
+            tr.llamadasIndividualesRealizadas > 0
+              ? Math.round((tr.llamadasIndividualesAsistidas / tr.llamadasIndividualesRealizadas) * 100)
+              : 0,
+          llamadasGrupalesRegistradas: groupCallsCount
+        };
+      })
+      .sort((a, b) => b.activos - a.activos || b.totalAsignados - a.totalAsignados);
+
+    const meta = {
+      source: 'Causa OS — Centro de Managers API (Nodus Sync)',
+      version: '1.0.0',
+      generatedAt: new Date().toISOString(),
+      projectId: FIREBASE_PROJECT_ID,
+      activeCohorteThresholds: ACTIVE_COHORTE_THRESHOLDS_WORKER,
+      filtersApplied: {
+        sede: filterSede || null,
+        estado: filterEstado || null,
+        equipo: filterEquipo || null,
+        entrenador: filterEntrenador || null
+      },
+      counts: {
+        totalManagers: filteredManagers.length,
+        activos: filteredManagers.filter((m) => m.estadoEfectivo === 'Activo').length,
+        graduados: filteredManagers.filter((m) => m.estadoEfectivo === 'Graduado').length,
+        desertores: filteredManagers.filter((m) => m.estadoEfectivo === 'Desertor').length,
+        totalSedes: sedesSummary.length,
+        totalEquipos: equiposSummary.length,
+        totalEntrenadores: entrenadoresSummary.length,
+        totalLlamadasGrupales: filteredLlamadasGrupales.length,
+        totalNotasSeguimiento: filteredNotas.length
+      }
+    };
+
+    const subPath = url.pathname.replace(/^\/api\/centro-managers\/?/, '').replace(/\/+$/, '');
+    if (subPath === 'managers') {
+      return json({ ok: true, meta, total: filteredManagers.length, managers: filteredManagers }, 200, origin);
+    }
+    if (subPath === 'equipos') {
+      return json(
+        { ok: true, meta, total: equiposSummary.length, sedesSummary, equipos: equiposSummary },
+        200,
+        origin
+      );
+    }
+    if (subPath === 'entrenadores') {
+      return json(
+        { ok: true, meta, total: entrenadoresSummary.length, entrenadores: entrenadoresSummary },
+        200,
+        origin
+      );
+    }
+    if (subPath === 'llamadas') {
+      return json(
+        {
+          ok: true,
+          meta,
+          llamadasGrupales: filteredLlamadasGrupales,
+          notasSeguimiento: filteredNotas
+        },
+        200,
+        origin
+      );
+    }
+
+    return json(
+      {
+        ok: true,
+        meta,
+        sedesSummary,
+        equiposSummary,
+        entrenadoresSummary,
+        managers: filteredManagers,
+        llamadasGrupales: filteredLlamadasGrupales,
+        notasSeguimiento: filteredNotas
+      },
+      200,
+      origin
+    );
+  } catch (err) {
+    console.error('[centro-managers-api] Error procesando solicitud:', err);
+    return json(
+      { ok: false, error: 'internal', message: err?.message || 'Error interno al consultar Centro de Managers.' },
+      500,
+      origin
+    );
+  }
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '*';
@@ -34904,11 +35475,19 @@ export default {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders(origin) });
     }
+
+    const url = new URL(request.url);
+    if (url.pathname === '/api/centro-managers' || url.pathname.startsWith('/api/centro-managers/')) {
+      if (request.method !== 'GET' && request.method !== 'POST') {
+        return json({ error: 'Método no permitido. Usa GET o POST.' }, 405, origin);
+      }
+      return handleCentroManagersApi(request, env, origin, url);
+    }
+
     if (request.method !== 'POST') {
       return json({ error: 'Método no permitido.' }, 405, origin);
     }
 
-    const url = new URL(request.url);
     if (url.pathname === '/nodus-data-map') {
       return handleNodusDataMap(request, env, origin);
     }
@@ -71024,6 +71603,7 @@ import {
   hasAmbiguousCycleCompletionScope,
   isTaskClosedForDelivery
 } from '../src/utils/taskLifecycle.js';
+import { SUPER_ADMIN_EMAILS, OBSERVER_EMAILS } from '../src/config/permissions.js';
 
 dotenv.config();
 
@@ -71174,7 +71754,17 @@ async function sendClaimedMail(docSnap, data) {
     }
 
     const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => to.endsWith(d));
-    if (isCorporate) {
+    const isPrivilegedEmail = SUPER_ADMIN_EMAILS.includes(to) || OBSERVER_EMAILS.includes(to);
+    const isContractOrSystemMail =
+      data.type === 'system_access_invite' ||
+      data.type === 'contract_confirmation' ||
+      (data.message?.subject && (
+        data.message.subject.includes('Caminata sobre Fuego') ||
+        data.message.subject.includes('Maestría del Juego') ||
+        data.message.subject.includes('Observador Total')
+      ));
+
+    if (isCorporate || isPrivilegedEmail || isContractOrSystemMail) {
       validRecipients.push(to);
       continue;
     }
@@ -71219,8 +71809,11 @@ async function sendClaimedMail(docSnap, data) {
   const cleanHtml = sanitizeHtml(rawHtml, {
     allowedTags: [
       'p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'br', 'hr',
-      'div', 'span', 'img', 'audio', 'source', 'iframe', 'table', 'tbody', 'thead', 'tr', 'td', 'th'
+      'div', 'span', 'img', 'audio', 'source', 'iframe', 'table', 'tbody', 'thead', 'tr', 'td', 'th', 'code'
     ],
+    allowedSchemesByTag: {
+      img: ['http', 'https', 'data', 'cid']
+    },
     allowedAttributes: {
       'a': ['href', 'target', 'style', 'class'],
       'p': ['style', 'class'],
@@ -71255,6 +71848,15 @@ async function sendClaimedMail(docSnap, data) {
     subject: data.message?.subject || 'Notificación Causa OS — CREAR PODER SIN LÍMITES',
     html: cleanHtml
   };
+
+  if (data.cc) {
+    mailOptions.cc = Array.isArray(data.cc) ? data.cc : [data.cc];
+  }
+
+  const rawAttachments = data.message?.attachments || data.attachments;
+  if (Array.isArray(rawAttachments) && rawAttachments.length > 0) {
+    mailOptions.attachments = rawAttachments;
+  }
 
   const icsAttachment = buildIcsAttachment(data.calendarEvent);
   if (icsAttachment) {
@@ -71776,9 +72378,45 @@ function formatDeadlineEsLocal(iso) {
   }
 }
 
+async function ensureArmandoObserverProfile() {
+  try {
+    const armandoProfile = {
+      id: 'observador_armandopilacuan',
+      name: 'Armando Pilacuán',
+      displayName: 'Armando Pilacuán',
+      role: 'observador',
+      appRole: 'observador',
+      roles: ['observador', 'direccion', 'gerente', 'consolidado'],
+      sede: 'Global',
+      email: 'armando.pilacuan@gmail.com',
+      corporateEmail: 'armando.pilacuan@crearpsl.net',
+      personalEmail: 'armando.pilacuan@gmail.com',
+      emails: [
+        'armando.pilacuan@gmail.com',
+        'armando.pilacuan@crearpsl.net',
+        'armando.pilacuan@crearpsl.com'
+      ],
+      active: true,
+      isActive: true,
+      status: 'active',
+      estado: 'activo',
+      isSuperAdmin: true,
+      isGlobalObserver: true,
+      updatedAt: FieldValue.serverTimestamp()
+    };
+    await db.collection('users').doc('observador_armandopilacuan').set(armandoProfile, { merge: true });
+    await db.collection('user_profiles').doc('armando.pilacuan@gmail.com').set(armandoProfile, { merge: true });
+    await db.collection('user_profiles').doc('armando.pilacuan@crearpsl.net').set(armandoProfile, { merge: true });
+    console.log('✅ Perfil de Observador Total para Armando Pilacuán sincronizado en Firestore.');
+  } catch (err) {
+    console.warn('⚠️ No se pudo sincronizar perfil de Armando Pilacuán:', err.message);
+  }
+}
+
 // Ejecución
 if (isOneShot) {
   console.log("⚡ Ejecución en modo One-Shot (GitHub Actions / Tarea programada)...");
+  await ensureArmandoObserverProfile();
   await processPendingMails();
   await checkInactivity();
   await checkOverdueTaskReminders();
@@ -76142,7 +76780,7 @@ function App() {
           <Route path="/nodus-aliados" element={<Navigate to="/contraste-nodus" replace />} />
 
           <Route path="/centro-managers" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'observador', 'consolidado', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
               <CentroManagers />
             </RoleRoute>
           } />
@@ -84066,14 +84704,14 @@ export const isLegalDocsPending = (currentUser, legalSignatures) => {
 import { PORTFOLIO_FI_REVIEW_EMAILS, isDataAdmin } from './permissions.js';
 import { isUserInactive } from '../utils/userNormalizer.js';
 
-export const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria'];
+export const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'observador'];
 export const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
-export const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria'];
+export const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria', 'observador'];
 // CAMPUS_ROLES: ya no se usa como filtro — Campus Interactivo es abierto a TODOS los
 // roles según la Matriz Oficial (fila "Campus Interactivo" = X en las 9 columnas).
 // Se deja declarada solo por si se necesita revertir a un acceso restringido.
-export const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
-export const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado', 'director_maestria'];
+export const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'observador'];
+export const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado', 'director_maestria', 'observador'];
 export const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria'];
 export const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria'];
 export const REPORTES_VISIBLE = (u) => Boolean(
@@ -112623,6 +113261,571 @@ export default function ApdaycPaymentAlert() {
         </div>
       )}
     </>
+  );
+}
+
+```
+
+---
+
+## Archivo: src/components/CentroManagersApiPanel.jsx
+
+```javascript
+import React, { useState } from 'react';
+import { Copy, Check, RefreshCw, ExternalLink, ShieldCheck, Terminal, Code, Database, Download } from 'lucide-react';
+
+export const CENTRO_MANAGERS_API_BASE_URL = 'https://so-ar-copiloto.jose-sanchez-e01.workers.dev/api/centro-managers';
+export const CENTRO_MANAGERS_API_KEY = 'CAUSA_NODUS_MANAGERS_API_2026_KEY_9F8A7B6C5D4E3F2A1B';
+
+const ENDPOINTS = [
+  {
+    id: 'full',
+    method: 'GET / POST',
+    path: '/api/centro-managers',
+    title: 'Snapshot Maestro Completo (Todo en 1)',
+    description: 'Devuelve meta, sedesSummary, equiposSummary, entrenadoresSummary, directorio completo de managers/capitanes (con llamadas 1..16), llamadasGrupales y notasSeguimiento.'
+  },
+  {
+    id: 'managers',
+    method: 'GET / POST',
+    path: '/api/centro-managers/managers',
+    title: 'Directorio de Managers y Capitanes + Llamadas Individuales (1..16)',
+    description: 'Lista todos los managers y capitanes con nombre, rol, teléfono, email, sede, equipo, numEquipo, entrenador normalizado, coordinador, estadoEfectivo (Activo/Graduado/Desertor) y llamadasHistorial.'
+  },
+  {
+    id: 'equipos',
+    method: 'GET / POST',
+    path: '/api/centro-managers/equipos',
+    title: 'Resumen de Equipos y Sedes',
+    description: 'Agrupa por sede y equipo con umbrales de cohorte activa vigente, entrenador asignado, coordinador, activos, graduados, desertores y conteo de llamadas grupales.'
+  },
+  {
+    id: 'entrenadores',
+    method: 'GET / POST',
+    path: '/api/centro-managers/entrenadores',
+    title: 'Resumen y KPIs por Entrenador',
+    description: 'Métricas por entrenador (incluyendo unificación de alias como Julio Cesar Narvaez), equipos activos vs graduados, llamadas individuales realizadas/asistidas y llamadas grupales.'
+  },
+  {
+    id: 'llamadas',
+    method: 'GET / POST',
+    path: '/api/centro-managers/llamadas',
+    title: 'Historial de Llamadas Grupales y Notas de Seguimiento / Quiebres',
+    description: 'Todas las sesiones grupales registradas por equipo y las bitácoras/quiebres de acompañamiento.'
+  }
+];
+
+export default function CentroManagersApiPanel({ onClose }) {
+  const [copiedId, setCopiedId] = useState('');
+  const [selectedEndpoint, setSelectedEndpoint] = useState('/api/centro-managers/equipos');
+  const [filterSede, setFilterSede] = useState('');
+  const [filterEstado, setFilterEstado] = useState('');
+  const [codeTab, setCodeTab] = useState('php');
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState(null);
+  const [testError, setTestError] = useState('');
+
+  const copyText = (text, id) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(''), 2200);
+  };
+
+  const buildLiveUrl = (includeKeyInQuery = false) => {
+    const base = `https://so-ar-copiloto.jose-sanchez-e01.workers.dev${selectedEndpoint}`;
+    const params = new URLSearchParams();
+    if (filterSede) params.set('sede', filterSede);
+    if (filterEstado) params.set('estado', filterEstado);
+    if (includeKeyInQuery) params.set('api_key', CENTRO_MANAGERS_API_KEY);
+    const qs = params.toString();
+    return qs ? `${base}?${qs}` : base;
+  };
+
+  const runLiveTest = async () => {
+    setTesting(true);
+    setTestError('');
+    try {
+      const url = buildLiveUrl(false);
+      const resp = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'X-Api-Key': CENTRO_MANAGERS_API_KEY
+        }
+      });
+      const data = await resp.json();
+      if (!resp.ok || !data.ok) {
+        throw new Error(data.message || `HTTP ${resp.status}`);
+      }
+      setTestResult(data);
+    } catch (err) {
+      setTestError(err.message || 'Error al consultar el endpoint en vivo.');
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  const curlSnippet = `curl -X GET "${buildLiveUrl(false)}" \\
+  -H "X-Api-Key: ${CENTRO_MANAGERS_API_KEY}" \\
+  -H "Accept: application/json"`;
+
+  const phpSnippet = `<?php
+// Sincronización Automática Causa OS (Centro de Managers) -> Nodus
+$endpoint = '${buildLiveUrl(false)}';
+$apiKey   = '${CENTRO_MANAGERS_API_KEY}';
+
+$ch = curl_init($endpoint);
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT        => 30,
+    CURLOPT_HTTPHEADER     => [
+        'Accept: application/json',
+        'X-Api-Key: ' . $apiKey,
+    ],
+]);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+if ($httpCode === 200) {
+    $payload = json_decode($response, true);
+    // $payload['meta']['counts'] -> Totales en tiempo real
+    // $payload['managers']       -> Directorio de Managers y Capitanes + llamadas 1..16
+    // $payload['equiposSummary'] -> Equipos con entrenador, coordinador y estadoCohorte
+    // $payload['entrenadoresSummary'] -> KPIs por entrenador
+}`;
+
+  const nodeSnippet = `// Node.js / Fetch — Sincronización Centro de Managers -> Nodus
+const response = await fetch('${buildLiveUrl(false)}', {
+  method: 'GET',
+  headers: {
+    'Accept': 'application/json',
+    'X-Api-Key': '${CENTRO_MANAGERS_API_KEY}'
+  }
+});
+
+const data = await response.json();
+console.log('Totales Centro de Managers:', data.meta.counts);`;
+
+  const activeSnippet = codeTab === 'php' ? phpSnippet : codeTab === 'curl' ? curlSnippet : nodeSnippet;
+
+  return (
+    <div style={{
+      background: '#0f172a',
+      color: '#f8fafc',
+      borderRadius: '16px',
+      border: '1px solid rgba(56, 189, 248, 0.3)',
+      boxShadow: '0 20px 50px rgba(0, 0, 0, 0.45)',
+      overflow: 'hidden',
+      marginBottom: '2rem'
+    }}>
+      {/* Header */}
+      <div style={{
+        padding: '1.5rem 2rem',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        borderBottom: '1px solid rgba(148, 163, 184, 0.2)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
+            <span style={{
+              background: 'rgba(16, 185, 129, 0.18)',
+              color: '#34d399',
+              border: '1px solid rgba(52, 211, 153, 0.4)',
+              padding: '0.2rem 0.65rem',
+              borderRadius: '999px',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              letterSpacing: '0.04em'
+            }}>
+              🟢 API LIVE · TIEMPO REAL
+            </span>
+            <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600 }}>
+              Puente Oficial Causa OS ⇄ Nodus (Armando Pilacuán)
+            </span>
+          </div>
+          <h2 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Database size={22} color="#38bdf8" /> API de Sincronización Automática — Centro de Managers
+          </h2>
+        </div>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              color: '#e2e8f0',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: '8px',
+              padding: '0.45rem 0.9rem',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '0.85rem'
+            }}
+          >
+            ✕ Cerrar Panel API
+          </button>
+        )}
+      </div>
+
+      <div style={{ padding: '1.75rem 2rem', display: 'grid', gap: '1.5rem' }}>
+        {/* Credenciales */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '1rem'
+        }}>
+          <div style={{
+            background: '#1e293b',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '12px',
+            padding: '1.1rem 1.25rem'
+          }}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', fontWeight: 700, marginBottom: '0.4rem' }}>
+              Endpoint Base de Producción
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', background: '#0f172a', padding: '0.65rem 0.9rem', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
+              <code style={{ color: '#38bdf8', fontSize: '0.82rem', wordBreak: 'break-all', fontWeight: 600 }}>
+                {CENTRO_MANAGERS_API_BASE_URL}
+              </code>
+              <button
+                type="button"
+                onClick={() => copyText(CENTRO_MANAGERS_API_BASE_URL, 'base_url')}
+                style={{
+                  background: copiedId === 'base_url' ? '#059669' : '#0284c7',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '0.4rem 0.7rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  flexShrink: 0
+                }}
+              >
+                {copiedId === 'base_url' ? <Check size={14} /> : <Copy size={14} />}
+                {copiedId === 'base_url' ? 'Copiado' : 'Copiar'}
+              </button>
+            </div>
+          </div>
+
+          <div style={{
+            background: '#1e293b',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '12px',
+            padding: '1.1rem 1.25rem'
+          }}>
+            <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#94a3b8', fontWeight: 700, marginBottom: '0.4rem' }}>
+              API Key Oficial (Header <code style={{ color: '#fbbf24' }}>X-Api-Key</code> o Query <code style={{ color: '#fbbf24' }}>?api_key=</code>)
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem', background: '#0f172a', padding: '0.65rem 0.9rem', borderRadius: '8px', border: '1px solid rgba(251, 191, 36, 0.3)' }}>
+              <code style={{ color: '#fbbf24', fontSize: '0.82rem', wordBreak: 'break-all', fontWeight: 700 }}>
+                {CENTRO_MANAGERS_API_KEY}
+              </code>
+              <button
+                type="button"
+                onClick={() => copyText(CENTRO_MANAGERS_API_KEY, 'api_key')}
+                style={{
+                  background: copiedId === 'api_key' ? '#059669' : '#d97706',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  padding: '0.4rem 0.7rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  flexShrink: 0
+                }}
+              >
+                {copiedId === 'api_key' ? <Check size={14} /> : <Copy size={14} />}
+                {copiedId === 'api_key' ? 'Copiada' : 'Copiar Key'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Lista de Endpoints */}
+        <div>
+          <h3 style={{ margin: '0 0 0.75rem 0', fontSize: '0.95rem', fontWeight: 800, color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <ShieldCheck size={18} color="#34d399" /> Endpoints Disponibles y Filtros Soportados
+          </h3>
+          <div style={{ display: 'grid', gap: '0.6rem' }}>
+            {ENDPOINTS.map((ep) => {
+              const fullUrlWithKey = `https://so-ar-copiloto.jose-sanchez-e01.workers.dev${ep.path}?api_key=${CENTRO_MANAGERS_API_KEY}`;
+              return (
+                <div
+                  key={ep.id}
+                  style={{
+                    background: selectedEndpoint === ep.path ? 'rgba(56, 189, 248, 0.12)' : '#1e293b',
+                    border: selectedEndpoint === ep.path ? '1px solid #38bdf8' : '1px solid rgba(148, 163, 184, 0.16)',
+                    borderRadius: '10px',
+                    padding: '0.85rem 1rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    flexWrap: 'wrap'
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: '260px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+                      <span style={{ background: '#0284c7', color: '#fff', fontSize: '0.68rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                        {ep.method}
+                      </span>
+                      <code style={{ color: '#38bdf8', fontWeight: 700, fontSize: '0.88rem' }}>{ep.path}</code>
+                      <span style={{ color: '#f8fafc', fontWeight: 700, fontSize: '0.86rem' }}>— {ep.title}</span>
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#cbd5e1' }}>{ep.description}</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedEndpoint(ep.path)}
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.15)',
+                        color: '#38bdf8',
+                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        borderRadius: '6px',
+                        padding: '0.35rem 0.65rem',
+                        cursor: 'pointer',
+                        fontSize: '0.76rem',
+                        fontWeight: 700
+                      }}
+                    >
+                      Seleccionar
+                    </button>
+                    <a
+                      href={fullUrlWithKey}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        background: 'rgba(16, 185, 129, 0.15)',
+                        color: '#34d399',
+                        border: '1px solid rgba(52, 211, 153, 0.35)',
+                        borderRadius: '6px',
+                        padding: '0.35rem 0.65rem',
+                        textDecoration: 'none',
+                        fontSize: '0.76rem',
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.3rem'
+                      }}
+                    >
+                      Abrir JSON <ExternalLink size={12} />
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: '0.6rem', fontSize: '0.78rem', color: '#94a3b8' }}>
+            💡 <strong>Parámetros de filtro opcionales:</strong>{' '}
+            <code>?sede=Lima</code> (Lima, Guayaquil, Quito, Cuenca, Medellín, México) ·{' '}
+            <code>&amp;estado=Activo</code> (Activo, Graduado, Desertor) ·{' '}
+            <code>&amp;equipo=32</code> ·{' '}
+            <code>&amp;entrenador=Julio%20Cesar%20Narvaez</code>
+          </div>
+        </div>
+
+        {/* Probador en Vivo + Snippets */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gap: '1.25rem'
+        }}>
+          {/* Probador en Vivo */}
+          <div style={{
+            background: '#1e293b',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '12px',
+            padding: '1.15rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Terminal size={16} color="#38bdf8" /> Probador de API en Tiempo Real
+              </h4>
+              <button
+                type="button"
+                onClick={runLiveTest}
+                disabled={testing}
+                style={{
+                  background: '#10b981',
+                  color: '#052e16',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '0.45rem 0.9rem',
+                  cursor: testing ? 'wait' : 'pointer',
+                  fontWeight: 800,
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                <RefreshCw size={14} /> {testing ? 'Consultando Firestore...' : '⚡ Ejecutar Consulta en Vivo'}
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '0.85rem', flexWrap: 'wrap' }}>
+              <select
+                value={selectedEndpoint}
+                onChange={(e) => setSelectedEndpoint(e.target.value)}
+                style={{ background: '#0f172a', color: '#f8fafc', border: '1px solid #334155', borderRadius: '6px', padding: '0.4rem 0.6rem', fontSize: '0.8rem', flex: 1 }}
+              >
+                {ENDPOINTS.map((ep) => (
+                  <option key={ep.id} value={ep.path}>{ep.path}</option>
+                ))}
+              </select>
+              <select
+                value={filterSede}
+                onChange={(e) => setFilterSede(e.target.value)}
+                style={{ background: '#0f172a', color: '#f8fafc', border: '1px solid #334155', borderRadius: '6px', padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
+              >
+                <option value="">Todas las Sedes</option>
+                <option value="Lima">Lima</option>
+                <option value="Guayaquil">Guayaquil</option>
+                <option value="Quito">Quito</option>
+                <option value="Cuenca">Cuenca</option>
+                <option value="Medellín">Medellín</option>
+                <option value="México">México</option>
+              </select>
+              <select
+                value={filterEstado}
+                onChange={(e) => setFilterEstado(e.target.value)}
+                style={{ background: '#0f172a', color: '#f8fafc', border: '1px solid #334155', borderRadius: '6px', padding: '0.4rem 0.6rem', fontSize: '0.8rem' }}
+              >
+                <option value="">Todos los Estados</option>
+                <option value="Activo">Solo Activos</option>
+                <option value="Graduado">Solo Graduados</option>
+                <option value="Desertor">Solo Desertores</option>
+              </select>
+            </div>
+
+            {testError && (
+              <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid #ef4444', color: '#fca5a5', padding: '0.65rem', borderRadius: '8px', fontSize: '0.8rem' }}>
+                {testError}
+              </div>
+            )}
+
+            {testResult && (
+              <div>
+                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.6rem', fontSize: '0.76rem' }}>
+                  <span style={{ background: '#0f172a', padding: '0.25rem 0.55rem', borderRadius: '6px', color: '#38bdf8', fontWeight: 700 }}>
+                    Total Managers: {testResult.meta?.counts?.totalManagers ?? 0}
+                  </span>
+                  <span style={{ background: '#0f172a', padding: '0.25rem 0.55rem', borderRadius: '6px', color: '#34d399', fontWeight: 700 }}>
+                    Activos: {testResult.meta?.counts?.activos ?? 0}
+                  </span>
+                  <span style={{ background: '#0f172a', padding: '0.25rem 0.55rem', borderRadius: '6px', color: '#fbbf24', fontWeight: 700 }}>
+                    Graduados: {testResult.meta?.counts?.graduados ?? 0}
+                  </span>
+                  <span style={{ background: '#0f172a', padding: '0.25rem 0.55rem', borderRadius: '6px', color: '#c084fc', fontWeight: 700 }}>
+                    Equipos: {testResult.meta?.counts?.totalEquipos ?? 0}
+                  </span>
+                </div>
+                <pre style={{
+                  background: '#0f172a',
+                  color: '#a7f3d0',
+                  padding: '0.75rem',
+                  borderRadius: '8px',
+                  fontSize: '0.74rem',
+                  maxHeight: '220px',
+                  overflow: 'auto',
+                  margin: 0,
+                  border: '1px solid #334155'
+                }}>
+                  {JSON.stringify(testResult, null, 2).slice(0, 4000)}
+                </pre>
+              </div>
+            )}
+          </div>
+
+          {/* Snippets de Integración para Nodus */}
+          <div style={{
+            background: '#1e293b',
+            border: '1px solid rgba(148, 163, 184, 0.2)',
+            borderRadius: '12px',
+            padding: '1.15rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Code size={16} color="#fbbf24" /> Código de Integración para Nodus
+              </h4>
+              <div style={{ display: 'flex', gap: '0.4rem' }}>
+                {[
+                  { id: 'php', label: 'PHP / Laravel (Nodus)' },
+                  { id: 'curl', label: 'cURL' },
+                  { id: 'node', label: 'Node.js / JS' }
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setCodeTab(t.id)}
+                    style={{
+                      background: codeTab === t.id ? '#0284c7' : '#0f172a',
+                      color: '#fff',
+                      border: '1px solid #334155',
+                      borderRadius: '6px',
+                      padding: '0.3rem 0.6rem',
+                      cursor: 'pointer',
+                      fontSize: '0.74rem',
+                      fontWeight: 700
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => copyText(activeSnippet, 'snippet')}
+                  style={{
+                    background: copiedId === 'snippet' ? '#059669' : '#334155',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '0.3rem 0.65rem',
+                    cursor: 'pointer',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem'
+                  }}
+                >
+                  {copiedId === 'snippet' ? <Check size={12} /> : <Copy size={12} />}
+                  {copiedId === 'snippet' ? 'Copiado' : 'Copiar'}
+                </button>
+              </div>
+            </div>
+            <pre style={{
+              background: '#0f172a',
+              color: '#e2e8f0',
+              padding: '0.85rem',
+              borderRadius: '8px',
+              fontSize: '0.75rem',
+              maxHeight: '250px',
+              overflow: 'auto',
+              margin: 0,
+              border: '1px solid #334155',
+              lineHeight: 1.45
+            }}>
+              {activeSnippet}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -190892,6 +192095,7 @@ import {
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
 import TrainerCoherencePanel from '../components/TrainerCoherencePanel';
+import CentroManagersApiPanel from '../components/CentroManagersApiPanel';
 import { isCoherenceAdmin, assertLegacyTrainerEdit, matchesExplicitTrainer } from '../utils/trainerCoherence';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
 import { buildTeamKeyResolver } from '../utils/teamGrouping';
@@ -194554,6 +195758,27 @@ export default function CentroManagers() {
             <HelpButton helpKey="recargarDirectorio" onClick={() => setManagersReload(value => value + 1)} className="btn-secondary" style={{ color: textDark, borderColor: borderLight }}>
               Actualizar directorio
             </HelpButton>
+            {(canViewAll || currentUser?.isSuperAdmin || currentUser?.isGlobalObserver || currentUser?.appRole === 'observador') && (
+              <HelpButton
+                helpKey="api_nodusTab"
+                onClick={() => setActiveTab(activeTab === 'api_nodus' ? 'directorio' : 'api_nodus')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  padding: '0.45rem 0.9rem',
+                  fontSize: '0.82rem',
+                  fontWeight: 800,
+                  borderRadius: '8px',
+                  border: '1px solid #0284c7',
+                  background: activeTab === 'api_nodus' ? '#0284c7' : 'rgba(2, 132, 199, 0.12)',
+                  color: activeTab === 'api_nodus' ? '#ffffff' : '#0284c7',
+                  cursor: 'pointer'
+                }}
+              >
+                <Activity size={16} /> 🔌 API Nodus Sync
+              </HelpButton>
+            )}
             <div>
               <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Users size={24} /> Centro de Managers
@@ -194627,6 +195852,9 @@ export default function CentroManagers() {
             ] : []),
             ...(canViewLiquidacion ? [
               { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
+            ] : []),
+            ...((canViewAll || currentUser?.isSuperAdmin || currentUser?.isGlobalObserver || currentUser?.appRole === 'observador') ? [
+              { id: 'api_nodus', icon: Activity, label: '🔌 API Nodus Sync' }
             ] : [])
           ].map(t => (
             <HelpButton helpKey={managersTabHelpKeys[t.id]} key={t.id} onClick={() => setActiveTab(t.id)} style={{
@@ -194649,6 +195877,9 @@ export default function CentroManagers() {
         />
 
         {activeTab === 'coherencia' && isCoherenceAdmin(currentUser) && <TrainerCoherencePanel />}
+        {activeTab === 'api_nodus' && (canViewAll || currentUser?.isSuperAdmin || currentUser?.isGlobalObserver || currentUser?.appRole === 'observador') && (
+          <CentroManagersApiPanel onClose={() => setActiveTab('directorio')} />
+        )}
 
         {/* DIRECTORIO */}
         {activeTab === 'directorio' && (

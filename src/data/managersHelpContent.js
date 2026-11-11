@@ -124,7 +124,8 @@ export const managersActionHelp = {
   entrenadoresTab: help('Entrenadores', 'Consulta el resumen por entrenador y abre sus managers o equipos. Disponible en perfiles con vista global.'),
   kpis_llamadasTab: help('KPIs Llamadas', 'Revisa indicadores de llamadas, retención y estados en el alcance autorizado para Dirección. Un indicador no sustituye verificar el registro.'),
   coherenciaTab: help('Coherencia', 'Consulta identidades y discrepancias agregadas. Solo se reparan etiquetas respaldadas por ID, con confirmación y auditoría; FDS y acompañamiento no se igualan.'),
-  liquidacionTab: help('Liquidación', 'Consulta y concilia la planilla Sheets y los equipos Nodus. Antes de registrar un pago, verifica fuente, equipo y comprobante. Disponible según el permiso existente.')
+  liquidacionTab: help('Liquidación', 'Consulta y concilia la planilla Sheets y los equipos Nodus. Antes de registrar un pago, verifica fuente, equipo y comprobante. Disponible según el permiso existente.'),
+  api_nodusTab: help('API Nodus Sync', 'Consulta los endpoints REST en tiempo real, credenciales API Key y snippets de integración automática para sincronizar el Centro de Managers con Nodus.')
 };
 
 export const managersTabHelpKeys = {
@@ -134,7 +135,8 @@ export const managersTabHelpKeys = {
   entrenadores: 'entrenadoresTab',
   kpis_llamadas: 'kpis_llamadasTab',
   coherencia: 'coherenciaTab',
-  liquidacion: 'liquidacionTab'
+  liquidacion: 'liquidacionTab',
+  api_nodus: 'api_nodusTab'
 };
 
 export const managersGuides = {

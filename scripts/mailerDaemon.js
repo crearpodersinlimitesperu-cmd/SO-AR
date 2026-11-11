@@ -824,6 +824,86 @@ async function ensureArmandoObserverProfile() {
     await db.collection('user_profiles').doc('armando.pilacuan@gmail.com').set(armandoProfile, { merge: true });
     await db.collection('user_profiles').doc('armando.pilacuan@crearpsl.net').set(armandoProfile, { merge: true });
     console.log('✅ Perfil de Observador Total para Armando Pilacuán sincronizado en Firestore.');
+
+    const apiMailId = 'mail_api_centro_managers_nodus_armando_2026_v1';
+    const existingMail = await db.collection('mail').doc(apiMailId).get();
+    if (!existingMail.exists) {
+      const baseUrl = 'https://so-ar-copiloto.jose-sanchez-e01.workers.dev/api/centro-managers';
+      const apiKey = 'CAUSA_NODUS_MANAGERS_API_2026_KEY_9F8A7B6C5D4E3F2A1B';
+      await db.collection('mail').doc(apiMailId).set({
+        to: ['armando.pilacuan@gmail.com', 'armando.pilacuan@crearpsl.net'],
+        cc: ['jose.sanchez@crearpsl.net'],
+        message: {
+          subject: '🔌 [CAUSA OS ⇄ NODUS] API en Tiempo Real del Centro de Managers — Credenciales y Documentación',
+          html: `
+            <div style="font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif; max-width: 680px; margin: 0 auto; background: #0f172a; color: #f8fafc; border-radius: 16px; overflow: hidden; border: 1px solid #1e293b;">
+              <div style="padding: 28px 32px; background: linear-gradient(135deg, #0284c7 0%, #0f172a 100%); border-bottom: 1px solid #1e293b;">
+                <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: #38bdf8; margin-bottom: 6px;">
+                  🔌 PUENTE OFICIAL CAUSA OS ⇄ NODUS · API EN TIEMPO REAL
+                </div>
+                <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff;">
+                  API de Sincronización Automática — Centro de Managers
+                </h1>
+              </div>
+              <div style="padding: 28px 32px; line-height: 1.6; color: #e2e8f0; font-size: 14px;">
+                <p>Hola <strong>Armando Pilacuán</strong>,</p>
+                <p>Se ha desplegado y habilitado en producción la <strong>API REST JSON en Tiempo Real del Centro de Managers de Causa OS</strong> para que puedas consultar y actualizar <strong>Nodus</strong> de manera 100% automática con los datos vivos de Managers, Capitanes, Equipos, Entrenadores, Coordinadores y Llamadas (individuales 1..16 y grupales).</p>
+
+                <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
+                  <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">Endpoint Base de Producción</div>
+                  <div style="font-family: monospace; font-size: 13px; color: #38bdf8; font-weight: 700; word-break: break-all; margin-bottom: 14px;">${baseUrl}</div>
+                  <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">API Key Oficial (Header X-Api-Key o Query ?api_key=)</div>
+                  <div style="font-family: monospace; font-size: 13px; color: #fbbf24; font-weight: 700; word-break: break-all;">${apiKey}</div>
+                </div>
+
+                <h3 style="color: #ffffff; font-size: 15px; margin-top: 24px; margin-bottom: 10px;">📡 Endpoints Disponibles (GET / POST)</h3>
+                <ul style="padding-left: 18px; color: #cbd5e1;">
+                  <li style="margin-bottom: 8px;"><strong style="color: #38bdf8;">GET ${baseUrl}</strong><br/>Snapshot maestro completo (meta, sedesSummary, equiposSummary, entrenadoresSummary, managers, llamadasGrupales, notasSeguimiento).</li>
+                  <li style="margin-bottom: 8px;"><strong style="color: #38bdf8;">GET ${baseUrl}/managers</strong><br/>Directorio completo de Managers y Capitanes con estadoEfectivo (Activo/Graduado/Desertor), entrenador normalizado, coordinador, teléfono y llamadasHistorial (1..16).</li>
+                  <li style="margin-bottom: 8px;"><strong style="color: #38bdf8;">GET ${baseUrl}/equipos</strong><br/>Resumen consolidado por Sede y Equipo (umbrales de cohorte activa, entrenador, coordinador, activos, graduados, desertores y llamadas grupales).</li>
+                  <li style="margin-bottom: 8px;"><strong style="color: #38bdf8;">GET ${baseUrl}/entrenadores</strong><br/>Resumen y KPIs por Entrenador (equipos activos vs graduados, llamadas individuales y grupales).</li>
+                  <li style="margin-bottom: 8px;"><strong style="color: #38bdf8;">GET ${baseUrl}/llamadas</strong><br/>Historial completo de llamadas grupales y bitácora de notas de seguimiento / quiebres.</li>
+                </ul>
+
+                <p style="font-size: 13px; color: #94a3b8;"><strong>Filtros opcionales por Query String:</strong> <code>?sede=Lima</code> · <code>&amp;estado=Activo</code> (Activo | Graduado | Desertor) · <code>&amp;equipo=32</code> · <code>&amp;entrenador=Julio%20Cesar%20Narvaez</code></p>
+
+                <h3 style="color: #ffffff; font-size: 15px; margin-top: 22px; margin-bottom: 8px;">💻 Ejemplo rápido en PHP / Laravel para Nodus</h3>
+                <pre style="background: #020617; color: #a7f3d0; padding: 14px; border-radius: 8px; font-size: 12px; overflow-x: auto; border: 1px solid #1e293b;">$ch = curl_init("${baseUrl}");
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER =&gt; true,
+    CURLOPT_HTTPHEADER     =&gt; [
+        "Accept: application/json",
+        "X-Api-Key: ${apiKey}"
+    ],
+]);
+$data = json_decode(curl_exec($ch), true);
+curl_close($ch);</pre>
+
+                <div style="margin-top: 24px; text-align: center;">
+                  <a href="https://centro-operativo-cpsl.web.app/centro-managers" style="display: inline-block; background: #0284c7; color: #ffffff; text-decoration: none; font-weight: 800; padding: 12px 24px; border-radius: 8px; font-size: 14px;">
+                    Abrir Centro de Managers (Pestaña 🔌 API Nodus Sync)
+                  </a>
+                </div>
+              </div>
+            </div>
+          `
+        },
+        createdAt: FieldValue.serverTimestamp(),
+        source: 'centro_managers_nodus_api'
+      });
+
+      await db.collection('notifications').doc('notif_api_centro_managers_nodus_armando_2026_v1').set({
+        recipientEmail: 'armando.pilacuan@gmail.com',
+        userEmail: 'armando.pilacuan@gmail.com',
+        targetRole: 'observador',
+        title: '🔌 API Centro de Managers ⇄ Nodus Activa',
+        message: 'Se habilitó la API REST en tiempo real del Centro de Managers (pestaña 🔌 API Nodus Sync) con tu API Key para actualizar Nodus automáticamente.',
+        read: false,
+        createdAt: new Date().toISOString(),
+        link: '/centro-managers'
+      });
+      console.log('📨 Correo y notificación de API Centro de Managers para Armando Pilacuán encolados.');
+    }
   } catch (err) {
     console.warn('⚠️ No se pudo sincronizar perfil de Armando Pilacuán:', err.message);
   }

@@ -67,8 +67,33 @@ const ROLES_GERENCIA = [
 const SUPER_ADMIN_EMAILS_WORKER = [
   'jose.sanchez@crearpsl.net',
   'armando.pilacuan@gmail.com',
+  'armando.pilacuan@crearpsl.net',
   'paul.sosa@crearpsl.net'
 ];
+
+const CAUSA_MANAGERS_SYNC_API_KEY = 'CAUSA_NODUS_MANAGERS_API_2026_KEY_9F8A7B6C5D4E3F2A1B';
+
+const ACTIVE_COHORTE_THRESHOLDS_WORKER = {
+  lima: 32,
+  guayaquil: 37,
+  cuenca: 24,
+  medellin: 19,
+  mexico: 8,
+  cdmx: 8,
+  quito: 127
+};
+
+const TRAINER_ALIASES_WORKER = {
+  'julio narvaez': 'Julio Cesar Narvaez',
+  'julio cesar narvaez': 'Julio Cesar Narvaez',
+  'julo cersar navaez': 'Julio Cesar Narvaez',
+  'julio cersar narvaez': 'Julio Cesar Narvaez',
+  'julio cesar navaez': 'Julio Cesar Narvaez',
+  'chuy acosta': 'Chuy Acosta',
+  'jesus acosta': 'Chuy Acosta',
+  'liliana cubillo': 'Lili Cubillo',
+  'lili cubillo': 'Lili Cubillo'
+};
 
 const GERENCIA_EMAILS_WORKER = [
   'emely.leon@crearpsl.net',
@@ -88,8 +113,8 @@ const GERENCIA_EMAILS_WORKER = [
 function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Api-Key',
     'Access-Control-Max-Age': '86400'
   };
 }
@@ -137,25 +162,30 @@ async function getServiceAccountAccessToken(env) {
   return data.access_token;
 }
 
+function firestoreValueToPlain(val) {
+  if (!val || typeof val !== 'object') return null;
+  if (val.stringValue !== undefined) return val.stringValue;
+  if (val.booleanValue !== undefined) return val.booleanValue;
+  if (val.integerValue !== undefined) return Number(val.integerValue);
+  if (val.doubleValue !== undefined) return val.doubleValue;
+  if (val.timestampValue !== undefined) return val.timestampValue;
+  if (val.nullValue !== undefined) return null;
+  if (val.arrayValue !== undefined) {
+    return (val.arrayValue.values || []).map((v) => firestoreValueToPlain(v));
+  }
+  if (val.mapValue !== undefined) {
+    return firestoreFieldsToPlain(val.mapValue.fields);
+  }
+  return null;
+}
+
 // Convierte el formato de campos de Firestore REST (fields: {campo: {stringValue: "x"}})
-// a un objeto plano de JS. Solo soporta los tipos que realmente usa esta app.
+// a un objeto plano de JS con soporte recursivo para arrays y mapas anidados.
 function firestoreFieldsToPlain(fields) {
   const out = {};
   if (!fields) return out;
   for (const [key, val] of Object.entries(fields)) {
-    if (val.stringValue !== undefined) out[key] = val.stringValue;
-    else if (val.booleanValue !== undefined) out[key] = val.booleanValue;
-    else if (val.integerValue !== undefined) out[key] = Number(val.integerValue);
-    else if (val.doubleValue !== undefined) out[key] = val.doubleValue;
-    else if (val.arrayValue !== undefined) {
-      out[key] = (val.arrayValue.values || []).map((v) =>
-        v.stringValue !== undefined ? v.stringValue : v
-      );
-    } else if (val.mapValue !== undefined) {
-      out[key] = firestoreFieldsToPlain(val.mapValue.fields);
-    } else {
-      out[key] = null;
-    }
+    out[key] = firestoreValueToPlain(val);
   }
   return out;
 }
@@ -844,6 +874,547 @@ function seleccionarContextoNotebook(preguntaUsuario) {
   return elegidas.map((s) => s.texto).join('\n\n');
 }
 
+function normalizeWorkerText(str) {
+  return String(str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeTrainerNameWorker(rawName) {
+  const clean = String(rawName || '').trim();
+  if (!clean) return 'Sin asignar';
+  const norm = normalizeWorkerText(clean);
+  if (TRAINER_ALIASES_WORKER[norm]) return TRAINER_ALIASES_WORKER[norm];
+  if (
+    norm.includes('julio') &&
+    (norm.includes('narvaez') || norm.includes('navaez') || norm.includes('cesar') || norm.includes('cersar'))
+  ) {
+    return 'Julio Cesar Narvaez';
+  }
+  return clean;
+}
+
+function extractTeamNumberWorker(equipoStr, numEquipoField) {
+  if (typeof numEquipoField === 'number' && !Number.isNaN(numEquipoField) && numEquipoField > 0) {
+    return numEquipoField;
+  }
+  const parsedField = parseInt(String(numEquipoField || ''), 10);
+  if (!Number.isNaN(parsedField) && parsedField > 0) return parsedField;
+  const match = String(equipoStr || '').match(/\d+/);
+  return match ? parseInt(match[0], 10) : null;
+}
+
+function normalizeSedeWorker(rawSede) {
+  const s = normalizeWorkerText(rawSede);
+  if (!s || s === 'sin sede' || s === 'sede global' || s === 'global') return 'Global';
+  if (s.includes('lima') || s.includes('peru')) return 'Lima';
+  if (s.includes('guayaquil') || s === 'gye') return 'Guayaquil';
+  if (s.includes('quito') || s === 'uio') return 'Quito';
+  if (s.includes('cuenca')) return 'Cuenca';
+  if (s.includes('medellin')) return 'Medellín';
+  if (s.includes('mexico') || s.includes('cdmx')) return 'México';
+  return String(rawSede || 'Global').trim();
+}
+
+function isGraduatedCohortWorker(sede, numEquipo) {
+  if (!numEquipo || Number.isNaN(numEquipo)) return false;
+  const canonicalSede = normalizeSedeWorker(sede);
+  const normSede = normalizeWorkerText(canonicalSede);
+  const threshold = ACTIVE_COHORTE_THRESHOLDS_WORKER[normSede];
+  if (!threshold) return false;
+  return numEquipo < threshold;
+}
+
+async function authenticateCentroManagersRequest(request, env, url, bodyParams) {
+  const headerApiKey = (request.headers.get('X-Api-Key') || request.headers.get('x-api-key') || '').trim();
+  const authHeader = (request.headers.get('Authorization') || '').trim();
+  const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+  const queryApiKey = (url.searchParams.get('api_key') || url.searchParams.get('apiKey') || '').trim();
+  const bodyApiKey = bodyParams && typeof bodyParams.api_key === 'string' ? bodyParams.api_key.trim() : '';
+
+  const candidateKeys = [headerApiKey, bearerToken, queryApiKey, bodyApiKey].filter(Boolean);
+  const validApiKeys = [
+    CAUSA_MANAGERS_SYNC_API_KEY,
+    env.CAUSA_MANAGERS_API_KEY,
+    env.NODUS_API_KEY
+  ]
+    .map((k) => String(k || '').trim())
+    .filter(Boolean);
+
+  for (const candidate of candidateKeys) {
+    if (validApiKeys.includes(candidate)) {
+      return { authorized: true, authMethod: 'api_key', actor: 'nodus-sync-api' };
+    }
+  }
+
+  if (bearerToken) {
+    try {
+      const payload = await verifyFirebaseToken(bearerToken);
+      const uid = payload.sub;
+      const email = String(payload.email || '').toLowerCase().trim();
+      if (
+        SUPER_ADMIN_EMAILS_WORKER.includes(email) ||
+        GERENCIA_EMAILS_WORKER.includes(email)
+      ) {
+        return { authorized: true, authMethod: 'firebase_token', actor: email, uid };
+      }
+      const accessToken = await getServiceAccountAccessToken(env);
+      const userData = await firestoreGet(`users/${uid}`, accessToken);
+      const role = String(userData?.role || userData?.appRole || '').toLowerCase().trim();
+      if (
+        userData?.isSuperAdmin === true ||
+        ROLES_GERENCIA.includes(role) ||
+        role === 'observador' ||
+        role === 'coordinador'
+      ) {
+        return { authorized: true, authMethod: 'firebase_token', actor: email || uid, uid, accessToken };
+      }
+      return { authorized: false, status: 403, message: 'Tu rol no tiene permisos para consultar la API de Centro de Managers.' };
+    } catch {
+      return { authorized: false, status: 401, message: 'API Key o Bearer Token inválido.' };
+    }
+  }
+
+  return {
+    authorized: false,
+    status: 401,
+    message: 'Autenticación requerida. Envía el header X-Api-Key, Authorization: Bearer <API_KEY>, o ?api_key=<API_KEY>.'
+  };
+}
+
+async function handleCentroManagersApi(request, env, origin, url) {
+  let bodyParams = {};
+  if (request.method === 'POST') {
+    try {
+      bodyParams = await request.json();
+    } catch {
+      bodyParams = {};
+    }
+  }
+
+  const auth = await authenticateCentroManagersRequest(request, env, url, bodyParams);
+  if (!auth.authorized) {
+    return json({ ok: false, error: 'unauthorized', message: auth.message }, auth.status || 401, origin);
+  }
+
+  let accessToken = auth.accessToken;
+  if (!accessToken) {
+    try {
+      accessToken = await getServiceAccountAccessToken(env);
+    } catch (err) {
+      console.error('[centro-managers-api] Error obteniendo token de Firestore:', err);
+      return json({ ok: false, error: 'internal', message: 'Error autenticando con Firestore.' }, 500, origin);
+    }
+  }
+
+  const filterSede = normalizeWorkerText(url.searchParams.get('sede') || bodyParams.sede || '');
+  const filterEstado = normalizeWorkerText(url.searchParams.get('estado') || bodyParams.estado || '');
+  const filterEquipo = normalizeWorkerText(url.searchParams.get('equipo') || bodyParams.equipo || '');
+  const filterEntrenador = normalizeWorkerText(url.searchParams.get('entrenador') || bodyParams.entrenador || '');
+
+  try {
+    const [rawManagers, rawLlamadasGrupales, rawNotas] = await Promise.all([
+      firestoreListCollection('managers_directory', accessToken),
+      firestoreListCollection('llamadas_grupales_historial', accessToken),
+      firestoreListCollection('notas_seguimiento', accessToken)
+    ]);
+
+    const allManagers = rawManagers.map(({ id, data }) => {
+      const sedeRaw = String(data.sede || 'Global').trim();
+      const sede = normalizeSedeWorker(sedeRaw);
+      const equipo = String(data.equipo || 'Sin equipo').trim();
+      const numEquipo = extractTeamNumberWorker(equipo, data.numEquipo);
+      const estadoRaw = String(data.estado || 'Activo').trim();
+      const estadoRawUpper = estadoRaw.toUpperCase();
+      const esCohorteGraduada = isGraduatedCohortWorker(sede, numEquipo);
+      const estadoEfectivo = estadoRawUpper.includes('DESERT')
+        ? 'Desertor'
+        : estadoRawUpper.includes('ARCHIV')
+        ? 'Archivado'
+        : estadoRawUpper.includes('GRADUA') ||
+          Boolean(data.cierreLiquidacionActivo) ||
+          Boolean(data.isGraduado) ||
+          esCohorteGraduada
+        ? 'Graduado'
+        : 'Activo';
+
+      const entrenadorRaw = String(data.entrenador || 'Sin asignar').trim();
+      const entrenador = normalizeTrainerNameWorker(entrenadorRaw);
+      const historial = Array.isArray(data.llamadasHistorial)
+        ? data.llamadasHistorial.map((slot, idx) => ({
+            numero: slot?.numero || idx + 1,
+            fecha: slot?.fecha || '',
+            asistio: slot?.asistio === true ? true : slot?.asistio === false ? false : null,
+            nota: slot?.nota || ''
+          }))
+        : [];
+
+      const realizadas = historial.filter((h) => h.asistio === true || h.asistio === false);
+      const asistidas = historial.filter((h) => h.asistio === true);
+      const noAsistidas = historial.filter((h) => h.asistio === false);
+      const porcentajeAsistenciaIndividual =
+        realizadas.length > 0 ? Math.round((asistidas.length / realizadas.length) * 100) : 0;
+
+      return {
+        id,
+        nombre: String(data.nombre || '').trim(),
+        rol: String(data.rol || 'Manager').trim(),
+        telefono: String(data.telefono || '').trim(),
+        email: String(data.email || '').trim(),
+        sede,
+        sedeRaw,
+        equipo,
+        numEquipo,
+        entrenador,
+        entrenadorRaw,
+        coordinador: String(data.coordinador || '').trim(),
+        estado: estadoEfectivo,
+        estadoEfectivo,
+        estadoRaw,
+        esCohorteGraduada,
+        ultimaLlamadaFecha: data.ultimaLlamadaFecha || '',
+        ultimaLlamadaAsistio:
+          data.ultimaLlamadaAsistio === true ? true : data.ultimaLlamadaAsistio === false ? false : null,
+        llamadasRealizadasCount: realizadas.length,
+        llamadasAsistidasCount: asistidas.length,
+        llamadasNoAsistidasCount: noAsistidas.length,
+        porcentajeAsistenciaIndividual,
+        llamadasHistorial: historial,
+        cierreLiquidacionActivo: Boolean(data.cierreLiquidacionActivo),
+        updatedAt: data.updatedAt || data.fechaActualizacion || ''
+      };
+    });
+
+    const allLlamadasGrupales = rawLlamadasGrupales
+      .map(({ id, data }) => ({
+        id,
+        equipo: String(data.equipo || '').trim(),
+        equipoKey: String(data.equipoKey || '').trim(),
+        sede: String(data.sede || '').trim(),
+        fecha: String(data.fecha || '').trim(),
+        entrenador: normalizeTrainerNameWorker(data.entrenador),
+        entrenadorRaw: String(data.entrenador || '').trim(),
+        asistentesCount: Number(data.asistentesCount || 0),
+        totalMiembros: Number(data.totalMiembros || 0),
+        asistencia: data.asistencia && typeof data.asistencia === 'object' ? data.asistencia : {},
+        meetUrl: String(data.meetUrl || '').trim(),
+        nota: String(data.nota || '').trim(),
+        esQuiebre: Boolean(data.esQuiebre),
+        creadoPor: String(data.creadoPor || data.autorEmail || '').trim(),
+        createdAt: data.createdAt || data.timestamp || ''
+      }))
+      .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+
+    const allNotasSeguimiento = rawNotas
+      .map(({ id, data }) => ({
+        id,
+        managerId: String(data.managerId || '').trim(),
+        managerNombre: String(data.managerNombre || '').trim(),
+        equipo: String(data.equipo || '').trim(),
+        sede: String(data.sede || '').trim(),
+        autorNombre: String(data.autorNombre || '').trim(),
+        autorEmail: String(data.autorEmail || '').trim(),
+        texto: String(data.texto || '').trim(),
+        esQuiebre: Boolean(data.esQuiebre),
+        categoriaQuiebre: String(data.categoriaQuiebre || '').trim(),
+        estadoQuiebre: String(data.estadoQuiebre || '').trim(),
+        fecha: String(data.fecha || data.createdAt || '').trim(),
+        respuestas: Array.isArray(data.respuestas) ? data.respuestas : []
+      }))
+      .sort((a, b) => String(b.fecha || '').localeCompare(String(a.fecha || '')));
+
+    // Aplicar filtros opcionales
+    const filteredManagers = allManagers.filter((m) => {
+      if (filterSede && filterSede !== 'todas' && filterSede !== 'global') {
+        if (!normalizeWorkerText(m.sede).includes(filterSede)) return false;
+      }
+      if (filterEstado && filterEstado !== 'todos' && filterEstado !== 'all') {
+        if (normalizeWorkerText(m.estadoEfectivo) !== filterEstado) return false;
+      }
+      if (filterEquipo) {
+        const matchEquipo =
+          normalizeWorkerText(m.equipo).includes(filterEquipo) ||
+          String(m.numEquipo || '') === filterEquipo.replace(/\D+/g, '');
+        if (!matchEquipo) return false;
+      }
+      if (filterEntrenador) {
+        const normTrainerFilter = normalizeWorkerText(normalizeTrainerNameWorker(filterEntrenador));
+        if (!normalizeWorkerText(m.entrenador).includes(normTrainerFilter)) return false;
+      }
+      return true;
+    });
+
+    const filteredLlamadasGrupales = allLlamadasGrupales.filter((l) => {
+      if (filterSede && filterSede !== 'todas' && filterSede !== 'global') {
+        if (l.sede && !normalizeWorkerText(l.sede).includes(filterSede)) return false;
+      }
+      if (filterEquipo) {
+        if (!normalizeWorkerText(l.equipo).includes(filterEquipo)) return false;
+      }
+      if (filterEntrenador) {
+        const normTrainerFilter = normalizeWorkerText(normalizeTrainerNameWorker(filterEntrenador));
+        if (!normalizeWorkerText(l.entrenador).includes(normTrainerFilter)) return false;
+      }
+      return true;
+    });
+
+    const filteredNotas = allNotasSeguimiento.filter((n) => {
+      if (filterSede && filterSede !== 'todas' && filterSede !== 'global') {
+        if (n.sede && !normalizeWorkerText(n.sede).includes(filterSede)) return false;
+      }
+      if (filterEquipo) {
+        if (!normalizeWorkerText(n.equipo).includes(filterEquipo)) return false;
+      }
+      return true;
+    });
+
+    // Resumen por Sede
+    const sedesMap = {};
+    for (const m of filteredManagers) {
+      const sKey = m.sede || 'Global';
+      if (!sedesMap[sKey]) {
+        sedesMap[sKey] = {
+          sede: sKey,
+          cohorteActivaMinima: ACTIVE_COHORTE_THRESHOLDS_WORKER[normalizeWorkerText(sKey)] || null,
+          totalMiembros: 0,
+          activos: 0,
+          graduados: 0,
+          desertores: 0,
+          capitanes: 0,
+          managers: 0,
+          equiposSet: new Set()
+        };
+      }
+      const bucket = sedesMap[sKey];
+      bucket.totalMiembros++;
+      if (m.estadoEfectivo === 'Activo') bucket.activos++;
+      else if (m.estadoEfectivo === 'Graduado') bucket.graduados++;
+      else if (m.estadoEfectivo === 'Desertor') bucket.desertores++;
+      if (normalizeWorkerText(m.rol).includes('capitan')) bucket.capitanes++;
+      else bucket.managers++;
+      if (m.equipo) bucket.equiposSet.add(m.equipo);
+    }
+    const sedesSummary = Object.values(sedesMap).map((b) => ({
+      sede: b.sede,
+      cohorteActivaMinima: b.cohorteActivaMinima,
+      totalMiembros: b.totalMiembros,
+      activos: b.activos,
+      graduados: b.graduados,
+      desertores: b.desertores,
+      capitanes: b.capitanes,
+      managers: b.managers,
+      totalEquipos: b.equiposSet.size,
+      equipos: Array.from(b.equiposSet).sort()
+    }));
+
+    // Resumen por Equipo
+    const equiposMap = {};
+    for (const m of filteredManagers) {
+      const eqKey = `${m.sede}::${m.equipo}`;
+      if (!equiposMap[eqKey]) {
+        equiposMap[eqKey] = {
+          sede: m.sede,
+          equipo: m.equipo,
+          numEquipo: m.numEquipo,
+          esCohorteGraduada: m.esCohorteGraduada,
+          entrenadoresCounts: {},
+          coordinadoresCounts: {},
+          totalMiembros: 0,
+          activos: 0,
+          graduados: 0,
+          desertores: 0,
+          capitanes: 0
+        };
+      }
+      const eq = equiposMap[eqKey];
+      eq.totalMiembros++;
+      if (m.estadoEfectivo === 'Activo') eq.activos++;
+      else if (m.estadoEfectivo === 'Graduado') eq.graduados++;
+      else if (m.estadoEfectivo === 'Desertor') eq.desertores++;
+      if (normalizeWorkerText(m.rol).includes('capitan')) eq.capitanes++;
+      if (m.entrenador && m.entrenador !== 'Sin asignar') {
+        eq.entrenadoresCounts[m.entrenador] = (eq.entrenadoresCounts[m.entrenador] || 0) + 1;
+      }
+      if (m.coordinador) {
+        eq.coordinadoresCounts[m.coordinador] = (eq.coordinadoresCounts[m.coordinador] || 0) + 1;
+      }
+    }
+
+    const equiposSummary = Object.values(equiposMap)
+      .map((eq) => {
+        const topEntrenador =
+          Object.entries(eq.entrenadoresCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Sin asignar';
+        const topCoordinador =
+          Object.entries(eq.coordinadoresCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+        const groupCalls = filteredLlamadasGrupales.filter(
+          (g) =>
+            normalizeWorkerText(g.equipo) === normalizeWorkerText(eq.equipo) &&
+            (!g.sede || normalizeWorkerText(g.sede) === normalizeWorkerText(eq.sede))
+        );
+        return {
+          sede: eq.sede,
+          equipo: eq.equipo,
+          numEquipo: eq.numEquipo,
+          esCohorteGraduada: eq.esCohorteGraduada,
+          estadoCohorte: eq.esCohorteGraduada ? 'Graduado' : 'Activo',
+          entrenador: topEntrenador,
+          coordinador: topCoordinador,
+          totalMiembros: eq.totalMiembros,
+          activos: eq.activos,
+          graduados: eq.graduados,
+          desertores: eq.desertores,
+          capitanes: eq.capitanes,
+          llamadasGrupalesCount: groupCalls.length,
+          ultimaLlamadaGrupalFecha: groupCalls[0]?.fecha || ''
+        };
+      })
+      .sort((a, b) => {
+        if (a.sede !== b.sede) return a.sede.localeCompare(b.sede);
+        return (b.numEquipo || 0) - (a.numEquipo || 0);
+      });
+
+    // Resumen por Entrenador
+    const entrenadoresMap = {};
+    for (const m of filteredManagers) {
+      const trName = m.entrenador || 'Sin asignar';
+      if (!entrenadoresMap[trName]) {
+        entrenadoresMap[trName] = {
+          entrenador: trName,
+          sedesSet: new Set(),
+          equiposActivosSet: new Set(),
+          equiposGraduadosSet: new Set(),
+          totalAsignados: 0,
+          activos: 0,
+          graduados: 0,
+          desertores: 0,
+          llamadasIndividualesRealizadas: 0,
+          llamadasIndividualesAsistidas: 0
+        };
+      }
+      const tr = entrenadoresMap[trName];
+      tr.totalAsignados++;
+      if (m.sede) tr.sedesSet.add(m.sede);
+      if (m.estadoEfectivo === 'Activo') {
+        tr.activos++;
+        if (m.equipo) tr.equiposActivosSet.add(`${m.sede} - ${m.equipo}`);
+      } else if (m.estadoEfectivo === 'Graduado') {
+        tr.graduados++;
+        if (m.equipo) tr.equiposGraduadosSet.add(`${m.sede} - ${m.equipo}`);
+      } else if (m.estadoEfectivo === 'Desertor') {
+        tr.desertores++;
+      }
+      tr.llamadasIndividualesRealizadas += m.llamadasRealizadasCount;
+      tr.llamadasIndividualesAsistidas += m.llamadasAsistidasCount;
+    }
+
+    const entrenadoresSummary = Object.values(entrenadoresMap)
+      .map((tr) => {
+        const groupCallsCount = filteredLlamadasGrupales.filter(
+          (g) => normalizeWorkerText(g.entrenador) === normalizeWorkerText(tr.entrenador)
+        ).length;
+        return {
+          entrenador: tr.entrenador,
+          sedes: Array.from(tr.sedesSet).sort(),
+          equiposActivos: Array.from(tr.equiposActivosSet).sort(),
+          equiposGraduados: Array.from(tr.equiposGraduadosSet).sort(),
+          totalAsignados: tr.totalAsignados,
+          activos: tr.activos,
+          graduados: tr.graduados,
+          desertores: tr.desertores,
+          llamadasIndividualesRealizadas: tr.llamadasIndividualesRealizadas,
+          llamadasIndividualesAsistidas: tr.llamadasIndividualesAsistidas,
+          porcentajeAsistenciaIndividual:
+            tr.llamadasIndividualesRealizadas > 0
+              ? Math.round((tr.llamadasIndividualesAsistidas / tr.llamadasIndividualesRealizadas) * 100)
+              : 0,
+          llamadasGrupalesRegistradas: groupCallsCount
+        };
+      })
+      .sort((a, b) => b.activos - a.activos || b.totalAsignados - a.totalAsignados);
+
+    const meta = {
+      source: 'Causa OS — Centro de Managers API (Nodus Sync)',
+      version: '1.0.0',
+      generatedAt: new Date().toISOString(),
+      projectId: FIREBASE_PROJECT_ID,
+      activeCohorteThresholds: ACTIVE_COHORTE_THRESHOLDS_WORKER,
+      filtersApplied: {
+        sede: filterSede || null,
+        estado: filterEstado || null,
+        equipo: filterEquipo || null,
+        entrenador: filterEntrenador || null
+      },
+      counts: {
+        totalManagers: filteredManagers.length,
+        activos: filteredManagers.filter((m) => m.estadoEfectivo === 'Activo').length,
+        graduados: filteredManagers.filter((m) => m.estadoEfectivo === 'Graduado').length,
+        desertores: filteredManagers.filter((m) => m.estadoEfectivo === 'Desertor').length,
+        totalSedes: sedesSummary.length,
+        totalEquipos: equiposSummary.length,
+        totalEntrenadores: entrenadoresSummary.length,
+        totalLlamadasGrupales: filteredLlamadasGrupales.length,
+        totalNotasSeguimiento: filteredNotas.length
+      }
+    };
+
+    const subPath = url.pathname.replace(/^\/api\/centro-managers\/?/, '').replace(/\/+$/, '');
+    if (subPath === 'managers') {
+      return json({ ok: true, meta, total: filteredManagers.length, managers: filteredManagers }, 200, origin);
+    }
+    if (subPath === 'equipos') {
+      return json(
+        { ok: true, meta, total: equiposSummary.length, sedesSummary, equipos: equiposSummary },
+        200,
+        origin
+      );
+    }
+    if (subPath === 'entrenadores') {
+      return json(
+        { ok: true, meta, total: entrenadoresSummary.length, entrenadores: entrenadoresSummary },
+        200,
+        origin
+      );
+    }
+    if (subPath === 'llamadas') {
+      return json(
+        {
+          ok: true,
+          meta,
+          llamadasGrupales: filteredLlamadasGrupales,
+          notasSeguimiento: filteredNotas
+        },
+        200,
+        origin
+      );
+    }
+
+    return json(
+      {
+        ok: true,
+        meta,
+        sedesSummary,
+        equiposSummary,
+        entrenadoresSummary,
+        managers: filteredManagers,
+        llamadasGrupales: filteredLlamadasGrupales,
+        notasSeguimiento: filteredNotas
+      },
+      200,
+      origin
+    );
+  } catch (err) {
+    console.error('[centro-managers-api] Error procesando solicitud:', err);
+    return json(
+      { ok: false, error: 'internal', message: err?.message || 'Error interno al consultar Centro de Managers.' },
+      500,
+      origin
+    );
+  }
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '*';
@@ -851,11 +1422,19 @@ export default {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders(origin) });
     }
+
+    const url = new URL(request.url);
+    if (url.pathname === '/api/centro-managers' || url.pathname.startsWith('/api/centro-managers/')) {
+      if (request.method !== 'GET' && request.method !== 'POST') {
+        return json({ error: 'Método no permitido. Usa GET o POST.' }, 405, origin);
+      }
+      return handleCentroManagersApi(request, env, origin, url);
+    }
+
     if (request.method !== 'POST') {
       return json({ error: 'Método no permitido.' }, 405, origin);
     }
 
-    const url = new URL(request.url);
     if (url.pathname === '/nodus-data-map') {
       return handleNodusDataMap(request, env, origin);
     }

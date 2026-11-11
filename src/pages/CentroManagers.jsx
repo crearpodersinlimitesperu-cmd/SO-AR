@@ -76,6 +76,7 @@ import {
 import CMJDashboard from '../components/CMJDashboard';
 import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
 import TrainerCoherencePanel from '../components/TrainerCoherencePanel';
+import CentroManagersApiPanel from '../components/CentroManagersApiPanel';
 import { isCoherenceAdmin, assertLegacyTrainerEdit, matchesExplicitTrainer } from '../utils/trainerCoherence';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
 import { buildTeamKeyResolver } from '../utils/teamGrouping';
@@ -3738,6 +3739,27 @@ export default function CentroManagers() {
             <HelpButton helpKey="recargarDirectorio" onClick={() => setManagersReload(value => value + 1)} className="btn-secondary" style={{ color: textDark, borderColor: borderLight }}>
               Actualizar directorio
             </HelpButton>
+            {(canViewAll || currentUser?.isSuperAdmin || currentUser?.isGlobalObserver || currentUser?.appRole === 'observador') && (
+              <HelpButton
+                helpKey="api_nodusTab"
+                onClick={() => setActiveTab(activeTab === 'api_nodus' ? 'directorio' : 'api_nodus')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  padding: '0.45rem 0.9rem',
+                  fontSize: '0.82rem',
+                  fontWeight: 800,
+                  borderRadius: '8px',
+                  border: '1px solid #0284c7',
+                  background: activeTab === 'api_nodus' ? '#0284c7' : 'rgba(2, 132, 199, 0.12)',
+                  color: activeTab === 'api_nodus' ? '#ffffff' : '#0284c7',
+                  cursor: 'pointer'
+                }}
+              >
+                <Activity size={16} /> 🔌 API Nodus Sync
+              </HelpButton>
+            )}
             <div>
               <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Users size={24} /> Centro de Managers
@@ -3811,6 +3833,9 @@ export default function CentroManagers() {
             ] : []),
             ...(canViewLiquidacion ? [
               { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
+            ] : []),
+            ...((canViewAll || currentUser?.isSuperAdmin || currentUser?.isGlobalObserver || currentUser?.appRole === 'observador') ? [
+              { id: 'api_nodus', icon: Activity, label: '🔌 API Nodus Sync' }
             ] : [])
           ].map(t => (
             <HelpButton helpKey={managersTabHelpKeys[t.id]} key={t.id} onClick={() => setActiveTab(t.id)} style={{
@@ -3833,6 +3858,9 @@ export default function CentroManagers() {
         />
 
         {activeTab === 'coherencia' && isCoherenceAdmin(currentUser) && <TrainerCoherencePanel />}
+        {activeTab === 'api_nodus' && (canViewAll || currentUser?.isSuperAdmin || currentUser?.isGlobalObserver || currentUser?.appRole === 'observador') && (
+          <CentroManagersApiPanel onClose={() => setActiveTab('directorio')} />
+        )}
 
         {/* DIRECTORIO */}
         {activeTab === 'directorio' && (
