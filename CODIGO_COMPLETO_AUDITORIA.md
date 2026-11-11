@@ -1045,21 +1045,19 @@ const regexNames = /export const NOMBRES_LEGALES_ENTRENADORES = ({[\s\S]*?});/
 <!doctype html>
 <html lang="es">
   <head>
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20261111b">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261111b">
-  <link rel="icon" type="image/png" href="/logo-crear.png?v=20261111b">
-  <link rel="icon" type="image/png" href="/logo_crear_oficial.png?v=20261111b">
-  <link rel="shortcut icon" href="/favicon.ico?v=20261111b">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261111b">
     <meta charset="UTF-8" />
-    <link rel="apple-touch-icon" href="/logo-crear.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Causa OS — Centro Operativo</title>
     <meta name="description" content="Causa OS — Centro de Liderazgo y Orquestación" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20261111c" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261111c" />
+    <link rel="icon" type="image/png" href="/logo-crear.png?v=20261111c" />
+    <link rel="shortcut icon" href="/favicon.ico?v=20261111c" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20261111c" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Causa OS — Centro Operativo</title>
     <!-- Fuentes de Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -187784,8 +187782,51 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
   return false;
 };
 
+// Resuelve deterministamente el estado efectivo de un manager considerando su ciclo de vida y eventos de graduación
+export const resolveManagerEstado = (m, eventsList = null) => {
+  if (!m) return 'Activo';
+  const raw = m.estado;
+  const s = String(raw || '').trim().toUpperCase();
+  if (s.includes('GRADUA')) return 'Graduado';
+  if (s.includes('DESERT')) return 'Desertor';
+  if (s.includes('ARCHIV')) return 'Archivado';
+
+  // Si tiene cierre de liquidación activo o bandera isGraduado, su ciclo concluyó formalmente
+  if (m.cierreLiquidacionActivo || m.isGraduado) {
+    return 'Graduado';
+  }
+
+  // Si se dispone de eventos de calendario y el evento "EL VIAJE" (graduación) ya ocurrió, está Graduado
+  if (eventsList && Array.isArray(eventsList) && eventsList.length > 0) {
+    const mSede = normalizeSede(m.sede);
+    const mNum = getTeamNumericValue(m);
+    if (mNum !== 999999) {
+      const today = Date.now();
+      const viajeEvent = eventsList.find(e => {
+        const eNombre = String(e.nombre || e.name || '').toUpperCase();
+        if (!eNombre.includes('VIAJE') && !eNombre.includes('FIN DE SEMANA') && !eNombre.includes('RETIRO')) return false;
+        const eSede = normalizeSede(e.sede || e.sedeTag);
+        if (eSede !== mSede) return false;
+        const eNum = getTeamNumericValue({ equipo: e.equipo || e.team || '', numEquipo: e.equipo || e.numEquipo });
+        return eNum === mNum && eNum !== 999999;
+      });
+      if (viajeEvent) {
+        const targetDate = new Date(viajeEvent.fecha_fin || viajeEvent.end || viajeEvent.fecha_inicio || viajeEvent.start).getTime();
+        if (!isNaN(targetDate) && today > targetDate) {
+          return 'Graduado';
+        }
+      }
+    }
+  }
+
+  if (s.includes('ACTIV') || s.includes('EN_JUEGO') || s === 'SI') return 'Activo';
+  return raw ? String(raw).trim() : 'Activo';
+};
+
 // Normaliza el estado de un manager para evitar fallos por mayúsculas/minúsculas o espacios
-export const normalizeManagerEstado = (estado) => {
+export const normalizeManagerEstado = (estado, m = null, eventsList = null) => {
+  if (estado && typeof estado === 'object') return resolveManagerEstado(estado, m || eventsList);
+  if (m) return resolveManagerEstado(m, eventsList);
   const s = String(estado || '').trim().toUpperCase();
   if (s.includes('GRADUA')) return 'Graduado';
   if (s.includes('DESERT')) return 'Desertor';
@@ -188203,8 +188244,8 @@ export default function CentroManagers() {
 
     activeTeams.forEach((teamMembers, key) => {
       const [sede, equipoStr] = key.split('_');
-      // Extraemos el numero real del equipo para comparar exacto
-      const equipoNum = getTeamNumericValue({ equipo: equipoStr });
+      // Extraemos el numero real del equipo para comparar exacto (usando teamMembers[0] o el string)
+      const equipoNum = getTeamNumericValue(teamMembers[0]) || getTeamNumericValue({ equipo: equipoStr });
 
       const viajeEvent = events.find(e => {
         const eNombre = String(e.nombre || e.name || '').toUpperCase();
@@ -188213,7 +188254,7 @@ export default function CentroManagers() {
         const eSede = normalizeSede(e.sede || e.sedeTag);
         if (eSede !== sede) return false;
         
-        const eNum = getTeamNumericValue({ equipo: e.equipo || e.team || '' });
+        const eNum = getTeamNumericValue({ equipo: e.equipo || e.team || '', numEquipo: e.equipo || e.numEquipo });
         return eNum === equipoNum && eNum !== 999999;
       });
 
@@ -188495,7 +188536,13 @@ export default function CentroManagers() {
       }
 
       // 5. Filtro Estado (Todos / Activo / Graduado / Desertor)
-      if (statusFilter !== 'Todos' && normalizeManagerEstado(m.estado) !== statusFilter) return false;
+      if (statusFilter !== 'Todos') {
+        const currentEvents = typeof events !== 'undefined' ? events : null;
+        const mEffectiveEstado = typeof resolveManagerEstado === 'function'
+          ? resolveManagerEstado(m, currentEvents)
+          : (m.estado || 'Activo');
+        if (mEffectiveEstado !== statusFilter) return false;
+      }
 
       // 6. Búsqueda texto
       if (search.trim()) {
@@ -188506,7 +188553,7 @@ export default function CentroManagers() {
 
       return true;
     });
-  }, [managers, search, filterSede, filterEntrenador, filterEquipo, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser, teamKeyOf]);
+  }, [managers, search, filterSede, filterEntrenador, filterEquipo, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser, teamKeyOf, events]);
 
   // Agrupación de equipos
   const [groupLifecycleFilter, setGroupLifecycleFilter] = useState('Activos'); // 'Activos' | 'Archivo' | 'Todos'
@@ -188564,6 +188611,11 @@ export default function CentroManagers() {
     });
 
     // 2. Agrupar managers en equipos identificando miembros activos vs archivo
+    const currentEvents = typeof events !== 'undefined' ? events : null;
+    const getEffectiveEstado = (m) => typeof resolveManagerEstado === 'function'
+      ? resolveManagerEstado(m, currentEvents)
+      : (typeof normalizeManagerEstado === 'function' ? normalizeManagerEstado(m.estado) : (m.estado || 'Activo'));
+
     const teams = {};
     visibleManagers.forEach(m => {
       const key = teamKeyOf(m);
@@ -188592,7 +188644,7 @@ export default function CentroManagers() {
         }
       } else {
         teams[key].allMembers.push(m);
-        const normSt = normalizeManagerEstado(m.estado);
+        const normSt = getEffectiveEstado(m);
         if (normSt === 'Activo') {
           teams[key].activeMembers.push(m);
         }
@@ -188631,14 +188683,14 @@ export default function CentroManagers() {
 
       // Desglose determinista de Capitanes (Activos y No Activos)
       const allCapitanes = t.allMembers.filter(m => (m.rol || '').toLowerCase().includes('capitan'));
-      const capActivos = allCapitanes.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
-      const capNoActivos = allCapitanes.filter(m => normalizeManagerEstado(m.estado) !== 'Activo').length;
+      const capActivos = allCapitanes.filter(m => getEffectiveEstado(m) === 'Activo').length;
+      const capNoActivos = allCapitanes.filter(m => getEffectiveEstado(m) !== 'Activo').length;
       const capTotal = allCapitanes.length;
 
       // Desglose determinista de Managers (Activos y No Activos)
       const allManagersOnly = t.allMembers.filter(m => !(m.rol || '').toLowerCase().includes('capitan'));
-      const mngActivos = allManagersOnly.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
-      const mngNoActivos = allManagersOnly.filter(m => normalizeManagerEstado(m.estado) !== 'Activo').length;
+      const mngActivos = allManagersOnly.filter(m => getEffectiveEstado(m) === 'Activo').length;
+      const mngNoActivos = allManagersOnly.filter(m => getEffectiveEstado(m) !== 'Activo').length;
       const mngTotal = allManagersOnly.length;
 
       // Totales del equipo
@@ -188648,8 +188700,8 @@ export default function CentroManagers() {
 
       // Ordenar integrantes del equipo: primero Activos, luego Inactivos
       const displayManagers = [...t.allMembers].sort((a, b) => {
-        const aAct = normalizeManagerEstado(a.estado) === 'Activo' ? 0 : 1;
-        const bAct = normalizeManagerEstado(b.estado) === 'Activo' ? 0 : 1;
+        const aAct = getEffectiveEstado(a) === 'Activo' ? 0 : 1;
+        const bAct = getEffectiveEstado(b) === 'Activo' ? 0 : 1;
         return aAct - bAct;
       });
 
@@ -188657,7 +188709,7 @@ export default function CentroManagers() {
       const managersOnly = displayManagers.filter(m => !(m.rol || '').toLowerCase().includes('capitan'));
 
       // Evaluación de llamadas grupales enfocada en los miembros activos
-      const activeList = t.allMembers.filter(m => normalizeManagerEstado(m.estado) === 'Activo');
+      const activeList = t.allMembers.filter(m => getEffectiveEstado(m) === 'Activo');
       const targetEvaluation = activeList.length > 0 ? activeList : t.allMembers;
       const asistieron = targetEvaluation.filter(m => m.llamadaAsistio === 'SI').length;
       const noAsistieron = targetEvaluation.filter(m => m.llamadaAsistio === 'NO').length;
@@ -188777,9 +188829,9 @@ export default function CentroManagers() {
       const normSede = normalizeSede(sedeName);
       const sedeManagers = managers.filter(m => normalizeSede(m.sede) === normSede);
       const total = sedeManagers.length;
-      const activos = sedeManagers.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
-      const graduados = sedeManagers.filter(m => normalizeManagerEstado(m.estado) === 'Graduado').length;
-      const desertores = sedeManagers.filter(m => normalizeManagerEstado(m.estado) === 'Desertor').length;
+      const activos = sedeManagers.filter(m => resolveManagerEstado(m, events) === 'Activo').length;
+      const graduados = sedeManagers.filter(m => resolveManagerEstado(m, events) === 'Graduado').length;
+      const desertores = sedeManagers.filter(m => resolveManagerEstado(m, events) === 'Desertor').length;
       const pctGrad = total > 0 ? Math.round((graduados / total) * 100) : 0;
 
       // Equipos y llamadas
@@ -188816,7 +188868,7 @@ export default function CentroManagers() {
       );
     }
     return list;
-  }, [managers, search]);
+  }, [managers, search, events]);
 
 
 
@@ -188824,9 +188876,9 @@ export default function CentroManagers() {
     let list = allTrainerNames.map(trainerName => {
       const trainerManagers = managers.filter(m => isTrainerMatch(m.entrenador, trainerName));
       const total = trainerManagers.length;
-      const activos = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
-      const graduados = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Graduado').length;
-      const desertores = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Desertor').length;
+      const activos = trainerManagers.filter(m => resolveManagerEstado(m, events) === 'Activo').length;
+      const graduados = trainerManagers.filter(m => resolveManagerEstado(m, events) === 'Graduado').length;
+      const desertores = trainerManagers.filter(m => resolveManagerEstado(m, events) === 'Desertor').length;
       
       const equipos = [...new Set(trainerManagers.map(m => m.equipo).filter(Boolean))];
       const sedes = [...new Set(trainerManagers.map(m => normalizeSede(m.sede)).filter(Boolean))];
@@ -188865,7 +188917,7 @@ export default function CentroManagers() {
       );
     }
     return list;
-  }, [allTrainerNames, canSeeInactives, managers, search]);
+  }, [allTrainerNames, canSeeInactives, managers, search, events]);
 
   // Mismo cálculo que trainersStats de arriba pero SIN el filtro de `search` y
   // para un solo nombre — usado por el modal "tarjeta de la persona" que se abre
@@ -188874,9 +188926,9 @@ export default function CentroManagers() {
     if (!trainerName) return null;
     const trainerManagers = managers.filter(m => isTrainerMatch(m.entrenador, trainerName));
     const total = trainerManagers.length;
-    const activos = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
-    const graduados = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Graduado').length;
-    const desertores = trainerManagers.filter(m => normalizeManagerEstado(m.estado) === 'Desertor').length;
+    const activos = trainerManagers.filter(m => resolveManagerEstado(m, events) === 'Activo').length;
+    const graduados = trainerManagers.filter(m => resolveManagerEstado(m, events) === 'Graduado').length;
+    const desertores = trainerManagers.filter(m => resolveManagerEstado(m, events) === 'Desertor').length;
     const equipos = [...new Set(trainerManagers.map(m => m.equipo).filter(Boolean))];
     const sedes = [...new Set(trainerManagers.map(m => normalizeSede(m.sede)).filter(Boolean))];
     const asistieron = trainerManagers.filter(m => m.llamadaAsistio === 'SI').length;
@@ -188937,12 +188989,12 @@ export default function CentroManagers() {
       : managers;
 
     const total = baseList.length;
-    const graduados = baseList.filter(m => normalizeManagerEstado(m.estado) === 'Graduado').length;
-    const desertores = baseList.filter(m => normalizeManagerEstado(m.estado) === 'Desertor').length;
-    const activos = baseList.filter(m => normalizeManagerEstado(m.estado) === 'Activo').length;
+    const graduados = baseList.filter(m => resolveManagerEstado(m, events) === 'Graduado').length;
+    const desertores = baseList.filter(m => resolveManagerEstado(m, events) === 'Desertor').length;
+    const activos = baseList.filter(m => resolveManagerEstado(m, events) === 'Activo').length;
     const pct = total > 0 ? Math.round((graduados / total) * 100) : 0;
     return { total, graduados, desertores, activos, pct };
-  }, [managers, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+  }, [managers, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser, events]);
 
   // Acciones
   const handleUpdateManagerField = async (id, field, value) => {
@@ -191672,11 +191724,11 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem' }}>
                           {canChangeStatus ? (
-                            <HelpSelect helpKey="estado" value={normalizeManagerEstado(m.estado)} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: normalizeManagerEstado(m.estado)==='Activo'?'#dbeafe':normalizeManagerEstado(m.estado)==='Graduado'?'#dcfce7':'#fee2e2', color: normalizeManagerEstado(m.estado)==='Activo'?'#2563eb':normalizeManagerEstado(m.estado)==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
+                            <HelpSelect helpKey="estado" value={resolveManagerEstado(m, events)} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: resolveManagerEstado(m, events)==='Activo'?'#dbeafe':resolveManagerEstado(m, events)==='Graduado'?'#dcfce7':'#fee2e2', color: resolveManagerEstado(m, events)==='Activo'?'#2563eb':resolveManagerEstado(m, events)==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
                               <option value="Activo">Activo</option><option value="Graduado">Graduado</option><option value="Desertor">Desertor</option>
                             </HelpSelect>
                           ) : (
-                             <span style={{ padding: '0.3rem 0.6rem', borderRadius: '4px', background: normalizeManagerEstado(m.estado)==='Activo'?'#dbeafe':normalizeManagerEstado(m.estado)==='Graduado'?'#dcfce7':'#fee2e2', color: normalizeManagerEstado(m.estado)==='Activo'?'#2563eb':normalizeManagerEstado(m.estado)==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem' }}>{normalizeManagerEstado(m.estado)}</span>
+                             <span style={{ padding: '0.3rem 0.6rem', borderRadius: '4px', background: resolveManagerEstado(m, events)==='Activo'?'#dbeafe':resolveManagerEstado(m, events)==='Graduado'?'#dcfce7':'#fee2e2', color: resolveManagerEstado(m, events)==='Activo'?'#2563eb':resolveManagerEstado(m, events)==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem' }}>{resolveManagerEstado(m, events)}</span>
                           )}
                         </td>
                         <td style={{ padding: '1rem' }}>
@@ -191864,10 +191916,10 @@ export default function CentroManagers() {
                                       borderRadius: '4px', 
                                       fontSize: '0.68rem', 
                                       fontWeight: 700,
-                                      background: normalizeManagerEstado(m.estado) === 'Activo' ? '#dbeafe' : normalizeManagerEstado(m.estado) === 'Graduado' ? '#dcfce7' : '#fee2e2',
-                                      color: normalizeManagerEstado(m.estado) === 'Activo' ? '#2563eb' : normalizeManagerEstado(m.estado) === 'Graduado' ? '#16a34a' : '#dc2626'
+                                      background: resolveManagerEstado(m, events) === 'Activo' ? '#dbeafe' : resolveManagerEstado(m, events) === 'Graduado' ? '#dcfce7' : '#fee2e2',
+                                      color: resolveManagerEstado(m, events) === 'Activo' ? '#2563eb' : resolveManagerEstado(m, events) === 'Graduado' ? '#16a34a' : '#dc2626'
                                     }}>
-                                      {normalizeManagerEstado(m.estado)}
+                                      {resolveManagerEstado(m, events)}
                                     </span>
                                   </div>
                                 </div>
@@ -192337,7 +192389,7 @@ export default function CentroManagers() {
                         {t.capitanes.map(m => {
                           const isAsistio = m.llamadaAsistio === 'SI';
                           const isNoAsistio = m.llamadaAsistio === 'NO';
-                          const normEstado = normalizeManagerEstado(m.estado);
+                          const normEstado = resolveManagerEstado(m, events);
                           const isActivo = normEstado === 'Activo';
 
                           return (
@@ -192411,7 +192463,7 @@ export default function CentroManagers() {
                         {t.managersOnly.map(m => {
                           const isAsistio = m.llamadaAsistio === 'SI';
                           const isNoAsistio = m.llamadaAsistio === 'NO';
-                          const normEstado = normalizeManagerEstado(m.estado);
+                          const normEstado = resolveManagerEstado(m, events);
                           const isActivo = normEstado === 'Activo';
                           const pillBg = isAsistio ? '#ecfdf5' : isNoAsistio ? '#fef2f2' : '#f8fafc';
                           const pillBorder = isAsistio ? '#a7f3d0' : isNoAsistio ? '#fecaca' : borderLight;
