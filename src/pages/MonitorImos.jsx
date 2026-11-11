@@ -779,6 +779,70 @@ export default function MonitorImos() {
     }
   };
 
+  const limaMonitorsPanel = (
+        <div className="glass-panel" style={{ padding: '1.25rem', borderRadius: '14px', border: '1px solid rgba(245, 158, 11, 0.35)', background: 'rgba(15, 23, 42, 0.92)' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+            marginBottom: '1.25rem',
+            paddingBottom: '1rem',
+            borderBottom: '1px solid rgba(148, 163, 184, 0.2)'
+          }}>
+            <div>
+              <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
+                🛡️ SUPERVISIÓN INTERNA OFICINA LIMA · INTEGRADO EN MONITOR DE IMOS
+              </div>
+              <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.2rem', fontWeight: 800 }}>
+                Monitores Oficiales de Acreditación y Firmas Legales — Sede Lima
+              </h3>
+            </div>
+            <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setLimaMonitorSubTab('caminata')}
+                style={{
+                  padding: '0.55rem 1.1rem',
+                  borderRadius: '8px',
+                  border: limaMonitorSubTab === 'caminata' ? '2px solid #f97316' : '1px solid rgba(249, 115, 22, 0.35)',
+                  background: limaMonitorSubTab === 'caminata' ? 'rgba(249, 115, 22, 0.22)' : 'rgba(15, 23, 42, 0.8)',
+                  color: limaMonitorSubTab === 'caminata' ? '#fb923c' : '#cbd5e1',
+                  fontWeight: 800,
+                  fontSize: '0.84rem',
+                  cursor: 'pointer'
+                }}
+              >
+                🔥 Monitor Caminata sobre Fuego (Lima)
+              </button>
+              <button
+                type="button"
+                onClick={() => setLimaMonitorSubTab('maestria')}
+                style={{
+                  padding: '0.55rem 1.1rem',
+                  borderRadius: '8px',
+                  border: limaMonitorSubTab === 'maestria' ? '2px solid #fbbf24' : '1px solid rgba(251, 191, 36, 0.35)',
+                  background: limaMonitorSubTab === 'maestria' ? 'rgba(245, 158, 11, 0.22)' : 'rgba(15, 23, 42, 0.8)',
+                  color: limaMonitorSubTab === 'maestria' ? '#fbbf24' : '#cbd5e1',
+                  fontWeight: 800,
+                  fontSize: '0.84rem',
+                  cursor: 'pointer'
+                }}
+              >
+                ⚖️ Monitor Reglas de Maestría (Lima)
+              </button>
+            </div>
+          </div>
+
+          {limaMonitorSubTab === 'maestria' ? (
+            <MonitorMaestriaLima />
+          ) : (
+            <MonitorAcreditacionFuegoLima />
+          )}
+        </div>
+  );
+
   if (loading) {
     return (
       <div className="p-8 text-center" style={{ color: 'var(--crear-gold)' }}>
@@ -788,10 +852,20 @@ export default function MonitorImos() {
     );
   }
 
+  if (!campaignFilter && viewMode === 'monitores_lima' && canViewLimaMonitors) {
+    return <main className="p-8" style={{ maxWidth: 1440, margin: '0 auto', color: 'var(--text-main)' }}>
+      <button onClick={() => navigate('/')}>← Volver al Centro Operativo</button>{' '}
+      <button onClick={() => setViewMode('imos')}>🦅 Ir a campañas de IMOs</button>
+      <h1>MONITORES LIMA</h1>
+      {limaMonitorsPanel}
+    </main>;
+  }
+
   if (!campaignFilter) {
     return <main className="p-8" style={{ maxWidth: 1100, margin: '0 auto', color: 'var(--text-main)' }}>
       <button onClick={() => navigate('/')}>← Volver al Centro Operativo</button>
       <h1>MONITOR DE IMOS</h1>
+      {canViewLimaMonitors && <button onClick={() => setViewMode('monitores_lima')} style={{ margin: '8px 0', padding: '10px 16px', fontWeight: 800 }}>🔥⚖️ Monitores Lima (Caminata Fuego &amp; Reglas Maestría)</button>}
       <p>Selecciona una campaña para consultar sus enrolamientos y avances. Los registros anteriores se consultan por separado.</p>
       {missionLoadError && <p role="alert">{missionLoadError}</p>}
       <label>Sede <select className="form-input" value={filterSede} onChange={e => { setFilterSede(e.target.value); setFilterEquipo('todos'); }}>
@@ -1439,67 +1513,7 @@ export default function MonitorImos() {
       )}
 
       {viewMode === 'monitores_lima' && canViewLimaMonitors ? (
-        <div className="glass-panel" style={{ padding: '1.25rem', borderRadius: '14px', border: '1px solid rgba(245, 158, 11, 0.35)', background: 'rgba(15, 23, 42, 0.92)' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            marginBottom: '1.25rem',
-            paddingBottom: '1rem',
-            borderBottom: '1px solid rgba(148, 163, 184, 0.2)'
-          }}>
-            <div>
-              <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
-                🛡️ SUPERVISIÓN INTERNA OFICINA LIMA · INTEGRADO EN MONITOR DE IMOS
-              </div>
-              <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.2rem', fontWeight: 800 }}>
-                Monitores Oficiales de Acreditación y Firmas Legales — Sede Lima
-              </h3>
-            </div>
-            <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={() => setLimaMonitorSubTab('caminata')}
-                style={{
-                  padding: '0.55rem 1.1rem',
-                  borderRadius: '8px',
-                  border: limaMonitorSubTab === 'caminata' ? '2px solid #f97316' : '1px solid rgba(249, 115, 22, 0.35)',
-                  background: limaMonitorSubTab === 'caminata' ? 'rgba(249, 115, 22, 0.22)' : 'rgba(15, 23, 42, 0.8)',
-                  color: limaMonitorSubTab === 'caminata' ? '#fb923c' : '#cbd5e1',
-                  fontWeight: 800,
-                  fontSize: '0.84rem',
-                  cursor: 'pointer'
-                }}
-              >
-                🔥 Monitor Caminata sobre Fuego (Lima)
-              </button>
-              <button
-                type="button"
-                onClick={() => setLimaMonitorSubTab('maestria')}
-                style={{
-                  padding: '0.55rem 1.1rem',
-                  borderRadius: '8px',
-                  border: limaMonitorSubTab === 'maestria' ? '2px solid #fbbf24' : '1px solid rgba(251, 191, 36, 0.35)',
-                  background: limaMonitorSubTab === 'maestria' ? 'rgba(245, 158, 11, 0.22)' : 'rgba(15, 23, 42, 0.8)',
-                  color: limaMonitorSubTab === 'maestria' ? '#fbbf24' : '#cbd5e1',
-                  fontWeight: 800,
-                  fontSize: '0.84rem',
-                  cursor: 'pointer'
-                }}
-              >
-                ⚖️ Monitor Reglas de Maestría (Lima)
-              </button>
-            </div>
-          </div>
-
-          {limaMonitorSubTab === 'maestria' ? (
-            <MonitorMaestriaLima />
-          ) : (
-            <MonitorAcreditacionFuegoLima />
-          )}
-        </div>
+        limaMonitorsPanel
       ) : viewMode === 'enrolados' ? (
         <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '12px', background: 'rgba(15, 23, 42, 0.85)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
