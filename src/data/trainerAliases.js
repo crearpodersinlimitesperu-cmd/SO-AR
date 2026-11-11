@@ -2,9 +2,12 @@
 // Normalización de nombres de cronograma (Sheets/Causa) hacia su nombre oficial legal.
 
 export const normalizarIdentidadEntrenador = (value = '') => String(value)
-  .toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean)
-  .map(token => ({ fernando: 'fer', fer: 'fer', erica: 'erika' }[token] || token))
+  .map(token => ({
+    fernando: 'fer', fer: 'fer', erica: 'erika',
+    julo: 'julio', cersar: 'cesar', navaez: 'narvaez'
+  }[token] || token))
   .join(' ');
 
 export const NOMBRES_LEGALES_ENTRENADORES = {
@@ -47,7 +50,13 @@ export const NOMBRES_LEGALES_ENTRENADORES = {
   'juan angel arreola': 'Juan Angel',
   'juan angel arreola morales': 'Juan Angel',
   'julio cesar narvaez': 'Julio César Narváez',
+  'julio cesar narvaez mora': 'Julio César Narváez',
   'julio narvaez': 'Julio César Narváez',
+  'julio narvaez mora': 'Julio César Narváez',
+  'julo cersar navaez': 'Julio César Narváez',
+  'julio cersar navaez': 'Julio César Narváez',
+  'julo cesar narvaez': 'Julio César Narváez',
+  'julio navaez': 'Julio César Narváez',
   'leandro brunis': 'Leandro Brunis',
   'lili cubillo': 'Liliana Lilibeth Cubillo Vera',
   'liliana cubillo': 'Liliana Lilibeth Cubillo Vera',

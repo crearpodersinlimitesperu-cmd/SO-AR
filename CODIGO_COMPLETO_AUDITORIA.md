@@ -165326,7 +165326,13 @@ const NOMBRES_LEGALES_ENTRENADORES = {
   'juan angel arreola': 'Juan Angel',
   'juan angel arreola morales': 'Juan Angel',
   'julio cesar narvaez': 'Julio César Narváez',
+  'julio cesar narvaez mora': 'Julio César Narváez',
   'julio narvaez': 'Julio César Narváez',
+  'julio narvaez mora': 'Julio César Narváez',
+  'julo cersar navaez': 'Julio César Narváez',
+  'julio cersar navaez': 'Julio César Narváez',
+  'julo cesar narvaez': 'Julio César Narváez',
+  'julio navaez': 'Julio César Narváez',
   'leandro brunis': 'Leandro Brunis',
   'lili cubillo': 'Liliana Lilibeth Cubillo Vera',
   'liliana cubillo': 'Liliana Lilibeth Cubillo Vera',
@@ -187772,6 +187778,11 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
         return true;
       }
 
+      // Alias conocido: Julio Narvaez / Julio Cesar Narvaez / Julio Cesar Narvaez Mora
+      if ((clean1.includes('narvaez') || clean1.includes('navaez')) && (clean2.includes('narvaez') || clean2.includes('navaez')) && (clean1.includes('julio') || clean1.includes('julo')) && (clean2.includes('julio') || clean2.includes('julo'))) {
+        return true;
+      }
+
       const w1 = clean1.split(/\s+/);
       const w2 = clean2.split(/\s+/);
       if (w1.length >= 2 && w2.length >= 2) {
@@ -205620,7 +205631,7 @@ export const TRAINER_FLIGHT_MAPPINGS = [
     id: 'asig-julio-narvaez',
     canonicalName: 'Julio Narváez',
     legalName: 'Julio César Narváez Mora',
-    tokens: ['julio', 'cesar', 'narvaez', 'mora'],
+    tokens: ['julio', 'cesar', 'narvaez', 'mora', 'julo', 'cersar', 'navaez'],
     sede: 'Guayaquil',
     equipo: 'GYE Asignación Oficial',
     entrenamiento: 'GYE Entrenamiento de Sala',

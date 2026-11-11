@@ -217,7 +217,7 @@ export const TRAINER_FLIGHT_MAPPINGS = [
     id: 'asig-julio-narvaez',
     canonicalName: 'Julio Narváez',
     legalName: 'Julio César Narváez Mora',
-    tokens: ['julio', 'cesar', 'narvaez', 'mora'],
+    tokens: ['julio', 'cesar', 'narvaez', 'mora', 'julo', 'cersar', 'navaez'],
     sede: 'Guayaquil',
     equipo: 'GYE Asignación Oficial',
     entrenamiento: 'GYE Entrenamiento de Sala',

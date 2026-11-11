@@ -10717,6 +10717,21 @@ export const TRAINER_METADATA = {
     "fullName": "Judith Regina Romero Rosales",
     "email": "judith.romero@crearpsl.net",
     "programa": "MJ"
+  },
+  "Julio Narvaez": {
+    "fullName": "Julio César Narváez Mora",
+    "email": "coor.operaciones2023@gmail.com",
+    "programa": "El Viaje"
+  },
+  "Julio Cesar Narvaez": {
+    "fullName": "Julio César Narváez Mora",
+    "email": "coor.operaciones2023@gmail.com",
+    "programa": "El Viaje"
+  },
+  "Julio César Narváez": {
+    "fullName": "Julio César Narváez Mora",
+    "email": "coor.operaciones2023@gmail.com",
+    "programa": "El Viaje"
   }
 };
 
@@ -10724,6 +10739,13 @@ export const normalizeCoordinator = (name) => {
   if (!name) return '';
   const clean = name.trim();
   const map = {
+  "JULIO NARVAEZ": "JULIO CESAR NARVAEZ",
+  "JULIO CESAR NARVAEZ": "JULIO CESAR NARVAEZ",
+  "JULIO CESAR NARVAEZ MORA": "JULIO CESAR NARVAEZ",
+  "JULIO CERSAR NAVAEZ": "JULIO CESAR NARVAEZ",
+  "JULO CERSAR NAVAEZ": "JULIO CESAR NARVAEZ",
+  "JULO CESAR NARVAEZ": "JULIO CESAR NARVAEZ",
+  "JULIO NAVAEZ": "JULIO CESAR NARVAEZ",
   "ISAAC BETANCOURTH": "ISAAC GABRIEL BETANCOURT PATINO",
   "ISAAC BETANCOURT": "ISAAC GABRIEL BETANCOURT PATINO",
   "JOSU VERA": "JOSUE VERA",

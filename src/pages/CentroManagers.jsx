@@ -139,6 +139,11 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
         return true;
       }
 
+      // Alias conocido: Julio Narvaez / Julio Cesar Narvaez / Julio Cesar Narvaez Mora
+      if ((clean1.includes('narvaez') || clean1.includes('navaez')) && (clean2.includes('narvaez') || clean2.includes('navaez')) && (clean1.includes('julio') || clean1.includes('julo')) && (clean2.includes('julio') || clean2.includes('julo'))) {
+        return true;
+      }
+
       const w1 = clean1.split(/\s+/);
       const w2 = clean2.split(/\s+/);
       if (w1.length >= 2 && w2.length >= 2) {
