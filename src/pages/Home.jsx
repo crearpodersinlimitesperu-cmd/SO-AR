@@ -49,7 +49,7 @@ import {
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
   canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar, isGlobalObserver,
-  PORTFOLIO_FI_REVIEW_EMAILS
+  canAccessMonitorContratoLima, PORTFOLIO_FI_REVIEW_EMAILS
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -2477,15 +2477,15 @@ export default function Home() {
                   </button>
                 )}
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'coordinacion', 'contabilidad', 'contador', 'finanzas', 'facturacion', 'legal', 'juridico', 'superadmin', 'director_maestria', 'oficina']) && (
+                {canAccessMonitorContratoLima(currentUser) && (
                   <>
-                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-maestria-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos?tab=maestria'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
                       👑 Supervisión Reglas Maestría (Lima)
                     </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/reglas-maestria'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
                       📜 Landing Contrato Maestría + QR
                     </button>
-                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-fuego-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fb923c', background: 'rgba(249, 115, 22, 0.12)', fontWeight: 'bold' }}>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos?tab=caminata'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fb923c', background: 'rgba(249, 115, 22, 0.12)', fontWeight: 'bold' }}>
                       🔥 Monitor Caminata Fuego (Lima)
                     </button>
                   </>
@@ -2727,6 +2727,11 @@ export default function Home() {
           {canAccessMonitorIMOs(currentUser) && (
             <ModuleHelpButton helpKey="imos" onClick={() => navigate('/monitor-imos')} className="home-module-card">
               🦅 Monitor de IMOs
+            </ModuleHelpButton>
+          )}
+          {canAccessMonitorContratoLima(currentUser) && (
+            <ModuleHelpButton helpKey="monitoresLima" onClick={() => navigate('/monitor-imos?tab=monitores_lima')} className="home-module-card" style={{ borderColor: 'rgba(245, 158, 11, 0.45)', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(124, 45, 18, 0.22) 100%)' }} title="Monitores de Caminata sobre Fuego y Reglas de Maestría (Sede Lima) integrados en Monitor de IMOs">
+              🔥⚖️ Monitores Caminata y Maestría (Lima)
             </ModuleHelpButton>
           )}
 

@@ -4,7 +4,7 @@ import { homeModuleHelp } from '../data/homeModuleHelp';
 import '../pages/HomeModules.css';
 
 const categories = [
-  { id: 'operacion', label: 'Operación y seguimiento', keys: ['horarios', 'gerencial', 'checklist', 'kpis', 'hubQT', 'vuelos', 'imos', 'asignador', 'rezagadosC1', 'baseNodusRezagados'] },
+  { id: 'operacion', label: 'Operación y seguimiento', keys: ['horarios', 'gerencial', 'checklist', 'kpis', 'hubQT', 'vuelos', 'imos', 'monitoresLima', 'asignador', 'rezagadosC1', 'baseNodusRezagados'] },
   { id: 'direccion', label: 'Dirección y gestión', keys: ['resultadosImposibles', 'portafolio', 'estrategia', 'auditoria', 'mando', 'cfo', 'finanzas', 'talento', 'legal', 'auditoriaLegal'] },
   { id: 'personas', label: 'Personas y equipos', keys: ['directorioQT', 'llamadas', 'managers', 'crm'] },
   { id: 'formacion', label: 'Formación y recursos', keys: ['manualQT', 'manualNodus', 'maestria', 'entrenador', 'campus', 'flyers'] },

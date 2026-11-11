@@ -1055,3 +1055,25 @@ export const isLegalDocsPending = (currentUser, legalSignatures) => {
   );
   return !sig || !sig.terms_accepted || !sig.nda_signed || !sig.privacy_accepted;
 };
+
+/**
+ * Acceso a los Monitores Oficiales de Oficina Lima (Caminata sobre Fuego y Reglas de Maestría).
+ * Habilitado para Dirección/SuperAdmin/Observador Total y para Gerencia, Coordinación y Contabilidad de Lima.
+ */
+export const canAccessMonitorContratoLima = (currentUser) => {
+  if (!currentUser || isUserInactive(currentUser)) return false;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  if (isGlobalObserver(currentUser) || isDataAdmin(currentUser) || isDireccionRole(currentUser)) return true;
+  const userRoles = collectUserRoles(currentUser);
+  if (userRoles.some(r => ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'director_maestria', 'observador', 'consolidado'].includes(r))) {
+    return true;
+  }
+  const sedeNorm = String(currentUser.sede || '').toLowerCase().trim();
+  const isLimaOrGlobal = !sedeNorm || sedeNorm.includes('lima') || sedeNorm === 'global';
+  if (!isLimaOrGlobal) return false;
+  return userRoles.some(r => [
+    'gerente', 'coordinador_mj', 'coord_maestria', 'coord_c1', 'coord_c2',
+    'coordinador_c1c2', 'coord_jr', 'coordinacion', 'contabilidad', 'contador',
+    'finanzas', 'facturacion', 'legal', 'juridico', 'oficina'
+  ].includes(r));
+};

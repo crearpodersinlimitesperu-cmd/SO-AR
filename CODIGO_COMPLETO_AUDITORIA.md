@@ -84757,6 +84757,28 @@ export const isLegalDocsPending = (currentUser, legalSignatures) => {
   return !sig || !sig.terms_accepted || !sig.nda_signed || !sig.privacy_accepted;
 };
 
+/**
+ * Acceso a los Monitores Oficiales de Oficina Lima (Caminata sobre Fuego y Reglas de Maestría).
+ * Habilitado para Dirección/SuperAdmin/Observador Total y para Gerencia, Coordinación y Contabilidad de Lima.
+ */
+export const canAccessMonitorContratoLima = (currentUser) => {
+  if (!currentUser || isUserInactive(currentUser)) return false;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  if (isGlobalObserver(currentUser) || isDataAdmin(currentUser) || isDireccionRole(currentUser)) return true;
+  const userRoles = collectUserRoles(currentUser);
+  if (userRoles.some(r => ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'director_maestria', 'observador', 'consolidado'].includes(r))) {
+    return true;
+  }
+  const sedeNorm = String(currentUser.sede || '').toLowerCase().trim();
+  const isLimaOrGlobal = !sedeNorm || sedeNorm.includes('lima') || sedeNorm === 'global';
+  if (!isLimaOrGlobal) return false;
+  return userRoles.some(r => [
+    'gerente', 'coordinador_mj', 'coord_maestria', 'coord_c1', 'coord_c2',
+    'coordinador_c1c2', 'coord_jr', 'coordinacion', 'contabilidad', 'contador',
+    'finanzas', 'facturacion', 'legal', 'juridico', 'oficina'
+  ].includes(r));
+};
+
 ```
 
 ---
@@ -134781,7 +134803,7 @@ import { homeModuleHelp } from '../data/homeModuleHelp';
 import '../pages/HomeModules.css';
 
 const categories = [
-  { id: 'operacion', label: 'Operación y seguimiento', keys: ['horarios', 'gerencial', 'checklist', 'kpis', 'hubQT', 'vuelos', 'imos', 'asignador', 'rezagadosC1', 'baseNodusRezagados'] },
+  { id: 'operacion', label: 'Operación y seguimiento', keys: ['horarios', 'gerencial', 'checklist', 'kpis', 'hubQT', 'vuelos', 'imos', 'monitoresLima', 'asignador', 'rezagadosC1', 'baseNodusRezagados'] },
   { id: 'direccion', label: 'Dirección y gestión', keys: ['resultadosImposibles', 'portafolio', 'estrategia', 'auditoria', 'mando', 'cfo', 'finanzas', 'talento', 'legal', 'auditoriaLegal'] },
   { id: 'personas', label: 'Personas y equipos', keys: ['directorioQT', 'llamadas', 'managers', 'crm'] },
   { id: 'formacion', label: 'Formación y recursos', keys: ['manualQT', 'manualNodus', 'maestria', 'entrenador', 'campus', 'flyers'] },
@@ -175618,7 +175640,7 @@ import { c1Eligibility } from '../../functions-imo/c1Eligibility.mjs';
 import { isMissionCandidate, contactRegistration, CONTACT_MISSION } from '../../functions-imo/contactEligibility.mjs';
 import { getEnroladosList as getAllEnrolados } from '../features/imo/missionEnrolados';
 import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { collection, query, where, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
 import MissionHistory from '../features/imo/MissionHistory';
 import CampaignGenerator from '../features/imo/CampaignGenerator';
@@ -175630,6 +175652,9 @@ import MissionWindowNotice from '../features/imo/MissionWindowNotice';
 import { db } from '../services/firebase';
 import { Search, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { canAccessMonitorContratoLima } from '../config/permissions';
+import MonitorAcreditacionFuegoLima from './MonitorAcreditacionFuegoLima';
+import MonitorMaestriaLima from './MonitorMaestriaLima';
 import { normalizeSede, parseTeamNumber } from '../data/usersData';
 import {
   initNodusRealtimeListener,
@@ -175687,9 +175712,35 @@ export default function MonitorImos() {
   const [campaignFilter, setCampaignFilter] = useState('');
   const campaignMissionIds = useMemo(() => rawMissions.filter(m => m.schemaVersion === 2 && m.campaignId === campaignFilter).map(m => m.id), [rawMissions, campaignFilter]);
   useEffect(() => { setCampaignReadError(''); }, [campaignFilter]);
+  const location = useLocation();
+  const canViewLimaMonitors = canAccessMonitorContratoLima(currentUser);
   const [filterEstado, setFilterEstado] = useState('todos');
   const [filterNodus, setFilterNodus] = useState('todos');
-  const [viewMode, setViewMode] = useState('imos'); // 'imos' | 'enrolados'
+  const [viewMode, setViewMode] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = (params.get('tab') || '').toLowerCase();
+    if (tab === 'monitores_lima' || tab === 'caminata' || tab === 'maestria') return 'monitores_lima';
+    return 'imos';
+  }); // 'imos' | 'enrolados' | 'monitores_lima'
+  const [limaMonitorSubTab, setLimaMonitorSubTab] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = (params.get('tab') || '').toLowerCase();
+    return tab === 'maestria' ? 'maestria' : 'caminata';
+  }); // 'caminata' | 'maestria'
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = (params.get('tab') || '').toLowerCase();
+    if (tab === 'caminata') {
+      setViewMode('monitores_lima');
+      setLimaMonitorSubTab('caminata');
+    } else if (tab === 'maestria') {
+      setViewMode('monitores_lima');
+      setLimaMonitorSubTab('maestria');
+    } else if (tab === 'monitores_lima') {
+      setViewMode('monitores_lima');
+    }
+  }, [location.search]);
   const [nodusSyncTick, setNodusSyncTick] = useState(0);
   // Estado de ordenamiento para la Vista por IMOs
   const [imoSortField, setImoSortField] = useState('nombre'); // 'nombre' | 'equipo' | 'avance' | 'confirmados' | 'estado' | 'conexion' | 'ubicacion' | 'nodus'
@@ -176731,7 +176782,7 @@ export default function MonitorImos() {
       {/* Barra de Filtros y Búsqueda */}
       <div className="glass-panel" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(255,255,255,0.08)' }}>
         {/* Selector de Modo de Vista */}
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
           <button
             onClick={() => setViewMode('imos')}
             style={{
@@ -176762,6 +176813,26 @@ export default function MonitorImos() {
           >
             📋 Lista Plana ({uniqueEnroladosList.length} Enrolamientos)
           </button>
+          {canViewLimaMonitors && (
+            <button
+              onClick={() => setViewMode('monitores_lima')}
+              style={{
+                padding: '6px 14px',
+                borderRadius: '6px',
+                border: viewMode === 'monitores_lima' ? '2px solid #f59e0b' : '1px solid rgba(245, 158, 11, 0.45)',
+                background: viewMode === 'monitores_lima' ? 'rgba(245, 158, 11, 0.22)' : 'rgba(245, 158, 11, 0.08)',
+                color: '#fbbf24',
+                fontSize: '0.8rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              🔥⚖️ Monitores Lima (Caminata Fuego &amp; Reglas Maestría)
+            </button>
+          )}
         </div>
 
         <label style={{ color: 'var(--text-main)' }}>Campaña
@@ -177005,7 +177076,69 @@ export default function MonitorImos() {
         </div>
       )}
 
-      {viewMode === 'enrolados' ? (
+      {viewMode === 'monitores_lima' && canViewLimaMonitors ? (
+        <div className="glass-panel" style={{ padding: '1.25rem', borderRadius: '14px', border: '1px solid rgba(245, 158, 11, 0.35)', background: 'rgba(15, 23, 42, 0.92)' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+            marginBottom: '1.25rem',
+            paddingBottom: '1rem',
+            borderBottom: '1px solid rgba(148, 163, 184, 0.2)'
+          }}>
+            <div>
+              <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
+                🛡️ SUPERVISIÓN INTERNA OFICINA LIMA · INTEGRADO EN MONITOR DE IMOS
+              </div>
+              <h3 style={{ margin: 0, color: '#f8fafc', fontSize: '1.2rem', fontWeight: 800 }}>
+                Monitores Oficiales de Acreditación y Firmas Legales — Sede Lima
+              </h3>
+            </div>
+            <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setLimaMonitorSubTab('caminata')}
+                style={{
+                  padding: '0.55rem 1.1rem',
+                  borderRadius: '8px',
+                  border: limaMonitorSubTab === 'caminata' ? '2px solid #f97316' : '1px solid rgba(249, 115, 22, 0.35)',
+                  background: limaMonitorSubTab === 'caminata' ? 'rgba(249, 115, 22, 0.22)' : 'rgba(15, 23, 42, 0.8)',
+                  color: limaMonitorSubTab === 'caminata' ? '#fb923c' : '#cbd5e1',
+                  fontWeight: 800,
+                  fontSize: '0.84rem',
+                  cursor: 'pointer'
+                }}
+              >
+                🔥 Monitor Caminata sobre Fuego (Lima)
+              </button>
+              <button
+                type="button"
+                onClick={() => setLimaMonitorSubTab('maestria')}
+                style={{
+                  padding: '0.55rem 1.1rem',
+                  borderRadius: '8px',
+                  border: limaMonitorSubTab === 'maestria' ? '2px solid #fbbf24' : '1px solid rgba(251, 191, 36, 0.35)',
+                  background: limaMonitorSubTab === 'maestria' ? 'rgba(245, 158, 11, 0.22)' : 'rgba(15, 23, 42, 0.8)',
+                  color: limaMonitorSubTab === 'maestria' ? '#fbbf24' : '#cbd5e1',
+                  fontWeight: 800,
+                  fontSize: '0.84rem',
+                  cursor: 'pointer'
+                }}
+              >
+                ⚖️ Monitor Reglas de Maestría (Lima)
+              </button>
+            </div>
+          </div>
+
+          {limaMonitorSubTab === 'maestria' ? (
+            <MonitorMaestriaLima />
+          ) : (
+            <MonitorAcreditacionFuegoLima />
+          )}
+        </div>
+      ) : viewMode === 'enrolados' ? (
         <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '12px', background: 'rgba(15, 23, 42, 0.85)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <div>
@@ -186569,7 +186702,7 @@ import {
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
   canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar, isGlobalObserver,
-  PORTFOLIO_FI_REVIEW_EMAILS
+  canAccessMonitorContratoLima, PORTFOLIO_FI_REVIEW_EMAILS
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -188997,15 +189130,15 @@ export default function Home() {
                   </button>
                 )}
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'coordinacion', 'contabilidad', 'contador', 'finanzas', 'facturacion', 'legal', 'juridico', 'superadmin', 'director_maestria', 'oficina']) && (
+                {canAccessMonitorContratoLima(currentUser) && (
                   <>
-                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-maestria-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos?tab=maestria'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
                       👑 Supervisión Reglas Maestría (Lima)
                     </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/reglas-maestria'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
                       📜 Landing Contrato Maestría + QR
                     </button>
-                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-fuego-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fb923c', background: 'rgba(249, 115, 22, 0.12)', fontWeight: 'bold' }}>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos?tab=caminata'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fb923c', background: 'rgba(249, 115, 22, 0.12)', fontWeight: 'bold' }}>
                       🔥 Monitor Caminata Fuego (Lima)
                     </button>
                   </>
@@ -189247,6 +189380,11 @@ export default function Home() {
           {canAccessMonitorIMOs(currentUser) && (
             <ModuleHelpButton helpKey="imos" onClick={() => navigate('/monitor-imos')} className="home-module-card">
               🦅 Monitor de IMOs
+            </ModuleHelpButton>
+          )}
+          {canAccessMonitorContratoLima(currentUser) && (
+            <ModuleHelpButton helpKey="monitoresLima" onClick={() => navigate('/monitor-imos?tab=monitores_lima')} className="home-module-card" style={{ borderColor: 'rgba(245, 158, 11, 0.45)', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(124, 45, 18, 0.22) 100%)' }} title="Monitores de Caminata sobre Fuego y Reglas de Maestría (Sede Lima) integrados en Monitor de IMOs">
+              🔥⚖️ Monitores Caminata y Maestría (Lima)
             </ModuleHelpButton>
           )}
 
