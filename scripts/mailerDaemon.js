@@ -805,12 +805,10 @@ async function ensureArmandoObserverProfile() {
       roles: ['observador', 'direccion', 'gerente', 'consolidado'],
       sede: 'Global',
       email: 'armando.pilacuan@gmail.com',
-      corporateEmail: 'armando.pilacuan@crearpsl.net',
+      corporateEmail: 'armando.pilacuan@gmail.com',
       personalEmail: 'armando.pilacuan@gmail.com',
       emails: [
-        'armando.pilacuan@gmail.com',
-        'armando.pilacuan@crearpsl.net',
-        'armando.pilacuan@crearpsl.com'
+        'armando.pilacuan@gmail.com'
       ],
       active: true,
       isActive: true,
@@ -822,19 +820,19 @@ async function ensureArmandoObserverProfile() {
     };
     await db.collection('users').doc('observador_armandopilacuan').set(armandoProfile, { merge: true });
     await db.collection('user_profiles').doc('armando.pilacuan@gmail.com').set(armandoProfile, { merge: true });
-    await db.collection('user_profiles').doc('armando.pilacuan@crearpsl.net').set(armandoProfile, { merge: true });
-    console.log('✅ Perfil de Observador Total para Armando Pilacuán sincronizado en Firestore.');
+    await db.collection('user_profiles').doc('armando.pilacuan@crearpsl.net').delete().catch(() => {});
+    console.log('✅ Perfil de Observador Total para Armando Pilacuán (armando.pilacuan@gmail.com) sincronizado en Firestore.');
 
-    const apiMailId = 'mail_api_centro_managers_nodus_armando_2026_v1';
+    const apiMailId = 'mail_api_centro_managers_nodus_armando_2026_v2';
     const existingMail = await db.collection('mail').doc(apiMailId).get();
     if (!existingMail.exists) {
       const baseUrl = 'https://so-ar-copiloto.jose-sanchez-e01.workers.dev/api/centro-managers';
       const apiKey = 'CAUSA_NODUS_MANAGERS_API_2026_KEY_9F8A7B6C5D4E3F2A1B';
       await db.collection('mail').doc(apiMailId).set({
-        to: ['armando.pilacuan@gmail.com', 'armando.pilacuan@crearpsl.net'],
+        to: ['armando.pilacuan@gmail.com'],
         cc: ['jose.sanchez@crearpsl.net'],
         message: {
-          subject: '🔌 [CAUSA OS ⇄ NODUS] API en Tiempo Real del Centro de Managers — Credenciales y Documentación',
+          subject: '🔌 [CAUSA OS ⇄ NODUS] API en Tiempo Real del Centro de Managers y Acceso Observador Total',
           html: `
             <div style="font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif; max-width: 680px; margin: 0 auto; background: #0f172a; color: #f8fafc; border-radius: 16px; overflow: hidden; border: 1px solid #1e293b;">
               <div style="padding: 28px 32px; background: linear-gradient(135deg, #0284c7 0%, #0f172a 100%); border-bottom: 1px solid #1e293b;">
@@ -846,8 +844,8 @@ async function ensureArmandoObserverProfile() {
                 </h1>
               </div>
               <div style="padding: 28px 32px; line-height: 1.6; color: #e2e8f0; font-size: 14px;">
-                <p>Hola <strong>Armando Pilacuán</strong>,</p>
-                <p>Se ha desplegado y habilitado en producción la <strong>API REST JSON en Tiempo Real del Centro de Managers de Causa OS</strong> para que puedas consultar y actualizar <strong>Nodus</strong> de manera 100% automática con los datos vivos de Managers, Capitanes, Equipos, Entrenadores, Coordinadores y Llamadas (individuales 1..16 y grupales).</p>
+                <p>Hola <strong>Armando Pilacuán</strong> (<code>armando.pilacuan@gmail.com</code>),</p>
+                <p>Tienes habilitado tu acceso de <strong>Observador Total</strong> en <strong>Causa OS</strong> ingresando con Google (<code>armando.pilacuan@gmail.com</code>), y además ya está activa en producción la <strong>API REST JSON en Tiempo Real del Centro de Managers</strong> para que puedas consultar y actualizar <strong>Nodus</strong> de manera 100% automática con los datos vivos de Managers, Capitanes, Equipos, Entrenadores, Coordinadores y Llamadas (individuales 1..16 y grupales).</p>
 
                 <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 18px 20px; margin: 20px 0;">
                   <div style="font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700; margin-bottom: 4px;">Endpoint Base de Producción</div>
@@ -891,18 +889,7 @@ curl_close($ch);</pre>
         createdAt: FieldValue.serverTimestamp(),
         source: 'centro_managers_nodus_api'
       });
-
-      await db.collection('notifications').doc('notif_api_centro_managers_nodus_armando_2026_v1').set({
-        recipientEmail: 'armando.pilacuan@gmail.com',
-        userEmail: 'armando.pilacuan@gmail.com',
-        targetRole: 'observador',
-        title: '🔌 API Centro de Managers ⇄ Nodus Activa',
-        message: 'Se habilitó la API REST en tiempo real del Centro de Managers (pestaña 🔌 API Nodus Sync) con tu API Key para actualizar Nodus automáticamente.',
-        read: false,
-        createdAt: new Date().toISOString(),
-        link: '/centro-managers'
-      });
-      console.log('📨 Correo y notificación de API Centro de Managers para Armando Pilacuán encolados.');
+      console.log('📨 Correo de API Centro de Managers para armando.pilacuan@gmail.com encolado.');
     }
   } catch (err) {
     console.warn('⚠️ No se pudo sincronizar perfil de Armando Pilacuán:', err.message);

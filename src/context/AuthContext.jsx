@@ -372,7 +372,7 @@ export function AuthProvider({ children }) {
     }
 
     // Armando Pilacuán: Acceso de Observador Total en toda la plataforma Causa OS
-    const isArmandoPilacuan = ['armando.pilacuan@gmail.com', 'armando.pilacuan@crearpsl.net', 'armando.pilacuan@crearpsl.com'].includes(normalizedEmail) || ['armando.pilacuan@gmail.com', 'armando.pilacuan@crearpsl.net', 'armando.pilacuan@crearpsl.com'].includes(rawEmail);
+    const isArmandoPilacuan = normalizedEmail === 'armando.pilacuan@gmail.com' || rawEmail === 'armando.pilacuan@gmail.com';
     if (isArmandoPilacuan) {
       if (!assignedRoles.includes('observador')) assignedRoles.push('observador');
       if (!assignedRoles.includes('direccion')) assignedRoles.push('direccion');

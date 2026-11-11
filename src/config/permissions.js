@@ -11,7 +11,6 @@ import { isUserInactive } from '../utils/userNormalizer.js';
 export const SUPER_ADMIN_EMAILS = [
   'jose.sanchez@crearpsl.net',      // José Sánchez — SuperAdmin + Gerente Lima
   'armando.pilacuan@gmail.com',     // Armando Pilacuán — SuperAdmin + Observador Total
-  'armando.pilacuan@crearpsl.net',  // Armando Pilacuán — Correo Corporativo Oficial
   'paul.sosa@crearpsl.net'          // Paul Sosa — SuperAdmin
 ];
 
@@ -272,9 +271,7 @@ export const OBSERVER_EMAILS = [
   'jesus.acosta@crearpsl.net',
   'chuyacostar88@gmail.com',
   'jesusadrianacosta@gmail.com',
-  'armando.pilacuan@gmail.com',
-  'armando.pilacuan@crearpsl.net',
-  'armando.pilacuan@crearpsl.com'
+  'armando.pilacuan@gmail.com'
 ];
 
 export const isGlobalObserver = (currentUser) => {

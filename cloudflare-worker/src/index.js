@@ -67,7 +67,6 @@ const ROLES_GERENCIA = [
 const SUPER_ADMIN_EMAILS_WORKER = [
   'jose.sanchez@crearpsl.net',
   'armando.pilacuan@gmail.com',
-  'armando.pilacuan@crearpsl.net',
   'paul.sosa@crearpsl.net'
 ];
 

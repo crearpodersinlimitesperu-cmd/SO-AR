@@ -1470,12 +1470,10 @@ export const USERS_TO_IMPORT = [
       "consolidado"
     ],
     "sede": "Global",
-    "corporateEmail": "armando.pilacuan@crearpsl.net",
+    "corporateEmail": "armando.pilacuan@gmail.com",
     "personalEmail": "armando.pilacuan@gmail.com",
     "emails": [
-      "armando.pilacuan@gmail.com",
-      "armando.pilacuan@crearpsl.net",
-      "armando.pilacuan@crearpsl.com"
+      "armando.pilacuan@gmail.com"
     ],
     "email": "armando.pilacuan@gmail.com"
   }

@@ -376,7 +376,7 @@ export class OmniAuditorOrquestador {
       tipo: 'ALERTA_ROJA_QUIEBRE_AGENTE',
       nivel: 'EMERGENCIA_OPERATIVA',
       quiebre,
-      destinatarios: ['jose.sanchez@crearpsl.net', 'armando.pilacuan@crearpsl.net', 'paul.sosa@crearpsl.net'],
+      destinatarios: ['jose.sanchez@crearpsl.net', 'armando.pilacuan@gmail.com', 'paul.sosa@crearpsl.net'],
       rolesDestino: ['superadmin', 'direccion', 'cfo'],
       timestamp: new Date().toISOString(),
       resuelto: false
