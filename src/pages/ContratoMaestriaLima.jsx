@@ -194,9 +194,30 @@ export default function ContratoMaestriaLima() {
     : 'https://centro-operativo-cpsl.web.app/reglas-maestria';
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=10&data=${encodeURIComponent(pageUrl)}`;
 
-  // Capturar IP y Geolocalización automáticamente al abrir la página sin excepción
+  // Capturar IP y Geolocalización automáticamente y blindar tema oscuro en la página pública
   useEffect(() => {
     document.title = 'Dossier Legal y Reglas de Maestría del Juego (Sede Lima) · Creación Cuántica E.I.R.L.';
+
+    const prevHtmlTheme = document.documentElement.getAttribute('data-theme');
+    const prevBodyTheme = document.body.getAttribute('data-theme');
+    const enforceDarkTheme = () => {
+      if (document.documentElement.getAttribute('data-theme') !== 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+      if (document.body.getAttribute('data-theme') !== 'dark') {
+        document.body.setAttribute('data-theme', 'dark');
+      }
+      document.documentElement.classList.remove('theme-light', 'theme-zen');
+      document.body.classList.remove('theme-light', 'theme-zen');
+      document.documentElement.classList.add('theme-dark');
+      document.body.classList.add('theme-dark');
+    };
+
+    enforceDarkTheme();
+    const observer = new MutationObserver(enforceDarkTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+    observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+
     let mounted = true;
     getClientGeoLocation({ forceFresh: false, tryGps: true }).then((geo) => {
       if (mounted) {
@@ -206,7 +227,12 @@ export default function ContratoMaestriaLima() {
     }).catch(() => {
       if (mounted) setLoadingGeo(false);
     });
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+      observer.disconnect();
+      if (prevHtmlTheme) document.documentElement.setAttribute('data-theme', prevHtmlTheme);
+      if (prevBodyTheme) document.body.setAttribute('data-theme', prevBodyTheme);
+    };
   }, []);
 
   const handleInputChange = (e) => {
@@ -460,51 +486,67 @@ export default function ContratoMaestriaLima() {
         paddingBottom: '4rem'
       }}
     >
-      {/* Blindaje de Contraste CSS para evitar que variables globales oscurezcan títulos o tablas */}
+      {/* Blindaje de Contraste CSS de Máxima Especificidad (#root) contra overrides globales de Modo Claro */}
       <style>{`
-        .maestria-contract-root h1,
-        .maestria-contract-root h2,
-        .maestria-contract-root h3 {
+        html body #root .maestria-contract-root h1,
+        html body #root .maestria-contract-root h2,
+        html body #root .maestria-contract-root h3,
+        html body #root .maestria-contract-root [style*="color: rgb(255, 255, 255)"],
+        html body #root .maestria-contract-root [style*="color: #ffffff"] {
           color: #ffffff !important;
         }
-        .maestria-contract-root h4 {
+        html body #root .maestria-contract-root h4 {
           color: #fef08a !important;
         }
-        .maestria-contract-root p {
-          color: #e2e8f0 !important;
+        html body #root .maestria-contract-root p,
+        html body #root .maestria-contract-root [style*="color: #e2e8f0"],
+        html body #root .maestria-contract-root [style*="color: #f1f5f9"],
+        html body #root .maestria-contract-root [style*="color: #f8fafc"],
+        html body #root .maestria-contract-root [style*="color: #cbd5e1"] {
+          color: #f1f5f9 !important;
         }
-        .maestria-contract-root table {
+        html body #root .maestria-contract-root table {
           width: 100% !important;
           border-collapse: collapse !important;
           background: #070d19 !important;
           color: #f8fafc !important;
         }
-        .maestria-contract-root thead tr,
-        .maestria-contract-root th {
+        html body #root .maestria-contract-root table thead tr,
+        html body #root .maestria-contract-root table th {
           background: #13203d !important;
           color: #fbbf24 !important;
           font-weight: 800 !important;
-          border-bottom: 2px solid rgba(245, 158, 11, 0.45) !important;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.55) !important;
           text-transform: uppercase !important;
           font-size: 0.78rem !important;
           letter-spacing: 0.04em !important;
         }
-        .maestria-contract-root tbody tr,
-        .maestria-contract-root td {
+        html body #root .maestria-contract-root table tbody tr,
+        html body #root .maestria-contract-root table tbody td {
           background: #0a1326 !important;
-          color: #f1f5f9 !important;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+          color: #f8fafc !important;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.14) !important;
         }
-        .maestria-contract-root tbody tr:nth-child(even) td {
+        html body #root .maestria-contract-root table tbody tr:nth-child(even) td {
           background: #0e1930 !important;
+          color: #f8fafc !important;
         }
-        .maestria-contract-root input,
-        .maestria-contract-root select {
+        html body #root .maestria-contract-root table tbody tr td:first-child {
+          color: #ffffff !important;
+          font-weight: 800 !important;
+        }
+        html body #root .maestria-contract-root input:not([type="checkbox"]),
+        html body #root .maestria-contract-root select {
           color: #ffffff !important;
           background-color: #060b17 !important;
+          border: 1px solid rgba(255, 255, 255, 0.25) !important;
         }
-        .maestria-contract-root input::placeholder {
-          color: #64748b !important;
+        html body #root .maestria-contract-root select option {
+          color: #ffffff !important;
+          background-color: #0b1428 !important;
+        }
+        html body #root .maestria-contract-root input::placeholder {
+          color: #94a3b8 !important;
         }
       `}</style>
 
@@ -528,21 +570,21 @@ export default function ContratoMaestriaLima() {
           gap: '0.8rem'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.95rem' }}>
-            {/* Contenedor de Alto Contraste para que el Logo Oficial CREAR sea 100% legible */}
+            {/* Contenedor de Alto Contraste con Logo Blanco Oficial CREAR */}
             <div style={{
-              background: '#ffffff',
+              background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
               padding: '6px 12px',
               borderRadius: '10px',
-              border: '2px solid #f59e0b',
+              border: '1.5px solid #f59e0b',
               boxShadow: '0 4px 14px rgba(245, 158, 11, 0.25)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
               <img
-                src="/logo-crear.png"
+                src="/logo_crear_blanco.png"
                 alt="CREAR Poder Sin Límites"
-                style={{ height: '36px', width: 'auto', objectFit: 'contain', display: 'block' }}
+                style={{ height: '40px', width: 'auto', objectFit: 'contain', display: 'block' }}
               />
             </div>
             <div>

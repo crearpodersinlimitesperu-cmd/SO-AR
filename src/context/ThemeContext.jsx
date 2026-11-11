@@ -57,7 +57,15 @@ export function ThemeProvider({ children }) {
     };
 
     const applyTheme = () => {
-      const resolved = calculateTheme();
+      const path = typeof window !== 'undefined' ? (window.location.pathname || '').toLowerCase() : '';
+      const isDarkLockedContractRoute =
+        path.startsWith('/reglas-maestria') ||
+        path.startsWith('/contrato-maestria') ||
+        path.startsWith('/caminata-sobre-fuego') ||
+        path.startsWith('/contrato-fuego') ||
+        Boolean(typeof document !== 'undefined' && document.querySelector('.maestria-contract-root, .fuego-contract-root'));
+
+      const resolved = isDarkLockedContractRoute ? 'dark' : calculateTheme();
       setActiveTheme(resolved);
       document.documentElement.setAttribute('data-theme', resolved);
       document.body.setAttribute('data-theme', resolved);
