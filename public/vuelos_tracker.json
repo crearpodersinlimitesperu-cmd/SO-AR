@@ -1,11 +1,11 @@
 {
   "version": "3.2.0-ai-engine",
-  "updatedAt": "2026-11-11T11:41:35.488073Z",
+  "updatedAt": "2026-11-11T20:00:37.130032Z",
   "liveStatusAvailable": false,
   "aiEngineStatus": "ACTIVE",
-  "totalPdfAnalyzed": 513,
-  "totalFlightsIndexed": 363,
-  "totalFlights": 363,
+  "totalPdfAnalyzed": 518,
+  "totalFlightsIndexed": 370,
+  "totalFlights": 370,
   "syncFrequency": "7 veces al día (01:00, 04:00, 10:00, 13:00, 16:00, 19:00, 22:00 UTC)",
   "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
@@ -11382,6 +11382,335 @@
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la1426",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1363_2026-11-19_GYE_CUE": {
+      "flightNumber": "LA 1363",
+      "flightCode": "LA1363_2026-11-19_GYE_CUE",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1363_2026-11-19_GYE_CUE",
+      "reservationCode": "OKBNCK",
+      "passengers": [
+        "MAURICIO PEREZ ROBLES"
+      ],
+      "sourcePdf": "MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 2-3.pdf",
+      "sourcePath": " / MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 2-3.pdf",
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "CUE",
+        "destinationCity": "Cuenca",
+        "destinationAirport": "Aeropuerto Mariscal La Mar",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-19",
+        "scheduledDeparture": "2026-11-19T15:10:00-05:00",
+        "scheduledArrival": "2026-11-19T15:59:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Hall Principal de Salida de Pasajeros (Aeropuerto CUE)",
+        "destination": "Sede Cuenca (Hospedaje por coordinar con Dirección de Sede) (Cuenca, Ecuador)",
+        "driverPickupEstimated": "20 min posteriores al aterrizaje",
+        "driverNote": "Traslado coordinado con equipo local de Sede Cuenca."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1363",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1363_2026-09-04_LIM_UIO": {
+      "flightNumber": "LA 1363",
+      "flightCode": "LA1363_2026-09-04_LIM_UIO",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1363_2026-09-04_LIM_UIO",
+      "reservationCode": "OKBNCK",
+      "passengers": [
+        "MAURICIO PEREZ ROBLES"
+      ],
+      "sourcePdf": "MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 2-3.pdf",
+      "sourcePath": " / MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 2-3.pdf",
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T08:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:30:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1363",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "AV1612_2026-11-23_CUE_UIO": {
+      "flightNumber": "AV 1612",
+      "flightCode": "AV1612_2026-11-23_CUE_UIO",
+      "airline": "Avianca",
+      "callsign": "AV1612_2026-11-23_CUE_UIO",
+      "reservationCode": "AMGHQK",
+      "passengers": [
+        "Mauricio Perez Robles"
+      ],
+      "sourcePdf": "MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 3-3.pdf",
+      "sourcePath": " / MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 3-3.pdf",
+      "route": {
+        "origin": "CUE",
+        "originCity": "Cuenca",
+        "originAirport": "Aeropuerto Mariscal La Mar",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-23",
+        "scheduledDeparture": "2026-11-23T14:15:00-05:00",
+        "scheduledArrival": "2026-11-23T15:10:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av1612",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Avianca+AV1612"
+    },
+    "CM536_2026-11-19_MEX_PTY": {
+      "flightNumber": "CM 536",
+      "flightCode": "CM536_2026-11-19_MEX_PTY",
+      "airline": "Copa Airlines",
+      "callsign": "CM536_2026-11-19_MEX_PTY",
+      "reservationCode": "2AOE7X",
+      "passengers": [
+        "Mauricio Perez Robles"
+      ],
+      "sourcePdf": "MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 1-3.pdf",
+      "sourcePath": " / MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 1-3.pdf",
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-19",
+        "scheduledDeparture": "2026-11-19T03:25:00-05:00",
+        "scheduledArrival": "2026-11-19T08:11:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm536",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM536"
+    },
+    "CM273_2026-11-19_PTY_GYE": {
+      "flightNumber": "CM 273",
+      "flightCode": "CM273_2026-11-19_PTY_GYE",
+      "airline": "Copa Airlines",
+      "callsign": "CM273_2026-11-19_PTY_GYE",
+      "reservationCode": "2AOE7X",
+      "passengers": [
+        "Mauricio Perez Robles"
+      ],
+      "sourcePdf": "MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 1-3.pdf",
+      "sourcePath": " / MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 1-3.pdf",
+      "route": {
+        "origin": "PTY",
+        "originCity": "Panamá",
+        "originAirport": "Aeropuerto Internacional de Tocumen",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-19",
+        "scheduledDeparture": "2026-11-19T09:02:00-05:00",
+        "scheduledArrival": "2026-11-19T11:18:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Arribos (Aeropuerto Olmedo GYE)",
+        "destination": "Sede Guayaquil (Hospedaje por coordinar con Dirección de Sede) (Guayaquil, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Dirección de Sede Guayaquil."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm273",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM273"
+    },
+    "CM158_2026-11-23_UIO_PTY": {
+      "flightNumber": "CM 158",
+      "flightCode": "CM158_2026-11-23_UIO_PTY",
+      "airline": "Copa Airlines",
+      "callsign": "CM158_2026-11-23_UIO_PTY",
+      "reservationCode": "2AOE7X",
+      "passengers": [
+        "Mauricio Perez Robles"
+      ],
+      "sourcePdf": "MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 1-3.pdf",
+      "sourcePath": " / MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 1-3.pdf",
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "PTY",
+        "destinationCity": "Panamá",
+        "destinationAirport": "Aeropuerto Internacional de Tocumen",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-23",
+        "scheduledDeparture": "2026-11-23T18:36:00-05:00",
+        "scheduledArrival": "2026-11-23T20:33:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Arribos Internacionales / Nacionales UIO (Cartel CPSL)",
+        "destination": "CREAR PODER SIN LÍMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Conductor de sede Quito te esperará con cartel oficial CREAR PODER SIN LÍMITES."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm158",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM158"
+    },
+    "CM194_2026-11-23_PTY_MEX": {
+      "flightNumber": "CM 194",
+      "flightCode": "CM194_2026-11-23_PTY_MEX",
+      "airline": "Copa Airlines",
+      "callsign": "CM194_2026-11-23_PTY_MEX",
+      "reservationCode": "2AOE7X",
+      "passengers": [
+        "Mauricio Perez Robles"
+      ],
+      "sourcePdf": "MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 1-3.pdf",
+      "sourcePath": " / MAURICIO PEREZ - CAP UNO EQ 25 - CUENCA 1-3.pdf",
+      "route": {
+        "origin": "PTY",
+        "originCity": "Panamá",
+        "originAirport": "Aeropuerto Internacional de Tocumen",
+        "destination": "MEX",
+        "destinationCity": "Ciudad de México",
+        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 00m"
+      },
+      "schedule": {
+        "departureDate": "2026-11-23",
+        "scheduledDeparture": "2026-11-23T21:31:00-05:00",
+        "scheduledArrival": "2026-11-24T00:15:00-05:00",
+        "estimatedDeparture": null,
+        "estimatedArrival": null,
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "SCHEDULED",
+      "statusLabel": "Programado según itinerario",
+      "statusDescription": "Estado real del vuelo no disponible; consultar aerolínea/radar externo",
+      "delayMinutes": null,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Salida de Vuelos Llegadas T1 / T2 (Aeropuerto Benito Juárez MEX)",
+        "destination": "Sede Ciudad de México (Hospedaje por coordinar con Dirección de Sede) (Ciudad de México, México)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "Coordinación de bienvenida y traslado con Sede México."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/cm194",
+      "checkInUrl": "https://www.google.com/search?q=check+in+Copa+Airlines+CM194"
     },
     "AM684_2026-11-18_MEX_UIO": {
       "flightNumber": "AM 684",
