@@ -19,6 +19,7 @@ import {
   hasAmbiguousCycleCompletionScope,
   isTaskClosedForDelivery
 } from '../src/utils/taskLifecycle.js';
+import { SUPER_ADMIN_EMAILS, OBSERVER_EMAILS } from '../src/config/permissions.js';
 
 dotenv.config();
 
@@ -169,7 +170,17 @@ async function sendClaimedMail(docSnap, data) {
     }
 
     const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => to.endsWith(d));
-    if (isCorporate) {
+    const isPrivilegedEmail = SUPER_ADMIN_EMAILS.includes(to) || OBSERVER_EMAILS.includes(to);
+    const isContractOrSystemMail =
+      data.type === 'system_access_invite' ||
+      data.type === 'contract_confirmation' ||
+      (data.message?.subject && (
+        data.message.subject.includes('Caminata sobre Fuego') ||
+        data.message.subject.includes('Maestría del Juego') ||
+        data.message.subject.includes('Observador Total')
+      ));
+
+    if (isCorporate || isPrivilegedEmail || isContractOrSystemMail) {
       validRecipients.push(to);
       continue;
     }
@@ -214,8 +225,11 @@ async function sendClaimedMail(docSnap, data) {
   const cleanHtml = sanitizeHtml(rawHtml, {
     allowedTags: [
       'p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'br', 'hr',
-      'div', 'span', 'img', 'audio', 'source', 'iframe', 'table', 'tbody', 'thead', 'tr', 'td', 'th'
+      'div', 'span', 'img', 'audio', 'source', 'iframe', 'table', 'tbody', 'thead', 'tr', 'td', 'th', 'code'
     ],
+    allowedSchemesByTag: {
+      img: ['http', 'https', 'data', 'cid']
+    },
     allowedAttributes: {
       'a': ['href', 'target', 'style', 'class'],
       'p': ['style', 'class'],
@@ -250,6 +264,15 @@ async function sendClaimedMail(docSnap, data) {
     subject: data.message?.subject || 'Notificación Causa OS — CREAR PODER SIN LÍMITES',
     html: cleanHtml
   };
+
+  if (data.cc) {
+    mailOptions.cc = Array.isArray(data.cc) ? data.cc : [data.cc];
+  }
+
+  const rawAttachments = data.message?.attachments || data.attachments;
+  if (Array.isArray(rawAttachments) && rawAttachments.length > 0) {
+    mailOptions.attachments = rawAttachments;
+  }
 
   const icsAttachment = buildIcsAttachment(data.calendarEvent);
   if (icsAttachment) {
@@ -771,9 +794,45 @@ function formatDeadlineEsLocal(iso) {
   }
 }
 
+async function ensureArmandoObserverProfile() {
+  try {
+    const armandoProfile = {
+      id: 'observador_armandopilacuan',
+      name: 'Armando Pilacuán',
+      displayName: 'Armando Pilacuán',
+      role: 'observador',
+      appRole: 'observador',
+      roles: ['observador', 'direccion', 'gerente', 'consolidado'],
+      sede: 'Global',
+      email: 'armando.pilacuan@gmail.com',
+      corporateEmail: 'armando.pilacuan@crearpsl.net',
+      personalEmail: 'armando.pilacuan@gmail.com',
+      emails: [
+        'armando.pilacuan@gmail.com',
+        'armando.pilacuan@crearpsl.net',
+        'armando.pilacuan@crearpsl.com'
+      ],
+      active: true,
+      isActive: true,
+      status: 'active',
+      estado: 'activo',
+      isSuperAdmin: true,
+      isGlobalObserver: true,
+      updatedAt: FieldValue.serverTimestamp()
+    };
+    await db.collection('users').doc('observador_armandopilacuan').set(armandoProfile, { merge: true });
+    await db.collection('user_profiles').doc('armando.pilacuan@gmail.com').set(armandoProfile, { merge: true });
+    await db.collection('user_profiles').doc('armando.pilacuan@crearpsl.net').set(armandoProfile, { merge: true });
+    console.log('✅ Perfil de Observador Total para Armando Pilacuán sincronizado en Firestore.');
+  } catch (err) {
+    console.warn('⚠️ No se pudo sincronizar perfil de Armando Pilacuán:', err.message);
+  }
+}
+
 // Ejecución
 if (isOneShot) {
   console.log("⚡ Ejecución en modo One-Shot (GitHub Actions / Tarea programada)...");
+  await ensureArmandoObserverProfile();
   await processPendingMails();
   await checkInactivity();
   await checkOverdueTaskReminders();

@@ -1,6 +1,9 @@
 name: 📧 Mail Dispatch & Inactivity Alerts
 
 on:
+  push:
+    branches:
+      - master
   schedule:
     # Runs every 5 minutes for faster mail delivery
     - cron: '*/5 * * * *'
