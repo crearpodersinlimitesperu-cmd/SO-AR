@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldCheck,
-  FileText,
   CheckCircle2,
   AlertTriangle,
   QrCode,
@@ -9,20 +8,11 @@ import {
   Printer,
   Copy,
   Search,
-  UserCheck,
   MapPin,
-  Lock,
-  Mail,
-  User,
   Check,
-  Eye,
-  Building2,
-  FileCheck2,
-  Globe,
-  Cpu,
   Award
 } from 'lucide-react';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
@@ -36,8 +26,9 @@ async function computeSha256(message) {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
-  } catch {}
-  // Fallback determinista si no hay subtle crypto
+  } catch {
+    // Fallback
+  }
   let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
   for (let i = 0, ch; i < message.length; i++) {
     ch = message.charCodeAt(i);
@@ -53,8 +44,8 @@ const SECCIONES_CONTRATO = [
   {
     id: 'sec1',
     numero: 'SECCIÓN I',
-    titulo: 'Marco Metodológico y Desarrollo Operacional',
-    resumen: 'Exposición metodológica de inmersión de alto rendimiento y deslinde pedagógico (no equivale a terapia psicológica ni médica).',
+    titulo: 'Marco Metodológico, Desarrollo Operacional y Vigencia en la Comunidad',
+    resumen: 'Exposición metodológica de inmersión de alto rendimiento, deslinde pedagógico y alcance continuo durante y después de Maestría.',
     articulos: [
       {
         subtitulo: '1.1 Exposición Metodológica del Programa',
@@ -65,38 +56,42 @@ const SECCIONES_CONTRATO = [
       },
       {
         subtitulo: '1.2 Deslinde Pedagógico y Naturaleza del Servicio',
-        contenido: `El Participante y el Manager reconocen formalmente que el primer fin de semana del programa MAESTRÍA DEL JUEGO constituye de manera exclusiva un servicio de entrenamiento, capacitación privada y desarrollo operacional de alto rendimiento contextual.
+        contenido: `El Participante y el Manager reconocen formalmente que el programa MAESTRÍA DEL JUEGO constituye de manera exclusiva un servicio de entrenamiento, capacitación privada y desarrollo operacional de alto rendimiento contextual.
 El presente entrenamiento NO constituye, NO reemplaza y NO equivale a:
 • Tratamiento psicológico, psicoterapéutico o psicoanalítico.
 • Consulta, evaluación o tratamiento médico, neurológico o psiquiátrico.
 • Terapia de salud mental o intervención clínica de ninguna índole.
-La participación del Participante y la integración del Manager al equipo de liderazgo en este primer fin de semana es completamente libre, voluntaria e informada.`
+La participación del Participante y la integración del Manager al equipo de liderazgo es completamente libre, voluntaria e informada.`
+      },
+      {
+        subtitulo: '1.3 Alcance Temporal: Durante Maestría, Después de Maestría como Comunidad y Vigencia Legal Peruana',
+        contenido: `Las reglas, principios éticos, acuerdos de confidencialidad y normas de convivencia establecidos en el presente instrumento rigen de manera obligatoria durante todo el desarrollo del programa MAESTRÍA DEL JUEGO, continúan aplicando después de Maestría para todas las personas como miembros e integrantes activos o graduados de la comunidad CREAR, y mantienen su plena exigibilidad jurídica por todo el tiempo que la legislación de la República del Perú lo considere vigente.`
       }
     ]
   },
   {
     id: 'sec2',
     numero: 'SECCIÓN II',
-    titulo: 'Código de Conducta, Reglas de Maestría y Acuerdo NDA / Confidencialidad',
-    resumen: 'Pacto de no divulgación (5 años), secreto de comunidad a perpetuidad, cero grabaciones, cero sustancias, prohibición de préstamos y relaciones de pareja nuevas, y asistencia >80%.',
+    titulo: 'Código de Conducta, Reglas de Maestría y Acuerdo de Confidencialidad (NDA)',
+    resumen: 'Pacto de no divulgación, secreto de comunidad durante y después de Maestría, cero grabaciones, cero sustancias, prohibición de préstamos y relaciones sentimentales nuevas en el proceso, y asistencia >80%.',
     articulos: [
       {
-        subtitulo: '2.1 Acuerdo de Confidencialidad Absoluta, NDA y Secreto de Comunidad',
-        contenido: `El Participante y el Manager reconocen que la metodología, dinámicas, guiones, manuales, estructuras operativas de bienvenida y material audiovisual empleados durante el primer fin de semana del entrenamiento constituyen propiedad intelectual reservada y secreto comercial de CREACIÓN CUÁNTICA E.I.R.L.
-• Pacto de No Divulgación del Entrenamiento y Operativa: Tanto Participantes como Managers se comprometen a no reproducir, publicar, compartir o comercializar, de forma total o parcial, los contenidos, protocolos de bienvenida u operaciones del entrenamiento por un plazo de cinco (5) años contados desde la firma de este documento.
-• Secreto de Comunidad y Servidor de Soporte (Indefinido): Las vivencias, testimonios, historias personales y declaraciones compartidas entre participantes y el equipo de managers durante las sesiones son de carácter estrictamente confidencial y reservado a perpetuidad. Queda expresamente prohibido divulgar fuera del entorno del entrenamiento cualquier vivencia ajena.`
+        subtitulo: '2.1 Acuerdo de Confidencialidad Absoluta (NDA) y Secreto de Comunidad',
+        contenido: `El Participante y el Manager reconocen que la metodología, dinámicas, guiones, manuales, estructuras operativas y material audiovisual empleados durante el entrenamiento constituyen propiedad intelectual reservada y secreto comercial de CREACIÓN CUÁNTICA E.I.R.L.
+• Pacto de No Divulgación del Entrenamiento y Operativa: Tanto Participantes como Managers se comprometen a no reproducir, publicar, compartir o comercializar, de forma total o parcial, los contenidos, protocolos o dinámicas del entrenamiento durante toda Maestría, después de Maestría como integrantes de la comunidad y por todo el plazo máximo de protección que la ley peruana vigente establezca.
+• Secreto de Comunidad y Reserva Absoluta: Las vivencias, testimonios, historias personales y declaraciones compartidas entre participantes y el equipo de liderazgo durante las sesiones y dentro de la comunidad son de carácter estrictamente confidencial y reservado de manera indefinida y permanente. Queda expresamente prohibido divulgar fuera del entorno del entrenamiento cualquier vivencia o información personal ajena.`
       },
       {
         subtitulo: '2.2 Prohibición Estricta de Grabación de Audio, Video y Fotografía',
         contenido: `Queda estrictamente prohibido registrar, grabar o fotografiar las actividades, sesiones, ponencias o dinámicas del entrenamiento en cualquier formato físico o digital, salvo por el equipo audiovisual oficial designado por CREACIÓN CUÁNTICA E.I.R.L.`
       },
       {
-        subtitulo: '2.3 Reglas Operativas de Sala y Convivencia en Maestría',
-        contenido: `Para preservar la integridad del contenedor de transformación, tanto Participantes como Managers se obligan a cumplir de forma irrestricta las siguientes normas:
-• Cero Alcohol y Sustancias Psicoactivas: Prohibición absoluta de asistir bajo efectos de alcohol, drogas o sustancias no prescritas, así como su consumo durante los días del entrenamiento.
-• Prohibición de Préstamos, Negocios y Apuestas: Queda prohibido solicitar u otorgar préstamos de dinero, realizar transacciones comerciales, multinivel o apuestas entre integrantes del equipo y staff durante todo el programa.
-• Cero Nuevas Relaciones Sentimentales en el Contenedor: Con el fin de evitar distracciones emocionales que vulneren el enfoque del proceso, queda prohibido iniciar vínculos afectivos o relaciones de pareja entre participantes, o entre participantes y managers/staff durante el ciclo activo.
-• Puntualidad y Asistencia Mínima (>80%): Es requisito indispensable cumplir con la puntualidad en cada bloque y mantener una asistencia superior al 80% de las sesiones para acreditar el fin de semana.`
+        subtitulo: '2.3 Reglas Operativas de Sala y Convivencia en Maestría y en la Comunidad',
+        contenido: `Para preservar la integridad del contenedor de transformación durante toda Maestría del Juego y en la convivencia posterior como miembros de la comunidad CREAR, tanto Participantes como Managers se obligan a cumplir de forma irrestricta las siguientes normas:
+• Cero Alcohol y Sustancias Psicoactivas: Prohibición absoluta de asistir bajo efectos de alcohol, drogas o sustancias no prescritas, así como su consumo durante las actividades y jornadas del programa.
+• Prohibición de Préstamos, Negocios y Apuestas: Queda prohibido solicitar u otorgar préstamos de dinero, realizar cobros, transacciones comerciales no autorizadas, esquemas de captación o apuestas aprovechando los espacios o directorios de los equipos y de la comunidad.
+• Cero Nuevas Relaciones Sentimentales en el Contenedor: Con el fin de evitar distracciones emocionales o conflictos de interés que vulneren el enfoque del proceso, queda prohibido iniciar vínculos afectivos o relaciones de pareja entre participantes, o entre participantes y managers/staff durante todo el ciclo del programa.
+• Puntualidad y Asistencia Mínima (>80%): Es requisito indispensable cumplir con la puntualidad en cada bloque y mantener una asistencia superior al 80% de las sesiones para acreditar el entrenamiento.`
       }
     ]
   },
@@ -112,7 +107,7 @@ La participación del Participante y la integración del Manager al equipo de li
       },
       {
         subtitulo: '3.2 Asunción de Responsabilidad y Deslinde Legal',
-        contenido: `Al amparo del Código Civil Peruano (D.Leg. N° 295), el Participante / Manager asume plena y exclusiva responsabilidad por sus decisiones, acciones, reacciones emocionales y resultados dentro y fuera del salón, otorgando indemne e irrevocable exoneración de responsabilidad civil, contractual o extracontractual a CREACIÓN CUÁNTICA E.I.R.L., sus representantes legales, entrenadores, coordinadores y staff.`
+        contenido: `Al amparo del Código Civil Peruano (D.Leg. N° 295), el Participante / Manager asume plena y exclusiva responsabilidad por sus decisiones, acciones, reacciones emocionales y resultados dentro y fuera del salón, otorgando indemne e irrevocable exoneración de responsabilidad civil, contractual o extracontractual a CREACIÓN CUÁNTICA E.I.R.L., sus representantes legales, entrenadores, coordinadores y equipo de apoyo por todo el tiempo que la ley peruana lo considere vigente.`
       }
     ]
   },
@@ -120,50 +115,46 @@ La participación del Participante y la integración del Manager al equipo de li
     id: 'sec4',
     numero: 'SECCIÓN IV',
     titulo: 'Protección de Datos Personales (Ley N° 29733) y Derechos de Imagen',
-    resumen: 'Autorización para tratamiento en banco de datos y uso institucional/pedagógico de material fotográfico o audiovisual.',
+    resumen: 'Autorización para tratamiento en banco de datos conforme a la ley peruana y uso institucional/pedagógico de material fotográfico o audiovisual.',
     articulos: [
       {
         subtitulo: '4.1 Consentimiento de Tratamiento de Datos Personales',
-        contenido: `De conformidad con la Ley N° 29733 y su Reglamento (modificado por D.S. N° 016-2024-JUS), el titular otorga su consentimiento libre, previo, expreso, informado e inequívoco para que CREACIÓN CUÁNTICA E.I.R.L. trate sus datos personales con fines de gestión académica, operativa, seguridad en sala y auditoría en la plataforma Causa OS / NODUS.`
+        contenido: `De conformidad con la Ley N° 29733 (Ley de Protección de Datos Personales del Perú) y su Reglamento aprobado por el Decreto Supremo N° 016-2024-JUS, el titular otorga su consentimiento libre, previo, expreso, informado e inequívoco para que CREACIÓN CUÁNTICA E.I.R.L. trate sus datos personales con fines de gestión académica, acreditación, seguridad en sala y resguardo legal durante y después del programa conforme a la normativa peruana vigente.`
       },
       {
         subtitulo: '4.2 Autorización de Uso de Imagen Institucional',
-        contenido: `El Participante / Manager autoriza de manera gratuita a CREACIÓN CUÁNTICA E.I.R.L. el uso de las fotografías o registros audiovisuales grupales captados por el equipo oficial durante las graduaciones o actividades autorizadas, exclusivamente para fines de memoria institucional, material pedagógico y difusión del programa CREAR PODER SIN LÍMITES.`
+        contenido: `El Participante / Manager autoriza de manera gratuita a CREACIÓN CUÁNTICA E.I.R.L. el uso de las fotografías o registros audiovisuales grupales captados por el equipo oficial durante las graduaciones o actividades autorizadas, exclusivamente para fines de memoria institucional, material pedagógico y difusión oficial del programa CREAR PODER SIN LÍMITES.`
       }
     ]
   },
   {
     id: 'sec5',
     numero: 'SECCIÓN V',
-    titulo: 'Salida Voluntaria, Separación por Incumplimiento y Rol Voluntario IMO',
-    resumen: 'Protocolo de retiro, facultad de separación inmediata por faltas éticas y regla de cancelación a 30 días para referidos.',
+    titulo: 'Salida Voluntaria, Separación por Incumplimiento e Invitados a la Comunidad',
+    resumen: 'Protocolo de retiro, facultad de separación inmediata por faltas éticas y protección de datos de invitados.',
     articulos: [
       {
-        subtitulo: '5.1 Retiro Voluntario y Facultad de Separación',
-        contenido: `La Empresa se reserva el derecho de separar de manera inmediata y sin derecho a reembolso a cualquier Participante o Manager que transgreda el acuerdo de confidencialidad, asista bajo efectos de sustancias prohibidas, incurra en faltas de respeto o vulnere la seguridad física o emocional del grupo.`
+        subtitulo: '5.1 Retiro Voluntario y Facultad de Separación por Incumplimiento',
+        contenido: `CREACIÓN CUÁNTICA E.I.R.L. se reserva el derecho de separar de manera inmediata y sin derecho a reembolso, tanto del entrenamiento activo como de los espacios de la comunidad CREAR, a cualquier Participante o Manager que transgreda el acuerdo de confidencialidad, asista bajo efectos de sustancias prohibidas, incurra en faltas éticas o vulnere la seguridad física, patrimonial o emocional de cualquier miembro de la comunidad.`
       },
       {
-        subtitulo: '5.2 Regulación del Rol Voluntario IMO (Líder Inspirador)',
-        contenido: `En caso de que el Participante asuma voluntariamente el rol de Líder Inspirador (IMO):
-• Tratamiento de Contactos Referidos: Los datos brindados serán tratados únicamente para enviar información previa sobre el programa.
-• Regla de Cancelación a 30 Días: Si el contacto referido no otorga su consentimiento en un plazo máximo de treinta (30) días calendario, sus datos serán eliminados definitivamente.
-• Prohibición de Menores de Edad: Queda estrictamente prohibido ingresar datos de menores de 18 años.`
+        subtitulo: '5.2 Responsabilidad ética al compartir el Programa con Invitados',
+        contenido: `Cuando el Participante o miembro graduado de la comunidad comparta libremente su experiencia o refiera invitados para conocer el programa:
+• Respeto y Veracidad: Se compromete a compartir la visión del programa con integridad, sin revelar dinámicas confidenciales de sala.
+• Protección de Datos de Invitados: Los datos de contacto compartidos serán tratados únicamente para brindar información oficial del programa por un plazo máximo de treinta (30) días calendario en caso de no concretarse su inscripción.
+• Prohibición de Menores de Edad: Queda estrictamente prohibido registrar datos de menores de 18 años en actividades de adultos.`
       }
     ]
   },
   {
     id: 'sec6',
     numero: 'SECCIÓN VI',
-    titulo: 'Consentimiento Clickwrap, Metadatos Forenses y Regla NODUS',
-    resumen: 'Validez jurídica Ley N° 27269, captura obligatoria de IP y Geolocalización, y condición de validación de pago en NODUS.',
+    titulo: 'Consentimiento Electrónico Clickwrap y Validez Probatoria (Ley N° 27269)',
+    resumen: 'Eficacia jurídica de la firma electrónica, captura obligatoria de IP y Geolocalización, y vigencia conforme a la ley peruana.',
     articulos: [
       {
         subtitulo: '6.1 Consentimiento Digital y Metadatos Probatorios Inalterables',
-        contenido: `Conforme a la Ley N° 27269 (Ley de Firmas y Certificados Digitales) y los artículos 141 y 141-A del Código Civil, la aceptación de las tres (3) casillas obligatorias junto con la firma digital registra de forma inalterable: Marca de Tiempo ISO 8601, Dirección IP Pública, Geolocalización (País, Ciudad y Coordenadas), Identificador de Dispositivo y Huella Criptográfica SHA-256.`
-      },
-      {
-        subtitulo: '6.2 Regla Estricta de Disparo de Acceso y Validación NODUS',
-        contenido: `REGLA DE ACCESO NODUS: El acceso definitivo al salón para el primer fin de semana, tanto para participantes como para managers, requiere que el pago haya sido validado y registrado formalmente en el sistema NODUS por la coordinación administrativa de la Empresa.`
+        contenido: `Conforme a la Ley N° 27269 (Ley de Firmas y Certificados Digitales) y los artículos 141 y 141-A del Código Civil Peruano, la aceptación de las tres (3) casillas obligatorias junto con la firma digital registra de forma inalterable: Marca de Tiempo ISO 8601, Dirección IP Pública, Geolocalización (País, Ciudad y Coordenadas), Identificador de Dispositivo y Huella Criptográfica SHA-256, constituyendo plena prueba de aceptación legal.`
       }
     ]
   }
@@ -174,6 +165,7 @@ export default function ContratoMaestriaLima() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signedSuccess, setSignedSuccess] = useState(null);
+  const [duplicateNotice, setDuplicateNotice] = useState('');
   const [passDataUrl, setPassDataUrl] = useState(null);
   const [showQrModal, setShowQrModal] = useState(false);
   const [geoInfo, setGeoInfo] = useState(null);
@@ -239,11 +231,11 @@ export default function ContratoMaestriaLima() {
   const validateForm = () => {
     const errors = {};
     if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es obligatorio.';
-    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El número de documento (DNI/CE) es obligatorio.';
+    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El número de documento (DNI/CE/Pasaporte) es obligatorio.';
     if (!formData.email.trim() || !formData.email.includes('@')) errors.email = 'Ingresa un correo electrónico válido para recibir tu contrato.';
     if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es obligatorio.';
     if (!formData.casilla1_TerminosNDA) {
-      errors.casilla1_TerminosNDA = 'Debes marcar la Casilla 1 (Aceptación del Contrato Unificado, Reglas de Sala y Confidencialidad NDA).';
+      errors.casilla1_TerminosNDA = 'Debes marcar la Casilla 1 (Aceptación del Contrato Unificado, Reglas de Maestría y Comunidad, y Confidencialidad NDA).';
     }
     if (!formData.casilla2_SaludExoneracion) {
       errors.casilla2_SaludExoneracion = 'Debes marcar la Casilla 2 (Declaración Jurada de Salud, Asunción de Riesgos y Exoneración).';
@@ -257,8 +249,12 @@ export default function ContratoMaestriaLima() {
     return errors;
   };
 
+  const normalizeDocNum = (val) => String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase().trim();
+  const normalizeEmail = (val) => String(val || '').toLowerCase().trim();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setDuplicateNotice('');
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -270,7 +266,54 @@ export default function ContratoMaestriaLima() {
 
     setIsSubmitting(true);
     try {
-      // Asegurar IP y Geolocalización fresca
+      const inputDocNorm = normalizeDocNum(formData.numeroDocumento);
+      const inputEmailNorm = normalizeEmail(formData.email);
+
+      // 0. VERIFICACIÓN ANTI-DUPLICADOS: Impedir que una misma persona se registre dos veces
+      if (db) {
+        const snap = await getDocs(collection(db, 'contratos_maestria_lima'));
+        let existingRecord = null;
+        snap.forEach((docSnap) => {
+          const d = docSnap.data();
+          const dbDocNorm = normalizeDocNum(d.numeroDocumento || (d.doc ? d.doc.split(':').pop() : ''));
+          const dbEmailNorm = normalizeEmail(d.email);
+          if ((inputDocNorm && dbDocNorm && inputDocNorm === dbDocNorm) || (inputEmailNorm && dbEmailNorm && inputEmailNorm === dbEmailNorm)) {
+            existingRecord = { id: docSnap.id, ...d };
+          }
+        });
+
+        if (existingRecord) {
+          const existingCode = existingRecord.code || existingRecord.verificationCode || 'CQ-MJ-VERIFIED';
+          const existingPassUrl = await generateMaestriaPassCanvas({
+            nombre: existingRecord.nombre || existingRecord.nombreCompleto || formData.nombreCompleto.trim(),
+            doc: existingRecord.doc || `${existingRecord.tipoDocumento || 'DNI'}: ${existingRecord.numeroDocumento || ''}`,
+            rol: existingRecord.rol || existingRecord.rolActividad || 'Participante',
+            equipo: existingRecord.equipo || existingRecord.equipoCohorte || 'Equipo 32',
+            sede: 'Lima',
+            fecha: existingRecord.fecha || 'Registrado',
+            codigo: existingCode,
+            ip: existingRecord.ip || 'Registrada',
+            geoLocation: existingRecord.geoLocation || 'Lima, Perú 🇵🇪',
+            coordinates: existingRecord.coordinates || '',
+            verificationUrl: `${pageUrl}?verify=${existingCode}`
+          });
+
+          setPassDataUrl(existingPassUrl);
+          setDuplicateNotice(
+            '⚠️ Ya cuentas con un registro legal firmado con este número de documento o correo electrónico. No está permitido registrarse dos veces. A continuación te mostramos tu constancia y Pase Oficial vigente. (Si registraste algún dato por error, solicita al equipo en sala eliminar tu registro previo para poder volver a firmar).'
+          );
+          setSignedSuccess({
+            ...existingRecord,
+            nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre,
+            codigo: existingCode
+          });
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Asegurar IP y Geolocalización fresca sin excepción
       const currentGeo = geoInfo || await getClientGeoLocation({ forceFresh: true, tryGps: true });
       const isoTimestamp = new Date().toISOString();
       const localFecha = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
@@ -316,15 +359,17 @@ export default function ContratoMaestriaLima() {
         nombreCompleto: formData.nombreCompleto.trim(),
         tipoDocumento: formData.tipoDocumento,
         numeroDocumento: formData.numeroDocumento.trim(),
+        numeroDocumentoNorm: inputDocNorm,
         doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
-        email: formData.email.trim().toLowerCase(),
+        email: inputEmailNorm,
         telefono: formData.telefono.trim(),
         rol: formData.rolActividad,
         rolActividad: formData.rolActividad,
         equipo: formData.equipoCohorte,
         equipoCohorte: formData.equipoCohorte,
         sede: 'Lima',
-        lugar: 'Lima, Perú — Maestría del Juego (1er Fin de Semana)',
+        lugar: 'Lima, Perú — Maestría del Juego & Comunidad CREAR',
+        alcanceVigencia: 'Durante toda Maestría del Juego, después de Maestría como miembros de la Comunidad CREAR y por todo el tiempo que la ley peruana lo considere vigente',
         casilla1_TerminosNDA: Boolean(formData.casilla1_TerminosNDA),
         casilla2_SaludExoneracion: Boolean(formData.casilla2_SaludExoneracion),
         casilla3_DatosImagen: Boolean(formData.casilla3_DatosImagen),
@@ -350,7 +395,7 @@ export default function ContratoMaestriaLima() {
         geoSource: currentGeo?.geoSource || 'IP_LOOKUP',
         device: currentGeo?.device || 'Navegador Web',
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        versionContrato: 'MJ-LIMA-UNIFICADO-2026-V1',
+        versionContrato: 'MJ-LIMA-UNIFICADO-2026-V2-COMUNIDAD',
         empresa: 'CREACIÓN CUÁNTICA E.I.R.L.',
         ruc: '20612592811',
         createdAt: serverTimestamp()
@@ -363,7 +408,7 @@ export default function ContratoMaestriaLima() {
       // 3. Envío automático inmediato del contrato y pase por correo electrónico
       const sent = await sendMaestriaConfirmationEmail({
         db,
-        toEmail: formData.email.trim().toLowerCase(),
+        toEmail: inputEmailNorm,
         nombre: formData.nombreCompleto.trim(),
         doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
         rol: formData.rolActividad,
@@ -405,21 +450,72 @@ export default function ContratoMaestriaLima() {
   });
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(180deg, #050914 0%, #0a1224 50%, #070b14 100%)',
-      color: '#f8fafc',
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      paddingBottom: '4rem'
-    }}>
-      {/* Barra Superior Institucional sin ruido */}
+    <div
+      className="maestria-contract-root"
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(180deg, #050914 0%, #0a1224 50%, #070b14 100%)',
+        color: '#f8fafc',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+        paddingBottom: '4rem'
+      }}
+    >
+      {/* Blindaje de Contraste CSS para evitar que variables globales oscurezcan títulos o tablas */}
+      <style>{`
+        .maestria-contract-root h1,
+        .maestria-contract-root h2,
+        .maestria-contract-root h3 {
+          color: #ffffff !important;
+        }
+        .maestria-contract-root h4 {
+          color: #fef08a !important;
+        }
+        .maestria-contract-root p {
+          color: #e2e8f0 !important;
+        }
+        .maestria-contract-root table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+          background: #070d19 !important;
+          color: #f8fafc !important;
+        }
+        .maestria-contract-root thead tr,
+        .maestria-contract-root th {
+          background: #13203d !important;
+          color: #fbbf24 !important;
+          font-weight: 800 !important;
+          border-bottom: 2px solid rgba(245, 158, 11, 0.45) !important;
+          text-transform: uppercase !important;
+          font-size: 0.78rem !important;
+          letter-spacing: 0.04em !important;
+        }
+        .maestria-contract-root tbody tr,
+        .maestria-contract-root td {
+          background: #0a1326 !important;
+          color: #f1f5f9 !important;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+        }
+        .maestria-contract-root tbody tr:nth-child(even) td {
+          background: #0e1930 !important;
+        }
+        .maestria-contract-root input,
+        .maestria-contract-root select {
+          color: #ffffff !important;
+          background-color: #060b17 !important;
+        }
+        .maestria-contract-root input::placeholder {
+          color: #64748b !important;
+        }
+      `}</style>
+
+      {/* Barra Superior Institucional sin botones internos de oficina */}
       <header style={{
         position: 'sticky',
         top: 0,
         zIndex: 50,
-        background: 'rgba(6, 11, 23, 0.92)',
+        background: 'rgba(6, 11, 23, 0.96)',
         backdropFilter: 'blur(14px)',
-        borderBottom: '1px solid rgba(245, 158, 11, 0.25)',
+        borderBottom: '1px solid rgba(245, 158, 11, 0.35)',
         padding: '0.85rem 1.5rem'
       }}>
         <div style={{
@@ -431,20 +527,31 @@ export default function ContratoMaestriaLima() {
           flexWrap: 'wrap',
           gap: '0.8rem'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <img
-              src="/logo-crear.png"
-              alt="CREAR"
-              style={{ width: '40px', height: '40px', objectFit: 'contain', borderRadius: '8px' }}
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.95rem' }}>
+            {/* Contenedor de Alto Contraste para que el Logo Oficial CREAR sea 100% legible */}
+            <div style={{
+              background: '#ffffff',
+              padding: '6px 12px',
+              borderRadius: '10px',
+              border: '2px solid #f59e0b',
+              boxShadow: '0 4px 14px rgba(245, 158, 11, 0.25)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <img
+                src="/logo-crear.png"
+                alt="CREAR Poder Sin Límites"
+                style={{ height: '36px', width: 'auto', objectFit: 'contain', display: 'block' }}
+              />
+            </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.12em', color: '#fbbf24', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 900, letterSpacing: '0.12em', color: '#fbbf24', textTransform: 'uppercase' }}>
                   CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811
                 </span>
               </div>
-              <h1 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#ffffff' }}>
+              <h1 style={{ margin: 0, fontSize: '1.08rem', fontWeight: 900, color: '#ffffff' }}>
                 Dossier Legal y Reglas de Maestría del Juego — Sede Lima
               </h1>
             </div>
@@ -458,13 +565,13 @@ export default function ContratoMaestriaLima() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                padding: '0.45rem 0.9rem',
+                padding: '0.5rem 0.95rem',
                 borderRadius: '8px',
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.45)',
+                background: 'rgba(245, 158, 11, 0.18)',
+                border: '1px solid rgba(245, 158, 11, 0.5)',
                 color: '#fbbf24',
-                fontSize: '0.8rem',
-                fontWeight: 700,
+                fontSize: '0.82rem',
+                fontWeight: 800,
                 cursor: 'pointer'
               }}
             >
@@ -477,52 +584,51 @@ export default function ContratoMaestriaLima() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.4rem',
-                padding: '0.45rem 0.9rem',
+                padding: '0.5rem 0.95rem',
                 borderRadius: '8px',
-                background: 'rgba(56, 189, 248, 0.12)',
-                border: '1px solid rgba(56, 189, 248, 0.35)',
+                background: 'rgba(56, 189, 248, 0.15)',
+                border: '1px solid rgba(56, 189, 248, 0.45)',
                 color: '#38bdf8',
-                fontSize: '0.8rem',
-                fontWeight: 700,
+                fontSize: '0.82rem',
+                fontWeight: 800,
                 cursor: 'pointer'
               }}
             >
               {copiedLink ? <Check size={15} /> : <Copy size={15} />}
               {copiedLink ? 'Enlace Copiado' : 'Copiar Link'}
             </button>
-            <a
-              href="/monitor-maestria-lima"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                padding: '0.45rem 0.9rem',
-                borderRadius: '8px',
-                background: 'rgba(16, 185, 129, 0.14)',
-                border: '1px solid rgba(16, 185, 129, 0.4)',
-                color: '#34d399',
-                fontSize: '0.8rem',
-                fontWeight: 700,
-                textDecoration: 'none'
-              }}
-            >
-              <ShieldCheck size={15} /> Panel Oficina Lima
-            </a>
           </div>
         </div>
       </header>
 
       <main style={{ maxWidth: '1020px', margin: '0 auto', padding: '2rem 1.25rem' }}>
-        {/* VISTA DE ÉXITO POST-FIRMA */}
+        {/* VISTA DE ÉXITO O REGISTRO PREVIO EXISTENTE */}
         {signedSuccess && (
           <div style={{
-            background: 'linear-gradient(145deg, rgba(6, 78, 59, 0.35) 0%, rgba(15, 23, 42, 0.95) 100%)',
-            border: '2px solid #10b981',
+            background: 'linear-gradient(145deg, rgba(6, 78, 59, 0.4) 0%, rgba(15, 23, 42, 0.98) 100%)',
+            border: duplicateNotice ? '2px solid #f59e0b' : '2px solid #10b981',
             borderRadius: '18px',
             padding: '2rem',
             marginBottom: '2.5rem',
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
           }}>
+            {duplicateNotice && (
+              <div style={{
+                background: 'rgba(245, 158, 11, 0.18)',
+                border: '1px solid rgba(245, 158, 11, 0.5)',
+                borderRadius: '12px',
+                padding: '1rem 1.25rem',
+                marginBottom: '1.5rem',
+                color: '#fef08a',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                lineHeight: 1.55,
+                textAlign: 'center'
+              }}>
+                {duplicateNotice}
+              </div>
+            )}
+
             <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
               <div style={{
                 width: '64px',
@@ -548,13 +654,15 @@ export default function ContratoMaestriaLima() {
                 letterSpacing: '0.08em',
                 marginBottom: '0.5rem'
               }}>
-                REGISTRO PROBATORIO COMPLETADO · LEY N° 27269
+                REGISTRO PROBATORIO VÁLIDO · LEY N° 27269
               </span>
               <h2 style={{ fontSize: '1.75rem', fontWeight: 900, margin: '0.3rem 0', color: '#ffffff' }}>
                 ¡Contrato y Reglas de Maestría Aceptados!
               </h2>
-              <p style={{ color: '#cbd5e1', fontSize: '0.95rem', maxWidth: '640px', margin: '0.5rem auto 0' }}>
-                {emailSentStatus
+              <p style={{ color: '#e2e8f0', fontSize: '0.95rem', maxWidth: '640px', margin: '0.5rem auto 0' }}>
+                {duplicateNotice
+                  ? `Registro verificado a nombre de ${signedSuccess.nombreCompleto || signedSuccess.nombre} (${signedSuccess.email}).`
+                  : emailSentStatus
                   ? `Se ha enviado automáticamente una copia del contrato y tu imagen de validación al correo ${signedSuccess.email}.`
                   : `Tu aceptación legal e imagen de validación han quedado registradas para ${signedSuccess.email}.`}
               </p>
@@ -562,8 +670,8 @@ export default function ContratoMaestriaLima() {
 
             {/* Resumen de Metadatos Forenses (IP y Geolocalización) */}
             <div style={{
-              background: 'rgba(15, 23, 42, 0.85)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              background: 'rgba(10, 18, 36, 0.95)',
+              border: '1px solid rgba(255, 255, 255, 0.16)',
               borderRadius: '12px',
               padding: '1.25rem',
               marginBottom: '1.75rem',
@@ -574,7 +682,7 @@ export default function ContratoMaestriaLima() {
             }}>
               <div>
                 <div style={{ color: '#94a3b8', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Titular Declarante</div>
-                <div style={{ color: '#ffffff', fontWeight: 800, marginTop: '2px' }}>{signedSuccess.nombreCompleto}</div>
+                <div style={{ color: '#ffffff', fontWeight: 800, marginTop: '2px' }}>{signedSuccess.nombreCompleto || signedSuccess.nombre}</div>
                 <div style={{ color: '#38bdf8', fontSize: '0.78rem' }}>{signedSuccess.doc} · {signedSuccess.rol}</div>
               </div>
               <div>
@@ -585,13 +693,13 @@ export default function ContratoMaestriaLima() {
               <div>
                 <div style={{ color: '#94a3b8', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Dirección IP y Geolocalización</div>
                 <div style={{ color: '#34d399', fontFamily: 'monospace', fontWeight: 800, marginTop: '2px' }}>IP: {signedSuccess.ip}</div>
-                <div style={{ color: '#cbd5e1', fontSize: '0.78rem' }}>{signedSuccess.geoLocation} ({signedSuccess.coordinates})</div>
+                <div style={{ color: '#e2e8f0', fontSize: '0.78rem' }}>{signedSuccess.geoLocation} {signedSuccess.coordinates ? `(${signedSuccess.coordinates})` : ''}</div>
               </div>
               <div>
                 <div style={{ color: '#94a3b8', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 700 }}>Fecha / Huella SHA-256</div>
                 <div style={{ color: '#ffffff', fontWeight: 700, marginTop: '2px' }}>{signedSuccess.fecha}</div>
-                <div style={{ color: '#64748b', fontFamily: 'monospace', fontSize: '0.7rem', wordBreak: 'break-all' }}>
-                  {signedSuccess.sha256Hash?.slice(0, 28)}...
+                <div style={{ color: '#94a3b8', fontFamily: 'monospace', fontSize: '0.7rem', wordBreak: 'break-all' }}>
+                  {(signedSuccess.sha256Hash || '').slice(0, 28)}...
                 </div>
               </div>
             </div>
@@ -623,7 +731,7 @@ export default function ContratoMaestriaLima() {
                       padding: '0.85rem 1.6rem',
                       borderRadius: '10px',
                       background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                      color: '#0f172a',
+                      color: '#050811',
                       fontWeight: 900,
                       fontSize: '0.92rem',
                       textDecoration: 'none',
@@ -641,8 +749,8 @@ export default function ContratoMaestriaLima() {
                       gap: '0.5rem',
                       padding: '0.85rem 1.4rem',
                       borderRadius: '10px',
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.25)',
                       color: '#ffffff',
                       fontWeight: 700,
                       fontSize: '0.9rem',
@@ -657,14 +765,14 @@ export default function ContratoMaestriaLima() {
           </div>
         )}
 
-        {/* BANNER EJECUTIVO DE INTRODUCCIÓN */}
+        {/* BANNER EJECUTIVO DE INTRODUCCIÓN CON ALTO CONTRASTE */}
         <section style={{
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(23, 37, 84, 0.5) 100%)',
-          border: '1px solid rgba(245, 158, 11, 0.35)',
+          background: 'linear-gradient(135deg, #0d172e 0%, #132247 100%)',
+          border: '1.5px solid rgba(245, 158, 11, 0.45)',
           borderRadius: '18px',
           padding: '2rem',
           marginBottom: '2rem',
-          boxShadow: '0 12px 35px rgba(0, 0, 0, 0.45)'
+          boxShadow: '0 12px 35px rgba(0, 0, 0, 0.5)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
             <div style={{ flex: '1 1 540px' }}>
@@ -672,23 +780,26 @@ export default function ContratoMaestriaLima() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.45rem',
-                padding: '0.3rem 0.8rem',
+                padding: '0.35rem 0.9rem',
                 borderRadius: '999px',
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.4)',
-                color: '#fbbf24',
-                fontSize: '0.73rem',
-                fontWeight: 800,
+                background: 'rgba(245, 158, 11, 0.2)',
+                border: '1px solid rgba(245, 158, 11, 0.55)',
+                color: '#fde047',
+                fontSize: '0.75rem',
+                fontWeight: 900,
                 letterSpacing: '0.06em',
-                marginBottom: '0.85rem'
+                marginBottom: '0.9rem'
               }}>
-                <Award size={14} /> GOBERNANZA CAUSA OS / SISTEMA NODUS · SEDE LIMA
+                <Award size={15} /> DOCUMENTO LEGAL VINCULANTE · CREAR PODER SIN LÍMITES · SEDE LIMA
               </div>
-              <h2 style={{ fontSize: '1.85rem', fontWeight: 900, margin: '0 0 0.75rem 0', lineHeight: 1.2, color: '#ffffff' }}>
-                Contrato Unificado y Reglas de Sala: <span style={{ color: '#fbbf24' }}>Maestría del Juego</span>
+              <h2 style={{ fontSize: '1.9rem', fontWeight: 900, margin: '0 0 0.8rem 0', lineHeight: 1.22, color: '#ffffff' }}>
+                <span style={{ color: '#ffffff' }}>Contrato Unificado y Reglas de Sala: </span>
+                <span style={{ color: '#fbbf24' }}>Maestría del Juego</span>
               </h2>
-              <p style={{ color: '#cbd5e1', fontSize: '0.94rem', lineHeight: 1.6, margin: '0 0 1rem 0' }}>
-                Instrumento jurídico vinculante aplicable a <strong>Participantes y Managers</strong> para el primer fin de semana de Maestría del Juego en Lima, suscrito con <strong>CREACIÓN CUÁNTICA E.I.R.L. (RUC N° 20612592811)</strong> bajo la Ley N° 29733, Ley N° 27269 y el Código Civil Peruano.
+              <p style={{ color: '#f1f5f9', fontSize: '0.95rem', lineHeight: 1.65, margin: '0 0 1.1rem 0' }}>
+                Instrumento jurídico vinculante aplicable a <strong style={{ color: '#ffffff' }}>Participantes y Managers</strong>{' '}
+                <strong style={{ color: '#fde047' }}>durante todo el programa de Maestría del Juego, después de Maestría como personas integrantes de la comunidad CREAR y por todo el tiempo que la legislación peruana lo considere vigente</strong>, suscrito con{' '}
+                <strong style={{ color: '#ffffff' }}>CREACIÓN CUÁNTICA E.I.R.L. (RUC N° 20612592811)</strong> bajo la Ley N° 29733, Ley N° 27269 y el Código Civil Peruano.
               </p>
 
               {/* Indicador en Vivo de Auditoría IP + Geolocalización */}
@@ -696,16 +807,16 @@ export default function ContratoMaestriaLima() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.6rem',
-                padding: '0.55rem 0.95rem',
+                padding: '0.6rem 1rem',
                 borderRadius: '10px',
-                background: 'rgba(16, 185, 129, 0.1)',
-                border: '1px solid rgba(16, 185, 129, 0.35)',
-                fontSize: '0.78rem',
-                color: '#a7f3d0'
+                background: 'rgba(16, 185, 129, 0.14)',
+                border: '1px solid rgba(16, 185, 129, 0.45)',
+                fontSize: '0.8rem',
+                color: '#d1fae5'
               }}>
-                <MapPin size={15} color="#10b981" />
+                <MapPin size={16} color="#34d399" />
                 <span>
-                  <strong>Trazabilidad Forense Activa:</strong>{' '}
+                  <strong style={{ color: '#34d399' }}>Trazabilidad Forense Activa:</strong>{' '}
                   {loadingGeo
                     ? 'Detectando IP pública y geolocalización...'
                     : `IP ${geoInfo?.ip || 'Registrada'} · ${geoInfo?.locationString || 'Lima, Perú'} (${geoInfo?.coordinates || '-12.0464, -77.0428'})`}
@@ -715,8 +826,8 @@ export default function ContratoMaestriaLima() {
 
             {/* Tarjeta QR Rápido en Cabecera */}
             <div style={{
-              background: 'rgba(6, 11, 23, 0.85)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
+              background: '#070d19',
+              border: '1.5px solid rgba(245, 158, 11, 0.35)',
               borderRadius: '14px',
               padding: '1rem',
               textAlign: 'center',
@@ -725,9 +836,9 @@ export default function ContratoMaestriaLima() {
               <img
                 src={qrUrl}
                 alt="QR Contrato Maestría Lima"
-                style={{ width: '120px', height: '120px', borderRadius: '8px', background: '#fff', padding: '4px' }}
+                style={{ width: '124px', height: '124px', borderRadius: '8px', background: '#ffffff', padding: '6px', display: 'block', margin: '0 auto' }}
               />
-              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.45rem', fontWeight: 600 }}>
+              <div style={{ fontSize: '0.74rem', color: '#e2e8f0', marginTop: '0.5rem', fontWeight: 700 }}>
                 Escanea para abrir en móvil
               </div>
             </div>
@@ -737,20 +848,20 @@ export default function ContratoMaestriaLima() {
         {/* BUSCADOR DE CLÁUSULAS */}
         <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', flex: 1, minWidth: '260px' }}>
-            <Search size={17} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+            <Search size={17} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
             <input
               type="text"
-              placeholder="Buscar cláusula, regla de sala, NDA, datos personales o condición..."
+              placeholder="Buscar cláusula, regla de sala, NDA, comunidad, datos personales..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
                 width: '100%',
-                padding: '0.75rem 1rem 0.75rem 2.6rem',
+                padding: '0.8rem 1rem 0.8rem 2.6rem',
                 borderRadius: '10px',
-                background: 'rgba(15, 23, 42, 0.85)',
-                border: '1px solid rgba(255, 255, 255, 0.14)',
-                color: '#f8fafc',
-                fontSize: '0.88rem',
+                background: '#0b1326',
+                border: '1px solid rgba(255, 255, 255, 0.22)',
+                color: '#ffffff',
+                fontSize: '0.9rem',
                 outline: 'none'
               }}
             />
@@ -758,12 +869,12 @@ export default function ContratoMaestriaLima() {
           <a
             href="#formulario-firma"
             style={{
-              padding: '0.75rem 1.3rem',
+              padding: '0.8rem 1.4rem',
               borderRadius: '10px',
               background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              color: '#0f172a',
-              fontWeight: 800,
-              fontSize: '0.86rem',
+              color: '#050811',
+              fontWeight: 900,
+              fontSize: '0.88rem',
               textDecoration: 'none',
               whiteSpace: 'nowrap'
             }}
@@ -772,36 +883,37 @@ export default function ContratoMaestriaLima() {
           </a>
         </div>
 
-        {/* CUERPO ÍNTEGRO DEL DOSSIER LEGAL (SIN RUIDO, ESTRUCTURA EJECUTIVA) */}
+        {/* CUERPO ÍNTEGRO DEL DOSSIER LEGAL */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
           {filteredSections.map((sec) => (
             <div
               key={sec.id}
               style={{
-                background: 'rgba(15, 23, 42, 0.78)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                background: '#0b1428',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
                 borderRadius: '14px',
                 padding: '1.5rem',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)'
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.45rem', flexWrap: 'wrap' }}>
                 <span style={{
-                  padding: '0.2rem 0.65rem',
+                  padding: '0.25rem 0.7rem',
                   borderRadius: '6px',
-                  background: 'rgba(245, 158, 11, 0.18)',
-                  color: '#fbbf24',
-                  fontSize: '0.72rem',
-                  fontWeight: 800,
+                  background: 'rgba(245, 158, 11, 0.22)',
+                  border: '1px solid rgba(245, 158, 11, 0.45)',
+                  color: '#fde047',
+                  fontSize: '0.74rem',
+                  fontWeight: 900,
                   letterSpacing: '0.05em'
                 }}>
                   {sec.numero}
                 </span>
-                <h3 style={{ margin: 0, fontSize: '1.12rem', fontWeight: 800, color: '#ffffff' }}>
+                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#ffffff' }}>
                   {sec.titulo}
                 </h3>
               </div>
-              <p style={{ margin: '0 0 1rem 0', fontSize: '0.83rem', color: '#94a3b8' }}>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.85rem', color: '#cbd5e1' }}>
                 {sec.resumen}
               </p>
 
@@ -810,20 +922,20 @@ export default function ContratoMaestriaLima() {
                   <div
                     key={idx}
                     style={{
-                      background: 'rgba(6, 11, 23, 0.65)',
-                      borderLeft: '3px solid #f59e0b',
+                      background: '#060c18',
+                      borderLeft: '3.5px solid #f59e0b',
                       borderRadius: '0 10px 10px 0',
-                      padding: '1rem 1.2rem'
+                      padding: '1.05rem 1.25rem'
                     }}
                   >
-                    <h4 style={{ margin: '0 0 0.45rem 0', fontSize: '0.94rem', fontWeight: 700, color: '#fef08a' }}>
+                    <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.96rem', fontWeight: 800, color: '#fef08a' }}>
                       {art.subtitulo}
                     </h4>
                     <div style={{
                       margin: 0,
-                      fontSize: '0.87rem',
-                      lineHeight: 1.65,
-                      color: '#e2e8f0',
+                      fontSize: '0.89rem',
+                      lineHeight: 1.68,
+                      color: '#f1f5f9',
                       whiteSpace: 'pre-line'
                     }}>
                       {art.contenido}
@@ -835,51 +947,51 @@ export default function ContratoMaestriaLima() {
           ))}
         </div>
 
-        {/* TABLA RESUMEN DE OBLIGACIONES */}
+        {/* TABLA RESUMEN DE OBLIGACIONES CON ALTO CONTRASTE */}
         <section style={{
-          background: 'rgba(15, 23, 42, 0.85)',
-          border: '1px solid rgba(56, 189, 248, 0.3)',
+          background: '#0b1428',
+          border: '1.5px solid rgba(56, 189, 248, 0.4)',
           borderRadius: '14px',
           padding: '1.5rem',
           marginBottom: '2.5rem',
           overflowX: 'auto'
         }}>
-          <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.05rem', fontWeight: 800, color: '#38bdf8' }}>
-            📊 Tabla Resumen de Obligaciones y Gobernanza (Participantes y Managers)
+          <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', fontWeight: 900, color: '#38bdf8' }}>
+            📊 Tabla Resumen de Compromisos Legales y de Comunidad (Participantes y Managers)
           </h3>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.86rem', background: '#070d19' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.15)', textAlign: 'left', color: '#94a3b8' }}>
-                <th style={{ padding: '0.65rem' }}>Módulo del Contrato</th>
-                <th style={{ padding: '0.65rem' }}>Normativa Aplicable</th>
-                <th style={{ padding: '0.65rem' }}>Compromiso Clave</th>
+              <tr style={{ background: '#13203d', borderBottom: '2px solid rgba(245, 158, 11, 0.45)', textAlign: 'left' }}>
+                <th style={{ padding: '0.85rem 1rem', color: '#fbbf24', fontWeight: 900 }}>Módulo del Contrato</th>
+                <th style={{ padding: '0.85rem 1rem', color: '#fbbf24', fontWeight: 900 }}>Normativa Aplicable</th>
+                <th style={{ padding: '0.85rem 1rem', color: '#fbbf24', fontWeight: 900 }}>Compromiso Clave y Vigencia</th>
               </tr>
             </thead>
             <tbody>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Metodología de Inmersión</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Marco Privado de Capacitación</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Inmersión contextual de alto rendimiento; no equivale a terapia ni consulta médica.</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Confidencialidad NDA</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Ley N° 29733 / D.Leg. 295</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>No divulgación de contenidos (5 años) y reserva absoluta de vivencias ajenas (indefinido).</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Conducta y Restricciones</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Reglamento Interno CREAR</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Cero alcohol/drogas, cero grabaciones, prohibición de préstamos/negocios, no parejas nuevas, &gt;80% asistencia.</td>
-              </tr>
-              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Exoneración Legal</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Código Civil D.Leg. 295</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Asunción de riesgos y deslinde irrevocable de responsabilidad a Creación Cuántica E.I.R.L.</td>
+              <tr>
+                <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#ffffff', background: '#0a1326' }}>Metodología de Inmersión</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#e2e8f0', background: '#0a1326' }}>Marco Privado de Capacitación</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#f1f5f9', background: '#0a1326' }}>Inmersión contextual de alto rendimiento; no equivale a terapia psicológica ni consulta médica.</td>
               </tr>
               <tr>
-                <td style={{ padding: '0.65rem', fontWeight: 700, color: '#fff' }}>Gobernanza NODUS</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Sistema de Control NODUS</td>
-                <td style={{ padding: '0.65rem', color: '#cbd5e1' }}>Acreditación en puerta sujeta a validación formal de pago en NODUS por coordinación administrativa.</td>
+                <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#ffffff', background: '#0e1930' }}>Confidencialidad NDA y Comunidad</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#e2e8f0', background: '#0e1930' }}>Ley N° 29733 / Código Civil Peruano</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#f1f5f9', background: '#0e1930' }}>Reserva absoluta de dinámicas y vivencias durante toda Maestría, después de Maestría como miembros de la comunidad y por todo el tiempo que la ley peruana lo considere vigente.</td>
+              </tr>
+              <tr>
+                <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#ffffff', background: '#0a1326' }}>Conducta y Reglas Éticas</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#e2e8f0', background: '#0a1326' }}>Reglamento de Maestría y Comunidad CREAR</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#f1f5f9', background: '#0a1326' }}>Cero alcohol/drogas, cero grabaciones, prohibición de préstamos/negocios/apuestas entre miembros, no parejas nuevas en el proceso y &gt;80% asistencia.</td>
+              </tr>
+              <tr>
+                <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#ffffff', background: '#0e1930' }}>Exoneración Legal y Salud</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#e2e8f0', background: '#0e1930' }}>Código Civil D.Leg. N° 295</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#f1f5f9', background: '#0e1930' }}>Declaración jurada de aptitud psicofísica, asunción de riesgos y deslinde irrevocable de responsabilidad a Creación Cuántica E.I.R.L.</td>
+              </tr>
+              <tr>
+                <td style={{ padding: '0.85rem 1rem', fontWeight: 800, color: '#ffffff', background: '#0a1326' }}>Firma Digital y Trazabilidad</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#e2e8f0', background: '#0a1326' }}>Ley N° 27269 / D.S. N° 016-2024-JUS</td>
+                <td style={{ padding: '0.85rem 1rem', color: '#f1f5f9', background: '#0a1326' }}>Validez jurídica plena con captura obligatoria de IP pública, geolocalización, sello de tiempo y huella SHA-256.</td>
               </tr>
             </tbody>
           </table>
@@ -890,22 +1002,22 @@ export default function ContratoMaestriaLima() {
           id="formulario-firma"
           ref={formRef}
           style={{
-            background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.96) 0%, rgba(10, 15, 29, 0.98) 100%)',
-            border: '2px solid rgba(245, 158, 11, 0.5)',
+            background: 'linear-gradient(180deg, #0d172e 0%, #070d19 100%)',
+            border: '2px solid rgba(245, 158, 11, 0.55)',
             borderRadius: '18px',
             padding: '2rem',
             boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)'
           }}
         >
-          <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
-            <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              SUSCRIPCIÓN DIGITAL VINCULANTE · LEY N° 27269
+          <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.12)', paddingBottom: '1rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              SUSCRIPCIÓN DIGITAL VINCULANTE · LEY N° 27269 · REGISTRO ÚNICO POR PERSONA
             </span>
             <h2 style={{ margin: '0.25rem 0 0 0', fontSize: '1.5rem', fontWeight: 900, color: '#ffffff' }}>
               Formulario de Aceptación de Reglas y Emisión de Pase Oficial
             </h2>
-            <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.86rem', color: '#94a3b8' }}>
-              Al completar y firmar, recibirás de inmediato en tu correo el contrato aceptado y tu imagen oficial de validación con código QR.
+            <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.88rem', color: '#cbd5e1' }}>
+              Al completar y firmar, recibirás de inmediato en tu correo el contrato aceptado y tu imagen oficial de validación con código QR. Cada participante o manager solo puede registrarse una única vez.
             </p>
           </div>
 
@@ -918,7 +1030,7 @@ export default function ContratoMaestriaLima() {
             }}>
               {/* Nombre Completo */}
               <div id="field-nombreCompleto">
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.4rem' }}>
                   Nombre y Apellidos Completos *
                 </label>
                 <input
@@ -931,9 +1043,9 @@ export default function ContratoMaestriaLima() {
                     width: '100%',
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
-                    background: 'rgba(6, 11, 23, 0.9)',
-                    border: formErrors.nombreCompleto ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.18)',
-                    color: '#fff',
+                    background: '#060b17',
+                    border: formErrors.nombreCompleto ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.22)',
+                    color: '#ffffff',
                     fontSize: '0.9rem'
                   }}
                 />
@@ -945,7 +1057,7 @@ export default function ContratoMaestriaLima() {
               {/* Tipo y Número de Documento */}
               <div id="field-numeroDocumento" style={{ display: 'flex', gap: '0.6rem' }}>
                 <div style={{ width: '105px' }}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.4rem' }}>
                     Tipo Doc.
                   </label>
                   <select
@@ -956,9 +1068,9 @@ export default function ContratoMaestriaLima() {
                       width: '100%',
                       padding: '0.75rem 0.6rem',
                       borderRadius: '10px',
-                      background: 'rgba(6, 11, 23, 0.9)',
-                      border: '1px solid rgba(255,255,255,0.18)',
-                      color: '#fff',
+                      background: '#060b17',
+                      border: '1px solid rgba(255,255,255,0.22)',
+                      color: '#ffffff',
                       fontSize: '0.9rem'
                     }}
                   >
@@ -968,7 +1080,7 @@ export default function ContratoMaestriaLima() {
                   </select>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.4rem' }}>
                     N° de Documento *
                   </label>
                   <input
@@ -981,9 +1093,9 @@ export default function ContratoMaestriaLima() {
                       width: '100%',
                       padding: '0.75rem 0.9rem',
                       borderRadius: '10px',
-                      background: 'rgba(6, 11, 23, 0.9)',
-                      border: formErrors.numeroDocumento ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.18)',
-                      color: '#fff',
+                      background: '#060b17',
+                      border: formErrors.numeroDocumento ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.22)',
+                      color: '#ffffff',
                       fontSize: '0.9rem'
                     }}
                   />
@@ -995,7 +1107,7 @@ export default function ContratoMaestriaLima() {
 
               {/* Correo Electrónico */}
               <div id="field-email">
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.4rem' }}>
                   Correo Electrónico (Recepción de Contrato y Pase) *
                 </label>
                 <input
@@ -1008,9 +1120,9 @@ export default function ContratoMaestriaLima() {
                     width: '100%',
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
-                    background: 'rgba(6, 11, 23, 0.9)',
-                    border: formErrors.email ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.18)',
-                    color: '#fff',
+                    background: '#060b17',
+                    border: formErrors.email ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.22)',
+                    color: '#ffffff',
                     fontSize: '0.9rem'
                   }}
                 />
@@ -1021,7 +1133,7 @@ export default function ContratoMaestriaLima() {
 
               {/* Teléfono / WhatsApp */}
               <div id="field-telefono">
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.4rem' }}>
                   Teléfono / WhatsApp *
                 </label>
                 <input
@@ -1034,9 +1146,9 @@ export default function ContratoMaestriaLima() {
                     width: '100%',
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
-                    background: 'rgba(6, 11, 23, 0.9)',
-                    border: formErrors.telefono ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.18)',
-                    color: '#fff',
+                    background: '#060b17',
+                    border: formErrors.telefono ? '1.5px solid #ef4444' : '1px solid rgba(255,255,255,0.22)',
+                    color: '#ffffff',
                     fontSize: '0.9rem'
                   }}
                 />
@@ -1047,7 +1159,7 @@ export default function ContratoMaestriaLima() {
 
               {/* Rol en Maestría */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.4rem' }}>
                   Calidad / Rol en Sala *
                 </label>
                 <select
@@ -1058,9 +1170,9 @@ export default function ContratoMaestriaLima() {
                     width: '100%',
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
-                    background: 'rgba(6, 11, 23, 0.9)',
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    color: '#fff',
+                    background: '#060b17',
+                    border: '1px solid rgba(255,255,255,0.22)',
+                    color: '#ffffff',
                     fontSize: '0.9rem'
                   }}
                 >
@@ -1073,7 +1185,7 @@ export default function ContratoMaestriaLima() {
 
               {/* Equipo / Cohorte */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#cbd5e1', marginBottom: '0.4rem' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#f1f5f9', marginBottom: '0.4rem' }}>
                   Cohorte / Equipo en Lima *
                 </label>
                 <select
@@ -1084,9 +1196,9 @@ export default function ContratoMaestriaLima() {
                     width: '100%',
                     padding: '0.75rem 0.9rem',
                     borderRadius: '10px',
-                    background: 'rgba(6, 11, 23, 0.9)',
-                    border: '1px solid rgba(255,255,255,0.18)',
-                    color: '#fff',
+                    background: '#060b17',
+                    border: '1px solid rgba(255,255,255,0.22)',
+                    color: '#ffffff',
                     fontSize: '0.9rem'
                   }}
                 >
@@ -1104,12 +1216,12 @@ export default function ContratoMaestriaLima() {
               <div
                 id="field-casilla1_TerminosNDA"
                 style={{
-                  background: formData.casilla1_TerminosNDA ? 'rgba(16, 185, 129, 0.1)' : 'rgba(6, 11, 23, 0.75)',
+                  background: formData.casilla1_TerminosNDA ? 'rgba(16, 185, 129, 0.12)' : '#060b17',
                   border: formErrors.casilla1_TerminosNDA
                     ? '1.5px solid #ef4444'
                     : formData.casilla1_TerminosNDA
                     ? '1.5px solid #10b981'
-                    : '1px solid rgba(255,255,255,0.15)',
+                    : '1px solid rgba(255,255,255,0.18)',
                   borderRadius: '12px',
                   padding: '1rem 1.15rem'
                 }}
@@ -1122,9 +1234,9 @@ export default function ContratoMaestriaLima() {
                     onChange={handleInputChange}
                     style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: '#10b981', cursor: 'pointer' }}
                   />
-                  <div style={{ fontSize: '0.86rem', lineHeight: 1.55, color: '#f1f5f9' }}>
-                    <strong style={{ color: '#fbbf24' }}>CASILLA 1 (DOC 1) — Aceptación de Términos, Reglas de Maestría y Confidencialidad NDA (Obligatorio):</strong>{' '}
-                    Declaro haber leído y acepto íntegramente el Contrato Unificado, el Marco Metodológico de Alto Rendimiento (reconociendo que no equivale a terapia psicológica ni médica), el Pacto de No Divulgación por 5 años, el Secreto de Comunidad a perpetuidad, la prohibición estricta de grabaciones, cero alcohol/drogas, prohibición de préstamos/negocios/apuestas entre participantes, cero nuevas relaciones de pareja durante el proceso y la asistencia mínima &gt;80%.
+                  <div style={{ fontSize: '0.87rem', lineHeight: 1.58, color: '#f8fafc' }}>
+                    <strong style={{ color: '#fbbf24' }}>CASILLA 1 (DOC 1) — Aceptación de Términos, Reglas de Maestría, Comunidad y Confidencialidad NDA (Obligatorio):</strong>{' '}
+                    Declaro haber leído y acepto íntegramente el Contrato Unificado, el Marco Metodológico de Alto Rendimiento (reconociendo que no equivale a terapia psicológica ni médica), el Pacto de No Divulgación y el Secreto de Comunidad aplicables <strong>durante toda Maestría del Juego, después de Maestría como integrante de la comunidad CREAR y por todo el tiempo que la ley peruana lo considere vigente</strong>; así como la prohibición estricta de grabaciones, cero alcohol/drogas, prohibición de préstamos/negocios/apuestas entre miembros, cero nuevas relaciones de pareja durante el proceso y asistencia mínima &gt;80%.
                   </div>
                 </label>
                 {formErrors.casilla1_TerminosNDA && (
@@ -1135,12 +1247,12 @@ export default function ContratoMaestriaLima() {
               <div
                 id="field-casilla2_SaludExoneracion"
                 style={{
-                  background: formData.casilla2_SaludExoneracion ? 'rgba(16, 185, 129, 0.1)' : 'rgba(6, 11, 23, 0.75)',
+                  background: formData.casilla2_SaludExoneracion ? 'rgba(16, 185, 129, 0.12)' : '#060b17',
                   border: formErrors.casilla2_SaludExoneracion
                     ? '1.5px solid #ef4444'
                     : formData.casilla2_SaludExoneracion
                     ? '1.5px solid #10b981'
-                    : '1px solid rgba(255,255,255,0.15)',
+                    : '1px solid rgba(255,255,255,0.18)',
                   borderRadius: '12px',
                   padding: '1rem 1.15rem'
                 }}
@@ -1153,9 +1265,9 @@ export default function ContratoMaestriaLima() {
                     onChange={handleInputChange}
                     style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: '#10b981', cursor: 'pointer' }}
                   />
-                  <div style={{ fontSize: '0.86rem', lineHeight: 1.55, color: '#f1f5f9' }}>
+                  <div style={{ fontSize: '0.87rem', lineHeight: 1.58, color: '#f8fafc' }}>
                     <strong style={{ color: '#fbbf24' }}>CASILLA 2 (DOC 2) — Declaración Jurada de Salud, Asunción de Riesgos y Exoneración (Obligatorio):</strong>{' '}
-                    Declaro bajo juramento encontrarme en plenas facultades físicas y psicológicas para participar en el primer fin de semana de Maestría del Juego, asumiendo la responsabilidad de mis actos y otorgando exoneración amplia e irrevocable de responsabilidad a CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811).
+                    Declaro bajo juramento encontrarme en plenas facultades físicas y psicológicas para participar en Maestría del Juego, asumiendo la responsabilidad de mis actos y otorgando exoneración amplia e irrevocable de responsabilidad a CREACIÓN CUÁNTICA E.I.R.L. (RUC 20612592811) conforme a la legislación peruana vigente.
                   </div>
                 </label>
                 {formErrors.casilla2_SaludExoneracion && (
@@ -1166,12 +1278,12 @@ export default function ContratoMaestriaLima() {
               <div
                 id="field-casilla3_DatosImagen"
                 style={{
-                  background: formData.casilla3_DatosImagen ? 'rgba(16, 185, 129, 0.1)' : 'rgba(6, 11, 23, 0.75)',
+                  background: formData.casilla3_DatosImagen ? 'rgba(16, 185, 129, 0.12)' : '#060b17',
                   border: formErrors.casilla3_DatosImagen
                     ? '1.5px solid #ef4444'
                     : formData.casilla3_DatosImagen
                     ? '1.5px solid #10b981'
-                    : '1px solid rgba(255,255,255,0.15)',
+                    : '1px solid rgba(255,255,255,0.18)',
                   borderRadius: '12px',
                   padding: '1rem 1.15rem'
                 }}
@@ -1184,7 +1296,7 @@ export default function ContratoMaestriaLima() {
                     onChange={handleInputChange}
                     style={{ width: '20px', height: '20px', marginTop: '2px', accentColor: '#10b981', cursor: 'pointer' }}
                   />
-                  <div style={{ fontSize: '0.86rem', lineHeight: 1.55, color: '#f1f5f9' }}>
+                  <div style={{ fontSize: '0.87rem', lineHeight: 1.58, color: '#f8fafc' }}>
                     <strong style={{ color: '#fbbf24' }}>CASILLA 3 (DOC 3) — Consentimiento de Tratamiento de Datos Personales e Imagen (Obligatorio):</strong>{' '}
                     Autorizo de manera libre, previa, expresa e informada el tratamiento de mis datos personales conforme a la Ley N° 29733 y D.S. N° 016-2024-JUS, el uso institucional de derechos de imagen grupal y el registro probatorio de mi dirección IP pública y geolocalización.
                   </div>
@@ -1197,7 +1309,7 @@ export default function ContratoMaestriaLima() {
 
             {/* FIRMA DIGITAL ESCRITA */}
             <div id="field-firmaTexto" style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#fef08a', marginBottom: '0.4rem' }}>
+              <label style={{ display: 'block', fontSize: '0.84rem', fontWeight: 800, color: '#fef08a', marginBottom: '0.4rem' }}>
                 Firma Electrónica Vinculante (Escribe tu Nombre y Apellidos Completos igual a tu documento) *
               </label>
               <input
@@ -1210,8 +1322,8 @@ export default function ContratoMaestriaLima() {
                   width: '100%',
                   padding: '0.9rem 1rem',
                   borderRadius: '10px',
-                  background: 'rgba(6, 11, 23, 0.95)',
-                  border: formErrors.firmaTexto ? '1.5px solid #ef4444' : '1.5px solid rgba(245, 158, 11, 0.5)',
+                  background: '#060b17',
+                  border: formErrors.firmaTexto ? '1.5px solid #ef4444' : '1.5px solid rgba(245, 158, 11, 0.55)',
                   color: '#fbbf24',
                   fontSize: '1.05rem',
                   fontWeight: 700,
@@ -1225,21 +1337,21 @@ export default function ContratoMaestriaLima() {
 
             {/* Sello de Metadatos Forenses antes de enviar */}
             <div style={{
-              background: 'rgba(6, 11, 23, 0.7)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: '#060b17',
+              border: '1px solid rgba(255,255,255,0.12)',
               borderRadius: '10px',
               padding: '0.85rem 1rem',
               marginBottom: '1.5rem',
-              fontSize: '0.76rem',
-              color: '#94a3b8',
+              fontSize: '0.78rem',
+              color: '#cbd5e1',
               display: 'flex',
               justifyContent: 'space-between',
               flexWrap: 'wrap',
               gap: '0.5rem'
             }}>
-              <span>🔒 <strong>IP Pública:</strong> {geoInfo?.ip || 'Detectada al firmar'}</span>
-              <span>📍 <strong>Geolocalización:</strong> {geoInfo?.locationString || 'Lima, Perú'} ({geoInfo?.coordinates || '-12.0464, -77.0428'})</span>
-              <span>💻 <strong>Entorno:</strong> {geoInfo?.device || 'Navegador Web'}</span>
+              <span>🔒 <strong style={{ color: '#ffffff' }}>IP Pública:</strong> {geoInfo?.ip || 'Detectada al firmar'}</span>
+              <span>📍 <strong style={{ color: '#ffffff' }}>Geolocalización:</strong> {geoInfo?.locationString || 'Lima, Perú'} ({geoInfo?.coordinates || '-12.0464, -77.0428'})</span>
+              <span>💻 <strong style={{ color: '#ffffff' }}>Entorno:</strong> {geoInfo?.device || 'Navegador Web'}</span>
             </div>
 
             <button
@@ -1252,7 +1364,7 @@ export default function ContratoMaestriaLima() {
                 background: isSubmitting
                   ? '#475569'
                   : 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                color: '#0f172a',
+                color: '#050811',
                 fontWeight: 900,
                 fontSize: '1.02rem',
                 border: 'none',
@@ -1263,7 +1375,7 @@ export default function ContratoMaestriaLima() {
               }}
             >
               {isSubmitting
-                ? 'Procesando Firma, Generando Pase y Enviando Contrato por Correo...'
+                ? 'Verificando Identidad, Generando Pase y Enviando Contrato por Correo...'
                 : '👑 Firmar Contrato, Generar Imagen de Validación y Recibir en mi Correo'}
             </button>
           </form>
@@ -1277,7 +1389,7 @@ export default function ContratoMaestriaLima() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0, 0, 0, 0.82)',
+            background: 'rgba(0, 0, 0, 0.85)',
             backdropFilter: 'blur(6px)',
             display: 'flex',
             alignItems: 'center',
@@ -1289,7 +1401,7 @@ export default function ContratoMaestriaLima() {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: '#0f172a',
+              background: '#0b1428',
               border: '2px solid #f59e0b',
               borderRadius: '18px',
               padding: '2rem',
@@ -1301,7 +1413,7 @@ export default function ContratoMaestriaLima() {
             <h3 style={{ margin: '0 0 0.4rem 0', color: '#fbbf24', fontSize: '1.2rem', fontWeight: 800 }}>
               Código QR Oficial — Reglas de Maestría
             </h3>
-            <p style={{ margin: '0 0 1.2rem 0', fontSize: '0.84rem', color: '#cbd5e1' }}>
+            <p style={{ margin: '0 0 1.2rem 0', fontSize: '0.84rem', color: '#e2e8f0' }}>
               Escanea este código con la cámara de tu celular para abrir y firmar el Contrato Unificado de Maestría del Juego (Sede Lima).
             </p>
             <div style={{
@@ -1313,7 +1425,7 @@ export default function ContratoMaestriaLima() {
             }}>
               <img src={qrUrl} alt="QR Contrato Maestría" style={{ width: '240px', height: '240px', display: 'block' }} />
             </div>
-            <div style={{ fontSize: '0.76rem', color: '#94a3b8', wordBreak: 'break-all', marginBottom: '1.2rem' }}>
+            <div style={{ fontSize: '0.76rem', color: '#cbd5e1', wordBreak: 'break-all', marginBottom: '1.2rem' }}>
               {pageUrl}
             </div>
             <button
@@ -1323,10 +1435,10 @@ export default function ContratoMaestriaLima() {
                 width: '100%',
                 padding: '0.75rem',
                 borderRadius: '10px',
-                background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.2)',
-                color: '#fff',
-                fontWeight: 700,
+                background: 'rgba(255,255,255,0.12)',
+                border: '1px solid rgba(255,255,255,0.25)',
+                color: '#ffffff',
+                fontWeight: 800,
                 cursor: 'pointer'
               }}
             >

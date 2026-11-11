@@ -17,32 +17,52 @@ test('1. geoLocator.js provee redundancia triple de IP y Geolocalización forens
   assert.ok(geoCode.includes('coordinates'), 'Debe incluir coordenadas geográficas');
 });
 
-test('2. ContratoMaestriaLima.jsx incluye las 6 secciones del Dossier Legal, QR, 3 casillas Clickwrap, IP y Geolocalización', () => {
+test('2. ContratoMaestriaLima.jsx: sin botones ni jerga de oficina interna, vigencia durante y después de Maestría (comunidad y ley peruana), alto contraste y anti-duplicados', () => {
   const code = fs.readFileSync(path.join(repoRoot, 'src/pages/ContratoMaestriaLima.jsx'), 'utf8');
   assert.ok(code.includes('Creación Cuántica E.I.R.L.'), 'Debe identificar a Creación Cuántica E.I.R.L.');
   assert.ok(code.includes('20612592811'), 'Debe mostrar RUC 20612592811');
-  assert.ok(code.includes('casilla1_TerminosNDA'), 'Debe exigir Casilla 1 (NDA y Reglas)');
-  assert.ok(code.includes('casilla2_SaludExoneracion'), 'Debe exigir Casilla 2 (Salud y Exoneración)');
-  assert.ok(code.includes('casilla3_DatosImagen'), 'Debe exigir Casilla 3 (Datos e Imagen)');
-  assert.ok(code.includes('getClientGeoLocation'), 'Debe capturar IP y Geolocalización sin excepción');
-  assert.ok(code.includes('contratos_maestria_lima'), 'Debe persistir en colección contratos_maestria_lima');
-  assert.ok(code.includes('sendMaestriaConfirmationEmail'), 'Debe enviar automáticamente el contrato y pase por correo');
-  assert.ok(code.includes('generateMaestriaPassCanvas'), 'Debe generar la imagen de validación');
+  assert.ok(!code.includes('Panel Oficina Lima'), 'NO debe exponer botón de Panel Oficina Lima al cliente externo');
+  assert.ok(!code.includes('/monitor-maestria-lima'), 'NO debe enlazar al monitor interno desde la landing pública');
+  assert.ok(!code.includes('NODUS'), 'NO debe mencionar jerga interna NODUS a clientes externos');
+  assert.ok(
+    code.includes('durante todo el programa de Maestría del Juego, después de Maestría como personas integrantes de la comunidad CREAR y por todo el tiempo que la legislación peruana lo considere vigente'),
+    'Debe establecer la vigencia durante toda Maestría, después como parte de la comunidad y por el tiempo que la ley peruana lo considere vigente'
+  );
+  assert.ok(code.includes('.maestria-contract-root'), 'Debe incluir estilos de alto contraste aislados');
+  assert.ok(code.includes('getDocs(collection(db, \'contratos_maestria_lima\'))'), 'Debe verificar anti-duplicados antes de registrar');
+  assert.ok(code.includes('duplicateNotice'), 'Debe mostrar aviso cuando la persona intenta registrarse dos veces');
 });
 
-test('3. MonitorMaestriaLima.jsx provee supervisión para Oficina de Lima con IP, Geolocalización, Padrón 111 y Reenvío de Correo', () => {
-  const code = fs.readFileSync(path.join(repoRoot, 'src/pages/MonitorMaestriaLima.jsx'), 'utf8');
-  assert.ok(code.includes('contratos_maestria_lima'), 'Debe escuchar en vivo contratos_maestria_lima');
-  assert.ok(code.includes('padron_fuego_lima_111.json'), 'Debe cruzar contra el padrón oficial de Lima');
-  assert.ok(code.includes('handleResendEmail'), 'Debe permitir reenviar contrato y pase por correo');
-  assert.ok(code.includes('handleExportCsv'), 'Debe permitir exportar CSV forense con IP y Geolocalización');
-  assert.ok(code.includes('selectedRecordForAudit'), 'Debe incluir modal de expediente forense detallado');
+test('3. MonitorMaestriaLima.jsx y MonitorAcreditacionFuegoLima.jsx permiten eliminar registros con datos errados y solo son accesibles dentro de Causa OS vía RoleRoute', () => {
+  const monitorMaestria = fs.readFileSync(path.join(repoRoot, 'src/pages/MonitorMaestriaLima.jsx'), 'utf8');
+  assert.ok(monitorMaestria.includes('deleteDoc'), 'MonitorMaestriaLima debe importar deleteDoc');
+  assert.ok(monitorMaestria.includes('handleDeleteRecord'), 'MonitorMaestriaLima debe permitir eliminar registros mal ingresados');
+  assert.ok(monitorMaestria.includes('Eliminar Registro'), 'MonitorMaestriaLima debe mostrar botón Eliminar Registro');
+
+  const monitorFuego = fs.readFileSync(path.join(repoRoot, 'src/pages/MonitorAcreditacionFuegoLima.jsx'), 'utf8');
+  assert.ok(monitorFuego.includes('deleteDoc'), 'MonitorAcreditacionFuegoLima debe importar deleteDoc');
+  assert.ok(monitorFuego.includes('handleDeleteFirewalkRecord'), 'MonitorAcreditacionFuegoLima debe permitir eliminar registros mal ingresados');
+  assert.ok(monitorFuego.includes('Eliminar Registro'), 'MonitorAcreditacionFuegoLima debe mostrar botón Eliminar Registro');
+
+  const appCode = fs.readFileSync(path.join(repoRoot, 'src/App.jsx'), 'utf8');
+  assert.ok(
+    appCode.includes('<Route path="/monitor-maestria-lima" element={\n            <RoleRoute') &&
+    appCode.includes('<Route path="/monitor-fuego-lima" element={\n            <RoleRoute'),
+    'Ambos monitores deben estar protegidos dentro de Causa OS con RoleRoute'
+  );
+  assert.ok(
+    appCode.includes("'contabilidad'") && appCode.includes("'oficina'") && appCode.includes("'gerente'") && appCode.includes("'coordinador_mj'"),
+    'RoleRoute de los monitores debe autorizar a Oficina de Lima, Gerente, Coordinadores y Contabilidad Local'
+  );
+  assert.ok(!fs.existsSync(path.join(repoRoot, 'public/monitor-fuego-lima')), 'No debe existir carpeta estática pública public/monitor-fuego-lima que salte RoleRoute');
 });
 
-test('4. Caminata sobre Fuego y Onboarding Legal registran IP y Geolocalización y envían imagen por correo inmediatamente', () => {
+test('4. Caminata sobre Fuego y Onboarding Legal registran IP y Geolocalización, previenen duplicados y envían imagen por correo inmediatamente', () => {
   const fireCode = fs.readFileSync(path.join(repoRoot, 'src/pages/ContratoCaminataFuego.jsx'), 'utf8');
   assert.ok(fireCode.includes('getClientGeoLocation'), 'ContratoCaminataFuego debe capturar IP y Geolocalización');
   assert.ok(fireCode.includes('sendFirewalkConfirmationEmail'), 'ContratoCaminataFuego debe enviar el pase por correo de inmediato');
+  assert.ok(fireCode.includes("getDocs(collection(db, 'contratos_caminata_fuego'))"), 'ContratoCaminataFuego debe prevenir doble registro');
+  assert.ok(!fireCode.includes('NODUS'), 'ContratoCaminataFuego no debe exponer jerga interna NODUS');
 
   const legalService = fs.readFileSync(path.join(repoRoot, 'src/services/legalSignatureService.js'), 'utf8');
   assert.ok(legalService.includes('getClientGeoLocation'), 'legalSignatureService debe capturar IP y Geolocalización en todas las firmas');

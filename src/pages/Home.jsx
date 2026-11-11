@@ -2477,7 +2477,7 @@ export default function Home() {
                   </button>
                 )}
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'legal', 'juridico', 'superadmin', 'director_maestria', 'oficina', 'qt']) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'coordinacion', 'contabilidad', 'contador', 'finanzas', 'facturacion', 'legal', 'juridico', 'superadmin', 'director_maestria', 'oficina']) && (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-maestria-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
                       👑 Supervisión Reglas Maestría (Lima)

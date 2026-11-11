@@ -25,7 +25,7 @@ import {
   Building2,
   FileCheck2
 } from 'lucide-react';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
@@ -36,6 +36,7 @@ export default function ContratoCaminataFuego() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signedSuccess, setSignedSuccess] = useState(null);
+  const [duplicateNotice, setDuplicateNotice] = useState(null);
   const [passDataUrl, setPassDataUrl] = useState(null);
   const [showQrModal, setShowQrModal] = useState(false);
   const [geoInfo, setGeoInfo] = useState({
@@ -166,7 +167,74 @@ export default function ContratoCaminataFuego() {
 
     setIsSubmitting(true);
     setEmailStatus('SENDING');
+    setDuplicateNotice(null);
     try {
+      const normalizedDocInput = formData.numeroDocumento.trim().replace(/\s+/g, '').toUpperCase();
+      const normalizedEmailInput = formData.email.trim().toLowerCase();
+
+      // Anti-duplicados: Verificar si la persona ya se registró por N° de Documento o Correo Electrónico
+      try {
+        const snap = await getDocs(collection(db, 'contratos_caminata_fuego'));
+        let existingDoc = null;
+        snap.forEach((docSnap) => {
+          const d = docSnap.data();
+          const dDoc = String(d.numeroDocumento || '')
+            .trim()
+            .replace(/\s+/g, '')
+            .toUpperCase();
+          const dEmail = String(d.email || '').trim().toLowerCase();
+          if (
+            (normalizedDocInput && dDoc && dDoc === normalizedDocInput) ||
+            (normalizedEmailInput && dEmail && dEmail === normalizedEmailInput)
+          ) {
+            existingDoc = { id: docSnap.id, ...d };
+          }
+        });
+
+        if (existingDoc) {
+          const existingCode = existingDoc.code || existingDoc.verificationCode || 'CQ-FIRE-VERIFIED';
+          const existingDocLabel = existingDoc.doc || `${existingDoc.tipoDocumento || 'DNI'}: ${existingDoc.numeroDocumento || normalizedDocInput}`;
+          const existingFecha = existingDoc.fecha || existingDoc.timestamp || new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
+          const existingLugar = existingDoc.lugar || existingDoc.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
+          const existingPass = await generateFirewalkPassCanvas({
+            nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
+            documento: existingDocLabel,
+            rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
+            lugar: existingLugar,
+            fecha: existingFecha,
+            codigo: existingCode,
+            ip: existingDoc.ip || geoInfo.ip,
+            geoLocation: existingDoc.geoLocation || geoInfo.locationString,
+            coordinates: existingDoc.coordinates || geoInfo.coordinates
+          });
+          if (existingPass) {
+            setPassDataUrl(existingPass);
+          }
+          setDuplicateNotice(
+            `Ya existe un registro firmado con el documento (${normalizedDocInput}) o correo (${normalizedEmailInput}). No es posible registrarse dos veces. A continuación te mostramos tu pase oficial vigente. Si necesitas corregir algún dato erróneo, solicita al equipo de coordinación u oficina que elimine tu registro anterior.`
+          );
+          setEmailStatus('SENT');
+          setSignedSuccess({
+            ...existingDoc,
+            nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
+            documento: existingDocLabel,
+            codigo: existingCode,
+            fecha: existingFecha,
+            rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
+            sedeLocacion: existingLugar,
+            lugar: existingLugar
+          });
+          setIsSubmitting(false);
+          setTimeout(() => {
+            const confirmEl = document.getElementById('constancia-firmada');
+            if (confirmEl) confirmEl.scrollIntoView({ behavior: 'smooth' });
+          }, 120);
+          return;
+        }
+      } catch (dupErr) {
+        console.warn('Verificación de duplicados omitida temporalmente:', dupErr);
+      }
+
       const freshGeo = await getClientGeoLocation().catch(() => geoInfo);
       const finalGeo = freshGeo || geoInfo;
       setGeoInfo(finalGeo);
@@ -430,7 +498,7 @@ export default function ContratoCaminataFuego() {
               3. Protección contra Comercialización y Flujo Transfronterizo
             </h4>
             <p>
-              Creación Cuántica E.I.R.L. garantiza que <strong>en ninguna circunstancia</strong> los datos sensibles de salud serán comercializados, transferidos a terceros con fines publicitarios ni utilizados para prospección comercial. Los datos serán alojados en plataformas informáticas seguras (como la infraestructura NODUS y servidores de Google Cloud) bajo contratos de encargo de tratamiento que garantizan confidencialidad y medidas de seguridad técnicas equivalentes a las exigidas por la Ley N° 29733.
+              Creación Cuántica E.I.R.L. garantiza que <strong>en ninguna circunstancia</strong> los datos sensibles de salud serán comercializados, transferidos a terceros con fines publicitarios ni utilizados para prospección comercial. Los datos serán alojados en plataformas informáticas seguras y servidores en la nube con cifrado criptográfico bajo contratos de encargo de tratamiento que garantizan confidencialidad y medidas de seguridad técnicas equivalentes a las exigidas por la Ley N° 29733.
             </p>
           </div>
 
@@ -505,6 +573,39 @@ export default function ContratoCaminataFuego() {
   });
 
   return (
+    <div className="firewalk-contract-root" style={{ minHeight: '100vh', background: '#070b13', color: '#f8fafc' }}>
+      <style>{`
+        .firewalk-contract-root {
+          color: #f8fafc !important;
+          background-color: #070b13 !important;
+        }
+        .firewalk-contract-root h1,
+        .firewalk-contract-root h2,
+        .firewalk-contract-root h3,
+        .firewalk-contract-root h4 {
+          color: #ffffff !important;
+        }
+        .firewalk-contract-root p,
+        .firewalk-contract-root li {
+          color: #e2e8f0;
+        }
+        .firewalk-contract-root table,
+        .firewalk-contract-root thead,
+        .firewalk-contract-root tbody,
+        .firewalk-contract-root tr,
+        .firewalk-contract-root th,
+        .firewalk-contract-root td {
+          background-color: #091124 !important;
+          color: #f1f5f9 !important;
+          border-color: #1e293b !important;
+        }
+        .firewalk-contract-root input,
+        .firewalk-contract-root select {
+          background-color: #0f172a !important;
+          color: #ffffff !important;
+          border-color: #334155 !important;
+        }
+      `}</style>
     <div style={{ maxWidth: '1240px', margin: '0 auto', padding: '1.5rem 1rem 4rem 1rem', color: '#f8fafc', fontFamily: 'inherit' }}>
       
       {/* HEADER DE IDENTIDAD - ESTILO GUÍAS CREAR */}
@@ -529,12 +630,23 @@ export default function ContratoCaminataFuego() {
 
         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1.5rem' }}>
           <div style={{ flex: '1 1 650px' }}>
-            {/* Branding Oficial CREAR */}
+            {/* Branding Oficial CREAR con contraste nítido */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" style={{ height: '42px', width: 'auto', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/logo-crear.png'; }} />
+              <div style={{
+                background: '#ffffff',
+                padding: '6px 12px',
+                borderRadius: '10px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.35)',
+                border: '1px solid rgba(249, 115, 22, 0.45)'
+              }}>
+                <img src="/logo-crear.png" alt="CREAR Poder Sin Límites" style={{ height: '32px', width: 'auto', objectFit: 'contain', display: 'block' }} />
+              </div>
               <div>
-                <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#f59e0b', textTransform: 'uppercase', display: 'block' }}>CREAR PODER SIN LÍMITES</span>
-                <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', display: 'block' }}>Centro de Formación y Liderazgo Transformacional</span>
+                <span style={{ fontSize: '0.78rem', fontWeight: 900, letterSpacing: '0.12em', color: '#fbbf24', textTransform: 'uppercase', display: 'block' }}>CREAR PODER SIN LÍMITES · CREACIÓN CUÁNTICA E.I.R.L.</span>
+                <span style={{ fontSize: '0.76rem', fontWeight: 700, color: '#f1f5f9', display: 'block' }}>Centro de Formación y Liderazgo Transformacional</span>
               </div>
             </div>
 
@@ -978,8 +1090,24 @@ export default function ContratoCaminataFuego() {
             </div>
 
             <h3 style={{ margin: '0 0 0.5rem 0', color: '#34d399', fontSize: '1.5rem', fontWeight: 900 }}>
-              ¡Acuerdo Validado y Firmado Exitosamente!
+              {duplicateNotice ? '¡Tu Registro ya se Encuentra Validado!' : '¡Acuerdo Validado y Firmado Exitosamente!'}
             </h3>
+            {duplicateNotice && (
+              <div style={{
+                background: 'rgba(245, 158, 11, 0.14)',
+                border: '1px solid rgba(245, 158, 11, 0.45)',
+                color: '#fde68a',
+                padding: '0.85rem 1.1rem',
+                borderRadius: '10px',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                maxWidth: '640px',
+                margin: '0 auto 1.1rem auto',
+                lineHeight: 1.5
+              }}>
+                ⚠️ {duplicateNotice}
+              </div>
+            )}
             <p style={{ color: '#e2e8f0', fontSize: '0.95rem', maxWidth: '640px', margin: '0 auto 1.5rem auto', lineHeight: '1.6' }}>
               Se ha emitido la constancia oficial de exoneración de responsabilidad, declaración de salud y consentimiento informado a favor de <strong>Creación Cuántica E.I.R.L. (RUC 20612592811)</strong>.
             </p>
@@ -1473,15 +1601,16 @@ export default function ContratoCaminataFuego() {
       </div>
 
       {/* FOOTER OFICIAL DE CONTROL DE VERSIÓN Y ENTIDAD */}
-      <div style={{ marginTop: '3rem', borderTop: '1px solid #334155', paddingTop: '1.5rem', textAlign: 'center', color: '#64748b', fontSize: '0.8rem', lineHeight: '1.6' }}>
+      <div style={{ marginTop: '3rem', borderTop: '1px solid #334155', paddingTop: '1.5rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.8rem', lineHeight: '1.6' }}>
         <p style={{ margin: '0 0 0.4rem 0' }}>
-          <strong>Control de Versión:</strong> V1.0-2026-FIREWALK-LIMA · <strong>Fecha de Vigencia:</strong> 26 de octubre de 2026
+          <strong>Control de Versión:</strong> V2.0-2026-FIREWALK-LIMA · <strong>Fecha de Vigencia:</strong> 26 de octubre de 2026
         </p>
         <p style={{ margin: 0 }}>
           <strong>Entidad Administradora:</strong> Creación Cuántica E.I.R.L. (RUC 20612592811) · Sede Fiscal: Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú · Canal ARCO: <strong>protecciondedatos@crearpsl.net</strong>
         </p>
       </div>
 
+    </div>
     </div>
   );
 }

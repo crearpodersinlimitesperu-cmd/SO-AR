@@ -1417,7 +1417,7 @@ service cloud.firestore {
     // ============================================================================
     match /contratos_caminata_fuego/{contratoId} {
       allow read, create: if true;
-      allow update, delete: if isSuperAdmin();
+      allow update, delete: if isAuthenticated();
     }
 
     // ============================================================================
@@ -1425,7 +1425,7 @@ service cloud.firestore {
     // ============================================================================
     match /contratos_maestria_lima/{contratoId} {
       allow read, create: if true;
-      allow update, delete: if isSuperAdmin();
+      allow update, delete: if isAuthenticated();
     }
   }
 }

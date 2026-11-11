@@ -277,12 +277,20 @@ function App() {
           <Route path="/caminata-fuego" element={<ContratoCaminataFuego />} />
           <Route path="/contrato-caminata-fuego" element={<ContratoCaminataFuego />} />
           <Route path="/firewalking" element={<Navigate to="/caminata-fuego" replace />} />
-          <Route path="/monitor-fuego-lima" element={<MonitorAcreditacionFuegoLima />} />
+          <Route path="/monitor-fuego-lima" element={
+            <RoleRoute allowedRoles={['gerente', 'coordinador_mj', 'coord_maestria', 'coordinacion', 'oficina', 'contabilidad', 'contador', 'finanzas', 'facturacion', 'legal', 'juridico', 'director_maestria', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin']} requireSuperAdmin={false}>
+              <MonitorAcreditacionFuegoLima />
+            </RoleRoute>
+          } />
           <Route path="/acreditacion-fuego-lima" element={<Navigate to="/monitor-fuego-lima" replace />} />
           <Route path="/reglas-maestria" element={<ContratoMaestriaLima />} />
           <Route path="/contrato-maestria-lima" element={<ContratoMaestriaLima />} />
           <Route path="/maestria-lima" element={<ContratoMaestriaLima />} />
-          <Route path="/monitor-maestria-lima" element={<MonitorMaestriaLima />} />
+          <Route path="/monitor-maestria-lima" element={
+            <RoleRoute allowedRoles={['gerente', 'coordinador_mj', 'coord_maestria', 'coordinacion', 'oficina', 'contabilidad', 'contador', 'finanzas', 'facturacion', 'legal', 'juridico', 'director_maestria', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin']} requireSuperAdmin={false}>
+              <MonitorMaestriaLima />
+            </RoleRoute>
+          } />
           <Route path="/supervision-maestria-lima" element={<Navigate to="/monitor-maestria-lima" replace />} />
           <Route path="/causa-os-task" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio', 'superadmin']}>

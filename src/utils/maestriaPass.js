@@ -89,7 +89,7 @@ export async function generateMaestriaPassCanvas({
 
       ctx.fillStyle = '#94a3b8';
       ctx.font = '600 16px Montserrat, -apple-system, sans-serif';
-      ctx.fillText('MAESTRÍA DEL JUEGO · SEDE LIMA · PRIMER FIN DE SEMANA', W / 2, 134);
+      ctx.fillText('MAESTRÍA DEL JUEGO & COMUNIDAD CREAR · SEDE LIMA', W / 2, 134);
 
       ctx.strokeStyle = 'rgba(245, 158, 11, 0.35)';
       ctx.lineWidth = 1;
@@ -332,7 +332,7 @@ export async function sendMaestriaConfirmationEmail({
             Estimado(a) <strong>${safeName}</strong>,
           </p>
           <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-            Confirmamos la recepción exitosa y el registro probatorio inalterable de tu aceptación del <strong>Dossier Legal, Contrato Unificado y Reglas de Sala</strong> para el primer fin de semana de <strong>Maestría del Juego en Creación (Sede Lima)</strong>.
+            Confirmamos la recepción exitosa y el registro probatorio inalterable de tu aceptación del <strong>Dossier Legal, Contrato Unificado y Reglas de Sala y Comunidad</strong> aplicables <strong>durante todo el programa de Maestría del Juego, después de Maestría como integrante de la comunidad CREAR y por todo el tiempo que la legislación peruana lo considere vigente</strong>.
           </p>
 
           <!-- Tarjeta de Datos Registrados y Auditoría Forense -->
@@ -394,16 +394,16 @@ export async function sendMaestriaConfirmationEmail({
               ✓ Tres (3) Declaraciones Vinculantes Aceptadas (Clickwrap):
             </h4>
             <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #166534; line-height: 1.6;">
-              <li><strong>Casilla 1 (DOC 1) · Términos, Reglas de Maestría y Confidencialidad NDA:</strong> Aceptación del diseño educativo de inmersión de alto rendimiento (no equivale a terapia psicológica ni médica), pacto de no divulgación de contenidos por 5 años, secreto de comunidad a perpetuidad, prohibición de grabaciones, cero alcohol/sustancias, prohibición de préstamos/negocios/apuestas entre participantes, cero nuevas relaciones sentimentales durante el proceso y asistencia mínima >80%.</li>
+              <li><strong>Casilla 1 (DOC 1) · Términos, Reglas de Maestría y Confidencialidad NDA:</strong> Aceptación del diseño educativo de inmersión de alto rendimiento (no equivale a terapia psicológica ni médica), pacto de no divulgación de contenidos y secreto de comunidad vigentes durante toda Maestría del Juego, después de Maestría como integrantes de la comunidad CREAR y por todo el tiempo que la ley peruana lo considere vigente; prohibición de grabaciones, cero alcohol/sustancias, prohibición de préstamos/negocios/apuestas entre miembros, cero nuevas relaciones sentimentales durante el proceso y asistencia mínima &gt;80%.</li>
               <li><strong>Casilla 2 (DOC 2) · Declaración Jurada de Salud y Exoneración:</strong> Declaración jurada de aptitud física y psicológica, y exoneración amplia e irrevocable de responsabilidad a Creación Cuántica E.I.R.L.</li>
               <li><strong>Casilla 3 (DOC 3) · Tratamiento de Datos e Imagen:</strong> Autorización de tratamiento de datos personales conforme a la Ley N° 29733 y D.S. N° 016-2024-JUS, y uso de imagen con fines exclusivamente institucionales y pedagógicos.</li>
             </ul>
           </div>
 
-          <!-- Indicación de Validación NODUS -->
+          <!-- Vigencia Legal y Comunitaria -->
           <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 14px 16px; margin: 20px 0; font-size: 13px; color: #1e40af; line-height: 1.5;">
-            <strong>📌 Regla Estricta de Disparo de Acceso y Validación NODUS:</strong><br/>
-            De acuerdo con las normativas operativas de la Sede Lima, la emisión del QR definitivo de Check-In para el ingreso físico al salón está sujeta a que el pago haya sido validado y registrado formalmente en el sistema <strong>NODUS</strong> por la coordinación administrativa de la Empresa.
+            <strong>📌 Ámbito de Aplicación y Vigencia Legal:</strong><br/>
+            Las reglas de ética, confidencialidad y convivencia aceptadas en este instrumento rigen de manera continua durante todo el programa de <strong>Maestría del Juego</strong>, después de Maestría como personas integrantes de la <strong>Comunidad CREAR</strong> y por todo el tiempo que la legislación de la República del Perú lo considere vigente y exigible.
           </div>
 
           <!-- Pase Oficial Adjunto -->
@@ -413,14 +413,14 @@ export async function sendMaestriaConfirmationEmail({
           </div>
 
           <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
-            Este es un documento probatorio oficial emitido por Causa OS para Creación Cuántica E.I.R.L. La firma electrónica con registro de IP y geolocalización goza de plena eficacia jurídica conforme a la Ley N° 27269 y el Código Civil Peruano (Arts. 141 y 141-A).
+            Este es un documento probatorio oficial emitido para Creación Cuántica E.I.R.L. La firma electrónica con registro de IP y geolocalización goza de plena eficacia jurídica conforme a la Ley N° 27269 y el Código Civil Peruano (Arts. 141 y 141-A).
           </p>
         </div>
 
         <!-- Pie de página -->
         <div style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 14px 20px; text-align: center; font-size: 11px; color: #94a3b8;">
           CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811 · Lima, Perú<br/>
-          Gobernanza Causa OS / Sistema NODUS
+          Programa de Potencial Humano CREAR Poder Sin Límites
         </div>
       </div>
     `;

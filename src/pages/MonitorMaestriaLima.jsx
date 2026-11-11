@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Crown,
   ShieldCheck,
@@ -16,14 +17,17 @@ import {
   Globe,
   Cpu,
   X,
-  Check
+  Check,
+  Trash2,
+  ArrowLeft
 } from 'lucide-react';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 
 export default function MonitorMaestriaLima() {
+  const navigate = useNavigate();
   const [signedContracts, setSignedContracts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('REGISTROS'); // 'REGISTROS' | 'PADRON'
@@ -39,7 +43,7 @@ export default function MonitorMaestriaLima() {
   const [padronStatusFilter, setPadronStatusFilter] = useState('TODOS');
 
   // Modales y Estados de Acción
-  const [qrModalType, setQrModalType] = useState(null); // 'contract' | 'monitor' | null
+  const [qrModalType, setQrModalType] = useState(null); // 'contract' | null
   const [copiedLink, setCopiedLink] = useState(false);
   const [selectedRecordForPass, setSelectedRecordForPass] = useState(null);
   const [passPreviewUrl, setPassPreviewUrl] = useState(null);
@@ -47,6 +51,7 @@ export default function MonitorMaestriaLima() {
   const [selectedRecordForAudit, setSelectedRecordForAudit] = useState(null);
   const [sendingEmailId, setSendingEmailId] = useState(null);
   const [emailStatusMap, setEmailStatusMap] = useState({});
+  const [deletingId, setDeletingId] = useState(null);
 
   const normalizeStr = (str) => {
     if (!str) return '';
@@ -285,6 +290,30 @@ export default function MonitorMaestriaLima() {
     }
   };
 
+  // Eliminar un registro con datos errados para permitir que el usuario vuelva a registrarse
+  const handleDeleteRecord = async (item) => {
+    if (!item?.id) {
+      alert('Este registro no tiene un ID válido de Firestore para eliminar.');
+      return;
+    }
+    const nombre = item.nombre || item.nombreCompleto || 'Participante';
+    const docNum = item.numeroDocumento || item.doc || '';
+    const confirmed = window.confirm(
+      `¿Confirmas ELIMINAR el registro de "${nombre}" (${docNum})?\n\nUsa esta opción únicamente si la persona quedó mal registrada o ingresó datos errados. Al eliminarlo, podrá volver a llenar y firmar su acuerdo desde cero.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(item.id);
+    try {
+      await deleteDoc(doc(db, 'contratos_maestria_lima', item.id));
+    } catch (err) {
+      console.error('Error al eliminar registro en contratos_maestria_lima:', err);
+      alert('No se pudo eliminar el registro. Verifica tus permisos en Causa OS.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   // Exportar CSV con Auditoría de IP y Geolocalización
   const handleExportCsv = () => {
     const headers = [
@@ -336,10 +365,30 @@ export default function MonitorMaestriaLima() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#050811', color: '#f8fafc', padding: '1.25rem 0.85rem' }}>
+    <div className="monitor-maestria-root" style={{ minHeight: '100vh', background: '#050811', color: '#f8fafc', padding: '1.25rem 0.85rem' }}>
+      <style>{`
+        .monitor-maestria-root {
+          color: #f8fafc !important;
+        }
+        .monitor-maestria-root h1,
+        .monitor-maestria-root h2,
+        .monitor-maestria-root h3,
+        .monitor-maestria-root h4 {
+          color: #ffffff !important;
+        }
+        .monitor-maestria-root p {
+          color: #cbd5e1;
+        }
+        .monitor-maestria-root input,
+        .monitor-maestria-root select {
+          background-color: #050811 !important;
+          color: #ffffff !important;
+          border-color: #334155 !important;
+        }
+      `}</style>
       <div style={{ maxWidth: '1140px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-        {/* Encabezado Ejecutivo — Oficina de Lima */}
+        {/* Encabezado Ejecutivo — Oficina de Lima (Uso Exclusivo Interno Causa OS) */}
         <div style={{
           position: 'relative',
           overflow: 'hidden',
@@ -361,18 +410,47 @@ export default function MonitorMaestriaLima() {
           {/* Barra Superior de Identidad */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-              <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/logo-crear.png'; }} />
+              <div style={{
+                background: '#ffffff',
+                padding: '6px 12px',
+                borderRadius: '10px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.35)',
+                border: '1px solid rgba(245, 158, 11, 0.45)'
+              }}>
+                <img src="/logo-crear.png" alt="CREAR Poder Sin Límites" style={{ height: '32px', width: 'auto', objectFit: 'contain', display: 'block' }} />
+              </div>
               <div>
-                <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#f59e0b', textTransform: 'uppercase', display: 'block' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#fbbf24', textTransform: 'uppercase', display: 'block' }}>
                   CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811
                 </span>
-                <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#94a3b8', display: 'block' }}>
-                  Causa OS · Panel de Supervisión Legal & Reglas de Sala (Oficina de Lima)
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#e2e8f0', display: 'block' }}>
+                  Causa OS · Panel Interno Exclusivo (Oficina Lima, Gerencia, Coordinadores y Contabilidad Local)
                 </span>
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => navigate('/home')}
+                style={{
+                  background: '#1e293b',
+                  color: '#f8fafc',
+                  border: '1px solid #334155',
+                  borderRadius: '8px',
+                  padding: '0.5rem 0.85rem',
+                  fontSize: '0.76rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                <ArrowLeft size={14} /> Volver a Causa OS
+              </button>
               <button
                 onClick={handleExportCsv}
                 style={{
@@ -802,6 +880,28 @@ export default function MonitorMaestriaLima() {
                           >
                             <FileText size={14} /> Expediente Forense
                           </button>
+
+                          <button
+                            onClick={() => handleDeleteRecord(item)}
+                            disabled={deletingId === item.id}
+                            title="Eliminar si quedó mal registrado con datos errados para que pueda volver a registrarse"
+                            style={{
+                              background: 'rgba(244, 63, 94, 0.15)',
+                              color: '#fb7185',
+                              border: '1px solid rgba(244, 63, 94, 0.4)',
+                              borderRadius: '8px',
+                              padding: '0.45rem 0.75rem',
+                              fontSize: '0.74rem',
+                              fontWeight: 800,
+                              cursor: deletingId === item.id ? 'wait' : 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <Trash2 size={14} />
+                            {deletingId === item.id ? 'Eliminando...' : 'Eliminar Registro'}
+                          </button>
                         </div>
                       </div>
 
@@ -984,7 +1084,7 @@ export default function MonitorMaestriaLima() {
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                         <button
                           onClick={() => handleViewPass(sig)}
                           style={{
@@ -1002,6 +1102,26 @@ export default function MonitorMaestriaLima() {
                           }}
                         >
                           <CheckCircle2 size={14} /> Ver Pase
+                        </button>
+                        <button
+                          onClick={() => handleDeleteRecord(sig)}
+                          disabled={deletingId === sig.id}
+                          title="Eliminar si quedó mal registrado con datos errados"
+                          style={{
+                            background: 'rgba(244, 63, 94, 0.15)',
+                            color: '#fb7185',
+                            border: '1px solid rgba(244, 63, 94, 0.4)',
+                            borderRadius: '8px',
+                            padding: '0.45rem 0.75rem',
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            cursor: deletingId === sig.id ? 'wait' : 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem'
+                          }}
+                        >
+                          <Trash2 size={14} /> {deletingId === sig.id ? 'Eliminando...' : 'Eliminar'}
                         </button>
                       </div>
                     </div>

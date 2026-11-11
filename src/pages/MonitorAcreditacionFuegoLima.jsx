@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Flame,
   ShieldCheck,
@@ -18,14 +19,17 @@ import {
   Sparkles,
   Calendar,
   Mail,
-  X
+  X,
+  Trash2,
+  ArrowLeft
 } from 'lucide-react';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 
 export default function MonitorAcreditacionFuegoLima() {
+  const navigate = useNavigate();
   const [signedContracts, setSignedContracts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('REGISTROS'); // 'REGISTROS' | 'PADRON'
@@ -39,10 +43,34 @@ export default function MonitorAcreditacionFuegoLima() {
   const [padronTeamFilter, setPadronTeamFilter] = useState('TODOS');
   const [padronStatusFilter, setPadronStatusFilter] = useState('TODOS');
 
-  const [qrModalType, setQrModalType] = useState(null); // 'contract' | 'monitor' | null
+  const [qrModalType, setQrModalType] = useState(null); // 'contract' | null
   const [copiedLink, setCopiedLink] = useState(false);
   const [sendingEmailId, setSendingEmailId] = useState(null);
   const [emailStatusMap, setEmailStatusMap] = useState({});
+  const [deletingId, setDeletingId] = useState(null);
+
+  const handleDeleteFirewalkRecord = async (item) => {
+    if (!item?.id) {
+      alert('Este registro no tiene un ID válido de Firestore para eliminar.');
+      return;
+    }
+    const nombre = item.nombre || item.nombreCompleto || 'Participante';
+    const docNum = item.numeroDocumento || item.doc || '';
+    const confirmed = window.confirm(
+      `¿Confirmas ELIMINAR el registro de Caminata sobre Fuego de "${nombre}" (${docNum})?\n\nUsa esta opción únicamente si la persona quedó mal registrada o ingresó datos errados. Al eliminarlo, podrá volver a llenar y firmar su acuerdo desde cero.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(item.id);
+    try {
+      await deleteDoc(doc(db, 'contratos_caminata_fuego', item.id));
+    } catch (err) {
+      console.error('Error al eliminar registro en contratos_caminata_fuego:', err);
+      alert('No se pudo eliminar el registro. Verifica tus permisos en Causa OS.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const handleResendFirewalkEmail = async (item) => {
     if (!item.email) {
@@ -205,8 +233,8 @@ export default function MonitorAcreditacionFuegoLima() {
     });
   }, [enrichedPadron, padronTeamFilter, padronStatusFilter, padronSearch]);
 
-  const contractUrl = 'https://cartas.crearpsl.net/contrato_caminata_fuego.html';
-  const monitorUrl = 'https://cartas.crearpsl.net/monitor_fuego_lima.html';
+  const originUrl = typeof window !== 'undefined' ? window.location.origin : 'https://centro-operativo-cpsl.web.app';
+  const contractUrl = `${originUrl}/caminata-fuego`;
 
   const copyUrl = (url) => {
     navigator.clipboard.writeText(url).then(() => {
@@ -216,10 +244,30 @@ export default function MonitorAcreditacionFuegoLima() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#070b13', color: '#f8fafc', padding: '1.25rem 0.75rem' }}>
+    <div className="monitor-fuego-root" style={{ minHeight: '100vh', background: '#070b13', color: '#f8fafc', padding: '1.25rem 0.75rem' }}>
+      <style>{`
+        .monitor-fuego-root {
+          color: #f8fafc !important;
+        }
+        .monitor-fuego-root h1,
+        .monitor-fuego-root h2,
+        .monitor-fuego-root h3,
+        .monitor-fuego-root h4 {
+          color: #ffffff !important;
+        }
+        .monitor-fuego-root p {
+          color: #cbd5e1;
+        }
+        .monitor-fuego-root input,
+        .monitor-fuego-root select {
+          background-color: #0b1120 !important;
+          color: #ffffff !important;
+          border-color: #334155 !important;
+        }
+      `}</style>
       <div style={{ maxWidth: '960px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
-        {/* Encabezado con Branding Oficial CREAR */}
+        {/* Encabezado con Branding Oficial CREAR (Uso Exclusivo Interno Causa OS) */}
         <div style={{
           position: 'relative',
           overflow: 'hidden',
@@ -239,12 +287,44 @@ export default function MonitorAcreditacionFuegoLima() {
           }} />
 
           {/* Logo Oficial CREAR */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <img src="/logo_crear_blanco.png" alt="CREAR Poder Sin Límites" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} onError={(e) => { e.currentTarget.src = '/logo-crear.png'; }} />
-            <div>
-              <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#f59e0b', textTransform: 'uppercase', display: 'block' }}>CREAR PODER SIN LÍMITES</span>
-              <span style={{ fontSize: '0.7rem', fontWeight: 600, color: '#94a3b8', display: 'block' }}>Causa OS · Centro de Acreditación y Operaciones</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.85rem', marginBottom: '1.25rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <div style={{
+                background: '#ffffff',
+                padding: '6px 12px',
+                borderRadius: '10px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.35)',
+                border: '1px solid rgba(249, 115, 22, 0.45)'
+              }}>
+                <img src="/logo-crear.png" alt="CREAR Poder Sin Límites" style={{ height: '32px', width: 'auto', objectFit: 'contain', display: 'block' }} />
+              </div>
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.12em', color: '#fbbf24', textTransform: 'uppercase', display: 'block' }}>CREAR PODER SIN LÍMITES · CREACIÓN CUÁNTICA E.I.R.L.</span>
+                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#e2e8f0', display: 'block' }}>Causa OS · Panel Interno Exclusivo (Oficina Lima, Gerencia, Coordinadores y Contabilidad Local)</span>
+              </div>
             </div>
+
+            <button
+              onClick={() => navigate('/home')}
+              style={{
+                background: '#1e293b',
+                color: '#f8fafc',
+                border: '1px solid #334155',
+                borderRadius: '8px',
+                padding: '0.5rem 0.85rem',
+                fontSize: '0.76rem',
+                fontWeight: 800,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+            >
+              <ArrowLeft size={14} /> Volver a Causa OS
+            </button>
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
@@ -545,32 +625,56 @@ export default function MonitorAcreditacionFuegoLima() {
                         <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
                           {nombre}
                         </h3>
-                        {item.email && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          {item.email && (
+                            <button
+                              onClick={() => handleResendFirewalkEmail(item)}
+                              disabled={sendingEmailId === (item.id || item.code)}
+                              style={{
+                                background: emailStatusMap[item.id || item.code] === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(249, 115, 22, 0.16)',
+                                color: emailStatusMap[item.id || item.code] === 'SENT' ? '#34d399' : '#fb923c',
+                                border: '1px solid rgba(249, 115, 22, 0.35)',
+                                borderRadius: '8px',
+                                padding: '0.4rem 0.75rem',
+                                fontSize: '0.73rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem'
+                              }}
+                            >
+                              <Mail size={13} />
+                              {sendingEmailId === (item.id || item.code)
+                                ? 'Enviando Pase...'
+                                : emailStatusMap[item.id || item.code] === 'SENT'
+                                ? '✓ Pase Enviado al Correo'
+                                : `Reenviar Pase (${item.email})`}
+                            </button>
+                          )}
+
                           <button
-                            onClick={() => handleResendFirewalkEmail(item)}
-                            disabled={sendingEmailId === (item.id || item.code)}
+                            onClick={() => handleDeleteFirewalkRecord(item)}
+                            disabled={deletingId === item.id}
+                            title="Eliminar si quedó mal registrado con datos errados para que pueda volver a registrarse"
                             style={{
-                              background: emailStatusMap[item.id || item.code] === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(249, 115, 22, 0.16)',
-                              color: emailStatusMap[item.id || item.code] === 'SENT' ? '#34d399' : '#fb923c',
-                              border: '1px solid rgba(249, 115, 22, 0.35)',
+                              background: 'rgba(244, 63, 94, 0.15)',
+                              color: '#fb7185',
+                              border: '1px solid rgba(244, 63, 94, 0.4)',
                               borderRadius: '8px',
                               padding: '0.4rem 0.75rem',
                               fontSize: '0.73rem',
                               fontWeight: 800,
-                              cursor: 'pointer',
+                              cursor: deletingId === item.id ? 'wait' : 'pointer',
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '0.35rem'
                             }}
                           >
-                            <Mail size={13} />
-                            {sendingEmailId === (item.id || item.code)
-                              ? 'Enviando Pase...'
-                              : emailStatusMap[item.id || item.code] === 'SENT'
-                              ? '✓ Pase Enviado al Correo'
-                              : `Reenviar Pase (${item.email})`}
+                            <Trash2 size={13} />
+                            {deletingId === item.id ? 'Eliminando...' : 'Eliminar Registro'}
                           </button>
-                        )}
+                        </div>
                       </div>
 
                       {/* Caja Destacada: Lugar, Fechas, IP y Geolocalización */}
@@ -771,7 +875,7 @@ export default function MonitorAcreditacionFuegoLima() {
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                         <span style={{
                           background: 'rgba(16, 185, 129, 0.15)',
                           color: '#34d399',
@@ -786,13 +890,33 @@ export default function MonitorAcreditacionFuegoLima() {
                         }}>
                           <CheckCircle2 size={15} color="#34d399" /> Listo para Ingreso
                         </span>
+                        <button
+                          onClick={() => handleDeleteFirewalkRecord(sig)}
+                          disabled={deletingId === sig.id}
+                          title="Eliminar si quedó mal registrado con datos errados"
+                          style={{
+                            background: 'rgba(244, 63, 94, 0.15)',
+                            color: '#fb7185',
+                            border: '1px solid rgba(244, 63, 94, 0.4)',
+                            borderRadius: '8px',
+                            padding: '0.4rem 0.75rem',
+                            fontSize: '0.74rem',
+                            fontWeight: 800,
+                            cursor: deletingId === sig.id ? 'wait' : 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem'
+                          }}
+                        >
+                          <Trash2 size={14} /> {deletingId === sig.id ? 'Eliminando...' : 'Eliminar'}
+                        </button>
                       </div>
                     </div>
                   );
                 } else {
                   // Pendiente
                   const waMessage = encodeURIComponent(
-                    `Hola ${item.nombre}, te escribe el equipo de CREAR PSL Lima. Por favor completa y firma tu exoneración legal obligatoria para la Caminata sobre Fuego en Casona Blanca antes de ingresar aquí: https://cartas.crearpsl.net/contrato_caminata_fuego.html`
+                    `Hola ${item.nombre}, te escribe el equipo de CREAR PSL Lima. Por favor completa y firma tu exoneración legal obligatoria para la Caminata sobre Fuego en Casona Blanca antes de ingresar aquí: ${contractUrl}`
                   );
 
                   return (
@@ -913,31 +1037,27 @@ export default function MonitorAcreditacionFuegoLima() {
               </button>
 
               <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: 900, color: '#fff' }}>
-                {qrModalType === 'contract' ? 'Escanear para Firmar Contrato' : 'Escanear para Abrir Monitor'}
+                Escanear para Firmar Contrato
               </h3>
               <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: '#94a3b8' }}>
-                {qrModalType === 'contract'
-                  ? 'Pide al participante o staff escanear este código con su celular para abrir la exoneración oficial.'
-                  : 'Comparte este monitor en vivo con el equipo de staff y capitanía.'}
+                Pide al participante o staff escanear este código con su celular para abrir la exoneración oficial.
               </p>
 
               <div style={{ background: '#fff', padding: '1rem', borderRadius: '12px', display: 'inline-block', margin: '0 auto 1rem auto' }}>
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                    qrModalType === 'contract' ? contractUrl : monitorUrl
-                  )}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(contractUrl)}`}
                   alt="QR Code"
                   style={{ width: '190px', height: '190px', display: 'block' }}
                 />
               </div>
 
               <div style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: '#94a3b8', wordBreak: 'break-all', marginBottom: '1rem' }}>
-                {qrModalType === 'contract' ? contractUrl : monitorUrl}
+                {contractUrl}
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
-                  onClick={() => copyUrl(qrModalType === 'contract' ? contractUrl : monitorUrl)}
+                  onClick={() => copyUrl(contractUrl)}
                   style={{
                     flex: 1,
                     background: '#ea580c',
