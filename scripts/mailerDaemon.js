@@ -896,10 +896,72 @@ curl_close($ch);</pre>
   }
 }
 
+async function ensureMilaTasksReadyNotification() {
+  try {
+    const mailId = 'mail_mila_tasks_ready_2026_11_11';
+    const existingMail = await db.collection('mail').doc(mailId).get();
+    if (!existingMail.exists) {
+      const nowIso = new Date().toISOString();
+      await db.collection('notifications').doc('notif_mila_tasks_ready_2026_11_11').set({
+        userId: 'emily.campuzano@crearpsl.net',
+        title: '✅ Módulo de Tareas y Guardar Avances Listo',
+        message: 'Hola Mila, ya quedó solucionado y desplegado el guardado de avances, evidencias y notas en todas las tareas de Causa OS (incluyendo "Información detallada de EL VIAJE (4fds)"). Ya puedes registrar tus evidencias y avances con total normalidad.',
+        type: 'system_update',
+        read: false,
+        created_at: nowIso
+      }, { merge: true });
+
+      await db.collection('mail').doc(mailId).set({
+        to: ['emily.campuzano@crearpsl.net', 'milacampuzano21@gmail.com'],
+        cc: ['jose.sanchez@crearpsl.net'],
+        message: {
+          subject: '✅ Causa OS | Listo el guardado de avances y evidencias en Tareas',
+          html: `
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 620px; margin: 0 auto; background: #0f172a; color: #f8fafc; border-radius: 16px; overflow: hidden; border: 1px solid #1e293b;">
+              <div style="padding: 26px 30px; background: linear-gradient(135deg, #0284c7 0%, #0f172a 100%); border-bottom: 2px solid #38bdf8;">
+                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #38bdf8; margin-bottom: 6px;">
+                  CREAR PODER SIN LÍMITES · CAUSA OS
+                </div>
+                <h1 style="margin: 0; font-size: 21px; font-weight: 800; color: #ffffff;">
+                  ✅ Módulo de Tareas Actualizado y Operativo
+                </h1>
+              </div>
+              <div style="padding: 28px 30px; line-height: 1.65; color: #e2e8f0; font-size: 14.5px;">
+                <p style="margin-top: 0;">Hola <strong>Mila</strong>,</p>
+                <p>Te confirmamos que ya quedó <strong>100% resuelto y desplegado en línea</strong> el inconveniente al presionar <strong>"Guardar Avances"</strong> en el módulo de Tareas de <strong>Causa OS</strong>.</p>
+                <div style="background: #1e293b; border-left: 4px solid #10b981; border-radius: 8px; padding: 16px 18px; margin: 20px 0; color: #f1f5f9; font-size: 13.5px;">
+                  <strong style="color: #34d399; display: block; margin-bottom: 6px;">Qué quedó habilitado para todos los perfiles y usuarios:</strong>
+                  <ul style="margin: 0; padding-left: 18px;">
+                    <li style="margin-bottom: 4px;">Guardado inmediato de <strong>Evidencias de Cumplimiento</strong> (Google Drive, archivos y enlaces), como en <em>"Informacion detallada de EL VIAJE (4fds)"</em>.</li>
+                    <li style="margin-bottom: 4px;">Registro directo en la <strong>Bitácora de Avances y Notas</strong> al guardar.</li>
+                    <li>Actualización de porcentaje individual y botón <strong>"Marcar Mi Parte Completada"</strong> sin bloqueos de permisos.</li>
+                  </ul>
+                </div>
+                <p style="font-size: 13.5px; color: #cbd5e1;">Solo recarga la página (<code>Ctrl + Shift + R</code> o actualizar en el navegador) e ingresa normalmente para continuar registrando tus avances.</p>
+                <div style="margin: 26px 0 10px 0; text-align: center;">
+                  <a href="https://centro-operativo-cpsl.web.app" style="display: inline-block; background: #0284c7; color: #ffffff; text-decoration: none; font-weight: 800; padding: 12px 28px; border-radius: 8px; font-size: 14px;">
+                    🚀 Abrir Causa OS
+                  </a>
+                </div>
+              </div>
+            </div>
+          `
+        },
+        createdAt: FieldValue.serverTimestamp(),
+        source: 'tasks_guardar_avances_ready_mila'
+      });
+      console.log('📨 Notificación in-app y correo para Mila (emily.campuzano@crearpsl.net) encolados.');
+    }
+  } catch (err) {
+    console.warn('⚠️ No se pudo encolar notificación para Mila:', err.message);
+  }
+}
+
 // Ejecución
 if (isOneShot) {
   console.log("⚡ Ejecución en modo One-Shot (GitHub Actions / Tarea programada)...");
   await ensureArmandoObserverProfile();
+  await ensureMilaTasksReadyNotification();
   await processPendingMails();
   await checkInactivity();
   await checkOverdueTaskReminders();

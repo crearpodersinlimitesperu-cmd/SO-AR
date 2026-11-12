@@ -52,12 +52,22 @@ service cloud.firestore {
       return request.auth.token.email.lower();
     }
 
+    function emailAliases(addr) {
+      let e = addr.lower();
+      let mila = ['milacampuzano21@gmail.com', 'emily.campuzano@crearpsl.net', 'emily.campuzano@crearpsl.com', 'emily.campuzano@crearpls.com'];
+      let ricardo = ['ricardogavilanez1021@gmail.com', 'ricardo.gavilanez@crearpsl.net', 'ricardo.gavilanez@crearpsl.com', 'ricardo.gavilanez@crearpls.com'];
+      let leandro = ['brunische66@gmail.com', 'leandro.brunis@crearpsl.net', 'leandro.brunis@crearpsl.com', 'leandro.brunis@crearpls.com'];
+      let parts = e.split('@');
+      return e in mila ? mila :
+        e in ricardo ? ricardo :
+        e in leandro ? leandro :
+        parts.size() == 2 && parts[1] in ['crearpsl.net', 'crearpsl.com', 'crearpls.com']
+          ? [parts[0] + '@crearpsl.net', parts[0] + '@crearpsl.com', parts[0] + '@crearpls.com']
+          : [e];
+    }
+
     function callerEmailAliases() {
-      let parts = email().split('@');
-      return parts.size() == 2 &&
-        (parts[1] == 'crearpsl.net' || parts[1] == 'crearpsl.com')
-        ? [email(), parts[0] + '@crearpsl.net', parts[0] + '@crearpsl.com']
-        : [email()];
+      return isAuthenticated() ? emailAliases(email()) : [];
     }
 
     // Debe coincidir con SUPER_ADMIN_EMAILS en src/config/permissions.js
@@ -80,20 +90,27 @@ service cloud.firestore {
     // Lista extra├¡da de usersToImport.js (snapshot GitHub, roles gerente/direccion/
     // cfo/cco/ceo/director_maestria/socio). VERIFICAR Y CORREGIR antes de desplegar.
     function isGerenteODireccion() {
-      return isSuperAdmin() || (isAuthenticated() && email() in [
+      let managerEmails = [
         'ricardo.gavilanez@crearpsl.net',
+        'ricardogavilanez1021@gmail.com',
         'fer.aragon@crearpsl.net',
         'andres.gomez@crearpsl.net',
         'gomeznueve@gmail.com',
         'contabilidad.global@crearpsl.net',
         'leandro.brunis@crearpsl.net',
+        'brunische66@gmail.com',
         'josue.vera@crearpsl.net',
         'yurany.gonzalez@crearpsl.net',
         'nora.zamora@crearpsl.net',
         'emily.campuzano@crearpsl.net',
+        'milacampuzano21@gmail.com',
         'freddy.sosa@crearpsl.net',
         'diana.moscoso@crearpsl.net'
-      ]);
+      ];
+      return isSuperAdmin() || (isAuthenticated() && (
+        email() in managerEmails ||
+        callerEmailAliases().hasAny(managerEmails)
+      ));
     }
 
     function isOwner(resourceData) {
@@ -137,16 +154,20 @@ service cloud.firestore {
 
     function isTaskRecipient(resourceData) {
       let callerEmail = isAuthenticated() ? email() : '';
-      let emailParts = callerEmail.split('@');
-      let callerAlias = emailParts.size() == 2 &&
-        (emailParts[1] == 'crearpsl.net' || emailParts[1] == 'crearpsl.com')
-        ? emailParts[0] + (emailParts[1] == 'crearpsl.net' ? '@crearpsl.com' : '@crearpsl.net')
-        : callerEmail;
+      let aliases = isAuthenticated() ? callerEmailAliases() : [''];
+      let a0 = aliases.size() > 0 ? aliases[0] : callerEmail;
+      let a1 = aliases.size() > 1 ? aliases[1] : callerEmail;
+      let a2 = aliases.size() > 2 ? aliases[2] : callerEmail;
+      let a3 = aliases.size() > 3 ? aliases[3] : callerEmail;
       return isAuthenticated() && (
         resourceData.get('assignedToEmail', '').lower() == callerEmail ||
+        resourceData.get('assignedToEmail', '').lower() in aliases ||
         (resourceData.keys().hasAny(['assignedToEmails']) &&
          (callerEmail in resourceData.assignedToEmails ||
-          callerAlias in resourceData.assignedToEmails))
+          a0 in resourceData.assignedToEmails ||
+          a1 in resourceData.assignedToEmails ||
+          a2 in resourceData.assignedToEmails ||
+          a3 in resourceData.assignedToEmails))
       );
     }
 
@@ -363,8 +384,12 @@ service cloud.firestore {
     }
 
     function participantEmail(key) {
-      return key.lower().replace('@crearpls[.]com$', '@crearpsl.net')
+      let normalized = key.lower()
+        .replace('@crearpls[.]com$', '@crearpsl.net')
         .replace('@crearpsl[.]com$', '@crearpsl.net');
+      return normalized == 'milacampuzano21@gmail.com' ? 'emily.campuzano@crearpsl.net' :
+        normalized == 'ricardogavilanez1021@gmail.com' ? 'ricardo.gavilanez@crearpsl.net' :
+        normalized == 'brunische66@gmail.com' ? 'leandro.brunis@crearpsl.net' : normalized;
     }
 
     function canChangeParticipant(taskData, key) {
@@ -373,11 +398,18 @@ service cloud.firestore {
     }
 
     function isTaskParticipant(taskData, key) {
-      return key in taskData.get('assigneeProgress', {}) ||
-        key in taskData.get('assignedToEmails', []) ||
-        key == taskData.get('assignedToEmail', '') ||
-        key == taskData.get('assigned_to', '') ||
-        key in taskData.get('collaborators', []) ||
+      let keyAliases = emailAliases(key);
+      let assignedToEmail = taskData.get('assignedToEmail', '');
+      let assignedTo = taskData.get('assigned_to', '');
+      let assignedToEmails = taskData.get('assignedToEmails', []);
+      let collaborators = taskData.get('collaborators', []);
+      return (taskData.get('assigneeProgress', {}) is map && key in taskData.get('assigneeProgress', {})) ||
+        (assignedToEmails is list && (key in assignedToEmails || assignedToEmails.hasAny(keyAliases))) ||
+        key == assignedToEmail ||
+        (assignedToEmail is string && assignedToEmail != '' && participantEmail(key) == participantEmail(assignedToEmail)) ||
+        key == assignedTo ||
+        (assignedTo is string && assignedTo != '' && participantEmail(key) == participantEmail(assignedTo)) ||
+        (collaborators is list && (key in collaborators || collaborators.hasAny(keyAliases))) ||
         (participantEmail(key) == participantEmail(email()) && isOwner(taskData));
     }
 

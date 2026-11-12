@@ -382,7 +382,7 @@ export function ChecklistProvider({ children }) {
           transaction.set(taskRef, initialData);
         }
 
-        const actorEmail = String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase();
+        const actorEmail = String(auth.currentUser?.email || currentUser?.email || '').trim().toLowerCase();
         for (const event of individualTransitions) {
           transaction.set(doc(db, 'task_completion_events', event.id), {
             taskId, action: event.action, actorEmail, occurredAt: serverTimestamp(),
@@ -1652,7 +1652,7 @@ export function ChecklistProvider({ children }) {
           transaction.set(doc(db, 'task_completion_events', event.id), {
             taskId,
             action: event.action,
-            actorEmail: String(currentUser?.email || auth.currentUser?.email || '').trim().toLowerCase(),
+            actorEmail: String(auth.currentUser?.email || currentUser?.email || '').trim().toLowerCase(),
             occurredAt: serverTimestamp(),
             source: 'manual',
             scope: event.scope,

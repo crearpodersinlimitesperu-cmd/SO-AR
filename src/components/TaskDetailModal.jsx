@@ -157,9 +157,19 @@ export default function TaskDetailModal({
   const [editingDeadline, setEditingDeadline] = useState(false);
   const [deadlineDate, setDeadlineDate] = useState('');
   const [deadlineTime, setDeadlineTime] = useState('');
+  const initializedTaskKeyRef = useRef('');
 
-  // Sincronizar estado cuando se abre el modal o cambia la tarea
+  // Sincronizar estado únicamente al abrir el modal o al cambiar de tarea (sin pisar avances locales por snapshots de fondo)
   useEffect(() => {
+    if (!isOpen || !task) {
+      initializedTaskKeyRef.current = '';
+      return;
+    }
+    const taskInstanceKey = String(task.uiKey || task.id || '');
+    if (initializedTaskKeyRef.current === taskInstanceKey) {
+      return;
+    }
+    initializedTaskKeyRef.current = taskInstanceKey;
     if (task && isOpen) {
       const initialProgress = getTaskProgress(task);
       
@@ -696,13 +706,40 @@ export default function TaskDetailModal({
   const handleSaveAll = async () => {
     setIsSaving(true);
     try {
-      const mainEvidenceUrl = evidencesList.length > 0 ? evidencesList[0].url : '';
-      const latestComment = notesList.length > 0 ? notesList[0].text : (task.comments || '');
+      let effectiveEvidencesList = [...evidencesList];
+      const pendingEvidenceUrl = newEvidenceUrl.trim();
+      if (pendingEvidenceUrl) {
+        const finalPendingUrl = /^https?:\/\//i.test(pendingEvidenceUrl) ? pendingEvidenceUrl : `https://${pendingEvidenceUrl}`;
+        effectiveEvidencesList = [{
+          id: `ev_${Date.now()}`,
+          url: finalPendingUrl,
+          title: newEvidenceTitle.trim() || 'Evidencia de cumplimiento',
+          createdAt: new Date().toISOString(),
+          addedByName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+          addedByEmail: currentUser?.email || ''
+        }, ...effectiveEvidencesList];
+      }
+
+      let effectiveNotesList = [...notesList];
+      const pendingNoteText = newNoteText.trim();
+      if (pendingNoteText) {
+        effectiveNotesList = [{
+          id: `note_${Date.now()}`,
+          text: pendingNoteText,
+          createdAt: new Date().toISOString(),
+          authorName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+          authorEmail: currentUser?.email || '',
+          progressPercentage: isMultiAssignee && typeof myProgress === 'number' ? myProgress : progress
+        }, ...effectiveNotesList];
+      }
+
+      const mainEvidenceUrl = effectiveEvidencesList.length > 0 ? effectiveEvidencesList[0].url : '';
+      const latestComment = effectiveNotesList.length > 0 ? effectiveNotesList[0].text : (task.comments || '');
 
       // Garantizar que el mapa incluya siempre el avance actual del usuario
       const targetKey = myEmailKey || normalizeTaskEmail(userEmail);
       let mapToSave = { ...assigneeProgressMap };
-      if (isMultiAssignee && targetKey && typeof myProgress === 'number') {
+      if (isMultiAssignee && targetKey && mapToSave[targetKey] && typeof myProgress === 'number') {
         const isDone = myProgress === 100 || myCompleted;
         mapToSave[targetKey] = {
           ...(mapToSave[targetKey] || {}),
@@ -718,7 +755,7 @@ export default function TaskDetailModal({
       let finalOverall = progress;
       let allDone = isCompleted;
 
-      if (isMultiAssignee) {
+      if (isMultiAssignee && !(completionIntent && !myAssigneeEntry)) {
         const entries = Object.values(mapToSave);
         if (entries.length > 0) {
           const sum = entries.reduce((acc, c) => {
@@ -759,8 +796,8 @@ export default function TaskDetailModal({
       });
 
       // Registrar avance en la bitácora de notas si el usuario actual avanzó
-      let updatedNotesList = [...notesList];
-      if (isMultiAssignee && targetKey) {
+      let updatedNotesList = [...effectiveNotesList];
+      if (isMultiAssignee && targetKey && mapToSave[targetKey] && assigneeChanged(mapToSave[targetKey], assigneeProgressBaseline.current[targetKey])) {
         const myName = mapToSave[targetKey]?.name || currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario';
         const autoNote = {
           id: `note_auto_${Date.now()}`,
@@ -789,7 +826,7 @@ export default function TaskDetailModal({
         assigneeProgress: persistedMap,
         evidenceUrl: mainEvidenceUrl,
         evidence_url: mainEvidenceUrl,
-        evidences: evidencesList,
+        evidences: effectiveEvidencesList,
         comments: latestComment,
         notes: task.notes || task.description || task.comments || '',
         description: task.description || task.notes || task.comments || '',
@@ -821,7 +858,7 @@ export default function TaskDetailModal({
       onClose();
     } catch (err) {
       console.error('Error guardando avances:', err);
-      showToast('No se pudieron guardar los avances.', 'error');
+      showToast(err?.message ? `No se pudieron guardar los avances: ${err.message}` : 'No se pudieron guardar los avances.', 'error');
     } finally {
       setIsSaving(false);
     }
