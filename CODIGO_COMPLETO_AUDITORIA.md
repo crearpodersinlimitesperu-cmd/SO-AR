@@ -35079,10 +35079,15 @@ async function handleCentroManagersApi(request, env, origin, url) {
   const filterEntrenador = normalizeWorkerText(url.searchParams.get('entrenador') || bodyParams.entrenador || '');
 
   try {
-    const [rawManagers, rawLlamadasGrupales, rawNotas] = await Promise.all([
+    const isLiquidacionesSubPath =
+      url.pathname.replace(/^\/api\/centro-managers\/?/, '').replace(/\/+$/, '') === 'liquidaciones';
+
+    const [rawManagers, rawLlamadasGrupales, rawNotas, rawLiquidaciones, rawMail] = await Promise.all([
       firestoreListCollection('managers_directory', accessToken),
       firestoreListCollection('llamadas_grupales_historial', accessToken),
-      firestoreListCollection('notas_seguimiento', accessToken)
+      firestoreListCollection('notas_seguimiento', accessToken),
+      isLiquidacionesSubPath ? firestoreListCollection('liquidaciones_pagos', accessToken) : Promise.resolve([]),
+      isLiquidacionesSubPath ? firestoreListCollection('mail', accessToken) : Promise.resolve([])
     ]);
 
     const allManagers = rawManagers.map(({ id, data }) => {
@@ -35437,6 +35442,38 @@ async function handleCentroManagersApi(request, env, origin, url) {
     if (subPath === 'entrenadores') {
       return json(
         { ok: true, meta, total: entrenadoresSummary.length, entrenadores: entrenadoresSummary },
+        200,
+        origin
+      );
+    }
+    if (subPath === 'liquidaciones') {
+      const liquidacionesPagos = rawLiquidaciones.map(({ id, data }) => ({ id, ...data }));
+      const eliMails = rawMail
+        .map(({ id, data }) => ({ id, ...data }))
+        .filter(
+          (m) =>
+            m.type === 'liquidacion_autorizacion_pago' ||
+            String(m.message?.subject || '').includes('AUTORIZACIÓN DE PAGO') ||
+            (Array.isArray(m.to) && m.to.some((x) => String(x || '').toLowerCase().includes('contabilidad.global')))
+        )
+        .map((m) => ({
+          id: m.id,
+          type: m.type || '',
+          to: m.to,
+          subject: m.message?.subject || '',
+          delivery: m.delivery || null,
+          metadata: m.metadata || null,
+          created_at: m.created_at || m.createdAt || ''
+        }));
+      return json(
+        {
+          ok: true,
+          meta,
+          totalLiquidaciones: liquidacionesPagos.length,
+          liquidacionesPagos,
+          totalEliMails: eliMails.length,
+          eliMails
+        },
         200,
         origin
       );
@@ -92611,18 +92648,19 @@ export function auditTaskRoleCoherence({
 ```js
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   ELI_ESCOBAR_EMAIL,
-  FEE_PER_EFFECTIVE_CALL_USD,
   groupItemsByTrainer,
-  buildLiquidacionEmailData
+  buildLiquidacionEmailData,
+  dispatchLiquidacionNotifications
 } from './liquidacionEmailHelper.js';
 
 test('groupItemsByTrainer groups correctly by trainer name', () => {
   const items = [
-    { equipo: 'AZRAK AETERNA', numEquipo: '124', sede: 'Quito', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25 },
-    { equipo: 'LOTUS IKIGAI', numEquipo: '21', sede: 'Cuenca', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25 },
-    { equipo: 'METAMORFOSIS', numEquipo: '30', sede: 'Guayaquil', entrenador: 'Erika Gavilánez', montoUSD: 25 }
+    { equipo: 'AZRAK AETERNA', numEquipo: '124', sede: 'Quito', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 400 },
+    { equipo: 'LOTUS IKIGAI', numEquipo: '21', sede: 'Cuenca', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 400 },
+    { equipo: 'KAIROS-CUM', numEquipo: '19', sede: 'Cuenca', entrenador: 'Erika Gavilánez', montoUSD: 400 }
   ];
 
   const grouped = groupItemsByTrainer(items);
@@ -92631,70 +92669,92 @@ test('groupItemsByTrainer groups correctly by trainer name', () => {
   assert.equal(grouped.get('Erika Gavilánez').length, 1);
 });
 
-test('buildLiquidacionEmailData creates correct subject, body and amounts', () => {
+test('buildLiquidacionEmailData creates correct subject, body, amounts and infers Quito for #125 Global', () => {
   const items = [
-    { tipo: 'grupal', equipo: 'AZRAK AETERNA', numEquipo: '124', sede: 'Quito', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25, llamadasEfectivas: 1 },
-    { tipo: 'grupal', equipo: 'LOTUS IKIGAI', numEquipo: '21', sede: 'Cuenca', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25, llamadasEfectivas: 1 }
+    { tipo: 'grupal', equipo: 'HATUN PUSHAK', numEquipo: '125', sede: 'Sede Global', entrenador: 'Julio Narvaez', montoUSD: 400 }
   ];
 
   const emailData = buildLiquidacionEmailData({
-    trainerName: 'Haydin Fernando Mendoza Clavijo',
-    trainerEmail: 'fernandomendozaclavijo22@gmail.com',
+    trainerName: 'Julio Narvaez',
     items,
-    authorizerUser: { name: 'José Sánchez', email: 'comunidadcrearpsl@gmail.com', appRole: 'Director General' }
+    authorizerUser: { name: 'José Luis Sánchez Moreno', email: 'jose.sanchez@crearpsl.net', appRole: 'Director General' }
   });
 
-  assert.equal(emailData.totalMontoUSD, 50);
-  assert.equal(emailData.itemsCount, 2);
-  assert.ok(emailData.subject.includes('Haydin Fernando Mendoza Clavijo'));
-  assert.ok(emailData.subject.includes('$50 USD'));
-  assert.ok(emailData.text.includes('Eli Escobar'));
-  assert.ok(emailData.text.includes('AZRAK AETERNA (#124)'));
-  assert.ok(emailData.text.includes('LOTUS IKIGAI (#21)'));
-  assert.ok(emailData.text.includes('Quito'));
-  assert.ok(emailData.text.includes('Cuenca'));
-  assert.ok(emailData.text.includes('José Sánchez'));
-  assert.ok(emailData.mailtoUrl.startsWith('mailto:contabilidad.global%40crearpsl.net'));
+  assert.equal(emailData.totalMontoUSD, 400);
+  assert.equal(emailData.itemsCount, 1);
+  assert.ok(emailData.subject.includes('Julio Narvaez'));
+  assert.ok(emailData.subject.includes('$400 USD'));
+  assert.ok(emailData.text.includes('HATUN PUSHAK (#125) | Sede: Quito'));
   assert.ok(emailData.html.includes('Nancy Elizabeth Escobar Pérez'));
-  assert.ok(emailData.html.includes('$50 USD'));
+  assert.ok(emailData.mailtoUrl.startsWith('mailto:contabilidad.global%40crearpsl.net'));
 });
 
-test('dispatchLiquidacionNotifications records both notification and mail docs', async () => {
+test('dispatchLiquidacionNotifications writes mail FIRST and notifications strictly matches firestore.rules allowed keys', async () => {
+  const rulesSrc = readFileSync(new URL('../../firestore.rules', import.meta.url), 'utf8');
+  const allowedMatch = rulesSrc.match(/function isValidNotificationData\(\)[\s\S]*?hasOnly\(\[([\s\S]*?)\]\)/);
+  assert.ok(allowedMatch, 'Debe existir isValidNotificationData con hasOnly en firestore.rules');
+  const allowedKeys = new Set(
+    [...allowedMatch[1].matchAll(/'([^']+)'/g)].map(m => m[1])
+  );
+
   const docsWritten = [];
   const fakeDb = {};
   const fakeCollection = (_db, name) => name;
   const fakeAddDoc = async (colName, data) => {
     docsWritten.push({ colName, data });
-    return { id: `mock_${Date.now()}` };
+    return { id: `mock_${docsWritten.length}` };
   };
 
   const items = [
-    { tipo: 'grupal', equipo: 'AZRAK AETERNA', numEquipo: '124', sede: 'Quito', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25 },
-    { tipo: 'grupal', equipo: 'LOTUS IKIGAI', numEquipo: '21', sede: 'Cuenca', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 25 }
+    { tipo: 'grupal', equipo: 'AZRAK AETERNA', numEquipo: '124', sede: 'Quito', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 400 },
+    { tipo: 'grupal', equipo: 'LOTUS IKIGAI', numEquipo: '21', sede: 'Cuenca', entrenador: 'Haydin Fernando Mendoza Clavijo', montoUSD: 400 }
   ];
 
-  const res = await (await import('./liquidacionEmailHelper.js')).dispatchLiquidacionNotifications({
+  const res = await dispatchLiquidacionNotifications({
     db: fakeDb,
     addDocFn: fakeAddDoc,
     collectionFn: fakeCollection,
     items,
-    authorizerUser: { name: 'José Sánchez', email: 'comunidadcrearpsl@gmail.com' }
+    authorizerUser: { name: 'José Sánchez', email: 'jose.sanchez@crearpsl.net' }
   });
 
   assert.equal(res.successCount, 1);
+  assert.equal(res.errors.length, 0);
   assert.equal(docsWritten.length, 2);
+  // Mail DEBE escribirse primero
+  assert.equal(docsWritten[0].colName, 'mail');
+  assert.deepEqual(docsWritten[0].data.to, [ELI_ESCOBAR_EMAIL]);
+  assert.deepEqual(docsWritten[0].data.cc, ['jose.sanchez@crearpsl.net']);
+  assert.equal(docsWritten[0].data.type, 'liquidacion_autorizacion_pago');
 
-  const notif = docsWritten.find(d => d.colName === 'notifications');
-  assert.ok(notif);
-  assert.equal(notif.data.userId, ELI_ESCOBAR_EMAIL);
-  assert.equal(notif.data.montoUSD, 50);
-
-  const mail = docsWritten.find(d => d.colName === 'mail');
-  assert.ok(mail);
-  assert.deepEqual(mail.data.to, [ELI_ESCOBAR_EMAIL]);
-  assert.ok(mail.data.message.subject.includes('Haydin Fernando Mendoza Clavijo'));
+  // Notification DEBE cumplir 100% las llaves permitidas por firestore.rules
+  assert.equal(docsWritten[1].colName, 'notifications');
+  assert.equal(docsWritten[1].data.userId, ELI_ESCOBAR_EMAIL);
+  for (const k of Object.keys(docsWritten[1].data)) {
+    assert.ok(allowedKeys.has(k), `Llave '${k}' en notifications NO está permitida por isValidNotificationData en firestore.rules`);
+  }
 });
 
+test('dispatchLiquidacionNotifications still enqueues mail even if notifications throws', async () => {
+  const fakeDb = {};
+  const fakeCollection = (_db, name) => name;
+  const fakeAddDoc = async (colName) => {
+    if (colName === 'notifications') throw new Error('Simulated in-app error');
+    return { id: 'mail_ok_1' };
+  };
+
+  const res = await dispatchLiquidacionNotifications({
+    db: fakeDb,
+    addDocFn: fakeAddDoc,
+    collectionFn: fakeCollection,
+    items: [{ tipo: 'grupal', equipo: 'KUNTUR SHINSEI', numEquipo: '35', sede: 'Guayaquil', entrenador: 'Jose Luis Sanchez Moreno', montoUSD: 400 }],
+    authorizerUser: { name: 'José Sánchez', email: 'jose.sanchez@crearpsl.net' }
+  });
+
+  assert.equal(res.successCount, 1);
+  assert.deepEqual(res.mailIds, ['mail_ok_1']);
+  assert.equal(res.errors.length, 0);
+});
 
 ```
 
@@ -94629,6 +94689,19 @@ export const FEE_PER_EFFECTIVE_CALL_USD = 25;
 export const FEE_PER_GROUP_TEAM_USD = 400;
 
 /**
+ * Normaliza la sede para liquidación cuando un equipo histórico de Quito quedó etiquetado como Global.
+ */
+function resolveLiquidacionSede(item) {
+  const raw = String(item?.sede || '').trim();
+  const low = raw.toLowerCase();
+  const num = parseInt(String(item?.numEquipo || '').replace(/\D/g, ''), 10);
+  if ((!raw || low === 'global' || low === 'sede global' || low === 'sin sede') && !isNaN(num) && num >= 80 && num <= 165) {
+    return 'Quito';
+  }
+  return raw || 'Global';
+}
+
+/**
  * Agrupa los ítems de liquidación seleccionados por entrenador.
  */
 export function groupItemsByTrainer(items = []) {
@@ -94668,6 +94741,14 @@ export function buildLiquidacionEmailData({
     year: 'numeric'
   });
 
+  const hasIndiv = items.some(it => it.tipo === 'individual');
+  const hasGroup = items.some(it => it.tipo !== 'individual');
+  const tarifaLabel = hasGroup && hasIndiv
+    ? `$${FEE_PER_GROUP_TEAM_USD} USD por equipo grupal / $${FEE_PER_EFFECTIVE_CALL_USD} USD por llamada individual`
+    : hasIndiv
+    ? `$${FEE_PER_EFFECTIVE_CALL_USD} USD por llamada efectiva (Tarifa fija oficial)`
+    : `$${FEE_PER_GROUP_TEAM_USD} USD por equipo grupal completado (Tarifa fija oficial)`;
+
   const subject = `AUTORIZACIÓN DE PAGO: Liquidación de Llamadas a Managers — ${cleanTrainer} ($${totalMontoUSD} USD)`;
 
   const fechaISO = new Date().toISOString().split('T')[0];
@@ -94676,7 +94757,7 @@ export function buildLiquidacionEmailData({
   const itemsText = items.map((it, idx) => {
     const modalidad = it.tipo === 'individual' ? 'Individual (1 a 1)' : 'Grupal (Equipo)';
     const destinatario = it.tipo === 'individual' ? (it.participanteNombre || 'Manager') : `${it.equipo || 'Equipo'}${it.numEquipo ? ` (#${it.numEquipo})` : ''}`;
-    const sede = it.sede || 'Global';
+    const sede = resolveLiquidacionSede(it);
     const entrenador = (it.entrenador || cleanTrainer);
     const itemMonto = it.montoUSD !== undefined ? Number(it.montoUSD) : (it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : FEE_PER_GROUP_TEAM_USD);
     const monto = it.esPagable === false ? '$0 USD (Sin desembolso)' : `$${itemMonto} USD`;
@@ -94686,12 +94767,12 @@ export function buildLiquidacionEmailData({
   }).join('\n');
 
   // Filas en HTML
-  const itemsHtml = items.map((it, idx) => {
+  const itemsHtml = items.map((it) => {
     const modalidad = it.tipo === 'individual' 
       ? '<span style="background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">👤 Individual</span>' 
       : '<span style="background: #f3e8ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">👥 Grupal</span>';
     const destinatario = it.tipo === 'individual' ? `<strong>${it.participanteNombre || 'Manager'}</strong>` : `<strong>${it.equipo || 'Equipo'}</strong>${it.numEquipo ? ` (#${it.numEquipo})` : ''}`;
-    const sede = it.sede || 'Global';
+    const sede = resolveLiquidacionSede(it);
     const entrenador = (it.entrenador || cleanTrainer);
     const itemMonto = it.montoUSD !== undefined ? Number(it.montoUSD) : (it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : FEE_PER_GROUP_TEAM_USD);
     const monto = it.esPagable === false ? '<span style="color: #64748b; font-weight: 700;">$0 USD (Sin desembolso)</span>' : `<strong style="color: #059669;">$${itemMonto} USD</strong>`;
@@ -94721,7 +94802,7 @@ DATOS DEL BENEFICIARIO Y LIQUIDACIÓN:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 • Entrenador: ${cleanTrainer}${trainerEmail ? `\n• Correo del Entrenador: ${trainerEmail}` : ''}
 • Concepto: Liquidación de Llamadas Efectivas a Equipos de Managers
-• Tarifa Aplicada: Tarifa oficial fija de Causa OS ($25 USD por llamada efectiva / equipo)
+• Tarifa Aplicada: ${tarifaLabel}
 • Total de Registros Autorizados: ${items.length}
 • MONTO TOTAL AUTORIZADO: $${totalMontoUSD} USD
 
@@ -94792,8 +94873,8 @@ Plataforma: Causa OS — Centro Operativo CPSL
           </tr>
           ` : ''}
           <tr>
-            <td style="padding: 4px 0; color: #64748b;"><strong>Tarifa por llamada:</strong></td>
-            <td style="padding: 4px 0;">$${FEE_PER_EFFECTIVE_CALL_USD} USD (Tarifa fija oficial)</td>
+            <td style="padding: 4px 0; color: #64748b;"><strong>Tarifa oficial:</strong></td>
+            <td style="padding: 4px 0;">${tarifaLabel}</td>
           </tr>
           <tr>
             <td style="padding: 4px 0; color: #64748b;"><strong>Total a desembolsar:</strong></td>
@@ -94853,8 +94934,8 @@ Plataforma: Causa OS — Centro Operativo CPSL
 }
 
 /**
- * Envía las notificaciones en Causa OS y encola los correos oficiales para Eli Escobar.
- * Funciona de forma segura y no bloqueante.
+ * Encola PRIMERO los correos oficiales para Eli Escobar en 'mail' (despachados desde no-reply@crearpsl.net)
+ * y luego registra la notificación In-App en 'notifications' respetando estrictamente el esquema de firestore.rules.
  */
 export async function dispatchLiquidacionNotifications({
   db,
@@ -94864,11 +94945,13 @@ export async function dispatchLiquidacionNotifications({
   authorizerUser = {}
 }) {
   if (!db || !addDocFn || !collectionFn || !items.length) {
-    return { successCount: 0, errors: [] };
+    return { successCount: 0, mailIds: [], notifiedTrainers: [], errors: [] };
   }
 
   const grouped = groupItemsByTrainer(items);
   let successCount = 0;
+  const mailIds = [];
+  const notifiedTrainers = [];
   const errors = [];
 
   for (const [trainer, trainerItems] of grouped.entries()) {
@@ -94879,25 +94962,15 @@ export async function dispatchLiquidacionNotifications({
         authorizerUser
       });
 
-      // 1. Notificación In-App en Causa OS para Eli Escobar
-      const sedesList = [...new Set(trainerItems.map(it => it.sede).filter(Boolean))].join(', ') || 'Global';
+      const sedesList = [...new Set(trainerItems.map(it => resolveLiquidacionSede(it)).filter(Boolean))].join(', ') || 'Global';
       const equiposList = trainerItems.map(it => it.equipo ? `${it.equipo}${it.numEquipo ? ` (#${it.numEquipo})` : ''}` : it.participanteNombre).join(', ');
+      const authEmail = String(authorizerUser?.email || '').trim().toLowerCase();
+      const ccList = authEmail && authEmail !== ELI_ESCOBAR_EMAIL ? [authEmail] : [];
 
-      await addDocFn(collectionFn(db, 'notifications'), {
-        userId: ELI_ESCOBAR_EMAIL,
-        title: `💰 Autorización de Pago: ${trainer} ($${emailData.totalMontoUSD} USD)`,
-        message: `Se ha registrado y autorizado la liquidación de llamadas para ${trainer} por un total de $${emailData.totalMontoUSD} USD (${trainerItems.length} registro(s) en ${sedesList}): ${equiposList}. Autorizado por ${authorizerUser?.name || authorizerUser?.email || 'Dirección'}.`,
-        type: 'liquidacion_pago_autorizado',
-        entrenador: trainer,
-        montoUSD: emailData.totalMontoUSD,
-        itemsCount: trainerItems.length,
-        read: false,
-        created_at: new Date().toISOString()
-      });
-
-      // 2. Encolado de correo oficial en la colección 'mail' (para mailerDaemon / Firebase Trigger Email)
-      await addDocFn(collectionFn(db, 'mail'), {
+      // 1. PRIMERO: Encolado de correo oficial en 'mail' (nunca bloqueado por notificaciones in-app)
+      const mailPayload = {
         to: [ELI_ESCOBAR_EMAIL],
+        ...(ccList.length > 0 ? { cc: ccList } : {}),
         type: 'liquidacion_autorizacion_pago',
         delivery: { state: 'PENDING', attemptCount: 0 },
         message: {
@@ -94909,22 +94982,43 @@ export async function dispatchLiquidacionNotifications({
           entrenador: trainer,
           montoUSD: emailData.totalMontoUSD,
           itemsCount: trainerItems.length,
+          equipos: equiposList,
+          sedes: sedesList,
           authorizerEmail: authorizerUser?.email || '',
           authorizerName: authorizerUser?.name || ''
         },
         created_at: new Date().toISOString()
-      });
+      };
 
+      const mailRef = await addDocFn(collectionFn(db, 'mail'), mailPayload);
+      if (mailRef?.id) mailIds.push(mailRef.id);
+      notifiedTrainers.push(trainer);
       successCount++;
+
+      // 2. SEGUNDO: Notificación In-App en Causa OS para Eli Escobar (esquema estricto de isValidNotificationData)
+      try {
+        await addDocFn(collectionFn(db, 'notifications'), {
+          userId: ELI_ESCOBAR_EMAIL,
+          title: `💰 Autorización de Pago: ${trainer} ($${emailData.totalMontoUSD} USD)`,
+          message: `Se ha registrado y autorizado la liquidación de llamadas para ${trainer} por un total de $${emailData.totalMontoUSD} USD (${trainerItems.length} registro(s) en ${sedesList}): ${equiposList}. Autorizado por ${authorizerUser?.name || authorizerUser?.email || 'Dirección'}.`,
+          type: 'liquidacion_pago_autorizado',
+          sede: sedesList.slice(0, 120),
+          priority: 'high',
+          requiresAction: true,
+          read: false,
+          created_at: new Date().toISOString()
+        });
+      } catch (inAppErr) {
+        console.warn(`Aviso: correo encolado para ${trainer}, pero falló notificación in-app:`, inAppErr?.message || inAppErr);
+      }
     } catch (err) {
-      console.error(`Error enviando notificación/correo para ${trainer}:`, err);
-      errors.push({ trainer, error: err.message });
+      console.error(`Error encolando correo oficial para ${trainer}:`, err);
+      errors.push({ trainer, error: err?.message || String(err) });
     }
   }
 
-  return { successCount, errors };
+  return { successCount, mailIds, notifiedTrainers, errors };
 }
-
 
 ```
 
@@ -196992,13 +197086,12 @@ export default function CentroManagers() {
           autorizadoPorEmail: currentUser?.email || '',
           fechaPago: today,
           fechaAutorizacion: today,
-          notificadoEli: true,
-          fechaNotificacionEli: new Date().toISOString(),
+          notificadoEli: false,
           updatedAt: serverTimestamp()
         }, { merge: true });
       });
 
-      // Notificación automática a Causa OS y encolado de correo oficial para Eli Escobar
+      // Notificación automática a Causa OS y encolado verificado de correo oficial para Eli Escobar
       const itemToNotify = {
         ...item,
         montoUSD: monto,
@@ -197006,14 +197099,23 @@ export default function CentroManagers() {
         fechaAutorizacion: today,
         autorizadoPorNombre: currentUser?.name || 'Dirección'
       };
+      let eliQueuedOk = false;
       try {
-        await dispatchLiquidacionNotifications({
+        const notifRes = await dispatchLiquidacionNotifications({
           db,
           addDocFn: addDoc,
           collectionFn: collection,
           items: [itemToNotify],
           authorizerUser: currentUser
         });
+        if (notifRes.successCount > 0 && notifRes.errors.length === 0) {
+          eliQueuedOk = true;
+          await updateDoc(pagoRef, {
+            notificadoEli: true,
+            notificadoEliMailId: notifRes.mailIds?.[0] || '',
+            fechaNotificacionEli: new Date().toISOString()
+          });
+        }
       } catch (notifErr) {
         console.warn('No se pudo despachar notificación para Eli Escobar:', notifErr);
       }
@@ -197027,7 +197129,11 @@ export default function CentroManagers() {
         details: `Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${monto} USD (${sinPago ? 'Sin desembolso' : 'Autorizado para pago'})`
       });
 
-      showToast(`Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}. Notificado a Eli Escobar en Causa OS.`, 'success');
+      if (eliQueuedOk) {
+        showToast(`Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}. Correo oficial enviado a Eli Escobar.`, 'success');
+      } else {
+        showToast(`Liquidación registrada, pero quedó pendiente el envío de correo a Eli Escobar. Usa el botón Notificar.`, 'warning');
+      }
     } catch (e) {
       console.error(e);
       showToast(e.message || 'Error al autorizar liquidación', 'error');
@@ -197037,22 +197143,26 @@ export default function CentroManagers() {
   // Notificar / Re-notificar individualmente a Eli Escobar
   const handleNotificarItem = async (item) => {
     try {
-      await dispatchLiquidacionNotifications({
+      const notifRes = await dispatchLiquidacionNotifications({
         db,
         addDocFn: addDoc,
         collectionFn: collection,
         items: [item],
         authorizerUser: currentUser
       });
+      if (!notifRes || notifRes.successCount === 0 || notifRes.errors.length > 0) {
+        throw new Error(notifRes?.errors?.[0]?.error || 'No se pudo encolar el correo en Firestore.');
+      }
 
-      // Actualizar marca de notificación en Firestore
+      // Actualizar marca de notificación en Firestore solo tras confirmar el documento en 'mail'
       const docKey = item.pagoDocId || item.liquidacionKey || item.equipoKey;
       if (docKey) {
         const pagoRef = doc(db, 'liquidaciones_pagos', docKey);
         await updateDoc(pagoRef, {
           notificadoEli: true,
+          notificadoEliMailId: notifRes.mailIds?.[0] || '',
           fechaNotificacionEli: new Date().toISOString()
-        }).catch(() => {});
+        });
       }
 
       const emailData = buildLiquidacionEmailData({
@@ -197061,10 +197171,10 @@ export default function CentroManagers() {
         authorizerUser: currentUser
       });
       setModalEmailEliData([emailData]);
-      showToast(`Notificación y correo encolados para Eli Escobar (${item.entrenador}).`, 'success');
+      showToast(`Correo oficial enviado a Eli Escobar (${item.entrenador}) desde no-reply@crearpsl.net.`, 'success');
     } catch (err) {
       console.error('Error al notificar:', err);
-      showToast('Error al notificar a Eli Escobar', 'error');
+      showToast(`Error al notificar a Eli Escobar: ${err?.message || 'Reintenta'}`, 'error');
     }
   };
 
@@ -197157,8 +197267,7 @@ export default function CentroManagers() {
             autorizadoPorEmail: currentUser?.email || '',
             fechaPago: today,
             fechaAutorizacion: today,
-            notificadoEli: true,
-            fechaNotificacionEli: new Date().toISOString(),
+            notificadoEli: false,
             updatedAt: serverTimestamp()
           }, { merge: true });
         });
@@ -197177,16 +197286,29 @@ export default function CentroManagers() {
       details: `Liquidación masiva completada: ${successCount} registros autorizados por $${totalMonto} USD (${errorCount} errores)`
     });
 
-    // Notificación automática a Causa OS y encolado de correo oficial para Eli Escobar
+    // Notificación automática a Causa OS y encolado verificado de correo oficial para Eli Escobar
     if (successCount > 0) {
       try {
-        await dispatchLiquidacionNotifications({
+        const notifRes = await dispatchLiquidacionNotifications({
           db,
           addDocFn: addDoc,
           collectionFn: collection,
           items: itemsToPay,
           authorizerUser: currentUser
         });
+        const notifiedSet = new Set((notifRes.notifiedTrainers || []).map(t => String(t || '').trim()));
+        if (notifiedSet.size > 0) {
+          const nowIso = new Date().toISOString();
+          for (const item of itemsToPay) {
+            const trKey = String(item.entrenador || 'Sin Asignar').trim();
+            if (!notifiedSet.has(trKey)) continue;
+            const docKey = item.tipo === 'individual' ? (item.liquidacionKey || `indiv__${item.managerId}`) : (item.equipoKey || item.liquidacionKey);
+            await updateDoc(doc(db, 'liquidaciones_pagos', docKey), {
+              notificadoEli: true,
+              fechaNotificacionEli: nowIso
+            }).catch(() => {});
+          }
+        }
       } catch (notifErr) {
         console.warn('No se pudo despachar notificación masiva para Eli Escobar:', notifErr);
       }
@@ -201254,9 +201376,19 @@ export default function CentroManagers() {
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.autorizadoPorNombre || item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
                               <td style={{ padding: '0.65rem 0.6rem', textAlign: 'center' }}>
                                 {item.notificadoEli ? (
-                                  <span style={{ background: '#ecfdf5', color: '#047857', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                                    <Check size={12} /> Notificado
-                                  </span>
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                    <span style={{ background: '#ecfdf5', color: '#047857', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                      <Check size={12} /> Notificado
+                                    </span>
+                                    <HelpButton helpKey="notificarEli"
+                                      type="button"
+                                      onClick={() => handleNotificarItem(item)}
+                                      title="Reenviar correo oficial de autorización a Eli Escobar"
+                                      style={{ padding: '0.18rem 0.45rem', borderRadius: '5px', border: '1px solid #cbd5e1', background: 'transparent', color: '#475569', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', whiteSpace: 'nowrap' }}
+                                    >
+                                      <Mail size={11} /> Reenviar
+                                    </HelpButton>
+                                  </div>
                                 ) : (
                                   <HelpButton helpKey="notificarEli"
                                     onClick={() => handleNotificarItem(item)}

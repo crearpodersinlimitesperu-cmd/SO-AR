@@ -1020,10 +1020,15 @@ async function handleCentroManagersApi(request, env, origin, url) {
   const filterEntrenador = normalizeWorkerText(url.searchParams.get('entrenador') || bodyParams.entrenador || '');
 
   try {
-    const [rawManagers, rawLlamadasGrupales, rawNotas] = await Promise.all([
+    const isLiquidacionesSubPath =
+      url.pathname.replace(/^\/api\/centro-managers\/?/, '').replace(/\/+$/, '') === 'liquidaciones';
+
+    const [rawManagers, rawLlamadasGrupales, rawNotas, rawLiquidaciones, rawMail] = await Promise.all([
       firestoreListCollection('managers_directory', accessToken),
       firestoreListCollection('llamadas_grupales_historial', accessToken),
-      firestoreListCollection('notas_seguimiento', accessToken)
+      firestoreListCollection('notas_seguimiento', accessToken),
+      isLiquidacionesSubPath ? firestoreListCollection('liquidaciones_pagos', accessToken) : Promise.resolve([]),
+      isLiquidacionesSubPath ? firestoreListCollection('mail', accessToken) : Promise.resolve([])
     ]);
 
     const allManagers = rawManagers.map(({ id, data }) => {
@@ -1378,6 +1383,38 @@ async function handleCentroManagersApi(request, env, origin, url) {
     if (subPath === 'entrenadores') {
       return json(
         { ok: true, meta, total: entrenadoresSummary.length, entrenadores: entrenadoresSummary },
+        200,
+        origin
+      );
+    }
+    if (subPath === 'liquidaciones') {
+      const liquidacionesPagos = rawLiquidaciones.map(({ id, data }) => ({ id, ...data }));
+      const eliMails = rawMail
+        .map(({ id, data }) => ({ id, ...data }))
+        .filter(
+          (m) =>
+            m.type === 'liquidacion_autorizacion_pago' ||
+            String(m.message?.subject || '').includes('AUTORIZACIÓN DE PAGO') ||
+            (Array.isArray(m.to) && m.to.some((x) => String(x || '').toLowerCase().includes('contabilidad.global')))
+        )
+        .map((m) => ({
+          id: m.id,
+          type: m.type || '',
+          to: m.to,
+          subject: m.message?.subject || '',
+          delivery: m.delivery || null,
+          metadata: m.metadata || null,
+          created_at: m.created_at || m.createdAt || ''
+        }));
+      return json(
+        {
+          ok: true,
+          meta,
+          totalLiquidaciones: liquidacionesPagos.length,
+          liquidacionesPagos,
+          totalEliMails: eliMails.length,
+          eliMails
+        },
         200,
         origin
       );

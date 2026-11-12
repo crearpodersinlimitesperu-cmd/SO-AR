@@ -15,7 +15,8 @@ const INSTANT_MAIL_TYPES = new Set([
   'contrato_fuego_confirmacion',
   'contract_confirmation',
   'system_access_invite',
-  'imo_welcome'
+  'imo_welcome',
+  'liquidacion_autorizacion_pago'
 ]);
 
 const MAIL_CLAIM_LEASE_MS = 10 * 60 * 1000;

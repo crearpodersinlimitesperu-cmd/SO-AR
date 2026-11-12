@@ -10,6 +10,19 @@ export const FEE_PER_EFFECTIVE_CALL_USD = 25;
 export const FEE_PER_GROUP_TEAM_USD = 400;
 
 /**
+ * Normaliza la sede para liquidación cuando un equipo histórico de Quito quedó etiquetado como Global.
+ */
+function resolveLiquidacionSede(item) {
+  const raw = String(item?.sede || '').trim();
+  const low = raw.toLowerCase();
+  const num = parseInt(String(item?.numEquipo || '').replace(/\D/g, ''), 10);
+  if ((!raw || low === 'global' || low === 'sede global' || low === 'sin sede') && !isNaN(num) && num >= 80 && num <= 165) {
+    return 'Quito';
+  }
+  return raw || 'Global';
+}
+
+/**
  * Agrupa los ítems de liquidación seleccionados por entrenador.
  */
 export function groupItemsByTrainer(items = []) {
@@ -49,6 +62,14 @@ export function buildLiquidacionEmailData({
     year: 'numeric'
   });
 
+  const hasIndiv = items.some(it => it.tipo === 'individual');
+  const hasGroup = items.some(it => it.tipo !== 'individual');
+  const tarifaLabel = hasGroup && hasIndiv
+    ? `$${FEE_PER_GROUP_TEAM_USD} USD por equipo grupal / $${FEE_PER_EFFECTIVE_CALL_USD} USD por llamada individual`
+    : hasIndiv
+    ? `$${FEE_PER_EFFECTIVE_CALL_USD} USD por llamada efectiva (Tarifa fija oficial)`
+    : `$${FEE_PER_GROUP_TEAM_USD} USD por equipo grupal completado (Tarifa fija oficial)`;
+
   const subject = `AUTORIZACIÓN DE PAGO: Liquidación de Llamadas a Managers — ${cleanTrainer} ($${totalMontoUSD} USD)`;
 
   const fechaISO = new Date().toISOString().split('T')[0];
@@ -57,7 +78,7 @@ export function buildLiquidacionEmailData({
   const itemsText = items.map((it, idx) => {
     const modalidad = it.tipo === 'individual' ? 'Individual (1 a 1)' : 'Grupal (Equipo)';
     const destinatario = it.tipo === 'individual' ? (it.participanteNombre || 'Manager') : `${it.equipo || 'Equipo'}${it.numEquipo ? ` (#${it.numEquipo})` : ''}`;
-    const sede = it.sede || 'Global';
+    const sede = resolveLiquidacionSede(it);
     const entrenador = (it.entrenador || cleanTrainer);
     const itemMonto = it.montoUSD !== undefined ? Number(it.montoUSD) : (it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : FEE_PER_GROUP_TEAM_USD);
     const monto = it.esPagable === false ? '$0 USD (Sin desembolso)' : `$${itemMonto} USD`;
@@ -67,12 +88,12 @@ export function buildLiquidacionEmailData({
   }).join('\n');
 
   // Filas en HTML
-  const itemsHtml = items.map((it, idx) => {
+  const itemsHtml = items.map((it) => {
     const modalidad = it.tipo === 'individual' 
       ? '<span style="background: #dbeafe; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">👤 Individual</span>' 
       : '<span style="background: #f3e8ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">👥 Grupal</span>';
     const destinatario = it.tipo === 'individual' ? `<strong>${it.participanteNombre || 'Manager'}</strong>` : `<strong>${it.equipo || 'Equipo'}</strong>${it.numEquipo ? ` (#${it.numEquipo})` : ''}`;
-    const sede = it.sede || 'Global';
+    const sede = resolveLiquidacionSede(it);
     const entrenador = (it.entrenador || cleanTrainer);
     const itemMonto = it.montoUSD !== undefined ? Number(it.montoUSD) : (it.tipo === 'individual' ? FEE_PER_EFFECTIVE_CALL_USD : FEE_PER_GROUP_TEAM_USD);
     const monto = it.esPagable === false ? '<span style="color: #64748b; font-weight: 700;">$0 USD (Sin desembolso)</span>' : `<strong style="color: #059669;">$${itemMonto} USD</strong>`;
@@ -102,7 +123,7 @@ DATOS DEL BENEFICIARIO Y LIQUIDACIÓN:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 • Entrenador: ${cleanTrainer}${trainerEmail ? `\n• Correo del Entrenador: ${trainerEmail}` : ''}
 • Concepto: Liquidación de Llamadas Efectivas a Equipos de Managers
-• Tarifa Aplicada: Tarifa oficial fija de Causa OS ($25 USD por llamada efectiva / equipo)
+• Tarifa Aplicada: ${tarifaLabel}
 • Total de Registros Autorizados: ${items.length}
 • MONTO TOTAL AUTORIZADO: $${totalMontoUSD} USD
 
@@ -173,8 +194,8 @@ Plataforma: Causa OS — Centro Operativo CPSL
           </tr>
           ` : ''}
           <tr>
-            <td style="padding: 4px 0; color: #64748b;"><strong>Tarifa por llamada:</strong></td>
-            <td style="padding: 4px 0;">$${FEE_PER_EFFECTIVE_CALL_USD} USD (Tarifa fija oficial)</td>
+            <td style="padding: 4px 0; color: #64748b;"><strong>Tarifa oficial:</strong></td>
+            <td style="padding: 4px 0;">${tarifaLabel}</td>
           </tr>
           <tr>
             <td style="padding: 4px 0; color: #64748b;"><strong>Total a desembolsar:</strong></td>
@@ -234,8 +255,8 @@ Plataforma: Causa OS — Centro Operativo CPSL
 }
 
 /**
- * Envía las notificaciones en Causa OS y encola los correos oficiales para Eli Escobar.
- * Funciona de forma segura y no bloqueante.
+ * Encola PRIMERO los correos oficiales para Eli Escobar en 'mail' (despachados desde no-reply@crearpsl.net)
+ * y luego registra la notificación In-App en 'notifications' respetando estrictamente el esquema de firestore.rules.
  */
 export async function dispatchLiquidacionNotifications({
   db,
@@ -245,11 +266,13 @@ export async function dispatchLiquidacionNotifications({
   authorizerUser = {}
 }) {
   if (!db || !addDocFn || !collectionFn || !items.length) {
-    return { successCount: 0, errors: [] };
+    return { successCount: 0, mailIds: [], notifiedTrainers: [], errors: [] };
   }
 
   const grouped = groupItemsByTrainer(items);
   let successCount = 0;
+  const mailIds = [];
+  const notifiedTrainers = [];
   const errors = [];
 
   for (const [trainer, trainerItems] of grouped.entries()) {
@@ -260,25 +283,15 @@ export async function dispatchLiquidacionNotifications({
         authorizerUser
       });
 
-      // 1. Notificación In-App en Causa OS para Eli Escobar
-      const sedesList = [...new Set(trainerItems.map(it => it.sede).filter(Boolean))].join(', ') || 'Global';
+      const sedesList = [...new Set(trainerItems.map(it => resolveLiquidacionSede(it)).filter(Boolean))].join(', ') || 'Global';
       const equiposList = trainerItems.map(it => it.equipo ? `${it.equipo}${it.numEquipo ? ` (#${it.numEquipo})` : ''}` : it.participanteNombre).join(', ');
+      const authEmail = String(authorizerUser?.email || '').trim().toLowerCase();
+      const ccList = authEmail && authEmail !== ELI_ESCOBAR_EMAIL ? [authEmail] : [];
 
-      await addDocFn(collectionFn(db, 'notifications'), {
-        userId: ELI_ESCOBAR_EMAIL,
-        title: `💰 Autorización de Pago: ${trainer} ($${emailData.totalMontoUSD} USD)`,
-        message: `Se ha registrado y autorizado la liquidación de llamadas para ${trainer} por un total de $${emailData.totalMontoUSD} USD (${trainerItems.length} registro(s) en ${sedesList}): ${equiposList}. Autorizado por ${authorizerUser?.name || authorizerUser?.email || 'Dirección'}.`,
-        type: 'liquidacion_pago_autorizado',
-        entrenador: trainer,
-        montoUSD: emailData.totalMontoUSD,
-        itemsCount: trainerItems.length,
-        read: false,
-        created_at: new Date().toISOString()
-      });
-
-      // 2. Encolado de correo oficial en la colección 'mail' (para mailerDaemon / Firebase Trigger Email)
-      await addDocFn(collectionFn(db, 'mail'), {
+      // 1. PRIMERO: Encolado de correo oficial en 'mail' (nunca bloqueado por notificaciones in-app)
+      const mailPayload = {
         to: [ELI_ESCOBAR_EMAIL],
+        ...(ccList.length > 0 ? { cc: ccList } : {}),
         type: 'liquidacion_autorizacion_pago',
         delivery: { state: 'PENDING', attemptCount: 0 },
         message: {
@@ -290,19 +303,40 @@ export async function dispatchLiquidacionNotifications({
           entrenador: trainer,
           montoUSD: emailData.totalMontoUSD,
           itemsCount: trainerItems.length,
+          equipos: equiposList,
+          sedes: sedesList,
           authorizerEmail: authorizerUser?.email || '',
           authorizerName: authorizerUser?.name || ''
         },
         created_at: new Date().toISOString()
-      });
+      };
 
+      const mailRef = await addDocFn(collectionFn(db, 'mail'), mailPayload);
+      if (mailRef?.id) mailIds.push(mailRef.id);
+      notifiedTrainers.push(trainer);
       successCount++;
+
+      // 2. SEGUNDO: Notificación In-App en Causa OS para Eli Escobar (esquema estricto de isValidNotificationData)
+      try {
+        await addDocFn(collectionFn(db, 'notifications'), {
+          userId: ELI_ESCOBAR_EMAIL,
+          title: `💰 Autorización de Pago: ${trainer} ($${emailData.totalMontoUSD} USD)`,
+          message: `Se ha registrado y autorizado la liquidación de llamadas para ${trainer} por un total de $${emailData.totalMontoUSD} USD (${trainerItems.length} registro(s) en ${sedesList}): ${equiposList}. Autorizado por ${authorizerUser?.name || authorizerUser?.email || 'Dirección'}.`,
+          type: 'liquidacion_pago_autorizado',
+          sede: sedesList.slice(0, 120),
+          priority: 'high',
+          requiresAction: true,
+          read: false,
+          created_at: new Date().toISOString()
+        });
+      } catch (inAppErr) {
+        console.warn(`Aviso: correo encolado para ${trainer}, pero falló notificación in-app:`, inAppErr?.message || inAppErr);
+      }
     } catch (err) {
-      console.error(`Error enviando notificación/correo para ${trainer}:`, err);
-      errors.push({ trainer, error: err.message });
+      console.error(`Error encolando correo oficial para ${trainer}:`, err);
+      errors.push({ trainer, error: err?.message || String(err) });
     }
   }
 
-  return { successCount, errors };
+  return { successCount, mailIds, notifiedTrainers, errors };
 }
-

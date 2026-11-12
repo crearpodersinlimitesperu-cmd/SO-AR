@@ -2412,13 +2412,12 @@ export default function CentroManagers() {
           autorizadoPorEmail: currentUser?.email || '',
           fechaPago: today,
           fechaAutorizacion: today,
-          notificadoEli: true,
-          fechaNotificacionEli: new Date().toISOString(),
+          notificadoEli: false,
           updatedAt: serverTimestamp()
         }, { merge: true });
       });
 
-      // Notificación automática a Causa OS y encolado de correo oficial para Eli Escobar
+      // Notificación automática a Causa OS y encolado verificado de correo oficial para Eli Escobar
       const itemToNotify = {
         ...item,
         montoUSD: monto,
@@ -2426,14 +2425,23 @@ export default function CentroManagers() {
         fechaAutorizacion: today,
         autorizadoPorNombre: currentUser?.name || 'Dirección'
       };
+      let eliQueuedOk = false;
       try {
-        await dispatchLiquidacionNotifications({
+        const notifRes = await dispatchLiquidacionNotifications({
           db,
           addDocFn: addDoc,
           collectionFn: collection,
           items: [itemToNotify],
           authorizerUser: currentUser
         });
+        if (notifRes.successCount > 0 && notifRes.errors.length === 0) {
+          eliQueuedOk = true;
+          await updateDoc(pagoRef, {
+            notificadoEli: true,
+            notificadoEliMailId: notifRes.mailIds?.[0] || '',
+            fechaNotificacionEli: new Date().toISOString()
+          });
+        }
       } catch (notifErr) {
         console.warn('No se pudo despachar notificación para Eli Escobar:', notifErr);
       }
@@ -2447,7 +2455,11 @@ export default function CentroManagers() {
         details: `Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${monto} USD (${sinPago ? 'Sin desembolso' : 'Autorizado para pago'})`
       });
 
-      showToast(`Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}. Notificado a Eli Escobar en Causa OS.`, 'success');
+      if (eliQueuedOk) {
+        showToast(`Liquidación autorizada: ${item.tipo === 'individual' ? item.participanteNombre : item.equipo}. Correo oficial enviado a Eli Escobar.`, 'success');
+      } else {
+        showToast(`Liquidación registrada, pero quedó pendiente el envío de correo a Eli Escobar. Usa el botón Notificar.`, 'warning');
+      }
     } catch (e) {
       console.error(e);
       showToast(e.message || 'Error al autorizar liquidación', 'error');
@@ -2457,22 +2469,26 @@ export default function CentroManagers() {
   // Notificar / Re-notificar individualmente a Eli Escobar
   const handleNotificarItem = async (item) => {
     try {
-      await dispatchLiquidacionNotifications({
+      const notifRes = await dispatchLiquidacionNotifications({
         db,
         addDocFn: addDoc,
         collectionFn: collection,
         items: [item],
         authorizerUser: currentUser
       });
+      if (!notifRes || notifRes.successCount === 0 || notifRes.errors.length > 0) {
+        throw new Error(notifRes?.errors?.[0]?.error || 'No se pudo encolar el correo en Firestore.');
+      }
 
-      // Actualizar marca de notificación en Firestore
+      // Actualizar marca de notificación en Firestore solo tras confirmar el documento en 'mail'
       const docKey = item.pagoDocId || item.liquidacionKey || item.equipoKey;
       if (docKey) {
         const pagoRef = doc(db, 'liquidaciones_pagos', docKey);
         await updateDoc(pagoRef, {
           notificadoEli: true,
+          notificadoEliMailId: notifRes.mailIds?.[0] || '',
           fechaNotificacionEli: new Date().toISOString()
-        }).catch(() => {});
+        });
       }
 
       const emailData = buildLiquidacionEmailData({
@@ -2481,10 +2497,10 @@ export default function CentroManagers() {
         authorizerUser: currentUser
       });
       setModalEmailEliData([emailData]);
-      showToast(`Notificación y correo encolados para Eli Escobar (${item.entrenador}).`, 'success');
+      showToast(`Correo oficial enviado a Eli Escobar (${item.entrenador}) desde no-reply@crearpsl.net.`, 'success');
     } catch (err) {
       console.error('Error al notificar:', err);
-      showToast('Error al notificar a Eli Escobar', 'error');
+      showToast(`Error al notificar a Eli Escobar: ${err?.message || 'Reintenta'}`, 'error');
     }
   };
 
@@ -2577,8 +2593,7 @@ export default function CentroManagers() {
             autorizadoPorEmail: currentUser?.email || '',
             fechaPago: today,
             fechaAutorizacion: today,
-            notificadoEli: true,
-            fechaNotificacionEli: new Date().toISOString(),
+            notificadoEli: false,
             updatedAt: serverTimestamp()
           }, { merge: true });
         });
@@ -2597,16 +2612,29 @@ export default function CentroManagers() {
       details: `Liquidación masiva completada: ${successCount} registros autorizados por $${totalMonto} USD (${errorCount} errores)`
     });
 
-    // Notificación automática a Causa OS y encolado de correo oficial para Eli Escobar
+    // Notificación automática a Causa OS y encolado verificado de correo oficial para Eli Escobar
     if (successCount > 0) {
       try {
-        await dispatchLiquidacionNotifications({
+        const notifRes = await dispatchLiquidacionNotifications({
           db,
           addDocFn: addDoc,
           collectionFn: collection,
           items: itemsToPay,
           authorizerUser: currentUser
         });
+        const notifiedSet = new Set((notifRes.notifiedTrainers || []).map(t => String(t || '').trim()));
+        if (notifiedSet.size > 0) {
+          const nowIso = new Date().toISOString();
+          for (const item of itemsToPay) {
+            const trKey = String(item.entrenador || 'Sin Asignar').trim();
+            if (!notifiedSet.has(trKey)) continue;
+            const docKey = item.tipo === 'individual' ? (item.liquidacionKey || `indiv__${item.managerId}`) : (item.equipoKey || item.liquidacionKey);
+            await updateDoc(doc(db, 'liquidaciones_pagos', docKey), {
+              notificadoEli: true,
+              fechaNotificacionEli: nowIso
+            }).catch(() => {});
+          }
+        }
       } catch (notifErr) {
         console.warn('No se pudo despachar notificación masiva para Eli Escobar:', notifErr);
       }
@@ -6674,9 +6702,19 @@ export default function CentroManagers() {
                               <td style={{ padding: '0.65rem 0.6rem' }}>{item.autorizadoPorNombre || item.pagadoPorNombre || item.pagadoPorEmail || '-'}</td>
                               <td style={{ padding: '0.65rem 0.6rem', textAlign: 'center' }}>
                                 {item.notificadoEli ? (
-                                  <span style={{ background: '#ecfdf5', color: '#047857', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                                    <Check size={12} /> Notificado
-                                  </span>
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                    <span style={{ background: '#ecfdf5', color: '#047857', padding: '0.2rem 0.55rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 800, whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                      <Check size={12} /> Notificado
+                                    </span>
+                                    <HelpButton helpKey="notificarEli"
+                                      type="button"
+                                      onClick={() => handleNotificarItem(item)}
+                                      title="Reenviar correo oficial de autorización a Eli Escobar"
+                                      style={{ padding: '0.18rem 0.45rem', borderRadius: '5px', border: '1px solid #cbd5e1', background: 'transparent', color: '#475569', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', whiteSpace: 'nowrap' }}
+                                    >
+                                      <Mail size={11} /> Reenviar
+                                    </HelpButton>
+                                  </div>
                                 ) : (
                                   <HelpButton helpKey="notificarEli"
                                     onClick={() => handleNotificarItem(item)}
