@@ -73,13 +73,13 @@ const SUPER_ADMIN_EMAILS_WORKER = [
 const CAUSA_MANAGERS_SYNC_API_KEY = 'CAUSA_NODUS_MANAGERS_API_2026_KEY_9F8A7B6C5D4E3F2A1B';
 
 const ACTIVE_COHORTE_THRESHOLDS_WORKER = {
-  lima: 32,
-  guayaquil: 37,
-  cuenca: 24,
-  medellin: 19,
-  mexico: 8,
-  cdmx: 8,
-  quito: 127
+  lima: 30,
+  guayaquil: 36,
+  cuenca: 22,
+  medellin: 18,
+  mexico: 7,
+  cdmx: 7,
+  quito: 126
 };
 
 const TRAINER_ALIASES_WORKER = {
@@ -906,21 +906,26 @@ function extractTeamNumberWorker(equipoStr, numEquipoField) {
   return match ? parseInt(match[0], 10) : null;
 }
 
-function normalizeSedeWorker(rawSede) {
+function normalizeSedeWorker(rawSede, numEquipo = null) {
   const s = normalizeWorkerText(rawSede);
-  if (!s || s === 'sin sede' || s === 'sede global' || s === 'global') return 'Global';
-  if (s.includes('lima') || s.includes('peru')) return 'Lima';
+  if (!s || s === 'sin sede' || s === 'sede global' || s === 'global') {
+    if (numEquipo && !Number.isNaN(numEquipo) && numEquipo >= 80 && numEquipo <= 165) {
+      return 'Quito';
+    }
+    return 'Global';
+  }
+  if (s.includes('lima') || s.includes('peru') || s === 'lim') return 'Lima';
   if (s.includes('guayaquil') || s === 'gye') return 'Guayaquil';
-  if (s.includes('quito') || s === 'uio') return 'Quito';
-  if (s.includes('cuenca')) return 'Cuenca';
-  if (s.includes('medellin')) return 'Medellín';
-  if (s.includes('mexico') || s.includes('cdmx')) return 'México';
+  if (s.includes('quito') || s.includes('uio')) return 'Quito';
+  if (s.includes('cuenca') || s === 'cue') return 'Cuenca';
+  if (s.includes('medellin') || s === 'med') return 'Medellín';
+  if (s.includes('mexico') || s.includes('cdmx') || s === 'mex') return 'México';
   return String(rawSede || 'Global').trim();
 }
 
 function isGraduatedCohortWorker(sede, numEquipo) {
   if (!numEquipo || Number.isNaN(numEquipo)) return false;
-  const canonicalSede = normalizeSedeWorker(sede);
+  const canonicalSede = normalizeSedeWorker(sede, numEquipo);
   const normSede = normalizeWorkerText(canonicalSede);
   const threshold = ACTIVE_COHORTE_THRESHOLDS_WORKER[normSede];
   if (!threshold) return false;
@@ -1023,9 +1028,9 @@ async function handleCentroManagersApi(request, env, origin, url) {
 
     const allManagers = rawManagers.map(({ id, data }) => {
       const sedeRaw = String(data.sede || 'Global').trim();
-      const sede = normalizeSedeWorker(sedeRaw);
       const equipo = String(data.equipo || 'Sin equipo').trim();
       const numEquipo = extractTeamNumberWorker(equipo, data.numEquipo);
+      const sede = normalizeSedeWorker(sedeRaw, numEquipo);
       const estadoRaw = String(data.estado || 'Activo').trim();
       const estadoRawUpper = estadoRaw.toUpperCase();
       const esCohorteGraduada = isGraduatedCohortWorker(sede, numEquipo);

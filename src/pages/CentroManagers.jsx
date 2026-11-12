@@ -79,7 +79,7 @@ import TrainerCoherencePanel from '../components/TrainerCoherencePanel';
 import CentroManagersApiPanel from '../components/CentroManagersApiPanel';
 import { isCoherenceAdmin, assertLegacyTrainerEdit, matchesExplicitTrainer } from '../utils/trainerCoherence';
 import { auditAndDeduplicateManagers } from '../services/dataIntegrityAgent';
-import { buildTeamKeyResolver } from '../utils/teamGrouping';
+import { buildTeamKeyResolver, isPlaceholderTeamName } from '../utils/teamGrouping';
 import defaultKpisData from '../data/kpisEntrenadoresData.json';
 import { ManagersHelpProvider, ManagersQuickGuide, ManagersHelpMode, HelpButton, HelpInput, HelpSelect, HelpTextarea, HelpLink, HelpSortHeader } from '../components/ManagersHelp';
 import { getManagersGuideRole, managersTabHelpKeys } from '../data/managersHelpContent';
@@ -170,18 +170,19 @@ export const getTeamNumericValue = (item) => {
   return 999999;
 };
 
-// Umbrales de cohorte activa vigente por sede (noviembre 2026):
-// Cualquier cohorte estrictamente anterior ya concluyó su ciclo y su estado es Graduado.
+// Umbrales mínimos de cohorte activa de Maestría del Juego (ciclo 90 días hasta "EL VIAJE") por sede:
+// Sincronizado con el Calendario Oficial Maestro (noviembre 2026). Las cohortes estrictamente anteriores
+// ya concluyeron su "EL VIAJE" y su estado efectivo es Graduado; las cohortes en curso permanecen Activas.
 export const ACTIVE_COHORTE_THRESHOLDS = {
-  lima: 32,
-  guayaquil: 37,
-  cuenca: 24,
-  medellin: 19,
-  medellín: 19,
-  mexico: 8,
-  méxico: 8,
-  cdmx: 8,
-  quito: 127
+  lima: 30,
+  guayaquil: 36,
+  cuenca: 22,
+  medellin: 18,
+  medellín: 18,
+  mexico: 7,
+  méxico: 7,
+  cdmx: 7,
+  quito: 126
 };
 
 // Resuelve deterministamente el estado efectivo de un manager considerando su ciclo de vida y eventos de graduación
@@ -198,32 +199,52 @@ export const resolveManagerEstado = (m, eventsList = null) => {
     return 'Graduado';
   }
 
-  // Umbral de ciclo activo por sede: si el equipo es de una cohorte anterior ya cerrada (ej. Lima E26, E31), su estado es Graduado
-  const mSedeKey = String(m.sede || '').trim().toLowerCase();
-  const mSedeNorm = typeof normalizeSede === 'function' ? normalizeSede(m.sede).toLowerCase() : mSedeKey;
-  const minActive = ACTIVE_COHORTE_THRESHOLDS[mSedeKey] || ACTIVE_COHORTE_THRESHOLDS[mSedeNorm];
+  // Umbral de ciclo activo por sede: si el equipo pertenece a una cohorte cuyo "EL VIAJE" ya concluyó, es Graduado
   const mNum = getTeamNumericValue(m);
+  const mSedeKey = String(m.sede || '').trim().toLowerCase();
+  let mSedeNorm = typeof normalizeSede === 'function' ? normalizeSede(m.sede).toLowerCase() : mSedeKey;
+  if ((!mSedeNorm || mSedeNorm === 'global' || mSedeNorm === 'sede global' || mSedeNorm === 'sin sede') && mNum !== 999999 && mNum >= 80 && mNum <= 165) {
+    mSedeNorm = 'quito';
+  }
+  const minActive = ACTIVE_COHORTE_THRESHOLDS[mSedeKey] || ACTIVE_COHORTE_THRESHOLDS[mSedeNorm];
   if (minActive && mNum !== 999999 && mNum < minActive) {
     return 'Graduado';
   }
 
-  // Si se dispone de eventos de calendario y el evento "EL VIAJE" (graduación) ya ocurrió, está Graduado
+  // Si se dispone de eventos de calendario y el cierre dominical de "EL VIAJE" (23:59:59) ya ocurrió, está Graduado
   if (eventsList && Array.isArray(eventsList) && eventsList.length > 0) {
-    const mSede = typeof normalizeSede === 'function' ? normalizeSede(m.sede) : m.sede;
+    let mSede = typeof normalizeSede === 'function' ? normalizeSede(m.sede) : m.sede;
+    if ((!mSede || mSede === 'Global' || mSede === 'Sede Global') && mNum !== 999999 && mNum >= 80 && mNum <= 165) {
+      mSede = 'Quito';
+    }
     if (mNum !== 999999) {
       const today = Date.now();
       const viajeEvent = eventsList.find(e => {
         const eNombre = String(e.nombre || e.name || '').toUpperCase();
-        if (!eNombre.includes('VIAJE') && !eNombre.includes('FIN DE SEMANA') && !eNombre.includes('RETIRO')) return false;
+        if (
+          !eNombre.includes('VIAJE') &&
+          !eNombre.includes('TERCER FIN DE SEMANA') &&
+          !eNombre.includes('CUARTO FIN DE SEMANA') &&
+          !eNombre.includes('RETIRO')
+        ) return false;
         const eSede = typeof normalizeSede === 'function' ? normalizeSede(e.sede || e.sedeTag) : (e.sede || e.sedeTag);
         if (eSede !== mSede) return false;
         const eNum = getTeamNumericValue({ equipo: e.equipo || e.team || '', numEquipo: e.equipo || e.numEquipo });
         return eNum === mNum && eNum !== 999999;
       });
       if (viajeEvent) {
-        const targetDate = new Date(viajeEvent.fecha_fin || viajeEvent.end || viajeEvent.fecha_inicio || viajeEvent.start).getTime();
-        if (!isNaN(targetDate) && today > targetDate) {
-          return 'Graduado';
+        const rawEnd = String(viajeEvent.fecha_fin || viajeEvent.end || viajeEvent.fecha_inicio || viajeEvent.start || '').trim();
+        if (rawEnd) {
+          const cleanEnd = rawEnd.replace(/Z$/i, '');
+          const endObj = new Date(cleanEnd);
+          if (!isNaN(endObj.getTime())) {
+            if (!cleanEnd.includes('T') || /T00:00(:00)?(\.0+)?$/.test(cleanEnd)) {
+              endObj.setHours(23, 59, 59, 999);
+            }
+            if (today > endObj.getTime()) {
+              return 'Graduado';
+            }
+          }
         }
       }
     }
@@ -644,7 +665,12 @@ export default function CentroManagers() {
 
       const viajeEvent = events.find(e => {
         const eNombre = String(e.nombre || e.name || '').toUpperCase();
-        if (!eNombre.includes('VIAJE') && !eNombre.includes('FIN DE SEMANA') && !eNombre.includes('RETIRO')) return false;
+        if (
+          !eNombre.includes('VIAJE') &&
+          !eNombre.includes('TERCER FIN DE SEMANA') &&
+          !eNombre.includes('CUARTO FIN DE SEMANA') &&
+          !eNombre.includes('RETIRO')
+        ) return false;
         
         const eSede = normalizeSede(e.sede || e.sedeTag);
         if (eSede !== sede) return false;
@@ -654,11 +680,17 @@ export default function CentroManagers() {
       });
 
       if (viajeEvent) {
-        // Usar fecha fin si existe, sino fecha inicio
-        const targetDate = new Date(viajeEvent.fecha_fin || viajeEvent.end || viajeEvent.fecha_inicio || viajeEvent.start).getTime();
-        // Si el día actual superó la fecha del evento, graduar inmediatamente sin esperar 3 días
-        if (!isNaN(targetDate) && today > targetDate) {
-           equiposAGraduar.push({ teamMembers, equipo: equipoStr, sede, event: viajeEvent });
+        // Usar fecha fin extendida al cierre dominical (23:59:59.999) para no graduar durante el domingo en curso
+        const rawEnd = String(viajeEvent.fecha_fin || viajeEvent.end || viajeEvent.fecha_inicio || viajeEvent.start || '').trim();
+        const cleanEnd = rawEnd.replace(/Z$/i, '');
+        const endObj = cleanEnd ? new Date(cleanEnd) : null;
+        if (endObj && !isNaN(endObj.getTime())) {
+          if (!cleanEnd.includes('T') || /T00:00(:00)?(\.0+)?$/.test(cleanEnd)) {
+            endObj.setHours(23, 59, 59, 999);
+          }
+          if (today > endObj.getTime()) {
+            equiposAGraduar.push({ teamMembers, equipo: equipoStr, sede, event: viajeEvent });
+          }
         }
       }
     });
@@ -1024,6 +1056,8 @@ export default function CentroManagers() {
           entrenadores: new Set(),
           lastDate: ''
         };
+      } else if (isPlaceholderTeamName(teams[key].equipo) && !isPlaceholderTeamName(m.equipo)) {
+        teams[key].equipo = m.equipo;
       }
       // Deduplicación canónica en la tarjeta del equipo para prevenir repetición de miembros
       const memberCleanName = (m.nombre || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
