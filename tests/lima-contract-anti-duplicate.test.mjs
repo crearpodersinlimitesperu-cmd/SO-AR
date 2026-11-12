@@ -126,8 +126,12 @@ test('5. ContratoCaminataFuego, ContratoMaestriaLima y ambos Monitores usan unic
 
   assert.ok(fuego.includes('registerUniqueLimaContract'), 'ContratoCaminataFuego debe registrar con bloqueo atómico');
   assert.ok(!fuego.includes('addDoc('), 'ContratoCaminataFuego NO debe usar addDoc con IDs aleatorios');
+  assert.ok(!fuego.includes('Registrar Nuevo Participante'), 'ContratoCaminataFuego NO debe mostrar botón para volver a llenar tras firmar');
+  assert.ok(fuego.includes('cq_firewalk_lima_signed_v2') && fuego.includes('handleIdentityBlur'), 'ContratoCaminataFuego debe bloquear en tiempo real al escribir documento/correo y al reabrir');
   assert.ok(maestria.includes('registerUniqueLimaContract'), 'ContratoMaestriaLima debe registrar con bloqueo atómico');
   assert.ok(!maestria.includes('addDoc('), 'ContratoMaestriaLima NO debe usar addDoc con IDs aleatorios');
+  assert.ok(maestria.includes('{!signedSuccess && ('), 'ContratoMaestriaLima debe ocultar el formulario completo una vez firmado o detectado como duplicado');
+  assert.ok(maestria.includes('cq_maestria_lima_signed_v2') && maestria.includes('handleIdentityBlur'), 'ContratoMaestriaLima debe bloquear en tiempo real al escribir documento/correo y al reabrir');
   assert.ok(monFuego.includes('deduplicateSignedContracts'), 'MonitorAcreditacionFuegoLima debe deduplicar registros');
   assert.ok(monMaestria.includes('deduplicateSignedContracts'), 'MonitorMaestriaLima debe deduplicar registros');
 });

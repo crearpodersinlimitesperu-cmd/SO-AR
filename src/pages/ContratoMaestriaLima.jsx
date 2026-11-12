@@ -18,6 +18,8 @@ import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
 import {
+  fetchAllLimaContractsFailClosed,
+  findMatchingLimaContract,
   normalizeLimaDocNumber,
   normalizeLimaEmail,
   registerUniqueLimaContract
@@ -234,6 +236,54 @@ export default function ContratoMaestriaLima() {
     }).catch(() => {
       if (mounted) setLoadingGeo(false);
     });
+
+    // Si la persona ya firmó Maestría en este dispositivo y su registro sigue vigente en Firestore, bloquear formulario de inmediato
+    (async () => {
+      try {
+        const rawSaved = localStorage.getItem('cq_maestria_lima_signed_v2');
+        if (!rawSaved) return;
+        const saved = JSON.parse(rawSaved);
+        const existingList = await fetchAllLimaContractsFailClosed(
+          'contratos_maestria_lima',
+          () => getDocs(collection(db, 'contratos_maestria_lima'))
+        );
+        const match = findMatchingLimaContract(existingList, saved);
+        if (!mounted) return;
+        if (!match) {
+          // Fue eliminado por coordinación en el Monitor -> liberar para permitir nuevo registro
+          localStorage.removeItem('cq_maestria_lima_signed_v2');
+          return;
+        }
+        const existingRecord = match.record || {};
+        const existingCode = existingRecord.code || existingRecord.verificationCode || 'CQ-MJ-VERIFIED';
+        const existingPassUrl = await generateMaestriaPassCanvas({
+          nombre: existingRecord.nombre || existingRecord.nombreCompleto || saved.nombreCompleto || 'Participante',
+          doc: existingRecord.doc || `${existingRecord.tipoDocumento || 'DNI'}: ${existingRecord.numeroDocumento || ''}`,
+          rol: existingRecord.rol || existingRecord.rolActividad || 'Participante',
+          equipo: existingRecord.equipo || existingRecord.equipoCohorte || 'Equipo 32',
+          sede: 'Lima',
+          fecha: existingRecord.fecha || 'Registrado',
+          codigo: existingCode,
+          ip: existingRecord.ip || 'Registrada',
+          geoLocation: existingRecord.geoLocation || 'Lima, Perú 🇵🇪',
+          coordinates: existingRecord.coordinates || '',
+          verificationUrl: `${pageUrl}?verify=${existingCode}`
+        });
+        if (!mounted) return;
+        setPassDataUrl(existingPassUrl);
+        setDuplicateNotice(
+          '🔒 Ya completaste tu único registro permitido de Maestría del Juego. No es posible registrarse más de una vez. Aquí tienes disponible tu Contrato Firmado (PDF) y tu Pase Oficial vigente.'
+        );
+        setSignedSuccess({
+          ...existingRecord,
+          nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre,
+          codigo: existingCode
+        });
+      } catch {
+        // Ignorar errores de almacenamiento privado
+      }
+    })();
+
     return () => {
       mounted = false;
       observer.disconnect();
@@ -250,6 +300,63 @@ export default function ContratoMaestriaLima() {
     }));
     if (formErrors[name]) {
       setFormErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  const handleIdentityBlur = async () => {
+    if (signedSuccess || isSubmitting) return;
+    const docNorm = normalizeLimaDocNumber(formData.numeroDocumento);
+    const emailNorm = normalizeLimaEmail(formData.email);
+    const nameTrim = formData.nombreCompleto.trim();
+    if (docNorm.length < 5 && !emailNorm.includes('@')) return;
+    try {
+      const existingList = await fetchAllLimaContractsFailClosed(
+        'contratos_maestria_lima',
+        () => getDocs(collection(db, 'contratos_maestria_lima'))
+      );
+      const match = findMatchingLimaContract(existingList, {
+        numeroDocumento: docNorm,
+        email: emailNorm,
+        nombreCompleto: nameTrim
+      });
+      if (!match) return;
+      const existingRecord = match.record || {};
+      const existingCode = existingRecord.code || existingRecord.verificationCode || 'CQ-MJ-VERIFIED';
+      try {
+        localStorage.setItem(
+          'cq_maestria_lima_signed_v2',
+          JSON.stringify({
+            numeroDocumento: existingRecord.numeroDocumento || docNorm,
+            email: existingRecord.email || emailNorm,
+            nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre || nameTrim
+          })
+        );
+      } catch { /* ignore */ }
+      const existingPassUrl = await generateMaestriaPassCanvas({
+        nombre: existingRecord.nombre || existingRecord.nombreCompleto || nameTrim || 'Participante',
+        doc: existingRecord.doc || `${existingRecord.tipoDocumento || 'DNI'}: ${existingRecord.numeroDocumento || docNorm}`,
+        rol: existingRecord.rol || existingRecord.rolActividad || 'Participante',
+        equipo: existingRecord.equipo || existingRecord.equipoCohorte || 'Equipo 32',
+        sede: 'Lima',
+        fecha: existingRecord.fecha || 'Registrado',
+        codigo: existingCode,
+        ip: existingRecord.ip || 'Registrada',
+        geoLocation: existingRecord.geoLocation || 'Lima, Perú 🇵🇪',
+        coordinates: existingRecord.coordinates || '',
+        verificationUrl: `${pageUrl}?verify=${existingCode}`
+      });
+      setPassDataUrl(existingPassUrl);
+      setDuplicateNotice(
+        `⚠️ Registro único detectado por ${match.matchReason}: ya cuentas con tu Contrato de Maestría del Juego firmado. Solo está permitido registrarse una vez. Aquí tienes tu Pase Oficial y PDF vigentes.`
+      );
+      setSignedSuccess({
+        ...existingRecord,
+        nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre,
+        codigo: existingCode
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch {
+      // Se verificará de forma estricta también al enviar
     }
   };
 
@@ -384,6 +491,16 @@ export default function ContratoMaestriaLima() {
       if (registrationResult.status === 'DUPLICATE') {
         const existingRecord = registrationResult.existingRecord || {};
         const existingCode = existingRecord.code || existingRecord.verificationCode || 'CQ-MJ-VERIFIED';
+        try {
+          localStorage.setItem(
+            'cq_maestria_lima_signed_v2',
+            JSON.stringify({
+              numeroDocumento: existingRecord.numeroDocumento || inputDocNorm,
+              email: existingRecord.email || inputEmailNorm,
+              nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre || formData.nombreCompleto.trim()
+            })
+          );
+        } catch { /* ignore */ }
         const existingPassUrl = await generateMaestriaPassCanvas({
           nombre: existingRecord.nombre || existingRecord.nombreCompleto || formData.nombreCompleto.trim(),
           doc: existingRecord.doc || `${existingRecord.tipoDocumento || 'DNI'}: ${existingRecord.numeroDocumento || inputDocNorm}`,
@@ -447,6 +564,17 @@ export default function ContratoMaestriaLima() {
         firmaTexto: payload.firmaTexto,
         sha256Hash
       });
+
+      try {
+        localStorage.setItem(
+          'cq_maestria_lima_signed_v2',
+          JSON.stringify({
+            numeroDocumento: inputDocNorm,
+            email: inputEmailNorm,
+            nombreCompleto: formData.nombreCompleto.trim()
+          })
+        );
+      } catch { /* ignore */ }
 
       setEmailSentStatus(sent);
       setSignedSuccess({
@@ -1058,7 +1186,8 @@ export default function ContratoMaestriaLima() {
           </table>
         </section>
 
-        {/* FORMULARIO DE ACEPTACIÓN CLICKWRAP Y FIRMA DIGITAL */}
+        {/* FORMULARIO DE ACEPTACIÓN CLICKWRAP Y FIRMA DIGITAL (OCULTO TRAS REGISTRO ÚNICO) */}
+        {!signedSuccess && (
         <section
           id="formulario-firma"
           ref={formRef}
@@ -1099,6 +1228,7 @@ export default function ContratoMaestriaLima() {
                   name="nombreCompleto"
                   value={formData.nombreCompleto}
                   onChange={handleInputChange}
+                  onBlur={handleIdentityBlur}
                   placeholder="Ej. Juan Carlos Pérez Gómez"
                   style={{
                     width: '100%',
@@ -1149,6 +1279,7 @@ export default function ContratoMaestriaLima() {
                     name="numeroDocumento"
                     value={formData.numeroDocumento}
                     onChange={handleInputChange}
+                    onBlur={handleIdentityBlur}
                     placeholder="Ej. 45678912"
                     style={{
                       width: '100%',
@@ -1176,6 +1307,7 @@ export default function ContratoMaestriaLima() {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
+                  onBlur={handleIdentityBlur}
                   placeholder="tucorreo@ejemplo.com"
                   style={{
                     width: '100%',
@@ -1441,6 +1573,7 @@ export default function ContratoMaestriaLima() {
             </button>
           </form>
         </section>
+        )}
       </main>
 
       {/* MODAL QR */}

@@ -31,6 +31,8 @@ import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 import { downloadFirewalkContractPdf } from '../utils/contractPdfGenerator';
 import {
+  fetchAllLimaContractsFailClosed,
+  findMatchingLimaContract,
   normalizeLimaDocNumber,
   normalizeLimaEmail,
   registerUniqueLimaContract
@@ -81,6 +83,47 @@ export default function ContratoCaminataFuego() {
     getClientGeoLocation().then((info) => {
       if (mounted && info) setGeoInfo(info);
     });
+
+    // Si ya firmó Caminata sobre Fuego en este dispositivo y el registro sigue vigente en Firestore, bloquear formulario
+    (async () => {
+      try {
+        const rawSaved = localStorage.getItem('cq_firewalk_lima_signed_v2');
+        if (!rawSaved) return;
+        const saved = JSON.parse(rawSaved);
+        const existingList = await fetchAllLimaContractsFailClosed(
+          'contratos_caminata_fuego',
+          () => getDocs(collection(db, 'contratos_caminata_fuego'))
+        );
+        const match = findMatchingLimaContract(existingList, saved);
+        if (!mounted) return;
+        if (!match) {
+          localStorage.removeItem('cq_firewalk_lima_signed_v2');
+          return;
+        }
+        const existingDoc = match.record || {};
+        const existingCode = existingDoc.code || existingDoc.verificationCode || 'CQ-FIRE-VERIFIED';
+        const existingDocLabel = existingDoc.doc || `${existingDoc.tipoDocumento || 'DNI'}: ${existingDoc.numeroDocumento || ''}`;
+        const existingFecha = existingDoc.fecha || existingDoc.timestamp || 'Registrado';
+        const existingLugar = existingDoc.lugar || existingDoc.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
+        setDuplicateNotice(
+          '🔒 Ya completaste tu único registro permitido para la Caminata sobre Fuego. No está permitido registrarse dos veces. Aquí tienes tu Pase Oficial y Contrato (PDF) vigentes.'
+        );
+        setEmailStatus('SENT');
+        setSignedSuccess({
+          ...existingDoc,
+          nombre: existingDoc.nombre || existingDoc.nombreCompleto || saved.nombreCompleto || 'Participante',
+          documento: existingDocLabel,
+          codigo: existingCode,
+          fecha: existingFecha,
+          rolActividad: existingDoc.rol || existingDoc.rolActividad || 'Participante',
+          sedeLocacion: existingLugar,
+          lugar: existingLugar
+        });
+      } catch {
+        // Ignorar errores de almacenamiento privado
+      }
+    })();
+
     return () => {
       mounted = false;
     };
@@ -142,6 +185,61 @@ export default function ContratoCaminataFuego() {
       navigator.clipboard.writeText(pageUrl);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
+
+  const handleIdentityBlur = async () => {
+    if (signedSuccess || isSubmitting) return;
+    const docNorm = normalizeLimaDocNumber(formData.numeroDocumento);
+    const emailNorm = normalizeLimaEmail(formData.email);
+    const nameTrim = formData.nombreCompleto.trim();
+    if (docNorm.length < 5 && !emailNorm.includes('@')) return;
+    try {
+      const existingList = await fetchAllLimaContractsFailClosed(
+        'contratos_caminata_fuego',
+        () => getDocs(collection(db, 'contratos_caminata_fuego'))
+      );
+      const match = findMatchingLimaContract(existingList, {
+        numeroDocumento: docNorm,
+        email: emailNorm,
+        nombreCompleto: nameTrim
+      });
+      if (!match) return;
+      const existingDoc = match.record || {};
+      const existingCode = existingDoc.code || existingDoc.verificationCode || 'CQ-FIRE-VERIFIED';
+      const existingDocLabel = existingDoc.doc || `${existingDoc.tipoDocumento || 'DNI'}: ${existingDoc.numeroDocumento || docNorm}`;
+      const existingFecha = existingDoc.fecha || existingDoc.timestamp || 'Registrado';
+      const existingLugar = existingDoc.lugar || existingDoc.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
+      try {
+        localStorage.setItem(
+          'cq_firewalk_lima_signed_v2',
+          JSON.stringify({
+            numeroDocumento: existingDoc.numeroDocumento || docNorm,
+            email: existingDoc.email || emailNorm,
+            nombreCompleto: existingDoc.nombre || existingDoc.nombreCompleto || nameTrim
+          })
+        );
+      } catch { /* ignore */ }
+      setDuplicateNotice(
+        `⚠️ Registro único detectado por ${match.matchReason}: ya cuentas con tu acuerdo de Caminata sobre Fuego firmado. Solo está permitido registrarse una vez. Aquí tienes tu Pase Oficial y PDF vigentes.`
+      );
+      setEmailStatus('SENT');
+      setSignedSuccess({
+        ...existingDoc,
+        nombre: existingDoc.nombre || existingDoc.nombreCompleto || nameTrim || 'Participante',
+        documento: existingDocLabel,
+        codigo: existingCode,
+        fecha: existingFecha,
+        rolActividad: existingDoc.rol || existingDoc.rolActividad || 'Participante',
+        sedeLocacion: existingLugar,
+        lugar: existingLugar
+      });
+      setTimeout(() => {
+        const confirmEl = document.getElementById('constancia-firmada');
+        if (confirmEl) confirmEl.scrollIntoView({ behavior: 'smooth' });
+      }, 120);
+    } catch {
+      // También se verifica de forma estricta al enviar
     }
   };
 
@@ -246,6 +344,16 @@ export default function ContratoCaminataFuego() {
       if (registrationResult.status === 'DUPLICATE') {
         const existingDoc = registrationResult.existingRecord || {};
         const existingCode = existingDoc.code || existingDoc.verificationCode || 'CQ-FIRE-VERIFIED';
+        try {
+          localStorage.setItem(
+            'cq_firewalk_lima_signed_v2',
+            JSON.stringify({
+              numeroDocumento: existingDoc.numeroDocumento || normalizedDocInput,
+              email: existingDoc.email || normalizedEmailInput,
+              nombreCompleto: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim()
+            })
+          );
+        } catch { /* ignore */ }
         const existingDocLabel = existingDoc.doc || `${existingDoc.tipoDocumento || 'DNI'}: ${existingDoc.numeroDocumento || normalizedDocInput}`;
         const existingFecha = existingDoc.fecha || existingDoc.timestamp || localFecha;
         const existingLugar = existingDoc.lugar || existingDoc.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
@@ -320,6 +428,17 @@ export default function ContratoCaminataFuego() {
         firmaTexto: formData.firmaTexto.trim(),
         sha256Hash
       });
+
+      try {
+        localStorage.setItem(
+          'cq_firewalk_lima_signed_v2',
+          JSON.stringify({
+            numeroDocumento: normalizedDocInput,
+            email: normalizedEmailInput,
+            nombreCompleto: formData.nombreCompleto.trim()
+          })
+        );
+      } catch { /* ignore */ }
 
       setEmailStatus(emailSent ? 'SENT' : 'ERROR');
 
@@ -1254,36 +1373,6 @@ export default function ContratoCaminataFuego() {
               >
                 <Printer size={18} /> Imprimir Constancia
               </button>
-              <button
-                onClick={() => {
-                  setSignedSuccess(null);
-                  setFormData({
-                    nombreCompleto: '',
-                    tipoDocumento: 'DNI',
-                    numeroDocumento: '',
-                    email: '',
-                    telefono: '',
-                    rolActividad: 'Participante',
-                    sedeLocacion: 'Lima - Casona Blanca (Huachipa)',
-                    aceptoRiesgos: false,
-                    aceptoSalud: false,
-                    aceptoImagen: false,
-                    firmaTexto: ''
-                  });
-                }}
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  color: '#cbd5e1',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  padding: '0.75rem 1.5rem',
-                  borderRadius: '8px',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  cursor: 'pointer'
-                }}
-              >
-                Registrar Nuevo Participante
-              </button>
             </div>
           </div>
         ) : (
@@ -1301,6 +1390,7 @@ export default function ContratoCaminataFuego() {
                     name="nombreCompleto"
                     value={formData.nombreCompleto}
                     onChange={handleInputChange}
+                    onBlur={handleIdentityBlur}
                     placeholder="Ej. Juan Pérez Quispe"
                     style={{
                       width: '100%',
@@ -1355,6 +1445,7 @@ export default function ContratoCaminataFuego() {
                     name="numeroDocumento"
                     value={formData.numeroDocumento}
                     onChange={handleInputChange}
+                    onBlur={handleIdentityBlur}
                     placeholder="Documento de identidad"
                     style={{
                       width: '100%',
@@ -1382,6 +1473,7 @@ export default function ContratoCaminataFuego() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    onBlur={handleIdentityBlur}
                     placeholder="tu.correo@ejemplo.com"
                     style={{
                       width: '100%',
