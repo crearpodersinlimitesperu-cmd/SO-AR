@@ -443,17 +443,18 @@ export default function AuditoriaKPIs({ defaultTab }) {
         let kpiList = [];
         if (kpiReportsSnap && !kpiReportsSnap.empty) {
           kpiList = kpiReportsSnap.docs.map(d => ({
-            id: d.id,
             ...d.data(),
+            clientReportId: d.data().clientReportId || d.data().id || d.id,
+            id: d.id,
             createdAt: d.data().createdAt?.toDate ? d.data().createdAt.toDate().toISOString() : d.data().createdAt
           }));
         }
 
         // Combinar con reportes locales de cpsl_kpi_reports_v1
         const localKpi = getLocalReports();
-        const existingKpiIds = new Set(kpiList.map(k => k.id));
+        const existingKpiIds = new Set(kpiList.flatMap(k => [k.id, k.clientReportId]).filter(Boolean));
         localKpi.forEach(lr => {
-          if (lr && lr.id && !existingKpiIds.has(lr.id) && !lr.id.startsWith('kpi_seed_')) {
+          if (lr && lr.id && !existingKpiIds.has(lr.id) && (!lr.clientReportId || !existingKpiIds.has(lr.clientReportId)) && !lr.id.startsWith('kpi_seed_')) {
             kpiList.push(lr);
           }
         });

@@ -74,6 +74,9 @@ function checkStaticRoutesAndCoreTests() {
     'tests/ui-routes-buttons-integrity.test.mjs',
     'tests/task-progress-roles.test.mjs',
     'tests/task-role-coherence.test.mjs',
+    'tests/task-privacy.test.mjs',
+    'tests/deactivated-users-privacy.test.mjs',
+    'tests/sede-datos-permissions.test.mjs',
     'tests/checklist-cycle-completion-persistence.test.mjs',
     'tests/legal-signature-save.test.mjs',
     'tests/mail-queue.test.mjs'

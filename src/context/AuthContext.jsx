@@ -885,7 +885,7 @@ export function AuthProvider({ children }) {
             setCurrentUser(null);
           }
         } else {
-          const mockDevUser = localStorage.getItem('cpsl_mock_user');
+          const mockDevUser = import.meta.env.DEV ? localStorage.getItem('cpsl_mock_user') : null;
           if (mockDevUser) {
             try {
               const parsed = JSON.parse(mockDevUser);

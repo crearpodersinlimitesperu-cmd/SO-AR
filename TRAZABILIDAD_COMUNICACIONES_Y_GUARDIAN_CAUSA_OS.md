@@ -36,13 +36,21 @@ Para proteger íntegramente a la organización, **ninguna contraseña de aplicac
 
 ## 3. Integridad de Guardados, Avances por Rol/Usuario y Anti-Duplicados
 
-1. **Avances por Usuario y Rol (`ChecklistBoard.jsx`, `GoalsBoard.jsx`, `PortfolioBoard.jsx`)**:
+1. **Avances por Usuario y Rol (`ChecklistBoard.jsx`, `TaskDetailModal.jsx`, `TaskAssignmentModal.jsx`, `GoalsBoard.jsx`, `PortfolioBoard.jsx`)**:
    - Cada avance (`participant_states`, `evidences`, `notes`, `status`) se persiste atómicamente respetando las reglas de seguridad de `firestore.rules` (evitando mutaciones innecesarias de mapas ajenos y liberando bloqueos de UI en bloques `finally`).
+   - Al editar una tarea compartida en `TaskAssignmentModal.jsx`, se preserva íntegramente el progreso previo (`completed`, `completedAt`, `progress`) de cada colaborador asignado sin reiniciar su avance a `0%`.
+   - En `ChecklistContext.jsx` (`syncTasksToGoogle`), cerrojo `googleSyncInFlightRef` en memoria que impide duplicación de tareas en Google Tasks por doble clic.
+   - En `firestore.rules` (`match /goals/{goalId}`), las coordinadoras asignadas pueden reportar su avance (`assignedCoordinators`, `currentValue`, `progress`, `updatedAt`) y ejecutar roll-up sin exponer campos estructurales de la meta.
    - Coherencia verificada continuamente por `scripts/auditTaskRoleCoherenceAgent.mjs` y `src/utils/taskRoleCoherence.js`.
-2. **Contratos Legales y Pases Lima (`ContratoMaestriaLima.jsx`, `ContratoCaminataFuego.jsx`, `MonitorMaestriaLima.jsx`, `MonitorAcreditacionFuegoLima.jsx`)**:
-   - Bloqueo anti-duplicados por documento de identidad antes de escribir en Firestore.
+2. **Persistencia de KPIs y Auditoría Gerencial (`MisKPIs.jsx`, `AuditoriaKPIs.jsx`)**:
+   - Separación explícita entre el ID real del documento en Firestore (`id: d.id`) y el identificador local (`clientReportId`), garantizando que la revisión gerencial (`status: 'reviewed'`) persista en Firestore y no duplique tarjetas locales.
+3. **Paridad de Roles, Perfiles Inactivos y Acceso Participante (`moduleRegistry.js`, `routeAccess.js`, `AuthContext.jsx`, `Login.jsx`)**:
+   - Paridad total entre tarjetas visibles en `MODULE_REGISTRY` (incluyendo multi-rol `consolidado` y SuperAdmin activo) y `RoleRoute` en `App.jsx`, bloqueando perfiles dados de baja (`isUserInactive`) y restringiendo `cpsl_mock_user` exclusivamente a entorno `DEV`.
+   - En `Login.jsx`, preservación explícita de `{ participant: isParticipantLogin }` al redirigir desde `/onboarding-legal`.
+4. **Contratos Legales y Pases Lima (`ContratoMaestriaLima.jsx`, `ContratoCaminataFuego.jsx`, `MonitorMaestriaLima.jsx`, `MonitorAcreditacionFuegoLima.jsx`, `legalSignatureService.js`)**:
+   - Bloqueo anti-duplicados por documento de identidad antes de escribir en Firestore y fallback resiliente de geolocalización para no interrumpir firmas legales.
    - Separación estricta entre el **Contrato Legal Íntegro Firmado en PDF A4 multipágina** (`src/utils/contractPdfGenerator.js`) y el **Pase de Validación** gráfico (`src/utils/maestriaPass.js`).
-3. **Cola de Correos sin Reenvíos Duplicados (`scripts/mailQueue.js`)**:
+5. **Cola de Correos sin Reenvíos Duplicados (`scripts/mailQueue.js`, `scripts/mailerDaemon.js`, `functions-mailer/index.mjs`)**:
    - Reclamación transaccional (`claimPendingMail`), presupuestos diarios por tarea/usuario (`mail_delivery_budgets`), supresión automática si la tarea o ciclo ya cerró (`skipTaskMailIfClosed`) y reintento resiliente de confirmación `SUCCESS` sobre IPv4 TLS 465.
 
 ---

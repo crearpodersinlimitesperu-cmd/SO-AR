@@ -1,11 +1,12 @@
 import { isGlobalObserver } from '../config/permissions.js';
+import { isUserInactive } from './userNormalizer.js';
 
 // Shared by RoleRoute and local recommendations; recommendations never grant access.
 export function canEnterRoleRoute(user, {
   allowedRoles = [], allowedEmails = [], requireSuperAdmin = false,
   excludeDireccionBypass = false
 } = {}) {
-  if (!user || user.isParticipantOnly) return false;
+  if (!user || user.isParticipantOnly || isUserInactive(user)) return false;
   if (user.isSuperAdmin && !user.isSimulated) return true;
   if (requireSuperAdmin) return Boolean(user.isSuperAdmin);
   if (!allowedRoles.length) return true;

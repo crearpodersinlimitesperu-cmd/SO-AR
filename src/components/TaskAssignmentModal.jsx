@@ -460,17 +460,23 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       ? assignedRolesList[0] 
       : (assignedRolesList.length > 1 ? 'varios' : finalRole);
 
-    // Inicializar mapa de seguimiento individual en una sola tarjeta:
+    // Inicializar mapa de seguimiento individual preservando avances previos al editar:
+    const existingProgressEntries = Object.entries(taskToEdit?.assigneeProgress || {});
     const assigneeProgress = {};
     assignedEmails.forEach(email => {
-      const u = activeUsersList.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
+      const normalizedEmail = email.toLowerCase().trim();
+      const priorMatch = existingProgressEntries.find(
+        ([k]) => k.toLowerCase().trim() === normalizedEmail
+      )?.[1];
+      const u = activeUsersList.find(usr => usr.email?.toLowerCase() === normalizedEmail);
       assigneeProgress[email] = {
-        name: u?.name || email,
-        role: u?.role || finalRole || 'colaborador',
-        sede: u?.sede || computedSede || 'Global',
-        completed: false,
-        completedAt: null,
-        progress: 0
+        ...(priorMatch || {}),
+        name: u?.name || priorMatch?.name || email,
+        role: u?.role || priorMatch?.role || finalRole || 'colaborador',
+        sede: u?.sede || priorMatch?.sede || computedSede || 'Global',
+        completed: Boolean(priorMatch?.completed),
+        completedAt: priorMatch?.completed ? (priorMatch?.completedAt || null) : null,
+        progress: typeof priorMatch?.progress === 'number' ? priorMatch.progress : (priorMatch?.completed ? 100 : 0)
       };
     });
 
@@ -535,48 +541,54 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       taskData.recurrence = recurrence;
     }
 
-    let success = false;
-    if (taskToEdit) {
-      success = await editCustomTask(taskToEdit.id, taskData);
-    } else {
-      success = await addCustomTask(taskData);
-    }
-    
-    if (success) {
-      try {
-        await recordAuditEvent({
-          action: taskToEdit ? 'TAREA_EDITADA' : 'NUEVA_TAREA_CREADA',
-          user: currentUser,
-          details: {
-            taskId: taskToEdit ? taskToEdit.id : null,
-            taskTitle: newTask.title.trim(),
-            hasNotes: !!trimmedNotes,
-            notesSnippet: trimmedNotes ? trimmedNotes.substring(0, 100) : '',
-            assignedRole: finalRole,
-            assignedEmails: taskData.assignedToEmails,
-            priority: newTask.priority,
-            deadline: deadlineISO
-          }
-        });
-      } catch (err) {
-        console.warn("Audit log notice:", err);
+    try {
+      let success = false;
+      if (taskToEdit) {
+        success = await editCustomTask(taskToEdit.id, taskData);
+      } else {
+        success = await addCustomTask(taskData);
       }
 
-      onClose();
-      setNewTask({
-        title: '',
-        notes: '',
-        location: '',
-        role: currentUser?.appRole || 'gerente',
-        deadlineDate: getTodayStr(),
-        deadlineTime: '18:00',
-        assignedToEmails: [],
-        assignedRoles: [],
-        assignedSede: currentUser?.sede || '',
-        priority: '🟡 AMARILLO'
-      });
+      if (success) {
+        try {
+          await recordAuditEvent({
+            email: currentUser?.email,
+            name: currentUser?.name || currentUser?.displayName || currentUser?.email,
+            role: currentUser?.appRole || currentUser?.role || 'gerente',
+            sede: currentUser?.sede || computedSede || 'Global',
+            action: taskToEdit ? 'TAREA_EDITADA' : 'NUEVA_TAREA_CREADA',
+            details: JSON.stringify({
+              taskId: taskToEdit ? taskToEdit.id : null,
+              taskTitle: newTask.title.trim(),
+              hasNotes: !!trimmedNotes,
+              notesSnippet: trimmedNotes ? trimmedNotes.substring(0, 100) : '',
+              assignedRole: finalRole,
+              assignedEmails: taskData.assignedToEmails,
+              priority: newTask.priority,
+              deadline: deadlineISO
+            })
+          });
+        } catch (err) {
+          console.warn("Audit log notice:", err);
+        }
+
+        onClose();
+        setNewTask({
+          title: '',
+          notes: '',
+          location: '',
+          role: currentUser?.appRole || 'gerente',
+          deadlineDate: getTodayStr(),
+          deadlineTime: '18:00',
+          assignedToEmails: [],
+          assignedRoles: [],
+          assignedSede: currentUser?.sede || '',
+          priority: '🟡 AMARILLO'
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   if (simple) return (

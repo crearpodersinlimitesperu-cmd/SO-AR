@@ -81297,7 +81297,7 @@ export function AuthProvider({ children }) {
             setCurrentUser(null);
           }
         } else {
-          const mockDevUser = localStorage.getItem('cpsl_mock_user');
+          const mockDevUser = import.meta.env.DEV ? localStorage.getItem('cpsl_mock_user') : null;
           if (mockDevUser) {
             try {
               const parsed = JSON.parse(mockDevUser);
@@ -82554,6 +82554,7 @@ export function ChecklistProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [taskLoadError, setTaskLoadError] = useState('');
   const pendingTaskToggles = useRef(new Set());
+  const googleSyncInFlightRef = useRef(false);
   const { showToast, showPrompt } = useUI();
   const { currentUser, reauthenticateGoogle } = useAuth();
   const taskReadIdentity = getTaskReadIdentity(currentUser);
@@ -83621,72 +83622,81 @@ export function ChecklistProvider({ children }) {
   };
 
   const syncTasksToGoogle = async (roleId) => {
-    let token = sessionStorage.getItem('googleAccessToken');
-    if (!token) {
-      // (04/09/2026) Antes esto obligaba a cerrar sesión completa — ahora se
-      // intenta primero un popup corto de reautenticación con Google.
-      token = await reauthenticateGoogle();
-    }
-    if (!token) {
-      showToast("No se pudo conectar con Google. Intenta el popup de nuevo o cierra sesión y vuelve a entrar.", "error");
+    if (googleSyncInFlightRef.current) {
+      showToast("Ya hay una sincronización con Google Tasks en curso.", "info");
       return;
     }
-
-    // Buscamos tareas para este rol que NO estén completadas ni sincronizadas
-    const myUnsyncedTasks = tasks.filter(t => t.role === roleId && !t.completed && !t.googleSynced);
-    if (myUnsyncedTasks.length === 0) {
-      showToast("No tienes tareas pendientes por sincronizar a Google.", "error");
-      return;
-    }
-
-    let successCount = 0;
-    let lastError = null;
-    for (let task of myUnsyncedTasks) {
-      const result = await createGoogleTask({
-        title: task.title,
-        description: task.description || '',
-        dueDate: task.dueDate || undefined
-      }, token);
-
-      if (result.success) {
-        // Actualizamos en Firestore para no volverla a sincronizar
-        try {
-          await writeTaskDoc(task.id, { googleSynced: true });
-          successCount++;
-        } catch (e) {
-          console.error("Error marcando tarea como sincronizada:", e);
-        }
-      } else {
-        lastError = result.error || 'Error desconocido';
-      }
-    }
-
-    // CONTEXTO (28/08/2026): antes este toast SIEMPRE decía "exitosamente" aunque
-    // successCount fuera 0 — el usuario reportó que "no sincroniza en la vida real"
-    // porque el botón parecía funcionar (mostraba éxito) pero nada llegaba a Google
-    // Tasks. Causa real más probable: el accessToken de Google se guarda una sola vez
-    // al iniciar sesión (sessionStorage) y NO se refresca — expira típicamente en ~1h,
-    // así que en sesiones largas createGoogleTask empieza a fallar en silencio.
-    // Ahora el mensaje refleja el resultado real de cada intento.
-    if (successCount === myUnsyncedTasks.length) {
-      showToast(`¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
-    } else if (successCount > 0) {
-      showToast(`Se sincronizaron ${successCount} de ${myUnsyncedTasks.length} tareas. Las demás fallaron${lastError ? `: ${lastError}` : ''}. Si persiste, cierra sesión y vuelve a entrar.`, "error");
-    } else {
-      showToast(`No se pudo sincronizar ninguna tarea a Google Tasks${lastError ? `: ${lastError}` : ''}. Tu permiso de Google probablemente expiró — cierra sesión y vuelve a entrar para renovarlo.`, "error");
-    }
-
-    // Guardar en el historial de sincronización
+    googleSyncInFlightRef.current = true;
     try {
-      await addDoc(collection(db, 'sync_history'), {
-        userEmail: currentUser?.email || 'Desconocido',
-        timestamp: new Date().toISOString(),
-        status: successCount === myUnsyncedTasks.length ? 'Éxito' : (successCount > 0 ? 'Parcial' : 'Error'),
-        details: successCount > 0 ? `Sincronizadas ${successCount} de ${myUnsyncedTasks.length} tareas.` : `Fallaron las ${myUnsyncedTasks.length} tareas intentadas.${lastError ? ` Último error: ${lastError}` : ''}`,
-        roleId: roleId
-      });
-    } catch (e) {
-      console.error("Error guardando historial de sync:", e);
+      let token = sessionStorage.getItem('googleAccessToken');
+      if (!token) {
+        // (04/09/2026) Antes esto obligaba a cerrar sesión completa — ahora se
+        // intenta primero un popup corto de reautenticación con Google.
+        token = await reauthenticateGoogle();
+      }
+      if (!token) {
+        showToast("No se pudo conectar con Google. Intenta el popup de nuevo o cierra sesión y vuelve a entrar.", "error");
+        return;
+      }
+
+      // Buscamos tareas para este rol que NO estén completadas ni sincronizadas
+      const myUnsyncedTasks = tasks.filter(t => t.role === roleId && !t.completed && !t.googleSynced);
+      if (myUnsyncedTasks.length === 0) {
+        showToast("No tienes tareas pendientes por sincronizar a Google.", "error");
+        return;
+      }
+
+      let successCount = 0;
+      let lastError = null;
+      for (let task of myUnsyncedTasks) {
+        const result = await createGoogleTask({
+          title: task.title,
+          description: task.description || '',
+          dueDate: task.dueDate || undefined
+        }, token);
+
+        if (result.success) {
+          // Actualizamos en Firestore para no volverla a sincronizar
+          try {
+            await writeTaskDoc(task.id, { googleSynced: true });
+            successCount++;
+          } catch (e) {
+            console.error("Error marcando tarea como sincronizada:", e);
+          }
+        } else {
+          lastError = result.error || 'Error desconocido';
+        }
+      }
+
+      // CONTEXTO (28/08/2026): antes este toast SIEMPRE decía "exitosamente" aunque
+      // successCount fuera 0 — el usuario reportó que "no sincroniza en la vida real"
+      // porque el botón parecía funcionar (mostraba éxito) pero nada llegaba a Google
+      // Tasks. Causa real más probable: el accessToken de Google se guarda una sola vez
+      // al iniciar sesión (sessionStorage) y NO se refresca — expira típicamente en ~1h,
+      // así que en sesiones largas createGoogleTask empieza a fallar en silencio.
+      // Ahora el mensaje refleja el resultado real de cada intento.
+      if (successCount === myUnsyncedTasks.length) {
+        showToast(`¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
+      } else if (successCount > 0) {
+        showToast(`Se sincronizaron ${successCount} de ${myUnsyncedTasks.length} tareas. Las demás fallaron${lastError ? `: ${lastError}` : ''}. Si persiste, cierra sesión y vuelve a entrar.`, "error");
+      } else {
+        showToast(`No se pudo sincronizar ninguna tarea a Google Tasks${lastError ? `: ${lastError}` : ''}. Tu permiso de Google probablemente expiró — cierra sesión y vuelve a entrar para renovarlo.`, "error");
+      }
+
+      // Guardar en el historial de sincronización
+      try {
+        await addDoc(collection(db, 'sync_history'), {
+          userEmail: currentUser?.email || 'Desconocido',
+          timestamp: new Date().toISOString(),
+          status: successCount === myUnsyncedTasks.length ? 'Éxito' : (successCount > 0 ? 'Parcial' : 'Error'),
+          details: successCount > 0 ? `Sincronizadas ${successCount} de ${myUnsyncedTasks.length} tareas.` : `Fallaron las ${myUnsyncedTasks.length} tareas intentadas.${lastError ? ` Último error: ${lastError}` : ''}`,
+          roleId: roleId
+        });
+      } catch (e) {
+        console.error("Error guardando historial de sync:", e);
+      }
+    } finally {
+      googleSyncInFlightRef.current = false;
     }
   };
 
@@ -85309,10 +85319,14 @@ export const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord
 export const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado', 'director_maestria', 'observador'];
 export const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria'];
 export const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria'];
-export const REPORTES_VISIBLE = (u) => Boolean(
-  u?.isSuperAdmin || u?.isGerente ||
-  ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'].includes(u?.appRole)
-);
+export const REPORTES_VISIBLE = (u) => {
+  const allowed = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'];
+  return Boolean(
+    u?.isSuperAdmin || u?.isGerente ||
+    allowed.includes(u?.appRole) ||
+    (u?.roles || []).some(r => allowed.includes(r))
+  );
+};
 
 export const MODULE_REGISTRY = [
   { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
@@ -85343,23 +85357,23 @@ export const MODULE_REGISTRY = [
   // director_maestria, tratado como Directivos) NO tienen acceso a Flyers C1.
   // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
   { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
-  { id: 'cfo-dashboard', label: 'Dirección Financiera Global', emoji: '🏦', route: '/cfo-dashboard', roles: null, visible: (u) => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'finance-workspace', label: 'Operativa Financiera', emoji: '💸', route: '/finance-workspace', roles: null, visible: (u) => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(u?.appRole) },
-  { id: 'maestria-global', label: 'Comando Global Maestría', emoji: '🎯', route: '/maestria-global', roles: null, visible: (u) => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'qt-hub', label: 'Hub Operativo QT', emoji: '⚡', route: '/qt-hub', roles: null, visible: (u) => ['qt', 'gerente', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'hr-command-center', label: 'HR Command Center', emoji: '🏢', route: '/hr-command-center', roles: null, visible: (u) => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'legal-hub', label: 'Torre de Riesgo (Legal)', emoji: '⚖️', route: '/legal-hub', roles: null, visible: (u) => ['legal', 'juridico', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
+  { id: 'cfo-dashboard', label: 'Dirección Financiera Global', emoji: '🏦', route: '/cfo-dashboard', roles: null, visible: (u) => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(u?.appRole) || (u?.roles || []).some(r => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(r)) || u?.isSuperAdmin },
+  { id: 'finance-workspace', label: 'Operativa Financiera', emoji: '💸', route: '/finance-workspace', roles: null, visible: (u) => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(u?.appRole) || (u?.roles || []).some(r => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(r)) || u?.isSuperAdmin },
+  { id: 'maestria-global', label: 'Comando Global Maestría', emoji: '🎯', route: '/maestria-global', roles: null, visible: (u) => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || (u?.roles || []).some(r => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(r)) || u?.isSuperAdmin },
+  { id: 'qt-hub', label: 'Hub Operativo QT', emoji: '⚡', route: '/qt-hub', roles: null, visible: (u) => ['qt', 'gerente', 'superadmin', 'ceo'].includes(u?.appRole) || (u?.roles || []).some(r => ['qt', 'gerente', 'superadmin', 'ceo'].includes(r)) || u?.isSuperAdmin },
+  { id: 'hr-command-center', label: 'HR Command Center', emoji: '🏢', route: '/hr-command-center', roles: null, visible: (u) => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(u?.appRole) || (u?.roles || []).some(r => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(r)) || u?.isSuperAdmin },
+  { id: 'legal-hub', label: 'Torre de Riesgo (Legal)', emoji: '⚖️', route: '/legal-hub', roles: null, visible: (u) => ['legal', 'juridico', 'superadmin', 'ceo'].includes(u?.appRole) || (u?.roles || []).some(r => ['legal', 'juridico', 'superadmin', 'ceo'].includes(r)) || u?.isSuperAdmin },
   { id: 'andres-command-center', label: 'Comando Maestría (Andrés)', emoji: '🌐', route: '/andres-command-center', roles: null, visible: (u) => ['coord_maestria_global', 'director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || (u?.roles || []).some(r => ['coord_maestria_global', 'director_maestria', 'direccion'].includes(r)) || u?.isSuperAdmin || (u?.email || '').toLowerCase().includes('andres.gomez') },
   { id: 'panel-legal', label: 'Auditoría Legal (Firmas)', emoji: '⚖️', route: '/legal-admin', roles: null, visible: (u) => isDataAdmin(u) },
 ];
 
 export const isModuleVisible = (mod, currentUser) => {
   if (currentUser && isUserInactive(currentUser)) return false;
+  // Super Administrador (cuando NO está en simulación explícita de otro usuario) tiene acceso total a todos los módulos
+  if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
   const allowedRoles = mod.roles || [];
-  // Super Administrador (cuando NO está en simulación explícita de otro usuario) tiene acceso total a todos los módulos
-  if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
   // Respaldo nominal únicamente para el acceso de revisión FI de Andrés Gómez.
   // No convierte su cuenta en superadmin ni altera otros módulos.
   if ((mod.id === 'portafolio' || mod.id === 'resultados-imposibles') && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;
@@ -93206,13 +93220,14 @@ export const getReviewSuggestion = (people, preferences, now) => {
 
 ```js
 import { isGlobalObserver } from '../config/permissions.js';
+import { isUserInactive } from './userNormalizer.js';
 
 // Shared by RoleRoute and local recommendations; recommendations never grant access.
 export function canEnterRoleRoute(user, {
   allowedRoles = [], allowedEmails = [], requireSuperAdmin = false,
   excludeDireccionBypass = false
 } = {}) {
-  if (!user || user.isParticipantOnly) return false;
+  if (!user || user.isParticipantOnly || isUserInactive(user)) return false;
   if (user.isSuperAdmin && !user.isSimulated) return true;
   if (requireSuperAdmin) return Boolean(user.isSuperAdmin);
   if (!allowedRoles.length) return true;
@@ -94470,7 +94485,7 @@ export function getNotificationToast(data = {}) {
 ## Archivo: src/utils/sedeDatosPermissions.js
 
 ```js
-import { canonicalSede } from './sede';
+import { canonicalSede } from './sede.js';
 
 // Decide si un usuario autenticado puede editar la ficha institucional de una sede.
 // Debe coincidir con canEditSedeInstitucional() en firestore.rules.
@@ -134469,17 +134484,23 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       ? assignedRolesList[0] 
       : (assignedRolesList.length > 1 ? 'varios' : finalRole);
 
-    // Inicializar mapa de seguimiento individual en una sola tarjeta:
+    // Inicializar mapa de seguimiento individual preservando avances previos al editar:
+    const existingProgressEntries = Object.entries(taskToEdit?.assigneeProgress || {});
     const assigneeProgress = {};
     assignedEmails.forEach(email => {
-      const u = activeUsersList.find(usr => usr.email?.toLowerCase() === email.toLowerCase());
+      const normalizedEmail = email.toLowerCase().trim();
+      const priorMatch = existingProgressEntries.find(
+        ([k]) => k.toLowerCase().trim() === normalizedEmail
+      )?.[1];
+      const u = activeUsersList.find(usr => usr.email?.toLowerCase() === normalizedEmail);
       assigneeProgress[email] = {
-        name: u?.name || email,
-        role: u?.role || finalRole || 'colaborador',
-        sede: u?.sede || computedSede || 'Global',
-        completed: false,
-        completedAt: null,
-        progress: 0
+        ...(priorMatch || {}),
+        name: u?.name || priorMatch?.name || email,
+        role: u?.role || priorMatch?.role || finalRole || 'colaborador',
+        sede: u?.sede || priorMatch?.sede || computedSede || 'Global',
+        completed: Boolean(priorMatch?.completed),
+        completedAt: priorMatch?.completed ? (priorMatch?.completedAt || null) : null,
+        progress: typeof priorMatch?.progress === 'number' ? priorMatch.progress : (priorMatch?.completed ? 100 : 0)
       };
     });
 
@@ -134544,48 +134565,54 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       taskData.recurrence = recurrence;
     }
 
-    let success = false;
-    if (taskToEdit) {
-      success = await editCustomTask(taskToEdit.id, taskData);
-    } else {
-      success = await addCustomTask(taskData);
-    }
-    
-    if (success) {
-      try {
-        await recordAuditEvent({
-          action: taskToEdit ? 'TAREA_EDITADA' : 'NUEVA_TAREA_CREADA',
-          user: currentUser,
-          details: {
-            taskId: taskToEdit ? taskToEdit.id : null,
-            taskTitle: newTask.title.trim(),
-            hasNotes: !!trimmedNotes,
-            notesSnippet: trimmedNotes ? trimmedNotes.substring(0, 100) : '',
-            assignedRole: finalRole,
-            assignedEmails: taskData.assignedToEmails,
-            priority: newTask.priority,
-            deadline: deadlineISO
-          }
-        });
-      } catch (err) {
-        console.warn("Audit log notice:", err);
+    try {
+      let success = false;
+      if (taskToEdit) {
+        success = await editCustomTask(taskToEdit.id, taskData);
+      } else {
+        success = await addCustomTask(taskData);
       }
 
-      onClose();
-      setNewTask({
-        title: '',
-        notes: '',
-        location: '',
-        role: currentUser?.appRole || 'gerente',
-        deadlineDate: getTodayStr(),
-        deadlineTime: '18:00',
-        assignedToEmails: [],
-        assignedRoles: [],
-        assignedSede: currentUser?.sede || '',
-        priority: '🟡 AMARILLO'
-      });
+      if (success) {
+        try {
+          await recordAuditEvent({
+            email: currentUser?.email,
+            name: currentUser?.name || currentUser?.displayName || currentUser?.email,
+            role: currentUser?.appRole || currentUser?.role || 'gerente',
+            sede: currentUser?.sede || computedSede || 'Global',
+            action: taskToEdit ? 'TAREA_EDITADA' : 'NUEVA_TAREA_CREADA',
+            details: JSON.stringify({
+              taskId: taskToEdit ? taskToEdit.id : null,
+              taskTitle: newTask.title.trim(),
+              hasNotes: !!trimmedNotes,
+              notesSnippet: trimmedNotes ? trimmedNotes.substring(0, 100) : '',
+              assignedRole: finalRole,
+              assignedEmails: taskData.assignedToEmails,
+              priority: newTask.priority,
+              deadline: deadlineISO
+            })
+          });
+        } catch (err) {
+          console.warn("Audit log notice:", err);
+        }
+
+        onClose();
+        setNewTask({
+          title: '',
+          notes: '',
+          location: '',
+          role: currentUser?.appRole || 'gerente',
+          deadlineDate: getTodayStr(),
+          deadlineTime: '18:00',
+          assignedToEmails: [],
+          assignedRoles: [],
+          assignedSede: currentUser?.sede || '',
+          priority: '🟡 AMARILLO'
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   if (simple) return (
@@ -143510,13 +143537,14 @@ export default function MisKPIs() {
       const snapshot = await getDocs(baseQuery);
       if (snapshot && !snapshot.empty) {
         const remoteData = snapshot.docs.map(d => ({
-          id: d.id,
           ...d.data(),
+          clientReportId: d.data().clientReportId || d.data().id || d.id,
+          id: d.id,
           createdAt: d.data().createdAt?.toDate ? d.data().createdAt.toDate().toISOString() : d.data().createdAt
         }));
         
-        const ids = new Set(remoteData.map(r => r.id));
-        local = [...remoteData, ...local.filter(r => !ids.has(r.id))];
+        const ids = new Set(remoteData.flatMap(r => [r.id, r.clientReportId]).filter(Boolean));
+        local = [...remoteData, ...local.filter(r => !ids.has(r.id) && (!r.clientReportId || !ids.has(r.clientReportId)))];
       }
     } catch (error) {
       console.warn("Aviso: usando historial local de KPIs:", error);
@@ -143543,8 +143571,10 @@ export default function MisKPIs() {
       role: roleCategory
     };
 
+    const clientReportId = 'kpi_' + Date.now();
     const newReport = {
-      id: 'kpi_' + Date.now(),
+      id: clientReportId,
+      clientReportId,
       targetUserId: targetPerson.id,
       targetUserName: targetPerson.name || targetPerson.nombre,
       targetUserEmail: targetPerson.email,
@@ -143573,21 +143603,26 @@ export default function MisKPIs() {
       saveLocalReports([newReport, ...local]);
 
       try {
-        await addDoc(collection(db, 'kpi_reports'), {
-          ...newReport,
+        const { id: _localOnlyId, ...firestorePayload } = newReport;
+        const docRef = await addDoc(collection(db, 'kpi_reports'), {
+          ...firestorePayload,
+          clientReportId,
           createdAt: serverTimestamp()
         });
+        if (docRef?.id) {
+          saveLocalReports([{ ...newReport, id: docRef.id, clientReportId }, ...local]);
+        }
       } catch (err) {
         console.warn("Firestore offline o denegado, guardado solo en cache local:", err);
       }
 
       await recordAuditEvent({
-        eventType: 'KPI_REPORT_SUBMITTED',
-        module: 'KPIS',
-        description: `${newReport.submittedBy} envió reporte de KPIs (${roleName}) para ${newReport.targetUserName} (${newReport.targetUserSede}).`,
-        targetUser: newReport.targetUserName,
-        targetEmail: newReport.targetUserEmail,
-        status: 'SUCCESS'
+        email: currentUser?.email || newReport.submittedByEmail,
+        name: newReport.submittedBy,
+        role: currentUser?.appRole || roleCategory,
+        sede: currentUser?.sede || newReport.targetUserSede || 'Global',
+        action: 'KPI_REPORT_SUBMITTED',
+        details: `${newReport.submittedBy} envió reporte de KPIs (${roleName}) para ${newReport.targetUserName} (${newReport.targetUserSede}).`
       });
 
       showToast(`¡Reporte de KPIs para ${newReport.targetUserName} enviado a Gerencia con éxito!`, 'success');
@@ -151722,17 +151757,18 @@ export default function AuditoriaKPIs({ defaultTab }) {
         let kpiList = [];
         if (kpiReportsSnap && !kpiReportsSnap.empty) {
           kpiList = kpiReportsSnap.docs.map(d => ({
-            id: d.id,
             ...d.data(),
+            clientReportId: d.data().clientReportId || d.data().id || d.id,
+            id: d.id,
             createdAt: d.data().createdAt?.toDate ? d.data().createdAt.toDate().toISOString() : d.data().createdAt
           }));
         }
 
         // Combinar con reportes locales de cpsl_kpi_reports_v1
         const localKpi = getLocalReports();
-        const existingKpiIds = new Set(kpiList.map(k => k.id));
+        const existingKpiIds = new Set(kpiList.flatMap(k => [k.id, k.clientReportId]).filter(Boolean));
         localKpi.forEach(lr => {
-          if (lr && lr.id && !existingKpiIds.has(lr.id) && !lr.id.startsWith('kpi_seed_')) {
+          if (lr && lr.id && !existingKpiIds.has(lr.id) && (!lr.clientReportId || !existingKpiIds.has(lr.clientReportId)) && !lr.id.startsWith('kpi_seed_')) {
             kpiList.push(lr);
           }
         });
@@ -177146,7 +177182,7 @@ export default function Login() {
     }
 
     try {
-      await loginWithGoogle();
+      await loginWithGoogle({ participant: isParticipantLogin });
       navigate(from);
     } catch (error) {
       console.error("Error al iniciar sesión", error);

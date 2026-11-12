@@ -11,10 +11,14 @@ export const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord
 export const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado', 'director_maestria', 'observador'];
 export const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria'];
 export const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'superadmin', 'consolidado', 'director_maestria'];
-export const REPORTES_VISIBLE = (u) => Boolean(
-  u?.isSuperAdmin || u?.isGerente ||
-  ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'].includes(u?.appRole)
-);
+export const REPORTES_VISIBLE = (u) => {
+  const allowed = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'];
+  return Boolean(
+    u?.isSuperAdmin || u?.isGerente ||
+    allowed.includes(u?.appRole) ||
+    (u?.roles || []).some(r => allowed.includes(r))
+  );
+};
 
 export const MODULE_REGISTRY = [
   { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
@@ -45,23 +49,23 @@ export const MODULE_REGISTRY = [
   // director_maestria, tratado como Directivos) NO tienen acceso a Flyers C1.
   // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
   { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
-  { id: 'cfo-dashboard', label: 'Dirección Financiera Global', emoji: '🏦', route: '/cfo-dashboard', roles: null, visible: (u) => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'finance-workspace', label: 'Operativa Financiera', emoji: '💸', route: '/finance-workspace', roles: null, visible: (u) => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(u?.appRole) },
-  { id: 'maestria-global', label: 'Comando Global Maestría', emoji: '🎯', route: '/maestria-global', roles: null, visible: (u) => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'qt-hub', label: 'Hub Operativo QT', emoji: '⚡', route: '/qt-hub', roles: null, visible: (u) => ['qt', 'gerente', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'hr-command-center', label: 'HR Command Center', emoji: '🏢', route: '/hr-command-center', roles: null, visible: (u) => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(u?.appRole) || u?.isSuperAdmin },
-  { id: 'legal-hub', label: 'Torre de Riesgo (Legal)', emoji: '⚖️', route: '/legal-hub', roles: null, visible: (u) => ['legal', 'juridico', 'superadmin', 'ceo'].includes(u?.appRole) || u?.isSuperAdmin },
+  { id: 'cfo-dashboard', label: 'Dirección Financiera Global', emoji: '🏦', route: '/cfo-dashboard', roles: null, visible: (u) => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(u?.appRole) || (u?.roles || []).some(r => ['cfo', 'ceo', 'superadmin', 'direccion'].includes(r)) || u?.isSuperAdmin },
+  { id: 'finance-workspace', label: 'Operativa Financiera', emoji: '💸', route: '/finance-workspace', roles: null, visible: (u) => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(u?.appRole) || (u?.roles || []).some(r => ['finanzas', 'facturacion', 'contador', 'superadmin'].includes(r)) || u?.isSuperAdmin },
+  { id: 'maestria-global', label: 'Comando Global Maestría', emoji: '🎯', route: '/maestria-global', roles: null, visible: (u) => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || (u?.roles || []).some(r => ['director_maestria', 'direccion', 'superadmin', 'ceo'].includes(r)) || u?.isSuperAdmin },
+  { id: 'qt-hub', label: 'Hub Operativo QT', emoji: '⚡', route: '/qt-hub', roles: null, visible: (u) => ['qt', 'gerente', 'superadmin', 'ceo'].includes(u?.appRole) || (u?.roles || []).some(r => ['qt', 'gerente', 'superadmin', 'ceo'].includes(r)) || u?.isSuperAdmin },
+  { id: 'hr-command-center', label: 'HR Command Center', emoji: '🏢', route: '/hr-command-center', roles: null, visible: (u) => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(u?.appRole) || (u?.roles || []).some(r => ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion'].includes(r)) || u?.isSuperAdmin },
+  { id: 'legal-hub', label: 'Torre de Riesgo (Legal)', emoji: '⚖️', route: '/legal-hub', roles: null, visible: (u) => ['legal', 'juridico', 'superadmin', 'ceo'].includes(u?.appRole) || (u?.roles || []).some(r => ['legal', 'juridico', 'superadmin', 'ceo'].includes(r)) || u?.isSuperAdmin },
   { id: 'andres-command-center', label: 'Comando Maestría (Andrés)', emoji: '🌐', route: '/andres-command-center', roles: null, visible: (u) => ['coord_maestria_global', 'director_maestria', 'direccion', 'superadmin', 'ceo'].includes(u?.appRole) || (u?.roles || []).some(r => ['coord_maestria_global', 'director_maestria', 'direccion'].includes(r)) || u?.isSuperAdmin || (u?.email || '').toLowerCase().includes('andres.gomez') },
   { id: 'panel-legal', label: 'Auditoría Legal (Firmas)', emoji: '⚖️', route: '/legal-admin', roles: null, visible: (u) => isDataAdmin(u) },
 ];
 
 export const isModuleVisible = (mod, currentUser) => {
   if (currentUser && isUserInactive(currentUser)) return false;
+  // Super Administrador (cuando NO está en simulación explícita de otro usuario) tiene acceso total a todos los módulos
+  if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
   const allowedRoles = mod.roles || [];
-  // Super Administrador (cuando NO está en simulación explícita de otro usuario) tiene acceso total a todos los módulos
-  if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
   // Respaldo nominal únicamente para el acceso de revisión FI de Andrés Gómez.
   // No convierte su cuenta en superadmin ni altera otros módulos.
   if ((mod.id === 'portafolio' || mod.id === 'resultados-imposibles') && PORTFOLIO_FI_REVIEW_EMAILS.includes((currentUser?.email || '').trim().toLowerCase())) return true;

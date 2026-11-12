@@ -163,6 +163,7 @@ export function ChecklistProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [taskLoadError, setTaskLoadError] = useState('');
   const pendingTaskToggles = useRef(new Set());
+  const googleSyncInFlightRef = useRef(false);
   const { showToast, showPrompt } = useUI();
   const { currentUser, reauthenticateGoogle } = useAuth();
   const taskReadIdentity = getTaskReadIdentity(currentUser);
@@ -1230,72 +1231,81 @@ export function ChecklistProvider({ children }) {
   };
 
   const syncTasksToGoogle = async (roleId) => {
-    let token = sessionStorage.getItem('googleAccessToken');
-    if (!token) {
-      // (04/09/2026) Antes esto obligaba a cerrar sesión completa — ahora se
-      // intenta primero un popup corto de reautenticación con Google.
-      token = await reauthenticateGoogle();
-    }
-    if (!token) {
-      showToast("No se pudo conectar con Google. Intenta el popup de nuevo o cierra sesión y vuelve a entrar.", "error");
+    if (googleSyncInFlightRef.current) {
+      showToast("Ya hay una sincronización con Google Tasks en curso.", "info");
       return;
     }
-
-    // Buscamos tareas para este rol que NO estén completadas ni sincronizadas
-    const myUnsyncedTasks = tasks.filter(t => t.role === roleId && !t.completed && !t.googleSynced);
-    if (myUnsyncedTasks.length === 0) {
-      showToast("No tienes tareas pendientes por sincronizar a Google.", "error");
-      return;
-    }
-
-    let successCount = 0;
-    let lastError = null;
-    for (let task of myUnsyncedTasks) {
-      const result = await createGoogleTask({
-        title: task.title,
-        description: task.description || '',
-        dueDate: task.dueDate || undefined
-      }, token);
-
-      if (result.success) {
-        // Actualizamos en Firestore para no volverla a sincronizar
-        try {
-          await writeTaskDoc(task.id, { googleSynced: true });
-          successCount++;
-        } catch (e) {
-          console.error("Error marcando tarea como sincronizada:", e);
-        }
-      } else {
-        lastError = result.error || 'Error desconocido';
-      }
-    }
-
-    // CONTEXTO (28/08/2026): antes este toast SIEMPRE decía "exitosamente" aunque
-    // successCount fuera 0 — el usuario reportó que "no sincroniza en la vida real"
-    // porque el botón parecía funcionar (mostraba éxito) pero nada llegaba a Google
-    // Tasks. Causa real más probable: el accessToken de Google se guarda una sola vez
-    // al iniciar sesión (sessionStorage) y NO se refresca — expira típicamente en ~1h,
-    // así que en sesiones largas createGoogleTask empieza a fallar en silencio.
-    // Ahora el mensaje refleja el resultado real de cada intento.
-    if (successCount === myUnsyncedTasks.length) {
-      showToast(`¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
-    } else if (successCount > 0) {
-      showToast(`Se sincronizaron ${successCount} de ${myUnsyncedTasks.length} tareas. Las demás fallaron${lastError ? `: ${lastError}` : ''}. Si persiste, cierra sesión y vuelve a entrar.`, "error");
-    } else {
-      showToast(`No se pudo sincronizar ninguna tarea a Google Tasks${lastError ? `: ${lastError}` : ''}. Tu permiso de Google probablemente expiró — cierra sesión y vuelve a entrar para renovarlo.`, "error");
-    }
-
-    // Guardar en el historial de sincronización
+    googleSyncInFlightRef.current = true;
     try {
-      await addDoc(collection(db, 'sync_history'), {
-        userEmail: currentUser?.email || 'Desconocido',
-        timestamp: new Date().toISOString(),
-        status: successCount === myUnsyncedTasks.length ? 'Éxito' : (successCount > 0 ? 'Parcial' : 'Error'),
-        details: successCount > 0 ? `Sincronizadas ${successCount} de ${myUnsyncedTasks.length} tareas.` : `Fallaron las ${myUnsyncedTasks.length} tareas intentadas.${lastError ? ` Último error: ${lastError}` : ''}`,
-        roleId: roleId
-      });
-    } catch (e) {
-      console.error("Error guardando historial de sync:", e);
+      let token = sessionStorage.getItem('googleAccessToken');
+      if (!token) {
+        // (04/09/2026) Antes esto obligaba a cerrar sesión completa — ahora se
+        // intenta primero un popup corto de reautenticación con Google.
+        token = await reauthenticateGoogle();
+      }
+      if (!token) {
+        showToast("No se pudo conectar con Google. Intenta el popup de nuevo o cierra sesión y vuelve a entrar.", "error");
+        return;
+      }
+
+      // Buscamos tareas para este rol que NO estén completadas ni sincronizadas
+      const myUnsyncedTasks = tasks.filter(t => t.role === roleId && !t.completed && !t.googleSynced);
+      if (myUnsyncedTasks.length === 0) {
+        showToast("No tienes tareas pendientes por sincronizar a Google.", "error");
+        return;
+      }
+
+      let successCount = 0;
+      let lastError = null;
+      for (let task of myUnsyncedTasks) {
+        const result = await createGoogleTask({
+          title: task.title,
+          description: task.description || '',
+          dueDate: task.dueDate || undefined
+        }, token);
+
+        if (result.success) {
+          // Actualizamos en Firestore para no volverla a sincronizar
+          try {
+            await writeTaskDoc(task.id, { googleSynced: true });
+            successCount++;
+          } catch (e) {
+            console.error("Error marcando tarea como sincronizada:", e);
+          }
+        } else {
+          lastError = result.error || 'Error desconocido';
+        }
+      }
+
+      // CONTEXTO (28/08/2026): antes este toast SIEMPRE decía "exitosamente" aunque
+      // successCount fuera 0 — el usuario reportó que "no sincroniza en la vida real"
+      // porque el botón parecía funcionar (mostraba éxito) pero nada llegaba a Google
+      // Tasks. Causa real más probable: el accessToken de Google se guarda una sola vez
+      // al iniciar sesión (sessionStorage) y NO se refresca — expira típicamente en ~1h,
+      // así que en sesiones largas createGoogleTask empieza a fallar en silencio.
+      // Ahora el mensaje refleja el resultado real de cada intento.
+      if (successCount === myUnsyncedTasks.length) {
+        showToast(`¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
+      } else if (successCount > 0) {
+        showToast(`Se sincronizaron ${successCount} de ${myUnsyncedTasks.length} tareas. Las demás fallaron${lastError ? `: ${lastError}` : ''}. Si persiste, cierra sesión y vuelve a entrar.`, "error");
+      } else {
+        showToast(`No se pudo sincronizar ninguna tarea a Google Tasks${lastError ? `: ${lastError}` : ''}. Tu permiso de Google probablemente expiró — cierra sesión y vuelve a entrar para renovarlo.`, "error");
+      }
+
+      // Guardar en el historial de sincronización
+      try {
+        await addDoc(collection(db, 'sync_history'), {
+          userEmail: currentUser?.email || 'Desconocido',
+          timestamp: new Date().toISOString(),
+          status: successCount === myUnsyncedTasks.length ? 'Éxito' : (successCount > 0 ? 'Parcial' : 'Error'),
+          details: successCount > 0 ? `Sincronizadas ${successCount} de ${myUnsyncedTasks.length} tareas.` : `Fallaron las ${myUnsyncedTasks.length} tareas intentadas.${lastError ? ` Último error: ${lastError}` : ''}`,
+          roleId: roleId
+        });
+      } catch (e) {
+        console.error("Error guardando historial de sync:", e);
+      }
+    } finally {
+      googleSyncInFlightRef.current = false;
     }
   };
 

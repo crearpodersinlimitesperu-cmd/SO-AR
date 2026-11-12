@@ -1,4 +1,4 @@
-import { canonicalSede } from './sede';
+import { canonicalSede } from './sede.js';
 
 // Decide si un usuario autenticado puede editar la ficha institucional de una sede.
 // Debe coincidir con canEditSedeInstitucional() en firestore.rules.

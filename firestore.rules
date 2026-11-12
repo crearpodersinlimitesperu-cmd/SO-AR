@@ -604,7 +604,9 @@ service cloud.firestore {
     match /goals/{goalId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated(); // igual que antes: sin restringir por rol
-      allow update: if isSuperAdmin() || isGerenteODireccion() || isOwner(resource.data);
+      allow update: if isSuperAdmin() || isGerenteODireccion() || isOwner(resource.data) ||
+        (callerHasAnyRole(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'coord_jr', 'coordinador']) &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['assignedCoordinators', 'currentValue', 'progress', 'updatedAt']));
       allow delete: if isSuperAdmin();
     }
 

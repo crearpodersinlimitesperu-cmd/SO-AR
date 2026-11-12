@@ -405,13 +405,14 @@ export default function MisKPIs() {
       const snapshot = await getDocs(baseQuery);
       if (snapshot && !snapshot.empty) {
         const remoteData = snapshot.docs.map(d => ({
-          id: d.id,
           ...d.data(),
+          clientReportId: d.data().clientReportId || d.data().id || d.id,
+          id: d.id,
           createdAt: d.data().createdAt?.toDate ? d.data().createdAt.toDate().toISOString() : d.data().createdAt
         }));
         
-        const ids = new Set(remoteData.map(r => r.id));
-        local = [...remoteData, ...local.filter(r => !ids.has(r.id))];
+        const ids = new Set(remoteData.flatMap(r => [r.id, r.clientReportId]).filter(Boolean));
+        local = [...remoteData, ...local.filter(r => !ids.has(r.id) && (!r.clientReportId || !ids.has(r.clientReportId)))];
       }
     } catch (error) {
       console.warn("Aviso: usando historial local de KPIs:", error);
@@ -438,8 +439,10 @@ export default function MisKPIs() {
       role: roleCategory
     };
 
+    const clientReportId = 'kpi_' + Date.now();
     const newReport = {
-      id: 'kpi_' + Date.now(),
+      id: clientReportId,
+      clientReportId,
       targetUserId: targetPerson.id,
       targetUserName: targetPerson.name || targetPerson.nombre,
       targetUserEmail: targetPerson.email,
@@ -468,21 +471,26 @@ export default function MisKPIs() {
       saveLocalReports([newReport, ...local]);
 
       try {
-        await addDoc(collection(db, 'kpi_reports'), {
-          ...newReport,
+        const { id: _localOnlyId, ...firestorePayload } = newReport;
+        const docRef = await addDoc(collection(db, 'kpi_reports'), {
+          ...firestorePayload,
+          clientReportId,
           createdAt: serverTimestamp()
         });
+        if (docRef?.id) {
+          saveLocalReports([{ ...newReport, id: docRef.id, clientReportId }, ...local]);
+        }
       } catch (err) {
         console.warn("Firestore offline o denegado, guardado solo en cache local:", err);
       }
 
       await recordAuditEvent({
-        eventType: 'KPI_REPORT_SUBMITTED',
-        module: 'KPIS',
-        description: `${newReport.submittedBy} envió reporte de KPIs (${roleName}) para ${newReport.targetUserName} (${newReport.targetUserSede}).`,
-        targetUser: newReport.targetUserName,
-        targetEmail: newReport.targetUserEmail,
-        status: 'SUCCESS'
+        email: currentUser?.email || newReport.submittedByEmail,
+        name: newReport.submittedBy,
+        role: currentUser?.appRole || roleCategory,
+        sede: currentUser?.sede || newReport.targetUserSede || 'Global',
+        action: 'KPI_REPORT_SUBMITTED',
+        details: `${newReport.submittedBy} envió reporte de KPIs (${roleName}) para ${newReport.targetUserName} (${newReport.targetUserSede}).`
       });
 
       showToast(`¡Reporte de KPIs para ${newReport.targetUserName} enviado a Gerencia con éxito!`, 'success');
