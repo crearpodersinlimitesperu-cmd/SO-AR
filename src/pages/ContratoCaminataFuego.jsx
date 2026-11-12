@@ -29,6 +29,7 @@ import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
+import { downloadFirewalkContractPdf } from '../utils/contractPdfGenerator';
 
 export default function ContratoCaminataFuego() {
   const [activeTab, setActiveTab] = useState('todo');
@@ -324,6 +325,8 @@ export default function ContratoCaminataFuego() {
         geoLocation: payload.geoLocation,
         coordinates: payload.coordinates,
         device: payload.dispositivo,
+        aceptoImagen: Boolean(formData.aceptoImagen),
+        firmaTexto: formData.firmaTexto.trim(),
         sha256Hash
       });
 
@@ -1222,7 +1225,8 @@ export default function ContratoCaminataFuego() {
 
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
-                onClick={handlePrint}
+                type="button"
+                onClick={() => downloadFirewalkContractPdf(signedSuccess)}
                 style={{
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   color: '#fff',
@@ -1234,10 +1238,29 @@ export default function ContratoCaminataFuego() {
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
+                  gap: '0.5rem',
+                  boxShadow: '0 6px 16px rgba(16, 185, 129, 0.3)'
+                }}
+              >
+                <Download size={18} /> Descargar Contrato Firmado (PDF)
+              </button>
+              <button
+                onClick={handlePrint}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.16)',
+                  color: '#38bdf8',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '8px',
+                  fontWeight: 800,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: '0.5rem'
                 }}
               >
-                <Printer size={18} /> Imprimir / Guardar Constancia PDF
+                <Printer size={18} /> Imprimir Constancia
               </button>
               <button
                 onClick={() => {

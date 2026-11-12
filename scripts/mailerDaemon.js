@@ -21,6 +21,10 @@ import {
 } from '../src/utils/taskLifecycle.js';
 import { SUPER_ADMIN_EMAILS, OBSERVER_EMAILS } from '../src/config/permissions.js';
 import { buildMaestriaEmailHtml, buildFirewalkEmailHtml } from '../src/utils/maestriaPass.js';
+import {
+  buildMaestriaContractPdfAttachment,
+  buildFirewalkContractPdfAttachment
+} from '../src/utils/contractPdfGenerator.js';
 
 dotenv.config();
 
@@ -976,7 +980,12 @@ async function ensureLimaContractConfirmationEmails() {
         const d = docSnap.data() || {};
         const code = String(d.codigoRegistro || '').trim();
         const st = d.delivery?.state;
-        if (code && (st === 'SUCCESS' || st === 'PENDING' || st === 'SENDING' || !st)) {
+        // Solo considerar cubierto si ya incluye el Contrato Legal Íntegro en PDF (hasFullContractPdf === true)
+        if (
+          code &&
+          d.hasFullContractPdf === true &&
+          (st === 'SUCCESS' || st === 'PENDING' || st === 'SENDING' || !st)
+        ) {
           activeOrSentCodes.add(code);
         }
       });
@@ -1007,7 +1016,7 @@ async function ensureLimaContractConfirmationEmails() {
     }
 
     console.log(
-      `📋 Recuperando correos de contrato Lima pendientes de encolar: Maestría=${missingMj.length}, Fuego=${missingFw.length}`
+      `📋 Recuperando correos de contrato PDF + pase Lima pendientes de encolar: Maestría=${missingMj.length}, Fuego=${missingFw.length}`
     );
 
     let page = null;
@@ -1020,7 +1029,7 @@ async function ensureLimaContractConfirmationEmails() {
       page = await browser.newPage();
       await page.setContent('<html><body></body></html>');
       const passModuleCode = readFileSync('./src/utils/maestriaPass.js', 'utf8')
-        .replace(/^import .*$/gm, '')
+        .replace(/import\s+[\s\S]*?from\s+['"][^'"]+['"];?/g, '')
         .replace(/export async function generateMaestriaPassCanvas/g, 'window.generateMaestriaPassCanvas = async function')
         .replace(/export async function preparePassEmailAttachment/g, 'window.preparePassEmailAttachment = async function')
         .replace(/export function buildMaestriaEmailHtml/g, 'window.buildMaestriaEmailHtml = function')
@@ -1030,11 +1039,11 @@ async function ensureLimaContractConfirmationEmails() {
         .replace(/export async function sendFirewalkConfirmationEmail/g, 'window.sendFirewalkConfirmationEmail = async function');
       await page.evaluate(passModuleCode);
     } catch (pupErr) {
-      console.warn('⚠️ Renderizador Chromium de pase no disponible en este entorno, se enviará contrato completo HTML:', pupErr.message);
+      console.warn('⚠️ Renderizador Chromium de pase no disponible en este entorno, se enviará Contrato PDF + HTML completo:', pupErr.message);
     }
 
     for (const item of missingMj) {
-      const safeId = `mail_contrato_mj_${item.code.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+      const safeId = `mail_contrato_pdf_mj_${item.code.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
       const existingRef = db.collection('mail').doc(safeId);
       const existingDoc = await existingRef.get();
       if (existingDoc.exists && ['SUCCESS', 'PENDING', 'SENDING'].includes(existingDoc.data()?.delivery?.state)) {
@@ -1050,17 +1059,35 @@ async function ensureLimaContractConfirmationEmails() {
       const geoLocation = item.geoLocation || 'Lima, Perú 🇵🇪';
       const coordinates = item.coordinates || '';
       const device = item.device || item.dispositivo || '';
+      const firmaTexto = item.firmaTexto || nombre;
       const sha256Hash = item.sha256Hash || '';
 
-      let attachment = null;
+      const contractPdfAttachment = buildMaestriaContractPdfAttachment({
+        nombre,
+        doc: docLabel,
+        email: item.email,
+        telefono: item.telefono || '',
+        rol,
+        equipo,
+        codigo: item.code,
+        fecha,
+        ip,
+        geoLocation,
+        coordinates,
+        device,
+        firmaTexto,
+        sha256Hash
+      });
+
+      let passAttachment = null;
       if (page) {
         try {
-          attachment = await page.evaluate(
+          passAttachment = await page.evaluate(
             async (params) => {
               const pngUrl = await window.generateMaestriaPassCanvas(params);
               return window.preparePassEmailAttachment(
                 pngUrl,
-                'COMPROMISO_MAESTRIA_LIMA',
+                'PASE_VALIDACION_MAESTRIA_LIMA',
                 params.codigo,
                 'pase_maestria_oficial'
               );
@@ -1080,13 +1107,16 @@ async function ensureLimaContractConfirmationEmails() {
             }
           );
         } catch (renderErr) {
-          console.warn(`⚠️ No se pudo renderizar adjunto JPEG para ${item.code}:`, renderErr.message);
+          console.warn(`⚠️ No se pudo renderizar adjunto JPEG de validación para ${item.code}:`, renderErr.message);
         }
       }
+
+      const attachments = [contractPdfAttachment, ...(passAttachment ? [passAttachment] : [])];
 
       const emailHtml = buildMaestriaEmailHtml({
         nombre,
         doc: docLabel,
+        email: item.email,
         rol,
         equipo,
         codigo: item.code,
@@ -1096,8 +1126,9 @@ async function ensureLimaContractConfirmationEmails() {
         geoLocation,
         coordinates,
         device,
+        firmaTexto,
         sha256Hash,
-        hasInlinePass: Boolean(attachment)
+        hasInlinePass: Boolean(passAttachment)
       });
 
       const nowIso = new Date().toISOString();
@@ -1111,23 +1142,24 @@ async function ensureLimaContractConfirmationEmails() {
           attemptCount: 0
         },
         type: 'contrato_maestria_confirmacion',
+        hasFullContractPdf: true,
         recipientEmail: item.email,
         recipientName: nombre,
         codigoRegistro: item.code,
         ip,
         geoLocation,
-        source: 'backfill_lima_contract_daemon',
+        source: 'backfill_lima_contract_pdf_v2',
         message: {
-          subject: `👑 CONTRATO & REGLAS ACEPTADAS: Maestría del Juego (Sede Lima) — ${item.code}`,
+          subject: `📄 CONTRATO FIRMADO (PDF) + PASE DE VALIDACIÓN: Maestría del Juego (Lima) — ${item.code}`,
           html: emailHtml,
-          attachments: attachment ? [attachment] : []
+          attachments
         }
       });
-      console.log(`📨 Encolado contrato + pase Maestría para ${nombre} (${item.email}) [${item.code}]`);
+      console.log(`📨 Encolado CONTRATO PDF + Pase de Validación Maestría para ${nombre} (${item.email}) [${item.code}]`);
     }
 
     for (const item of missingFw) {
-      const safeId = `mail_contrato_fw_${item.code.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+      const safeId = `mail_contrato_pdf_fw_${item.code.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
       const existingRef = db.collection('mail').doc(safeId);
       const existingDoc = await existingRef.get();
       if (existingDoc.exists && ['SUCCESS', 'PENDING', 'SENDING'].includes(existingDoc.data()?.delivery?.state)) {
@@ -1143,17 +1175,37 @@ async function ensureLimaContractConfirmationEmails() {
       const geoLocation = item.geoLocation || 'Lima, Perú 🇵🇪';
       const coordinates = item.coordinates || '';
       const device = item.dispositivo || item.device || '';
+      const aceptoImagen = Boolean(item.aceptoImagen);
+      const firmaTexto = item.firmaTexto || nombre;
       const sha256Hash = item.sha256Hash || '';
 
-      let attachment = null;
+      const contractPdfAttachment = buildFirewalkContractPdfAttachment({
+        nombre,
+        documento: docLabel,
+        email: item.email,
+        telefono: item.telefono || '',
+        rolActividad,
+        lugar,
+        codigo: item.code,
+        fecha,
+        ip,
+        geoLocation,
+        coordinates,
+        device,
+        aceptoImagen,
+        firmaTexto,
+        sha256Hash
+      });
+
+      let passAttachment = null;
       if (page) {
         try {
-          attachment = await page.evaluate(
+          passAttachment = await page.evaluate(
             async (params) => {
               const pngUrl = await window.generateFirewalkPassCanvas(params);
               return window.preparePassEmailAttachment(
                 pngUrl,
-                'PASE_CAMINATA_FUEGO',
+                'PASE_VALIDACION_CAMINATA_FUEGO',
                 params.codigo,
                 'pase_fuego_oficial'
               );
@@ -1175,9 +1227,13 @@ async function ensureLimaContractConfirmationEmails() {
         }
       }
 
+      const attachments = [contractPdfAttachment, ...(passAttachment ? [passAttachment] : [])];
+
       const emailHtml = buildFirewalkEmailHtml({
         nombre,
         documento: docLabel,
+        email: item.email,
+        telefono: item.telefono || '',
         rolActividad,
         lugar,
         codigo: item.code,
@@ -1186,8 +1242,10 @@ async function ensureLimaContractConfirmationEmails() {
         geoLocation,
         coordinates,
         device,
+        aceptoImagen,
+        firmaTexto,
         sha256Hash,
-        hasInlinePass: Boolean(attachment)
+        hasInlinePass: Boolean(passAttachment)
       });
 
       const nowIso = new Date().toISOString();
@@ -1201,19 +1259,20 @@ async function ensureLimaContractConfirmationEmails() {
           attemptCount: 0
         },
         type: 'contrato_fuego_confirmacion',
+        hasFullContractPdf: true,
         recipientEmail: item.email,
         recipientName: nombre,
         codigoRegistro: item.code,
         ip,
         geoLocation,
-        source: 'backfill_lima_contract_daemon',
+        source: 'backfill_lima_contract_pdf_v2',
         message: {
-          subject: `🔥 PASE OFICIAL DE CONFIRMACIÓN: Caminata sobre Fuego (Sede Lima) — ${item.code}`,
+          subject: `📄 CONTRATO FIRMADO (PDF) + PASE DE VALIDACIÓN: Caminata sobre Fuego (Lima) — ${item.code}`,
           html: emailHtml,
-          attachments: attachment ? [attachment] : []
+          attachments
         }
       });
-      console.log(`📨 Encolado contrato + pase Caminata sobre Fuego para ${nombre} (${item.email}) [${item.code}]`);
+      console.log(`📨 Encolado CONTRATO PDF + Pase de Validación Caminata sobre Fuego para ${nombre} (${item.email}) [${item.code}]`);
     }
   } catch (err) {
     console.warn('⚠️ Error verificando correos de contratos Lima pendientes:', err.message);

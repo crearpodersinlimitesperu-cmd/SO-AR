@@ -16,6 +16,7 @@ import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
+import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
 
 // Generador de Hash SHA-256 usando Web Crypto API
 async function computeSha256(message) {
@@ -431,7 +432,7 @@ export default function ContratoMaestriaLima() {
         await addDoc(collection(db, 'contratos_maestria_lima'), payload);
       }
 
-      // 3. Envío automático inmediato del contrato y pase por correo electrónico
+      // 3. Envío automático inmediato del contrato firmado (PDF) y pase de validación por correo electrónico
       const sent = await sendMaestriaConfirmationEmail({
         db,
         toEmail: inputEmailNorm,
@@ -447,6 +448,7 @@ export default function ContratoMaestriaLima() {
         geoLocation: payload.geoLocation,
         coordinates: payload.coordinates,
         device: payload.device,
+        firmaTexto: payload.firmaTexto,
         sha256Hash
       });
 
@@ -763,9 +765,29 @@ export default function ContratoMaestriaLima() {
                   />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => downloadMaestriaContractPdf(signedSuccess)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.85rem 1.6rem',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      color: '#ffffff',
+                      fontWeight: 900,
+                      fontSize: '0.92rem',
+                      border: 'none',
+                      cursor: 'pointer',
+                      boxShadow: '0 8px 20px rgba(16, 185, 129, 0.35)'
+                    }}
+                  >
+                    <Download size={18} /> Descargar Contrato Firmado (PDF)
+                  </button>
                   <a
                     href={passDataUrl}
-                    download={`PASE_MAESTRIA_LIMA_${signedSuccess.codigo}.png`}
+                    download={`PASE_VALIDACION_MAESTRIA_LIMA_${signedSuccess.codigo}.png`}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -780,7 +802,7 @@ export default function ContratoMaestriaLima() {
                       boxShadow: '0 8px 20px rgba(245, 158, 11, 0.35)'
                     }}
                   >
-                    <Download size={18} /> Descargar Imagen de Validación (PNG)
+                    <Download size={18} /> Descargar Pase de Validación (PNG)
                   </a>
                   <button
                     type="button"

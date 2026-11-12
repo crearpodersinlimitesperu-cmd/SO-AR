@@ -26,6 +26,7 @@ import toast from 'react-hot-toast';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
+import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
 
 export default function MonitorMaestriaLima() {
   const navigate = useNavigate();
@@ -316,12 +317,13 @@ export default function MonitorMaestriaLima() {
         geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
         coordinates: item.coordinates || '',
         device: item.dispositivo || item.device || '',
+        firmaTexto: item.firmaTexto || item.nombre || item.nombreCompleto || '',
         sha256Hash: item.sha256Hash || ''
       });
 
       if (ok) {
         setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'QUEUED' }));
-        toast.success(`Contrato y Pase enviados a ${item.email}`);
+        toast.success(`Contrato firmado (PDF) y Pase de Validación enviados a ${item.email}`);
       } else {
         setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
         toast.error(`No se pudo encolar el correo para ${item.email}. Intenta nuevamente.`);
@@ -872,7 +874,28 @@ export default function MonitorMaestriaLima() {
                         {/* Botones de Acción para Supervisión Lima */}
                         <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
                           <button
+                            onClick={() => downloadMaestriaContractPdf(item)}
+                            title="Descargar el Contrato Legal Íntegro Firmado en PDF A4"
+                            style={{
+                              background: 'rgba(16, 185, 129, 0.18)',
+                              color: '#34d399',
+                              border: '1px solid rgba(16, 185, 129, 0.45)',
+                              borderRadius: '8px',
+                              padding: '0.45rem 0.75rem',
+                              fontSize: '0.74rem',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <Download size={14} /> Contrato PDF
+                          </button>
+
+                          <button
                             onClick={() => handleViewPass(item)}
+                            title="Ver la Credencial Visual de Validación con QR para ingreso a sala"
                             style={{
                               background: 'rgba(245, 158, 11, 0.16)',
                               color: '#fbbf24',
@@ -887,7 +910,7 @@ export default function MonitorMaestriaLima() {
                               gap: '0.35rem'
                             }}
                           >
-                            <Eye size={14} /> Ver Pase Oficial
+                            <Eye size={14} /> Pase de Validación
                           </button>
 
                           <button
@@ -932,12 +955,12 @@ export default function MonitorMaestriaLima() {
                             {sendingEmailId === rowKey
                               ? 'Enviando...'
                               : emailStatus === 'DELIVERED'
-                              ? '✓ Contrato y Pase Entregados'
+                              ? '✓ Contrato PDF + Pase Entregados'
                               : emailStatus === 'QUEUED' || emailStatus === 'SENT'
                               ? '⏳ En despacho al correo...'
                               : emailStatus === 'ERROR'
                               ? '⚠️ Error · Reenviar Contrato + Pase'
-                              : 'Reenviar Contrato + Pase'}
+                              : 'Reenviar Contrato PDF + Pase'}
                           </button>
 
                           <button
@@ -1333,7 +1356,7 @@ export default function MonitorMaestriaLima() {
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <a
                       href={passPreviewUrl}
-                      download={`PASE_MAESTRIA_${selectedRecordForPass.code || 'LIMA'}.png`}
+                      download={`PASE_VALIDACION_MAESTRIA_LIMA_${selectedRecordForPass.code || 'LIMA'}.png`}
                       style={{
                         flex: 1,
                         background: 'linear-gradient(135deg, #f59e0b, #d97706)',
@@ -1349,7 +1372,7 @@ export default function MonitorMaestriaLima() {
                         gap: '0.4rem'
                       }}
                     >
-                      <Download size={15} /> Descargar Imagen PNG
+                      <Download size={15} /> Descargar Pase (PNG)
                     </a>
                     <button
                       onClick={() => setSelectedRecordForPass(null)}
@@ -1435,7 +1458,25 @@ export default function MonitorMaestriaLima() {
                 <div><strong style={{ color: '#94a3b8' }}>Timestamp Oficial:</strong> <span style={{ color: '#34d399' }}>{selectedRecordForAudit.fecha || selectedRecordForAudit.fechaValidacionLocal} ({selectedRecordForAudit.fechaValidacionIso})</span></div>
               </div>
 
-              <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+              <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => downloadMaestriaContractPdf(selectedRecordForAudit)}
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '8px',
+                    padding: '0.6rem 1.2rem',
+                    fontWeight: 800,
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <Download size={15} /> Descargar Contrato Firmado (PDF)
+                </button>
                 <button
                   onClick={() => setSelectedRecordForAudit(null)}
                   style={{

@@ -1,4 +1,11 @@
 import { addDoc, collection } from 'firebase/firestore';
+import {
+  MAESTRIA_CONTRACT_SECTIONS,
+  FIREWALK_CONTRACT_SECTIONS,
+  buildMaestriaContractPdfAttachment,
+  buildFirewalkContractPdfAttachment,
+  renderContractSectionsHtml
+} from './contractPdfGenerator.js';
 
 /**
  * Genera el Pase Oficial Digital (1080x1440) de Compromiso y Reglas de Maestría del Juego
@@ -108,16 +115,16 @@ export async function generateMaestriaPassCanvas({
       ctx.shadowColor = 'rgba(245, 158, 11, 0.7)';
       ctx.shadowBlur = 24;
       ctx.fillStyle = titleGrad;
-      ctx.font = '900 54px Montserrat, -apple-system, sans-serif';
-      ctx.fillText('COMPROMISO OFICIAL', W / 2, 315);
+      ctx.font = '900 52px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('PASE DE VALIDACIÓN', W / 2, 315);
 
       ctx.font = '900 46px Montserrat, -apple-system, sans-serif';
       ctx.fillText('REGLAS DE MAESTRÍA', W / 2, 375);
       ctx.shadowBlur = 0;
 
       ctx.fillStyle = '#38bdf8';
-      ctx.font = '700 17px Montserrat, -apple-system, sans-serif';
-      ctx.fillText('CONTRATO UNIFICADO & ACREDITACIÓN DE SALA ACEPTADOS', W / 2, 418);
+      ctx.font = '700 16px Montserrat, -apple-system, sans-serif';
+      ctx.fillText('CREDENCIAL DE ACREDITACIÓN · CONTRATO ÍNTEGRO EN PDF ADJUNTO', W / 2, 418);
 
       // 6. Tarjeta Central del Titular
       const boxX = 75;
@@ -416,6 +423,7 @@ export async function preparePassEmailAttachment(passDataUrl, filenamePrefix, co
 export function buildMaestriaEmailHtml({
   nombre,
   doc,
+  email = '',
   rol,
   equipo,
   codigo,
@@ -425,17 +433,21 @@ export function buildMaestriaEmailHtml({
   geoLocation = 'Lima, Perú 🇵🇪',
   coordinates = '',
   device = '',
+  firmaTexto = '',
   sha256Hash = '',
   hasInlinePass = false
 }) {
   const safeName = nombre || 'Participante';
+  const safeSignature = firmaTexto || safeName;
+  const fullClausesHtml = renderContractSectionsHtml(MAESTRIA_CONTRACT_SECTIONS, '#d97706');
+
   return `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 680px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
         <!-- Cabecera Institucional -->
         <div style="background: linear-gradient(135deg, #091124 0%, #172554 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #f59e0b;">
           <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 800; margin-bottom: 8px;">CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811</span>
-          <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">👑 MAESTRÍA DEL JUEGO · SEDE LIMA</h1>
-          <p style="margin: 8px 0 0 0; font-size: 15px; color: #93c5fd; font-weight: 600;">Confirmación y Copia de Contrato Unificado Aceptado</p>
+          <h1 style="margin: 0; font-size: 23px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">📄 CONTRATO FIRMADO + PASE DE VALIDACIÓN</h1>
+          <p style="margin: 8px 0 0 0; font-size: 14.5px; color: #93c5fd; font-weight: 600;">Maestría del Juego &amp; Comunidad CREAR · Sede Lima · Código ${codigo}</p>
         </div>
 
         <!-- Contenido Principal -->
@@ -444,13 +456,30 @@ export function buildMaestriaEmailHtml({
             Estimado(a) <strong>${safeName}</strong>,
           </p>
           <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-            Confirmamos la recepción exitosa y el registro probatorio inalterable de tu aceptación del <strong>Dossier Legal, Contrato Unificado y Reglas de Sala y Comunidad</strong> aplicables <strong>durante todo el programa de Maestría del Juego, después de Maestría como integrante de la comunidad CREAR y por todo el tiempo que la legislación peruana lo considere vigente</strong>.
+            Adjunto a este correo encontrarás <strong>ambos documentos oficiales diferenciados</strong> correspondientes a tu suscripción electrónica del <strong>Contrato Unificado y Reglas de Sala y Comunidad</strong> de <strong>Maestría del Juego (Sede Lima)</strong>:
           </p>
+
+          <!-- Guía Clara de los 2 Archivos Adjuntos -->
+          <div style="background-color: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 10px; padding: 16px 18px; margin: 18px 0;">
+            <div style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: #92400e; margin-bottom: 10px;">
+              📎 Documentos Oficiales Incluidos en este Correo:
+            </div>
+            <div style="margin-bottom: 10px; padding: 10px 12px; background-color: #ffffff; border: 1px solid #fde68a; border-radius: 8px; font-size: 13px; color: #1e293b;">
+              <strong style="color: #b45309;">1. 📄 CONTRATO LEGAL ÍNTEGRO FIRMADO (PDF):</strong><br/>
+              <span style="font-family: monospace; font-weight: 700; color: #0f172a;">CONTRATO_FIRMADO_MAESTRIA_LIMA_${codigo}.pdf</span><br/>
+              <span style="color: #475569; font-size: 12.5px;">Documento jurídico A4 completo con todas las cláusulas (Secciones I a VI), las 3 casillas Clickwrap aceptadas, tu firma electrónica vinculante y el sello criptográfico SHA-256.</span>
+            </div>
+            <div style="padding: 10px 12px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; color: #1e293b;">
+              <strong style="color: #0369a1;">2. 🪪 PASE VISUAL DE VALIDACIÓN / ACREDITACIÓN (JPG):</strong><br/>
+              <span style="font-family: monospace; font-weight: 700; color: #0f172a;">PASE_VALIDACION_MAESTRIA_LIMA_${codigo}.jpg</span><br/>
+              <span style="color: #475569; font-size: 12.5px;">Credencial gráfica con código QR únicamente para verificación ágil de ingreso en puerta/sala.</span>
+            </div>
+          </div>
 
           <!-- Tarjeta de Datos Registrados y Auditoría Forense -->
           <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; margin: 20px 0;">
             <h3 style="margin: 0 0 14px 0; color: #0f172a; font-size: 15px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
-              📋 Resumen del Registro Legal y Trazabilidad Forense
+              📋 Datos del Suscriptor, Firma Electrónica y Trazabilidad Forense
             </h3>
             <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
               <tr>
@@ -461,6 +490,10 @@ export function buildMaestriaEmailHtml({
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Documento de Identidad:</td>
                 <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${doc}</td>
               </tr>
+              ${email ? `<tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Correo Registrado:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${email}</td>
+              </tr>` : ''}
               <tr>
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Teléfono / WhatsApp:</td>
                 <td style="padding: 6px 0; color: #0f172a;">${telefono || 'Registrado'}</td>
@@ -472,6 +505,10 @@ export function buildMaestriaEmailHtml({
               <tr>
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Cohorte / Equipo:</td>
                 <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${equipo}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Firma Electrónica Vinculante:</td>
+                <td style="padding: 6px 0; color: #15803d; font-weight: 800; font-style: italic;">"${safeSignature}"</td>
               </tr>
               <tr>
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Código Digital Único:</td>
@@ -500,32 +537,38 @@ export function buildMaestriaEmailHtml({
             </table>
           </div>
 
-          <!-- Bloque de Cláusulas Aceptadas -->
+          <!-- Bloque de Cláusulas Clickwrap Aceptadas -->
           <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-left: 4px solid #16a34a; border-radius: 8px; padding: 16px 18px; margin: 20px 0;">
             <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 14px; font-weight: 700;">
               ✓ Tres (3) Declaraciones Vinculantes Aceptadas (Clickwrap):
             </h4>
             <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #166534; line-height: 1.6;">
               <li><strong>Casilla 1 (DOC 1) · Términos, Reglas de Maestría y Confidencialidad NDA:</strong> Aceptación del diseño educativo de inmersión de alto rendimiento (no equivale a terapia psicológica ni médica), pacto de no divulgación de contenidos y secreto de comunidad vigentes durante toda Maestría del Juego, después de Maestría como integrantes de la comunidad CREAR y por todo el tiempo que la ley peruana lo considere vigente; prohibición de grabaciones, cero alcohol/sustancias, prohibición de préstamos/negocios/apuestas entre miembros, cero nuevas relaciones sentimentales durante el proceso y asistencia mínima &gt;80%.</li>
-              <li><strong>Casilla 2 (DOC 2) · Declaración Jurada de Salud y Exoneración:</strong> Declaración jurada de aptitud física y psicológica, y exoneración amplia e irrevocable de responsabilidad a Creación Cuántica E.I.R.L.</li>
-              <li><strong>Casilla 3 (DOC 3) · Tratamiento de Datos e Imagen:</strong> Autorización de tratamiento de datos personales conforme a la Ley N° 29733 y D.S. N° 016-2024-JUS, y uso de imagen con fines exclusivamente institucionales y pedagógicos.</li>
+              <li><strong>Casilla 2 (DOC 2) · Declaración Jurada de Salud y Exoneración:</strong> Declaración jurada de aptitud física y psicológica, y exoneración amplia e irrevocable de responsabilidad a Creación Cuántica E.I.R.L. (RUC 20612592811).</li>
+              <li><strong>Casilla 3 (DOC 3) · Tratamiento de Datos e Imagen:</strong> Autorización de tratamiento de datos personales conforme a la Ley N° 29733 y D.S. N° 016-2024-JUS, uso de imagen institucional y registro probatorio de IP pública y geolocalización.</li>
             </ul>
           </div>
 
-          <!-- Vigencia Legal y Comunitaria -->
-          <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 14px 16px; margin: 20px 0; font-size: 13px; color: #1e40af; line-height: 1.5;">
-            <strong>📌 Ámbito de Aplicación y Vigencia Legal:</strong><br/>
-            Las reglas de ética, confidencialidad y convivencia aceptadas en este instrumento rigen de manera continua durante todo el programa de <strong>Maestría del Juego</strong>, después de Maestría como personas integrantes de la <strong>Comunidad CREAR</strong> y por todo el tiempo que la legislación de la República del Perú lo considere vigente y exigible.
+          <!-- Texto Íntegro del Contrato Firmado en el Cuerpo del Correo -->
+          <div style="margin: 26px 0;">
+            <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 800; color: #0f172a; border-bottom: 2px solid #f59e0b; padding-bottom: 6px;">
+              📜 Texto Íntegro del Contrato Unificado y Reglas de Sala Firmado (Secciones I a VI)
+            </h3>
+            <p style="font-size: 12.5px; color: #475569; margin: 0 0 14px 0;">
+              A continuación se transcribe íntegramente el texto contractual aceptado (idéntico al archivo <strong>CONTRATO_FIRMADO_MAESTRIA_LIMA_${codigo}.pdf</strong> adjunto):
+            </p>
+            ${fullClausesHtml}
           </div>
 
-          <!-- Pase Oficial Adjunto -->
-          ${hasInlinePass ? `<div style="text-align: center; margin: 28px 0;">
-            <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Tu imagen oficial de validación ha sido generada e incluida como archivo adjunto:</p>
-            <img src="cid:pase_maestria_oficial" alt="Pase Oficial de Maestría" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 2px solid #f59e0b;" />
+          <!-- Pase Oficial de Validación Adjunto -->
+          ${hasInlinePass ? `<div style="text-align: center; margin: 28px 0; padding: 18px; background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px;">
+            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #0369a1; margin-bottom: 4px;">🪪 Credencial Visual de Validación para Sala</div>
+            <p style="font-size: 12.5px; color: #64748b; margin: 0 0 12px 0;">Usa esta imagen para acreditar tu ingreso en puerta (tu contrato legal completo es el PDF adjunto):</p>
+            <img src="cid:pase_maestria_oficial" alt="Pase de Validación de Maestría" style="max-width: 320px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 2px solid #f59e0b;" />
           </div>` : ''}
 
           <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
-            Este es un documento probatorio oficial emitido para Creación Cuántica E.I.R.L. La firma electrónica con registro de IP y geolocalización goza de plena eficacia jurídica conforme a la Ley N° 27269 y el Código Civil Peruano (Arts. 141 y 141-A).
+            Este es un expediente probatorio oficial emitido para Creación Cuántica E.I.R.L. (RUC 20612592811 · Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú). La firma electrónica con registro de IP y geolocalización goza de plena eficacia jurídica conforme a la Ley N° 27269 y el Código Civil Peruano (Arts. 141 y 141-A).
           </p>
         </div>
 
@@ -539,7 +582,9 @@ export function buildMaestriaEmailHtml({
 }
 
 /**
- * Envía el correo formal de confirmación con el contrato firmado, metadatos de IP y Geolocalización, y el pase adjunto
+ * Envía el correo formal con AMBOS adjuntos oficiales:
+ * 1) CONTRATO_FIRMADO_MAESTRIA_LIMA_${codigo}.pdf (Contrato legal íntegro firmado en A4)
+ * 2) PASE_VALIDACION_MAESTRIA_LIMA_${codigo}.jpg (Pase visual de validación con QR)
  */
 export async function sendMaestriaConfirmationEmail({
   db,
@@ -556,6 +601,7 @@ export async function sendMaestriaConfirmationEmail({
   geoLocation = 'Lima, Perú 🇵🇪',
   coordinates = '',
   device = '',
+  firmaTexto = '',
   sha256Hash = ''
 }) {
   const cleanEmail = String(toEmail || '').trim().toLowerCase();
@@ -563,27 +609,50 @@ export async function sendMaestriaConfirmationEmail({
 
   try {
     const safeName = nombre || 'Participante';
-    const attachment = await preparePassEmailAttachment(
+    const safeCode = codigo || 'VERIFIED';
+
+    const contractPdfAttachment = buildMaestriaContractPdfAttachment({
+      nombre: safeName,
+      doc,
+      email: cleanEmail,
+      telefono,
+      rol,
+      equipo,
+      codigo: safeCode,
+      fecha,
+      ip,
+      geoLocation,
+      coordinates,
+      device,
+      firmaTexto: firmaTexto || safeName,
+      sha256Hash
+    });
+
+    const passAttachment = await preparePassEmailAttachment(
       passDataUrl,
-      'COMPROMISO_MAESTRIA_LIMA',
-      codigo || 'VERIFIED',
+      'PASE_VALIDACION_MAESTRIA_LIMA',
+      safeCode,
       'pase_maestria_oficial'
     );
+
+    const attachments = [contractPdfAttachment, ...(passAttachment ? [passAttachment] : [])];
 
     const emailHtml = buildMaestriaEmailHtml({
       nombre: safeName,
       doc,
+      email: cleanEmail,
       rol,
       equipo,
-      codigo,
+      codigo: safeCode,
       fecha,
       telefono,
       ip,
       geoLocation,
       coordinates,
       device,
+      firmaTexto: firmaTexto || safeName,
       sha256Hash,
-      hasInlinePass: Boolean(attachment)
+      hasInlinePass: Boolean(passAttachment)
     });
 
     const nowIso = new Date().toISOString();
@@ -597,15 +666,16 @@ export async function sendMaestriaConfirmationEmail({
         attemptCount: 0
       },
       type: 'contrato_maestria_confirmacion',
+      hasFullContractPdf: true,
       recipientEmail: cleanEmail,
       recipientName: safeName,
-      codigoRegistro: codigo,
+      codigoRegistro: safeCode,
       ip,
       geoLocation,
       message: {
-        subject: `👑 CONTRATO & REGLAS ACEPTADAS: Maestría del Juego (Sede Lima) — ${codigo}`,
+        subject: `📄 CONTRATO FIRMADO (PDF) + PASE DE VALIDACIÓN: Maestría del Juego (Lima) — ${safeCode}`,
         html: emailHtml,
-        attachments: attachment ? [attachment] : []
+        attachments
       }
     };
 
@@ -827,6 +897,8 @@ export async function generateFirewalkPassCanvas({
 export function buildFirewalkEmailHtml({
   nombre,
   documento,
+  email = '',
+  telefono = '',
   rolActividad,
   lugar,
   codigo,
@@ -835,16 +907,21 @@ export function buildFirewalkEmailHtml({
   geoLocation = 'Lima, Perú 🇵🇪',
   coordinates = '',
   device = '',
+  aceptoImagen = false,
+  firmaTexto = '',
   sha256Hash = '',
   hasInlinePass = false
 }) {
   const safeName = nombre || 'Participante';
+  const safeSignature = firmaTexto || safeName;
+  const fullClausesHtml = renderContractSectionsHtml(FIREWALK_CONTRACT_SECTIONS, '#ea580c');
+
   return `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 680px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
         <div style="background: linear-gradient(135deg, #120702 0%, #431407 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #ea580c;">
           <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 800; margin-bottom: 8px;">CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811</span>
-          <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: #ffffff;">🔥 SÍ VOY A CAMINAR SOBRE FUEGO</h1>
-          <p style="margin: 8px 0 0 0; font-size: 14px; color: #fdba74; font-weight: 600;">Confirmación Oficial de Acreditación y Firma Electrónica · Sede Lima</p>
+          <h1 style="margin: 0; font-size: 23px; font-weight: 900; color: #ffffff;">📄 CONTRATO FIRMADO + PASE DE VALIDACIÓN</h1>
+          <p style="margin: 8px 0 0 0; font-size: 14px; color: #fdba74; font-weight: 600;">Caminata sobre Fuego (Firewalk) · Sede Lima · Código ${codigo}</p>
         </div>
 
         <div style="padding: 28px 24px;">
@@ -852,12 +929,29 @@ export function buildFirewalkEmailHtml({
             Hola <strong>${safeName}</strong>,
           </p>
           <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-            Tu asistencia y suscripción del <strong>Instrumento Integrado de Exoneración de Responsabilidad, Declaración de Salud y Tratamiento de Datos</strong> para la dinámica <strong>Caminata sobre Fuego (Firewalk Lima)</strong> ha sido registrada de manera exitosa. Adjuntamos tu <strong>Pase Oficial de Confirmación</strong>.
+            Tu suscripción electrónica del <strong>Instrumento Integrado de Exoneración de Responsabilidad, Declaración de Salud y Tratamiento de Datos</strong> para la dinámica <strong>Caminata sobre Fuego (Sede Lima)</strong> ha sido registrada de manera exitosa. En este correo te entregamos <strong>ambos documentos oficiales diferenciados</strong>:
           </p>
+
+          <!-- Guía Clara de los 2 Archivos Adjuntos -->
+          <div style="background-color: #fff7ed; border: 1.5px solid #ea580c; border-radius: 10px; padding: 16px 18px; margin: 18px 0;">
+            <div style="font-size: 13px; font-weight: 800; text-transform: uppercase; color: #9a3412; margin-bottom: 10px;">
+              📎 Documentos Oficiales Incluidos en este Correo:
+            </div>
+            <div style="margin-bottom: 10px; padding: 10px 12px; background-color: #ffffff; border: 1px solid #fed7aa; border-radius: 8px; font-size: 13px; color: #1e293b;">
+              <strong style="color: #c2410c;">1. 📄 CONTRATO LEGAL ÍNTEGRO FIRMADO (PDF):</strong><br/>
+              <span style="font-family: monospace; font-weight: 700; color: #0f172a;">CONTRATO_FIRMADO_CAMINATA_FUEGO_${codigo}.pdf</span><br/>
+              <span style="color: #475569; font-size: 12.5px;">Documento jurídico A4 completo con todas las cláusulas de exoneración, salud y protección de datos, casillas aceptadas, firma electrónica y huella SHA-256.</span>
+            </div>
+            <div style="padding: 10px 12px; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; color: #1e293b;">
+              <strong style="color: #0369a1;">2. 🪪 PASE VISUAL DE VALIDACIÓN / ACREDITACIÓN (JPG):</strong><br/>
+              <span style="font-family: monospace; font-weight: 700; color: #0f172a;">PASE_VALIDACION_CAMINATA_FUEGO_${codigo}.jpg</span><br/>
+              <span style="color: #475569; font-size: 12.5px;">Credencial visual para validación ágil de acceso al área de Caminata sobre Fuego.</span>
+            </div>
+          </div>
 
           <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px 20px; margin: 20px 0;">
             <h3 style="margin: 0 0 14px 0; color: #0f172a; font-size: 15px; font-weight: 700; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
-              🔥 Resumen de Acreditación y Trazabilidad Forense
+              🔥 Resumen del Suscriptor, Firma Electrónica y Trazabilidad Forense
             </h3>
             <table style="width: 100%; border-collapse: collapse; font-size: 13.5px;">
               <tr>
@@ -868,6 +962,14 @@ export function buildFirewalkEmailHtml({
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Documento:</td>
                 <td style="padding: 6px 0; color: #0f172a; font-weight: 600;">${documento}</td>
               </tr>
+              ${email ? `<tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Correo Registrado:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${email}</td>
+              </tr>` : ''}
+              ${telefono ? `<tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Teléfono / WhatsApp:</td>
+                <td style="padding: 6px 0; color: #0f172a;">${telefono}</td>
+              </tr>` : ''}
               <tr>
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Rol en la Actividad:</td>
                 <td style="padding: 6px 0; color: #ea580c; font-weight: 700;">${rolActividad}</td>
@@ -875,6 +977,14 @@ export function buildFirewalkEmailHtml({
               <tr>
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Locación Confirmada:</td>
                 <td style="padding: 6px 0; color: #0f172a;">${lugar}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Uso de Imagen (Opt-In):</td>
+                <td style="padding: 6px 0; color: ${aceptoImagen ? '#15803d' : '#475569'}; font-weight: 700;">${aceptoImagen ? 'AUTORIZADO (5 años)' : 'NO AUTORIZADO (Distintivo de privacidad en sala)'}</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Firma Electrónica Vinculante:</td>
+                <td style="padding: 6px 0; color: #15803d; font-weight: 800; font-style: italic;">"${safeSignature}"</td>
               </tr>
               <tr>
                 <td style="padding: 6px 0; color: #64748b; font-weight: 600;">Código Digital Único:</td>
@@ -903,13 +1013,25 @@ export function buildFirewalkEmailHtml({
             </table>
           </div>
 
-          ${hasInlinePass ? `<div style="text-align: center; margin: 28px 0;">
-            <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Tu Pase Oficial de Confirmación está incluido en este correo y como imagen adjunta:</p>
-            <img src="cid:pase_fuego_oficial" alt="Pase Oficial Caminata sobre Fuego" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 2px solid #ea580c;" />
+          <!-- Texto Íntegro del Contrato Firmado en el Cuerpo del Correo -->
+          <div style="margin: 26px 0;">
+            <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 800; color: #0f172a; border-bottom: 2px solid #ea580c; padding-bottom: 6px;">
+              📜 Texto Íntegro del Instrumento Legal Firmado (Caminata sobre Fuego)
+            </h3>
+            <p style="font-size: 12.5px; color: #475569; margin: 0 0 14px 0;">
+              A continuación se transcribe íntegramente el contrato suscrito (idéntico al archivo <strong>CONTRATO_FIRMADO_CAMINATA_FUEGO_${codigo}.pdf</strong> adjunto):
+            </p>
+            ${fullClausesHtml}
+          </div>
+
+          ${hasInlinePass ? `<div style="text-align: center; margin: 28px 0; padding: 18px; background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px;">
+            <div style="font-size: 12px; font-weight: 800; text-transform: uppercase; color: #c2410c; margin-bottom: 4px;">🪪 Credencial Visual de Validación para Sala</div>
+            <p style="font-size: 12.5px; color: #64748b; margin: 0 0 12px 0;">Usa esta imagen para acreditar tu ingreso en sala (tu contrato legal completo es el PDF adjunto):</p>
+            <img src="cid:pase_fuego_oficial" alt="Pase de Validación Caminata sobre Fuego" style="max-width: 320px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 2px solid #ea580c;" />
           </div>` : ''}
 
           <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
-            Documento probatorio oficial emitido por Causa OS para Creación Cuántica E.I.R.L. (RUC 20612592811) conforme a la Ley N° 27269 y Ley N° 29733.
+            Expediente probatorio oficial emitido para Creación Cuántica E.I.R.L. (RUC 20612592811 · Cal. Berlín Nro. 965 Int. 302, Miraflores, Lima – Perú) conforme a la Ley N° 27269, Código Civil Peruano y Ley N° 29733.
           </p>
         </div>
       </div>
@@ -917,7 +1039,9 @@ export function buildFirewalkEmailHtml({
 }
 
 /**
- * Envía inmediatamente por correo la imagen de confirmación y copia legal de la Caminata sobre Fuego
+ * Envía inmediatamente por correo AMBOS adjuntos oficiales de la Caminata sobre Fuego:
+ * 1) CONTRATO_FIRMADO_CAMINATA_FUEGO_${codigo}.pdf (Instrumento legal íntegro firmado en A4)
+ * 2) PASE_VALIDACION_CAMINATA_FUEGO_${codigo}.jpg (Pase visual de validación)
  */
 export async function sendFirewalkConfirmationEmail({
   db,
@@ -934,6 +1058,8 @@ export async function sendFirewalkConfirmationEmail({
   geoLocation = 'Lima, Perú 🇵🇪',
   coordinates = '',
   device = '',
+  aceptoImagen = false,
+  firmaTexto = '',
   sha256Hash = ''
 }) {
   const cleanEmail = String(toEmail || '').trim().toLowerCase();
@@ -941,26 +1067,52 @@ export async function sendFirewalkConfirmationEmail({
 
   try {
     const safeName = nombre || 'Participante';
-    const attachment = await preparePassEmailAttachment(
-      passDataUrl,
-      'PASE_CAMINATA_FUEGO',
-      codigo || 'VERIFIED',
-      'pase_fuego_oficial'
-    );
+    const safeCode = codigo || 'VERIFIED';
 
-    const emailHtml = buildFirewalkEmailHtml({
+    const contractPdfAttachment = buildFirewalkContractPdfAttachment({
       nombre: safeName,
       documento,
+      email: cleanEmail,
+      telefono: telefono || '',
       rolActividad,
       lugar,
-      codigo,
+      codigo: safeCode,
       fecha,
       ip,
       geoLocation,
       coordinates,
       device,
+      aceptoImagen: Boolean(aceptoImagen),
+      firmaTexto: firmaTexto || safeName,
+      sha256Hash
+    });
+
+    const passAttachment = await preparePassEmailAttachment(
+      passDataUrl,
+      'PASE_VALIDACION_CAMINATA_FUEGO',
+      safeCode,
+      'pase_fuego_oficial'
+    );
+
+    const attachments = [contractPdfAttachment, ...(passAttachment ? [passAttachment] : [])];
+
+    const emailHtml = buildFirewalkEmailHtml({
+      nombre: safeName,
+      documento,
+      email: cleanEmail,
+      telefono: telefono || '',
+      rolActividad,
+      lugar,
+      codigo: safeCode,
+      fecha,
+      ip,
+      geoLocation,
+      coordinates,
+      device,
+      aceptoImagen: Boolean(aceptoImagen),
+      firmaTexto: firmaTexto || safeName,
       sha256Hash,
-      hasInlinePass: Boolean(attachment)
+      hasInlinePass: Boolean(passAttachment)
     });
 
     const nowIso = new Date().toISOString();
@@ -974,16 +1126,17 @@ export async function sendFirewalkConfirmationEmail({
         attemptCount: 0
       },
       type: 'contrato_fuego_confirmacion',
+      hasFullContractPdf: true,
       recipientEmail: cleanEmail,
       recipientName: safeName,
-      codigoRegistro: codigo,
+      codigoRegistro: safeCode,
       telefono: telefono || '',
       ip,
       geoLocation,
       message: {
-        subject: `🔥 PASE OFICIAL DE CONFIRMACIÓN: Caminata sobre Fuego (Sede Lima) — ${codigo}`,
+        subject: `📄 CONTRATO FIRMADO (PDF) + PASE DE VALIDACIÓN: Caminata sobre Fuego (Lima) — ${safeCode}`,
         html: emailHtml,
-        attachments: attachment ? [attachment] : []
+        attachments
       }
     };
 

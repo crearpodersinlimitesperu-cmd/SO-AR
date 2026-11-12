@@ -16,6 +16,7 @@ import {
   Clock,
   MapPin,
   FileText,
+  Download,
   Sparkles,
   Calendar,
   Mail,
@@ -28,6 +29,7 @@ import toast from 'react-hot-toast';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
+import { downloadFirewalkContractPdf } from '../utils/contractPdfGenerator';
 
 export default function MonitorAcreditacionFuegoLima() {
   const navigate = useNavigate();
@@ -150,12 +152,14 @@ export default function MonitorAcreditacionFuegoLima() {
         geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
         coordinates: item.coordinates || '',
         device: item.dispositivo || item.device || '',
+        aceptoImagen: Boolean(item.aceptoImagen),
+        firmaTexto: item.firmaTexto || item.nombre || item.nombreCompleto || '',
         sha256Hash: item.sha256Hash || ''
       });
 
       if (ok) {
         setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'QUEUED' }));
-        toast.success(`Pase de Caminata sobre Fuego enviado a ${item.email}`);
+        toast.success(`Contrato firmado (PDF) y Pase de Validación enviados a ${item.email}`);
       } else {
         setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
         toast.error(`No se pudo encolar el correo para ${item.email}. Intenta nuevamente.`);
@@ -674,6 +678,37 @@ export default function MonitorAcreditacionFuegoLima() {
                           {nombre}
                         </h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() =>
+                              downloadFirewalkContractPdf({
+                                ...item,
+                                nombre,
+                                documento: `${tipoDoc}: ${numDoc}`,
+                                rolActividad: rol,
+                                lugar,
+                                codigo: code,
+                                fecha
+                              })
+                            }
+                            title="Descargar el Contrato Legal Íntegro Firmado en PDF A4"
+                            style={{
+                              background: 'rgba(16, 185, 129, 0.18)',
+                              color: '#34d399',
+                              border: '1px solid rgba(16, 185, 129, 0.45)',
+                              borderRadius: '8px',
+                              padding: '0.4rem 0.75rem',
+                              fontSize: '0.73rem',
+                              fontWeight: 800,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <Download size={13} />
+                            Contrato PDF
+                          </button>
+
                           {item.email && (() => {
                             const rowKey = item.id || item.code;
                             const cleanRecordEmail = String(item.email || '').trim().toLowerCase();
@@ -721,14 +756,14 @@ export default function MonitorAcreditacionFuegoLima() {
                               >
                                 <Mail size={13} />
                                 {sendingEmailId === rowKey
-                                  ? 'Enviando Pase...'
+                                  ? 'Enviando Contrato + Pase...'
                                   : effectiveStatus === 'DELIVERED'
-                                  ? `✓ Pase Entregado (${item.email})`
+                                  ? `✓ Contrato PDF + Pase Entregados (${item.email})`
                                   : effectiveStatus === 'QUEUED' || effectiveStatus === 'SENT'
                                   ? `⏳ En despacho (${item.email})`
                                   : effectiveStatus === 'ERROR'
                                   ? `⚠️ Error · Reenviar (${item.email})`
-                                  : `Reenviar Pase (${item.email})`}
+                                  : `Reenviar Contrato PDF + Pase (${item.email})`}
                               </button>
                             );
                           })()}
