@@ -77135,6 +77135,7 @@ function App() {
           <Route path="/opt-out" element={<OptOutPage />} />
           <Route path="/caminata-fuego" element={<ContratoCaminataFuego />} />
           <Route path="/contrato-caminata-fuego" element={<ContratoCaminataFuego />} />
+          <Route path="/contrato_caminata_fuego.html" element={<Navigate to="/caminata-fuego" replace />} />
           <Route path="/firewalking" element={<Navigate to="/caminata-fuego" replace />} />
           <Route path="/monitor-fuego-lima" element={
             <RoleRoute allowedRoles={['gerente', 'coordinador_mj', 'coord_maestria', 'coordinacion', 'oficina', 'contabilidad', 'contador', 'finanzas', 'facturacion', 'legal', 'juridico', 'director_maestria', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin']} requireSuperAdmin={false}>
@@ -77143,6 +77144,7 @@ function App() {
           } />
           <Route path="/acreditacion-fuego-lima" element={<Navigate to="/monitor-fuego-lima" replace />} />
           <Route path="/reglas-maestria" element={<ContratoMaestriaLima />} />
+          <Route path="/reglas_maestria_lima.html" element={<Navigate to="/reglas-maestria" replace />} />
           <Route path="/contrato-maestria-lima" element={<ContratoMaestriaLima />} />
           <Route path="/maestria-lima" element={<ContratoMaestriaLima />} />
           <Route path="/monitor-maestria-lima" element={

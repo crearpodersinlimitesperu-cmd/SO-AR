@@ -1,12 +1,13 @@
 # 📦 CAJA NEGRA OPERATIVA & TÉCNICA (SISTEMA CAUSA OS - CPSL)
 
 **Plataforma Central:** Causa OS — Centro de Liderazgo, CRM & Orquestación Autónoma  
-**URL de Producción:** [https://causa-operativo.web.app](https://causa-operativo.web.app) / [https://centro-operativo-cpsl.web.app/home](https://centro-operativo-cpsl.web.app/home)  
+**URL de Producción:** [https://centro-operativo-cpsl.web.app](https://centro-operativo-cpsl.web.app) / [https://causa-operativo.web.app](https://causa-operativo.web.app)  
+**Portales Satélite Sincronizados:** [https://cartas.crearpsl.net](https://cartas.crearpsl.net) (`crearpodersinlimitesperu-cmd/cartas-crear`) · Auditor Financiero Cloud (`crearpodersinlimitesperu-cmd/auditor-financiero-cpsl`)  
 **Repositorio Principal:** [`crearpodersinlimitesperu-cmd/SO-AR`](https://github.com/crearpodersinlimitesperu-cmd/SO-AR) (rama `master`)  
-**Fecha de Certificación y Consolidación:** 12 de Septiembre de 2026  
-**Última Actualización Registrada:** 13 de Septiembre de 2026 (ver Sección 11)  
-**Auditor & Arquitecto:** Antigravity AI (Google DeepMind) / Claude Sonnet 5 (Anthropic) — actualizaciones del 13/09  
-**Directiva Permanente del Sistema:** **"AGREGAR TODO A LA CAJA NEGRA SIEMPRE"** — Cada cambio, regla de negocio, credencial, arquitectura o integración técnica debe quedar inmediatamente registrado y versionado en este documento.
+**Fecha de Certificación y Consolidación Inicial:** 12 de Septiembre de 2026  
+**Última Actualización Registrada:** 12 de Noviembre de 2026 (ver Sección 19)  
+**Auditor & Arquitecto:** Antigravity AI (Google DeepMind) — Consolidación Integral al 12/11/2026  
+**Directiva Permanente del Sistema:** **"AGREGAR TODO A LA CAJA NEGRA SIEMPRE"** — Cada cambio, regla de negocio, arquitectura, gobernanza de permisos o integración técnica debe quedar inmediatamente registrado y versionado en este documento (sin exponer jamás secretos ni credenciales en texto plano).
 
 ---
 
@@ -71,12 +72,15 @@ flowchart TD
   * Si se ingresa la contraseña sin el asterisco, el backend responde HTTP 200 pero mantiene al usuario en `/auth/login` sin mensaje de error (rechazo silencioso).
   * Con el asterisco correcto, el backend responde HTTP 302 y autoriza la sesión redirigiendo inmediatamente a `/sedes`.
 
-### 2.2. Servidor de Correo (Gmail SMTP)
-* **Host / Puerto:** `smtp.gmail.com:465` (SSL/TLS nativo)
-* **Cuenta Remitente:** `servidorcrearpsl@gmail.com`
-* **Contraseña de Aplicación:** Ver GitHub Secrets: `GMAIL_PASS`. No se documenta el valor (ni siquiera parcial) en este archivo — el repositorio `SO-AR` es público (ver Sección 11.4).
-* **Estado SMTP:** Autenticación aprobada con código `235 2.7.0 Accepted`.
-* **Función Operativa:** Envío automatizado de bienvenidas IMO, alertas de inactividad, recordatorios de metas, invitaciones y notificaciones de coordinación.
+### 2.2. Servidor de Correo y Canal Oficial Único (`no-reply@crearpsl.net`)
+* **Host / Puerto:** `smtp.gmail.com:465` (SSL/TLS nativo forzado sobre IPv4 en Linux runners y Cloud Functions)
+* **Canal Remitente Oficial Único (`From` y `Reply-To`):** `"CREAR PODER SIN LÍMITES — Causa OS" <no-reply@crearpsl.net>` (fuente canónica en `src/config/officialMailConfig.js`; reemplaza cualquier remitente legado `@gmail.com`).
+* **Secretos Cifrados (Cero Texto Plano):**
+  * GitHub Actions Secrets: `GMAIL_USER`, `GMAIL_PASS`, `CAUSA_OFFICIAL_FROM_EMAIL`.
+  * Google Cloud Secret Manager (Cloud Functions `deliverContractMail` e `imoDeliverCode`): `IMO_MAIL_USER`, `IMO_MAIL_PASS`, `IMO_VERIFICATION_SECRET`.
+  * No se documenta ningún valor de contraseña en este archivo — el repositorio `SO-AR` es público.
+* **Estado SMTP:** Autenticación aprobada con código `235 2.7.0 Accepted` y verificada cada 3 horas por `scripts/causaOsIntegrityGuardian.mjs`.
+* **Función Operativa:** Despacho en tiempo real (~2 s vía `functions-mailer`) y por cola transaccional (`scripts/mailerDaemon.js`) de contratos firmados PDF A4, pases de acreditación QR, códigos OTP Misión IMO, alertas de tareas, liquidaciones financieras e invitaciones corporativas.
 
 ### 2.3. Firebase: CI Tokens vs. Service Account (Solución Permanente)
 * **Tokens de CI (`1//...`):**
@@ -892,6 +896,84 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
       1. Se restauró en Firestore el objeto `Cuenca__CUE-EQ-24` al 100% en `cc1y2_post1`, `cc1y2_post2` y `cc1y2_post3`.
       2. Se unificó la sede de `evelyn_cedillo` a `"Cuenca"` y se integró [`canonicalSede`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/sede.js) en [`src/context/ChecklistContext.jsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/context/ChecklistContext.jsx).
       3. Se adaptó [`src/utils/taskLifecycle.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/taskLifecycle.js) para que la búsqueda de ciclo sea insensible a mayúsculas/minúsculas y vincule por `cycleId`, blindando el avance contra pérdidas de estado.
+
+---
+
+## 19. 🛡️ Consolidación Integral de Noviembre 2026: Canal Único de Correo, Permisos Globales, Cohortes MJ, Instrumentos Legales, Guardián 3H, Auditor Financiero Cloud y Embudo Nodus Lima (12 de Noviembre de 2026)
+
+### 19.1. Unificación del Canal Oficial Único de Correo (`no-reply@crearpsl.net`) y Despacho Instantáneo
+* **Fuente Canónica:** `src/config/officialMailConfig.js` (`OFFICIAL_CAUSA_MAIL_ADDRESS`, `OFFICIAL_CAUSA_MAIL_FROM`, `resolveOfficialMailFrom`).
+* **Unificación Total de Demonios y Funciones (`a4fb152`, `811b8ff`, `3d34c64`):**
+  1. **Cloud Function Tiempo Real (`functions-mailer/index.mjs` → `deliverContractMail`):** Despacho inmediato (~2 s) al crearse documentos en `mail/{docId}`, comprimiendo adjuntos bajo el límite de `1 MiB` de Firestore y confirmando entrega `SUCCESS` con reintento resiliente post-SMTP.
+  2. **Cola Transaccional (`scripts/mailerDaemon.js` & `scripts/mailQueue.js`):** Forzado explícito de `family: 4` (IPv4 sobre TLS `465`) en runners Linux de GitHub Actions, cerrojo transaccional `claimPendingMail`, presupuestos diarios (`mail_delivery_budgets`) y descarte automático si la tarea/ciclo ya fue cerrado (`skipTaskMailIfClosed`).
+  3. **Cloud Function Misión IMO (`functions-imo/index.mjs` → `imoDeliverCode`) y Agente Institucional (`scripts/nodusMarketingAgencyAgent.mjs`):** Eliminación total de remitentes legados `@gmail.com`.
+  4. **Flujo de Liquidaciones Financieras (`1f65004`):** Corrección del orden de despacho de correos de liquidación para Contabilidad/Tesorería (`Eli Escobar`), validación estricta de esquema contra `firestore.rules` y botón de reenvío manual auditado.
+
+---
+
+### 19.2. Blindaje Global de Permisos de Tareas (`tasks`), Metas (`goals`), KPIs y Sincronización `users/{uid}`
+* **Causa Raíz Detectada (Casos Jonathan La Rosa, Brenda Rodríguez y auditoría sobre los 153 usuarios activos):**
+  1. `firestore.rules` resolvía roles operativos buscando únicamente `users/$(request.auth.uid)` (ausente para ~92% de usuarios cuyo perfil histórico estaba indexado por slug de correo) sin consultar el padrón oficial en reglas.
+  2. `src/utils/taskPrivacy.js` contenía un atajo temprano en `collaborators: []` (arreglo vacío por defecto en todas las tareas de catálogo) que devolvía `false` antes de evaluar `task.role` y `task.assignedRoles`, ocultando tareas al marcar avance o recargar y provocando apariencia de reinicio a `0%`.
+  3. `src/context/ChecklistContext.jsx` enviaba llaves prohibidas en `task_completions` (`progress` / mutaciones fuera de `hasOnly`) que disparaban `FirebaseError: Missing or insufficient permissions`.
+* **Solución Definitiva Desplegada (`f28ea85`, `6b04e6b`, `8d6e80a`, `8841f77`):**
+  - **Reglas de Seguridad (`firestore.rules`):** Incorporación de `officialRosterHasRole()` y soporte de alias multi-correo (`callerMatchesEmailList`), autorizando lectura y guardado de avances (`participant_states`, `evidences`, `notes`, `status`, `task_completions`) a los **8 roles operativos** y **153 perfiles activos** en las 6 sedes, manteniendo aislamiento estricto frente a usuarios externos o inactivos (`isUserInactive`).
+  - **Sincronizador Automático (`scripts/syncUsersUidProfiles.mjs` integrado en `.github/workflows/deploy.yml`):** Garantiza que el 100% de las cuentas en Firebase Auth posean su documento canónico `users/{uid}` alineado con `officialUsers.js`.
+  - **Privacidad y Persistencia (`src/utils/taskPrivacy.js`, `src/pages/ChecklistBoard.jsx`, `src/components/TaskAssignmentModal.jsx`):** `collaborators` solo actúa como lista explícita cuando contiene correos reales (`length > 0`), preservando visibilidad por rol y conservando el progreso individual de cada colaborador al editar tareas compartidas.
+  - **Metas y KPIs (`src/pages/GoalsBoard.jsx`, `src/pages/MisKPIs.jsx`, `src/pages/AuditoriaKPIs.jsx`):** Autorización en `goals/{goalId}` para reporte de coordinadoras asignadas y separación estricta entre `id` real de Firestore y `clientReportId` local.
+
+---
+
+### 19.3. Gobernanza de Observador Total y Centro de Managers (Cohortes Activas MJ de 90 Días)
+* **Perfil de Observador Total y API REST (`c3ee50c`, `585436f`, `3250f6a`):** Habilitación de acceso transversal de lectura (`Observador Total`) y endpoint de consulta en tiempo real del Centro de Managers + panel de sincronización Nodus para auditoría directiva (`Armando Pilacuán`).
+* **Restauración de Cohortes Activas MJ 90 Días y Llaves de Equipo (`812e045`, `4744e97`):** Corrección de agrupación de equipos sin número oficial (`placeholder keys`), filtrado automático de cohortes graduadas en la vista de entrenadores y alineación con el calendario oficial de Maestría del Juego (`Alejandro Díaz`).
+* **Protección de Cohortes antes de Graduación (`EL VIAJE`) y Reactivación Manual (`f28ea85` — Caso Cuenca `#22 JAGUARUNDIS KAWSAY`):**
+  - *Problema:* El equipo `#22 JAGUARUNDIS KAWSAY` de Cuenca (en curso hacia su 4to FDS `EL VIAJE` del `20 al 22 de noviembre de 2026`) aparecía como `Graduado` en la tarjeta porque `CentroManagers.jsx` infería graduación prematura cuando existía un equipo de número superior, mientras el modal leía el campo crudo `Activo` y el worker sobreescribía cambios manuales.
+  - *Solución:* Unificación de la política en `src/pages/CentroManagers.jsx`, `src/services/managerSyncPolicy.js` y `cloudflare-worker/src/index.js`: ningún equipo se marca como `Graduado` antes de concluir `EL VIAJE`, el modal refleja el estado efectivo real y al guardar `Activo` se persiste `estadoReactivadoManual: true` respetado por todas las sincronizaciones automáticas.
+
+---
+
+### 19.4. Ecosistema de Instrumentos Legales Digitales Sede Lima y Portal Satélite `cartas.crearpsl.net`
+* **Contratos Vinculantes y Pases QR (`140b610`, `3588721`, `0b30676`, `3d34c64`, `63cb005`):**
+  1. **Instrumentos Activos:** Reglas Oficiales de Maestría del Juego (`/reglas-maestria-lima` / `/contrato-maestria-lima`, colección `contratos_maestria_lima`) y Exoneración / Declaración de Caminata sobre Fuego (`/caminata-fuego` / `/contrato-caminata-fuego`, colección `contratos_caminata_fuego`), más redirecciones compatibles `.html` en `src/App.jsx`.
+  2. **Trazabilidad Forense y Anti-Duplicados (`src/services/legalSignatureService.js`):** Captura de IP pública, geolocalización con fallback resiliente para no bloquear la firma, sello criptográfico `SHA-256` y bloqueo previo de registros duplicados por documento de identidad o correo.
+  3. **Doble Entregable Separado:** Generación independiente del **Contrato Legal Íntegro Firmado en PDF A4 multipágina** (`src/utils/contractPdfGenerator.js`) y del **Pase Oficial de Acreditación PNG (`1080×1440`)** (`src/utils/maestriaPass.js`), despachados por correo en tiempo real y descargables en pantalla.
+  4. **Monitores Internos Protegidos por RBAC (`e341d9f`, `5b10f21`):** Rutas `/monitor-fuego-lima` y `/monitor-maestria-lima` blindadas dentro de `RoleRoute` e integradas directamente en la barra principal del **Monitor de IMOs** (`/home`) antes del selector de campaña.
+* **Reparación y Auditoría Total de `https://cartas.crearpsl.net` (`crearpodersinlimitesperu-cmd/cartas-crear` commit `15d49ff`):**
+  - Corrección de `ReferenceError: db is not defined` en `contrato_caminata_fuego.html` (y sus mirrors en `/caminata-fuego/`, `/contrato-caminata-fuego/`, `/firewalking/` y `/docs/`), incorporando inicialización Firebase con timeout de `6 s`, fallback directo a Firestore REST API (`contratos_caminata_fuego` + `mail` con `delivery.state = 'PENDING'`) y banner visible de validación con auto-scroll.
+  - Auditoría automatizada sobre las **129 páginas HTML** del portal `cartas-crear`: `0` referencias rotas, `0` instancias de `db` sin inicializar y respuesta `HTTP 200` verificada en producción.
+
+---
+
+### 19.5. Guardián Autónomo 3H (`causaOsIntegrityGuardian.mjs`) y Auditor Financiero Diario Cloud (`auditor-financiero-cpsl`)
+* **Guardián Autónomo 3H (`a4fb152`, `6b04e6b`):**
+  - **Workflow y Agente:** `.github/workflows/causa-os-3h-integrity-guardian.yml` (`cron: '23 */3 * * *'`, grupo de concurrencia aislado) y `scripts/causaOsIntegrityGuardian.mjs`.
+  - **Cobertura:** Valida cada 3 horas las rutas estáticas y 4 suites de tests, HTTP 200 de `https://centro-operativo-cpsl.web.app` y sus bundles `/assets/*`, handshake activo `SMTP TLS 465 IPv4` de `no-reply@crearpsl.net`, higiene cero-secretos en los volcados de auditoría (`DOCUMENTO_REPLICA_PLATAFORMA.md`, `CODIGO_COMPLETO_AUDITORIA.md`, `TRAZABILIDAD_COMUNICACIONES_Y_GUARDIAN_CAUSA_OS.md`), integridad de colecciones críticas en Firestore y salud de los 20 workflows de GitHub Actions, publicando certificado en `nodus_reports/causa_os_3h_guardian_latest`.
+  - **Agente Nodus CRM (`4a455d1`):** Soporte nativo de escritura vía Firebase Admin SDK en `CausaNodusCRMSyncAgent` sin requerir `NODUS_ROBOT_SECRET` cuando opera con Service Account.
+* **Reparación del Auditor Financiero Diario CPSL (`crearpodersinlimitesperu-cmd/auditor-financiero-cpsl` commit `fba3965`):**
+  - *Causa Raíz del Fallo Diario (`Run #43308990178`):* El secreto `SPREADSHEET_ID` apuntaba a una hoja antigua sin permisos (`HttpError 403 PERMISSION_DENIED`) y el workflow utilizaba versiones obsoletas (`checkout@v3`, `setup-python@v4`, Python `3.10`).
+  - *Solución Certificada (`Run #43313965531` — `success`, `0` anotaciones):* Actualización de secretos cifrados hacia el libro oficial `EGRESOS CREAR 2026` (`1WCBnpomyGxgJXgHrp3dWcINbij-QIoaG7MPoBCM-AkU`) y las 3 Unidades Compartidas (`Pagos Semanales`, `Presupuesto Lima`, `Facturas Drive`), actualización del workflow a `ubuntu-24.04` + `actions/checkout@v7` + `actions/setup-python@v7` + Python `3.12`, e implementación en `main.py` + `orthography_guard.py` del cuadre real de las 11 pestañas contables, verificación de acceso a Drive y prueba de buzón bancario SSL IMAP (`imap.gmail.com:993`).
+
+---
+
+### 19.6. Auditoría Forense de Embudo Nodus — Sede Lima (`Equipos 28 al 32`: Diana, Joyce y Linid)
+* **Alcance y Reglas No Negociables Aplicadas (Corte `12/11/2026`, `id_sede=7`):**
+  - Extracción íntegra y sin estimaciones sobre **852 participantes únicos** (deduplicados por documento de identidad) en los equipos cronológicos `E28 → E29 → E30 → E31 → E32` desde la API oficial `https://imo.crearpslglobal.com/api` y la matriz autenticada `/actividadcoordinadores`.
+  - **Reglas de Conteo Institucionales:**
+    1. Separación estricta entre **Nuevos** (`705` asignados: `631` en `Diana` + `Joyce`) y **Rezagados** (`147` registros reprogramados), prohibiendo mezclarlos en un mismo denominador.
+    2. Separación estricta entre **Pagado verificado** y **Promesa / Abono parcial** (`con abono`), contabilizando cierres reales únicamente sobre pagos verificados.
+    3. Cuadre aritmético cerrado (`brecha sin clasificar = 0`) en todos los bloques (`C1 Nuevos`, `Conversión C1 → C2`, `C2 → MJ`, `Control de Aliados` y `Avance de Módulos de Maestría: Creación → Gratitud → El Viaje`).
+  - **Cifras Críticas Consolidadas (`E28–E32`):**
+    - **C1 Nuevos (`Diana` + `Joyce`):** `631` asignados → `558` contactados (`88.4%`) → `452` confirmados (`81.0%`) → **`416` sentados en sala C1 (`92.0%` sobre confirmados)**, más `35` rezagados sentados en columna separada.
+    - **Conversión C1 → C2 (Base Sentados C1 Nuevos):** `127 / 416` pagaron C2 (**`30.5%`**, principal etapa de fuga del embudo con `289` no cerrados: `Diana 31.8%` vs. `Joyce 29.0%`), con **`85.8%` de asistencia a sala C2** (`109 / 127`) y `18` pagados pendientes de sentarse (`14` de ellos en `E32`).
+    - **Conversión C2 → Maestría (`Linid` + Equipo):** `171` inscritos/pagados totales C2, `100` pagados totales MJ (`91` cerrados durante C2 sobre `148` sentados C2 = **`61.5%`**) y `85` sentados acumulados en módulos de Maestría (`Creación → Gratitud / Relación → El Viaje`).
+
+---
+
+### 19.7. Regla Permanente de Higiene y Gobernanza de la Caja Negra (Repositorio Público)
+* Dado que `crearpodersinlimitesperu-cmd/SO-AR` es un repositorio con trazabilidad auditable:
+  1. **Cero Secretos en Texto Plano:** Prohibido escribir contraseñas, App Passwords, tokens (`GH_PAT`, `ROBOT_TOKEN`) o llaves privadas en `CAJA_NEGRA_OPERATIVA.md`, `docs/caja_negra_operativa_cpsl.md`, `DOCUMENTO_REPLICA_PLATAFORMA.md` o `CODIGO_COMPLETO_AUDITORIA.md` (auditado automáticamente cada 3 horas por `checkTraceabilityAndSecretHygiene()` en `scripts/causaOsIntegrityGuardian.mjs`).
+  2. **Sincronización Espejo y Cloud:** Cada cierre arquitectónico relevante debe actualizar simultáneamente `CAJA_NEGRA_OPERATIVA.md`, su espejo `docs/caja_negra_operativa_cpsl.md`, los volcados de réplica (`python3 dump_code.py`) y el registro inmutable en Firestore `/audit_logs` (`action: 'ACTUALIZACION_CAJA_NEGRA'`).
 
 ---
 

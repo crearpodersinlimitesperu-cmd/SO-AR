@@ -1,8 +1,8 @@
 # Trazabilidad Oficial: Canal Único `no-reply@crearpsl.net` y Guardián Autónomo 3H — Causa OS
 
-**Última actualización:** 11 de noviembre de 2026  
-**Plataforma:** Causa OS (`https://centro-operativo-cpsl.web.app`)  
-**Proyecto Firebase:** `centro-operativo-cpsl`
+**Última actualización:** 12 de noviembre de 2026  
+**Plataforma:** Causa OS (`https://centro-operativo-cpsl.web.app`) · Cartas & Contratos (`https://cartas.crearpsl.net`)  
+**Proyecto Firebase:** `centro-operativo-cpsl` · **Caja Negra Maestra:** `CAJA_NEGRA_OPERATIVA.md` (Sección 19)
 
 ---
 
@@ -66,5 +66,5 @@ Para proteger íntegramente a la organización, **ninguna contraseña de aplicac
   3. Unificación del remitente `no-reply@crearpsl.net` y verificación activa `SMTP TLS 465 IPv4` (`transporter.verify()`).
   4. Higiene de trazabilidad y cero exposición de secretos en documentos `.md`.
   5. Estado en vivo en Firestore de `tasks`, `participant_states`, `evidences`, `mail`, `contratos_maestria_lima`, `contratos_caminata_fuego` y `audit_logs`.
-  6. Salud de los bots y sincronizadores autónomos de GitHub Actions (`Nodus 30-Min Sync`, `Mail Dispatch`, `Managers Sync`, `QT Sync`, `Flight Monitor`, `Calendar Guardian`).
-  7. Registro automático del certificado de salud en `nodus_reports/causa_os_3h_guardian_latest` y `platform_diagnostic_reports` para visualización en el Centro de Mando.
+  6. Salud de los bots y sincronizadores autónomos de GitHub Actions (`Nodus 30-Min Sync`, `Mail Dispatch`, `Managers Sync`, `QT Sync`, `Flight Monitor`, `Calendar Guardian`), además del repositorio financiero diario `crearpodersinlimitesperu-cmd/auditor-financiero-cpsl` (`EGRESOS CREAR 2026` + Drive + IMAP).
+  7. Registro automático del certificado de salud en `nodus_reports/causa_os_3h_guardian_latest` y `platform_diagnostic_reports` para visualización en el Centro de Mando, junto con sincronización de perfiles `users/{uid}` (`scripts/syncUsersUidProfiles.mjs`) y resiliencia dual SDK/REST en `https://cartas.crearpsl.net/contrato_caminata_fuego.html`.

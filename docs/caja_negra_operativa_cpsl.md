@@ -1,12 +1,13 @@
 # 📦 CAJA NEGRA OPERATIVA & TÉCNICA (SISTEMA CAUSA OS - CPSL)
 
 **Plataforma Central:** Causa OS — Centro de Liderazgo, CRM & Orquestación Autónoma  
-**URL de Producción:** [https://causa-operativo.web.app](https://causa-operativo.web.app) / [https://centro-operativo-cpsl.web.app/home](https://centro-operativo-cpsl.web.app/home)  
+**URL de Producción:** [https://centro-operativo-cpsl.web.app](https://centro-operativo-cpsl.web.app) / [https://causa-operativo.web.app](https://causa-operativo.web.app)  
+**Portales Satélite Sincronizados:** [https://cartas.crearpsl.net](https://cartas.crearpsl.net) (`crearpodersinlimitesperu-cmd/cartas-crear`) · Auditor Financiero Cloud (`crearpodersinlimitesperu-cmd/auditor-financiero-cpsl`)  
 **Repositorio Principal:** [`crearpodersinlimitesperu-cmd/SO-AR`](https://github.com/crearpodersinlimitesperu-cmd/SO-AR) (rama `master`)  
-**Fecha de Certificación y Consolidación:** 12 de Septiembre de 2026  
-**Última Actualización Registrada:** 13 de Septiembre de 2026 (ver Sección 11)  
-**Auditor & Arquitecto:** Antigravity AI (Google DeepMind) / Claude Sonnet 5 (Anthropic) — actualizaciones del 13/09  
-**Directiva Permanente del Sistema:** **"AGREGAR TODO A LA CAJA NEGRA SIEMPRE"** — Cada cambio, regla de negocio, credencial, arquitectura o integración técnica debe quedar inmediatamente registrado y versionado en este documento.
+**Fecha de Certificación y Consolidación Inicial:** 12 de Septiembre de 2026  
+**Última Actualización Registrada:** 12 de Noviembre de 2026 (ver Sección 19 y `CAJA_NEGRA_OPERATIVA.md` raíz)  
+**Auditor & Arquitecto:** Antigravity AI (Google DeepMind) — Consolidación Integral al 12/11/2026  
+**Directiva Permanente del Sistema:** **"AGREGAR TODO A LA CAJA NEGRA SIEMPRE"** — Cada cambio, regla de negocio, arquitectura, gobernanza de permisos o integración técnica debe quedar inmediatamente registrado y versionado en este documento (sin exponer jamás secretos ni credenciales en texto plano).
 
 ---
 
@@ -71,12 +72,12 @@ flowchart TD
   * Si se ingresa la contraseña sin el asterisco, el backend responde HTTP 200 pero mantiene al usuario en `/auth/login` sin mensaje de error (rechazo silencioso).
   * Con el asterisco correcto, el backend responde HTTP 302 y autoriza la sesión redirigiendo inmediatamente a `/sedes`.
 
-### 2.2. Servidor de Correo (Gmail SMTP)
-* **Host / Puerto:** `smtp.gmail.com:465` (SSL/TLS nativo)
-* **Cuenta Remitente:** `servidorcrearpsl@gmail.com`
-* **Contraseña de Aplicación:** Ver GitHub Secrets: `GMAIL_PASS`. No se documenta el valor (ni siquiera parcial) en este archivo — el repositorio `SO-AR` es público (ver Sección 11.4).
-* **Estado SMTP:** Autenticación aprobada con código `235 2.7.0 Accepted`.
-* **Función Operativa:** Envío automatizado de bienvenidas IMO, alertas de inactividad, recordatorios de metas, invitaciones y notificaciones de coordinación.
+### 2.2. Servidor de Correo y Canal Oficial Único (`no-reply@crearpsl.net`)
+* **Host / Puerto:** `smtp.gmail.com:465` (SSL/TLS nativo forzado sobre IPv4 en Linux runners y Cloud Functions)
+* **Canal Remitente Oficial Único (`From` y `Reply-To`):** `"CREAR PODER SIN LÍMITES — Causa OS" <no-reply@crearpsl.net>` (fuente canónica en `src/config/officialMailConfig.js`).
+* **Secretos Cifrados (Cero Texto Plano):** GitHub Secrets (`GMAIL_USER`, `GMAIL_PASS`, `CAUSA_OFFICIAL_FROM_EMAIL`) y Google Cloud Secret Manager (`IMO_MAIL_USER`, `IMO_MAIL_PASS`, `IMO_VERIFICATION_SECRET`). No se documenta ningún valor de contraseña en este archivo — el repositorio `SO-AR` es público.
+* **Estado SMTP:** Autenticación aprobada con código `235 2.7.0 Accepted` y verificada cada 3 horas por `scripts/causaOsIntegrityGuardian.mjs`.
+* **Función Operativa:** Despacho en tiempo real (~2 s vía `functions-mailer`) y por cola transaccional (`scripts/mailerDaemon.js`) de contratos firmados PDF A4, pases de acreditación QR, códigos OTP Misión IMO, alertas de tareas, liquidaciones financieras e invitaciones corporativas.
 
 ### 2.3. Firebase: CI Tokens vs. Service Account (Solución Permanente)
 * **Tokens de CI (`1//...`):**
@@ -611,6 +612,17 @@ Este registro resume evidencia histórica y no certifica el estado actual de pro
 | Perfiles de prueba | El respaldo revisado no contenía coincidencia exacta del ejemplo “Leyla Ochoa” ni marcas nominales explícitas de prueba en los campos examinados. | Esto no prueba ausencia en Nodus, otras colecciones ni datos actuales. No se acusó ni eliminó a ninguna persona. |
 
 Los conteos del respaldo son históricos y no representan personas activas, ventas, conversión ni integridad total. El exportador de respaldo puede convertir errores de lectura en listas vacías; por ello, un cero exportado no basta para afirmar `[DATO NO REGISTRADO EN NODUS]`. La evidencia detallada solo debe publicarse en el panel después de revisión y saneamiento de datos sensibles.
+
+---
+
+## 19. 🛡️ Consolidación Integral de Noviembre 2026 (Sincronizada con `CAJA_NEGRA_OPERATIVA.md` Sección 19 — 12/11/2026)
+
+1. **Canal Oficial Único de Correo (`no-reply@crearpsl.net`):** Unificado en `src/config/officialMailConfig.js`, `scripts/mailerDaemon.js` (TLS 465 IPv4 + confirmación transaccional), `functions-mailer/index.mjs` (`deliverContractMail` ~2 s), `functions-imo/index.mjs` y flujo de liquidaciones financieras (`1f65004`).
+2. **Permisos Globales de Tareas, Metas y Sincronización `users/{uid}` (`f28ea85`, `6b04e6b`):** Incorporación de `officialRosterHasRole()` y alias multi-correo en `firestore.rules`, corrección de `collaborators: []` en `src/utils/taskPrivacy.js` y sincronización automática `scripts/syncUsersUidProfiles.mjs` en `deploy.yml` para los **153 usuarios activos y 8 roles** en las 6 sedes.
+3. **Centro de Managers y Cohortes Activas MJ (`812e045`, `f28ea85`):** Restauración de cohortes activas de 90 días, bloqueo de auto-graduación antes de concluir el 4to FDS `EL VIAJE` y persistencia de `estadoReactivadoManual: true` en `src/pages/CentroManagers.jsx`, `src/services/managerSyncPolicy.js` y `cloudflare-worker/src/index.js` (incluyendo Cuenca `#22 JAGUARUNDIS KAWSAY`).
+4. **Instrumentos Legales Digitales Sede Lima y `cartas.crearpsl.net` (`0b30676`, `3588721`, `63cb005`, `cartas-crear@15d49ff`):** Separación del Contrato Legal PDF A4 multipágina y Pase QR PNG (`< 1 MiB`), monitores internos protegidos por RBAC (`/monitor-fuego-lima`, `/monitor-maestria-lima`), y reparación de firma resiliente SDK + REST API en `https://cartas.crearpsl.net/contrato_caminata_fuego.html` (`129` páginas HTML auditadas con `0` enlaces rotos).
+5. **Guardián Autónomo 3H y Auditor Financiero Diario Cloud (`a4fb152`, `auditor-financiero-cpsl@fba3965`):** Supervisión integral cada 3 horas (`scripts/causaOsIntegrityGuardian.mjs`) y modernización/reparación del workflow diario `auditor-financiero-cpsl` (`ubuntu-24.04`, Python `3.12`, cuadre de 11 pestañas de `EGRESOS CREAR 2026`, Unidades Compartidas Drive e IMAP SSL).
+6. **Auditoría Forense Embudo Nodus Lima (`Equipos 28–32`):** Consolidación verificada sobre `852` fichas únicas (`id_sede=7`, corte `12/11/2026`), separando estrictamente `Nuevos` vs. `Rezagados` y `Pagado verificado` vs. `Abono`. El desglose técnico completo reside en `CAJA_NEGRA_OPERATIVA.md` (Secciones 14 a 19).
 
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.

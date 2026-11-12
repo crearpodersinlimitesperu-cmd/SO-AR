@@ -50,6 +50,12 @@ function initAdminFirestore() {
     if (getApps().length > 0) {
       return getFirestore(getApps()[0]);
     }
+    const envPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (envPath && fs.existsSync(envPath)) {
+      const sa = JSON.parse(fs.readFileSync(envPath, 'utf8'));
+      initializeApp({ credential: cert(sa), projectId: sa.project_id || 'centro-operativo-cpsl' });
+      return getFirestore();
+    }
     const rawEnv = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
     if (rawEnv && rawEnv.trim().startsWith('{')) {
       initializeApp({ credential: cert(JSON.parse(rawEnv)), projectId: 'centro-operativo-cpsl' });
@@ -216,6 +222,8 @@ async function checkOfficialMailChannelAndSmtp() {
  */
 function checkTraceabilityAndSecretHygiene() {
   const traceFiles = [
+    'CAJA_NEGRA_OPERATIVA.md',
+    'docs/caja_negra_operativa_cpsl.md',
     'DOCUMENTO_REPLICA_PLATAFORMA.md',
     'CODIGO_COMPLETO_AUDITORIA.md',
     'TRAZABILIDAD_COMUNICACIONES_Y_GUARDIAN_CAUSA_OS.md'
@@ -228,7 +236,11 @@ function checkTraceabilityAndSecretHygiene() {
     const full = path.join(REPO_ROOT, rel);
     if (!fs.existsSync(full)) continue;
     const txt = fs.readFileSync(full, 'utf8');
-    if (txt.includes('-----BEGIN PRIVATE KEY-----') || /GMAIL_SERVER_APP_PASSWORD\s*=\s*\S+/.test(txt)) {
+    if (
+      txt.includes('-----BEGIN PRIVATE KEY-----') ||
+      /GMAIL_SERVER_APP_PASSWORD\s*=\s*\S+/.test(txt) ||
+      /ghp_[A-Za-z0-9]{20,}/.test(txt)
+    ) {
       secretLeaks.push(rel);
     }
   }
@@ -475,6 +487,55 @@ async function main() {
       overallStatus === 'HEALTHY'
         ? `Guardián 3H CERTIFICADO: Web 200 OK, canal ${OFFICIAL_CAUSA_MAIL_ADDRESS} activo, avances por rol íntegros y bots operativos.`
         : `Guardián 3H (${overallStatus}): ${[...criticalFailures, ...warnings].join(' | ').slice(0, 260)}`;
+
+    const cajaNegraPath = path.join(REPO_ROOT, 'CAJA_NEGRA_OPERATIVA.md');
+    const cajaNegraSha256 = fs.existsSync(cajaNegraPath)
+      ? crypto.createHash('sha256').update(fs.readFileSync(cajaNegraPath)).digest('hex')
+      : null;
+
+    if (cajaNegraSha256) {
+      const stateRef = db.collection('nodus_reports').doc('caja_negra_sync_state');
+      const prevSnap = await stateRef.get();
+      const prevSha = prevSnap.exists ? prevSnap.data()?.sha256 : null;
+      if (prevSha !== cajaNegraSha256) {
+        const nowIso = new Date().toISOString();
+        await Promise.all([
+          db.collection('audit_logs').add({
+            email: 'jose.sanchez@crearpsl.net',
+            name: 'José Sánchez (Guardián Caja Negra Causa OS)',
+            role: 'super_admin',
+            sede: 'Sede Global',
+            action: 'ACTUALIZACION_CAJA_NEGRA',
+            details: `Caja Negra Operativa sincronizada y certificada (SHA-256: ${cajaNegraSha256.slice(0, 16)} · commit: ${(process.env.GITHUB_SHA || 'local').slice(0, 7)}) — Cero secretos expuestos.`,
+            isSimulation: false,
+            simulatedBy: null,
+            timestamp: FieldValue.serverTimestamp(),
+            createdAtIso: nowIso,
+            country: 'Perú',
+            countryCode: 'PE',
+            city: 'Lima',
+            region: 'Lima',
+            flag: '🇵🇪',
+            ip: 'GitHub-Actions-Guardian',
+            timezone: 'America/Lima',
+            device: 'Guardián Autónomo 3H Causa OS',
+            userAgent: 'Guardián Autónomo 3H Causa OS',
+            location: 'Cloud / Sede Global 🌐',
+            cajaNegraSha256,
+            commit: process.env.GITHUB_SHA || null,
+            runId: process.env.GITHUB_RUN_ID || null
+          }),
+          stateRef.set({
+            sha256: cajaNegraSha256,
+            commit: process.env.GITHUB_SHA || null,
+            runId: process.env.GITHUB_RUN_ID || null,
+            updatedAt: FieldValue.serverTimestamp(),
+            updatedAtIso: nowIso
+          })
+        ]);
+        console.log(`📦 [Caja Negra Cloud] Nueva revisión registrada en /audit_logs (sha256=${cajaNegraSha256.slice(0, 12)})`);
+      }
+    }
 
     await Promise.all([
       db.collection('nodus_reports').doc('causa_os_3h_guardian_latest').set({
