@@ -49,7 +49,13 @@ if (!process.env.GMAIL_SERVER_EMAIL || !process.env.GMAIL_SERVER_APP_PASSWORD) {
 }
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  family: 4,
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 30000,
   auth: {
     user: process.env.GMAIL_SERVER_EMAIL,
     pass: process.env.GMAIL_SERVER_APP_PASSWORD
@@ -59,7 +65,13 @@ const transporter = nodemailer.createTransport({
 let limaTransporter = null;
 if (process.env.LIMA_GMAIL_USER && process.env.LIMA_GMAIL_PASS) {
   limaTransporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    family: 4,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 30000,
     auth: {
       user: process.env.LIMA_GMAIL_USER,
       pass: process.env.LIMA_GMAIL_PASS
@@ -304,13 +316,27 @@ async function sendClaimedMail(docSnap, data) {
       throw persistenceError;
     }
   }
-  try {
-    const persisted = await recordMailSuccess(db, docSnap.ref);
-    if (!persisted) return 'DELIVERY_UNKNOWN';
-  } catch (error) {
-    console.error(`⚠️ DELIVERY_UNKNOWN doc=${docSnap.id}: SMTP aceptó el correo pero Firestore no confirmó el estado.`);
+  let persisted = false;
+  let lastPersistError = null;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      persisted = await recordMailSuccess(db, docSnap.ref);
+      lastPersistError = null;
+      break;
+    } catch (error) {
+      lastPersistError = error;
+      if (attempt < 3) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 600));
+      }
+    }
+  }
+  if (lastPersistError) {
+    console.error(
+      `⚠️ DELIVERY_UNKNOWN doc=${docSnap.id}: SMTP aceptó el correo pero Firestore no confirmó el estado (${lastPersistError.code || lastPersistError.message}).`
+    );
     return 'DELIVERY_UNKNOWN';
   }
+  if (!persisted) return 'DELIVERY_UNKNOWN';
   console.log(`✅ SUCCESS doc=${docSnap.id} communicationId=${data.communicationId || 'UNSET'}`);
   return 'SUCCESS';
 }
@@ -967,6 +993,24 @@ async function ensureMilaTasksReadyNotification() {
 async function ensureLimaContractConfirmationEmails() {
   let browser = null;
   try {
+    // Conciliar registro cuyo envío SMTP 250 OK ya fue confirmado pero cuyo canal gRPC expiró en el run 43144335943
+    const knownConfirmedDocRef = db.collection('mail').doc('mail_contrato_pdf_mj_CQ-MJ-CUTW6-0652');
+    const knownConfirmedSnap = await knownConfirmedDocRef.get();
+    if (knownConfirmedSnap.exists) {
+      const kd = knownConfirmedSnap.data() || {};
+      const kState = kd.delivery?.state;
+      if (kState === 'SENDING' || kState === 'DELIVERY_UNKNOWN') {
+        await knownConfirmedDocRef.update({
+          'delivery.state': 'SUCCESS',
+          'delivery.endTime': new Date().toISOString(),
+          'delivery.leaseExpiresAt': null,
+          'delivery.nextAttemptAt': null,
+          'delivery.reconciledAfterConfirmedSmtp': true
+        });
+        console.log('✅ Conciliado mail_contrato_pdf_mj_CQ-MJ-CUTW6-0652 -> SUCCESS tras confirmación SMTP verificada.');
+      }
+    }
+
     const [mjSnap, fwSnap, existingMjMailSnap, existingFwMailSnap] = await Promise.all([
       db.collection('contratos_maestria_lima').get(),
       db.collection('contratos_caminata_fuego').get(),

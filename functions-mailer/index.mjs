@@ -99,7 +99,13 @@ export const deliverContractMail = onDocumentCreated(
     try {
       const senderEmail = mailUser.value();
       const transport = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        family: 4,
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000,
         auth: {
           user: senderEmail,
           pass: mailPass.value()
