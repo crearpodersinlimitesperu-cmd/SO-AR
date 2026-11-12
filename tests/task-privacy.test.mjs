@@ -95,6 +95,58 @@ test('consolidated and simulated users remain restricted to their own profile ro
   }, simulatedCoordinator), false);
 });
 
+test('catalog tasks with empty personal fields or collaborators remain visible to role holders and invited collaborators', () => {
+  const jonathan = {
+    uid: 'jonathan-1',
+    email: 'jonathan.larosa@crearpsl.net',
+    role: 'coord_maestria',
+    roles: ['coord_maestria']
+  };
+  const brenda = {
+    uid: 'brenda-1',
+    email: 'brenda.rodriguez@crearpsl.net',
+    role: 'coordinador_c1c2',
+    roles: ['coordinador_c1c2']
+  };
+  const peerCollab = {
+    uid: 'peer-1',
+    email: 'peer.staff@crearpsl.net',
+    role: 'staff',
+    roles: ['staff']
+  };
+
+  const catalogMjTaskWithEmptyFields = {
+    id: 'cmjv2_f4_1',
+    role: 'coord_maestria',
+    isCustom: false,
+    catalogTask: true,
+    assignedToEmail: '',
+    assignedToEmails: [],
+    collaborators: ['peer.staff@crearpsl.net']
+  };
+  const catalogC1TaskWithEmptyCollabs = {
+    id: 'c1v2_th_1',
+    role: 'coord_c1',
+    isCustom: false,
+    catalogTask: true,
+    collaborators: []
+  };
+
+  assert.equal(isTaskVisibleForUser(catalogMjTaskWithEmptyFields, jonathan), true);
+  assert.equal(isTaskVisibleForUser(catalogMjTaskWithEmptyFields, peerCollab), true);
+  assert.equal(isTaskVisibleForUser(catalogMjTaskWithEmptyFields, brenda), false);
+  assert.equal(isTaskVisibleForUser(catalogC1TaskWithEmptyCollabs, brenda), true);
+});
+
+test('firestore.rules includes official active roster fallback for coordinators and trainers without profile role fields', () => {
+  const rules = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8');
+  assert.match(rules, /jonathan\[\.\]larosa@crearpsl\[\.\]net/);
+  assert.match(rules, /brenda\[\.\]rodriguez@crearpsl\[\.\]net/);
+  assert.match(rules, /kerly\[\.\]carrillo@crearpsl\[\.\]net/);
+  assert.match(rules, /gina\[\.\]cardenas@crearpsl\[\.\]net/);
+  assert.match(rules, /hasManualDeadline/);
+});
+
 test('every static catalog task is included in the Firestore role allowlist', () => {
   const rules = readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8');
   const roleBlocks = new Map();

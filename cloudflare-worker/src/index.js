@@ -1039,10 +1039,19 @@ async function handleCentroManagersApi(request, env, origin, url) {
       const estadoRaw = String(data.estado || 'Activo').trim();
       const estadoRawUpper = estadoRaw.toUpperCase();
       const esCohorteGraduada = isGraduatedCohortWorker(sede, numEquipo);
+      const reactivadoManual =
+        Boolean(data.estadoReactivadoManual) &&
+        !estadoRawUpper.includes('GRADUA') &&
+        !estadoRawUpper.includes('DESERT') &&
+        !estadoRawUpper.includes('ARCHIV') &&
+        !Boolean(data.cierreLiquidacionActivo) &&
+        !Boolean(data.isGraduado);
       const estadoEfectivo = estadoRawUpper.includes('DESERT')
         ? 'Desertor'
         : estadoRawUpper.includes('ARCHIV')
         ? 'Archivado'
+        : reactivadoManual
+        ? 'Activo'
         : estadoRawUpper.includes('GRADUA') ||
           Boolean(data.cierreLiquidacionActivo) ||
           Boolean(data.isGraduado) ||

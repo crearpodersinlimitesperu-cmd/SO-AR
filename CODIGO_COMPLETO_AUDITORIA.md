@@ -35098,10 +35098,19 @@ async function handleCentroManagersApi(request, env, origin, url) {
       const estadoRaw = String(data.estado || 'Activo').trim();
       const estadoRawUpper = estadoRaw.toUpperCase();
       const esCohorteGraduada = isGraduatedCohortWorker(sede, numEquipo);
+      const reactivadoManual =
+        Boolean(data.estadoReactivadoManual) &&
+        !estadoRawUpper.includes('GRADUA') &&
+        !estadoRawUpper.includes('DESERT') &&
+        !estadoRawUpper.includes('ARCHIV') &&
+        !Boolean(data.cierreLiquidacionActivo) &&
+        !Boolean(data.isGraduado);
       const estadoEfectivo = estadoRawUpper.includes('DESERT')
         ? 'Desertor'
         : estadoRawUpper.includes('ARCHIV')
         ? 'Archivado'
+        : reactivadoManual
+        ? 'Activo'
         : estadoRawUpper.includes('GRADUA') ||
           Boolean(data.cierreLiquidacionActivo) ||
           Boolean(data.isGraduado) ||
@@ -82804,7 +82813,7 @@ export function ChecklistProvider({ children }) {
           const initialData = {
             ...(baseTask || {}),
             id: taskId,
-            ...(baseTask ? { catalogTask: true } : {}),
+            ...(baseTask ? { catalogTask: true, isCustom: false } : {}),
             completed: false,
             status: 'Pendiente',
             priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
@@ -88169,14 +88178,38 @@ const normalizeTaskRole = (value) => String(value || '').trim().toLowerCase();
 const catalogRoleById = new Map(checklistData.map(task => [task.id, normalizeTaskRole(task.role)]));
 const catalogRoles = new Set(catalogRoleById.values());
 
+const MULTI_EMAIL_GROUPS = [
+  ['milacampuzano21@gmail.com', 'emily.campuzano@crearpsl.net', 'emily.campuzano@crearpsl.com', 'emily.campuzano@crearpls.com'],
+  ['ricardogavilanez1021@gmail.com', 'ricardo.gavilanez@crearpsl.net', 'ricardo.gavilanez@crearpsl.com', 'ricardo.gavilanez@crearpls.com'],
+  ['brunische66@gmail.com', 'carlos.brunis@crearpsl.net', 'carlos.brunis@crearpsl.com', 'leandro.brunis@crearpsl.net', 'leandro.brunis@crearpsl.com', 'leandro.brunis@crearpls.com'],
+  ['gomeznueve@gmail.com', 'andres.gomez@crearpsl.net', 'andres.gomez@crearpsl.com'],
+  ['jorgeramirezmorejon@gmail.com', 'jorge.ramirez@crearpsl.net', 'jorge.ramirez@crearpsl.com'],
+  ['cardenasgina29@gmail.com', 'cardenaslopezgina@gmail.com', 'gina.cardenas@crearpsl.net', 'gina.cardenas@crearpsl.com'],
+  ['santiago.proao527@gmail.com', 'sso@crearpsl.net', 'sso@crearpsl.com'],
+  ['maboadar@gmail.com', 'direccion@bmbgbrokers.com']
+];
+
 const emailAliases = (email) => {
   const normalized = normalizeEmail(email);
   if (!normalized) return [];
+  const matchedGroup = MULTI_EMAIL_GROUPS.find(group => group.includes(normalized)) || [];
   return [...new Set([
     normalized,
+    normalized.replace('@crearpls.com', '@crearpsl.net'),
     normalized.replace('@crearpsl.com', '@crearpsl.net'),
-    normalized.replace('@crearpsl.net', '@crearpsl.com')
+    normalized.replace('@crearpsl.net', '@crearpsl.com'),
+    ...matchedGroup
   ])];
+};
+
+const normalizeChecklistRoleAlias = (value) => {
+  const r = normalizeTaskRole(value);
+  if (!r) return '';
+  if (r === 'coordinador_c1c2' || r === 'coordinador_c1' || r === 'coord_c1_c2' || r === 'coord_jr') return 'coord_c1';
+  if (r === 'coordinador_mj' || r === 'coordinador_maestria') return 'coord_maestria';
+  if (r === 'quantum_team' || r === 'coord_qt' || r === 'coordinador_qt') return 'qt';
+  if (r === 'coach') return 'entrenador';
+  return r;
 };
 
 export const getChecklistRolesForUser = (user) => {
@@ -88184,10 +88217,12 @@ export const getChecklistRolesForUser = (user) => {
     ...(Array.isArray(user?.roles) ? user.roles : []),
     user?.appRole,
     user?.role
-  ].map(normalizeTaskRole).filter(Boolean);
+  ].map(normalizeChecklistRoleAlias).filter(Boolean);
 
   return [...new Set(roles)].filter(role => catalogRoles.has(role));
 };
+
+const hasNonEmptyString = (value) => typeof value === 'string' && value.trim().length > 0;
 
 const hasEmailIn = (values, emails) => {
   const entries = Array.isArray(values) ? values : (values ? [values] : []);
@@ -88202,7 +88237,7 @@ export const isTaskVisibleForUser = (task, user) => {
 
   const userEmails = new Set(emailAliases(user.email));
   const roles = getChecklistRolesForUser(user);
-  const taskRole = normalizeTaskRole(task.role);
+  const taskRole = normalizeChecklistRoleAlias(task.role);
   const hasRole = Boolean(taskRole && roles.includes(taskRole));
 
   const isPersonallyRelated = Boolean(
@@ -88211,28 +88246,30 @@ export const isTaskVisibleForUser = (task, user) => {
     hasEmailIn(task.assigned_to, userEmails) ||
     hasEmailIn(task.assignedByEmail, userEmails) ||
     hasEmailIn([task.createdBy, task.createdByEmail, task.created_by], userEmails) ||
-    (task.ownerId && task.ownerId === user.uid)
+    (hasNonEmptyString(task.ownerId) && task.ownerId === user.uid)
   );
 
   const hasPersonalMetadata = Boolean(
-    task.isCustom ||
+    task.isCustom === true ||
     (typeof task.id === 'string' && task.id.startsWith('custom_')) ||
-    task.assignedToEmail ||
-    (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) ||
-    task.assignedByEmail ||
-    task.assigned_to ||
-    task.ownerId ||
-    task.createdBy ||
-    task.createdByEmail ||
-    task.created_by ||
-    task.collaborators
+    hasNonEmptyString(task.assignedToEmail) ||
+    (Array.isArray(task.assignedToEmails) && task.assignedToEmails.some(hasNonEmptyString)) ||
+    hasNonEmptyString(task.assignedByEmail) ||
+    hasNonEmptyString(task.assigned_to) ||
+    hasNonEmptyString(task.ownerId) ||
+    hasNonEmptyString(task.createdBy) ||
+    hasNonEmptyString(task.createdByEmail) ||
+    hasNonEmptyString(task.created_by)
   );
 
   if (hasPersonalMetadata) return isPersonallyRelated;
   if (task.isValidation === true) return hasRole;
 
   const isCatalogTask = catalogRoleById.get(task.id) === taskRole;
-  return isCatalogTask && hasRole;
+  const isInvitedCollaborator = Array.isArray(task.collaborators) &&
+    task.collaborators.length > 0 &&
+    hasEmailIn(task.collaborators, userEmails);
+  return isCatalogTask && (hasRole || isInvitedCollaborator);
 };
 
 export const filterTasksForUser = (tasks, user) =>
@@ -95981,19 +96018,19 @@ test('calendar readback matches accents, aliases, whitespace and Quito cycle lab
     ['Guayaquil', 'GYE'], ['UIO C2', 'Quito'], ['lima', 'LIM']
   ]) {
     const rows = JSON.parse(JSON.stringify([{ id: 'saved', sede: stored }, { id: 'other', sede: 'Cuenca' }]));
-    assert.deepEqual(visibleMJCalendars(rows, { appRole: 'coordinador_mj', sede: profile }).map(row => row.id), ['saved']);
+    assert.deepEqual(visibleMJCalendars(rows, { appRole: 'coord_c1', sede: profile }).map(row => row.id), ['saved']);
   }
 });
 
 test('calendar filtering preserves global visibility and excludes absent or different sedes', () => {
   const rows = [{ sede: 'Lima' }, { sede: 'Quito' }, {}];
-  for (const appRole of ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'consolidado', 'director_maestria']) {
+  for (const appRole of ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']) {
     assert.deepEqual(visibleMJCalendars(rows, { appRole }), rows);
   }
   assert.deepEqual(visibleMJCalendars(rows, { isSuperAdmin: true }), rows);
   assert.deepEqual(visibleMJCalendars(rows, null), []);
-  assert.deepEqual(visibleMJCalendars(rows, { appRole: 'coordinador_mj' }), []);
-  assert.deepEqual(visibleMJCalendars(rows, { appRole: 'coordinador_mj', sede: 'Cuenca' }), []);
+  assert.deepEqual(visibleMJCalendars(rows, { appRole: 'coord_c1' }), []);
+  assert.deepEqual(visibleMJCalendars(rows, { appRole: 'coord_c1', sede: 'Cuenca' }), []);
 });
 
 ```
@@ -193690,7 +193727,7 @@ export default function ChecklistBoard() {
     const current = task.deadline || "";
     const newDeadline = await showPrompt("⏰ Establecer Fecha y Hora Límite obligatoria:\n(Ejemplo: 2026-08-22 18:00 o Lunes 09:00)", current);
     if (newDeadline !== null && newDeadline.trim() !== "") {
-      updateTaskDetails(task.id, { deadline: newDeadline.trim() });
+      updateTaskDetails(task.id, { deadline: newDeadline.trim(), hasManualDeadline: true });
     }
   };
 
@@ -194873,6 +194910,11 @@ export const resolveManagerEstado = (m, eventsList = null) => {
     return 'Graduado';
   }
 
+  // Si Coordinación de Maestría o Dirección reactivó explícitamente al integrante (ej. llamada pendiente o graduación reprogramada), respetar Activo
+  if (m.estadoReactivadoManual === true && (s.includes('ACTIV') || s.includes('EN_JUEGO') || s === 'SI' || !s)) {
+    return 'Activo';
+  }
+
   // Umbral de ciclo activo por sede: si el equipo pertenece a una cohorte cuyo "EL VIAJE" ya concluyó, es Graduado
   const mNum = getTeamNumericValue(m);
   const mSedeKey = String(m.sede || '').trim().toLowerCase();
@@ -195320,7 +195362,7 @@ export default function CentroManagers() {
 
     const activeTeams = new Map(); 
     managers.forEach(m => {
-      if (normalizeManagerEstado(m.estado) === 'Activo' && !m.cierreLiquidacionActivo && m.equipo) {
+      if (normalizeManagerEstado(m.estado) === 'Activo' && !m.cierreLiquidacionActivo && !m.isGraduado && !m.estadoReactivadoManual && m.equipo) {
         const key = `${normalizeSede(m.sede)}_${String(m.equipo).trim().toUpperCase()}`;
         if (!activeTeams.has(key)) activeTeams.set(key, []);
         activeTeams.get(key).push(m);
@@ -195385,6 +195427,8 @@ export default function CentroManagers() {
           const docRef = doc(db, 'managers_directory', docKey);
           batch.update(docRef, {
             estado: 'Graduado',
+            isGraduado: true,
+            estadoReactivadoManual: false,
             cierreLiquidacionActivo: true,
             cierreLiquidacionFecha: new Date().toISOString(),
             cierreLiquidacionPorEmail: 'sistema@crearpsl.net',
@@ -196118,7 +196162,7 @@ export default function CentroManagers() {
     if (field === 'entrenador' && finalValue) {
       const activeCount = managers.filter(m => 
         String(m.id) !== String(id) &&
-        normalizeManagerEstado(m.estado) === 'Activo' &&
+        resolveManagerEstado(m, events) === 'Activo' &&
         parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(finalValue)
       ).length;
       if (activeCount >= MAX_TRAINER_LOAD) {
@@ -196135,16 +196179,33 @@ export default function CentroManagers() {
       if (field === 'entrenador') assertLegacyTrainerEdit(targetManager, finalValue);
 
       const isStatusChange = field === 'estado';
-      const estadoAnterior = normalizeManagerEstado(targetManager?.estado || 'Activo');
+      const estadoAnterior = resolveManagerEstado(targetManager, events);
       const nuevoEstado = isStatusChange ? finalValue : estadoAnterior;
+      const nowISO = new Date().toISOString();
+
+      if (isStatusChange) {
+        if (nuevoEstado === 'Activo') {
+          cleanData.cierreLiquidacionActivo = false;
+          cleanData.isGraduado = false;
+          cleanData.estadoReactivadoManual = true;
+          cleanData.estadoReactivadoFecha = nowISO;
+          cleanData.estadoReactivadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
+        } else {
+          cleanData.estadoReactivadoManual = false;
+          cleanData.isGraduado = nuevoEstado === 'Graduado';
+          if (nuevoEstado === 'Desertor' || nuevoEstado === 'Archivado') {
+            cleanData.cierreLiquidacionActivo = false;
+          }
+        }
+      }
 
       if (isStatusChange && estadoAnterior !== nuevoEstado) {
         cleanData.estadoAnterior = estadoAnterior;
-        cleanData.estadoActualizadoFecha = new Date().toISOString();
+        cleanData.estadoActualizadoFecha = nowISO;
         cleanData.estadoActualizadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
         cleanData.estadoActualizadoPorNombre = currentUser?.name || 'Usuario';
         cleanData.historialEstados = arrayUnion({
-          fecha: new Date().toISOString(),
+          fecha: nowISO,
           estadoAnterior,
           estadoNuevo: nuevoEstado,
           cambiadoPorEmail: currentUser?.email || 'admin@crearpsl.net',
@@ -197503,13 +197564,15 @@ export default function CentroManagers() {
         const docRef = doc(db, 'managers_directory', docKey);
         
         // Al cerrar el equipo para liquidación, los integrantes que estaban activos concluyen su ciclo (Graduado)
-        const currentNormState = normalizeManagerEstado(m.estado);
-        const finalEstado = currentNormState === 'Activo' ? 'Graduado' : m.estado;
+        const currentNormState = resolveManagerEstado(m, events);
+        const finalEstado = currentNormState === 'Activo' ? 'Graduado' : currentNormState;
 
         // Update only this operation's fields; never upsert a missing member.
         const payload = {
           estado: finalEstado,
-          estadoAntesCierreLiquidacion: m.estado || 'Activo',
+          isGraduado: finalEstado === 'Graduado',
+          estadoReactivadoManual: false,
+          estadoAntesCierreLiquidacion: currentNormState || 'Activo',
           cierreLiquidacionActivo: true,
           cierreLiquidacionFecha: nowISO,
           cierreLiquidacionPorNombre: userName,
@@ -197532,12 +197595,14 @@ export default function CentroManagers() {
         const isMatch = normalizeSede(m.sede) === targetSede && 
                         getTeamNumericValue(m) === targetEquipoNum && getTeamNumericValue(m) !== 999999;
         if (!isMatch) return m;
-        const currentNormState = normalizeManagerEstado(m.estado);
-        const finalEstado = currentNormState === 'Activo' ? 'Graduado' : m.estado;
+        const currentNormState = resolveManagerEstado(m, events);
+        const finalEstado = currentNormState === 'Activo' ? 'Graduado' : currentNormState;
         return { 
           ...m, 
           estado: finalEstado,
-          estadoAntesCierreLiquidacion: m.estado || 'Activo',
+          isGraduado: finalEstado === 'Graduado',
+          estadoReactivadoManual: false,
+          estadoAntesCierreLiquidacion: currentNormState || 'Activo',
           cierreLiquidacionActivo: true, 
           cierreLiquidacionFecha: nowISO, 
           cierreLiquidacionPorNombre: userName, 
@@ -197599,11 +197664,15 @@ export default function CentroManagers() {
       miembros.forEach((m) => {
         const docRef = doc(db, 'managers_directory', (m.docId || m.id).toString());
         const estadoAnterior = m.estadoAntesCierreLiquidacion;
-        const estadoRestaurado = estadoAnterior || (
+        const estadoRestaurado = normalizeManagerEstado(estadoAnterior || (
           normalizeManagerEstado(m.estado) === 'Graduado' ? 'Activo' : m.estado
-        );
+        ));
         batch.update(docRef, manualManagerPatch(m, {
           estado: estadoRestaurado || 'Activo',
+          isGraduado: estadoRestaurado === 'Graduado',
+          estadoReactivadoManual: (estadoRestaurado || 'Activo') === 'Activo',
+          estadoReactivadoFecha: nowISO,
+          estadoReactivadoPorEmail: userEmail,
           cierreLiquidacionActivo: false,
           cierreLiquidacionReabiertoFecha: nowISO,
           cierreLiquidacionReabiertoPorNombre: userName,
@@ -197634,14 +197703,18 @@ export default function CentroManagers() {
           getTeamNumericValue(m) === targetEquipoNum &&
           getTeamNumericValue(m) !== 999999;
         if (!matches) return m;
-        const estadoRestaurado = m.estadoAntesCierreLiquidacion || (
+        const estadoRestaurado = normalizeManagerEstado(m.estadoAntesCierreLiquidacion || (
           normalizeManagerEstado(m.estado) === 'Graduado' ? 'Activo' : m.estado
-        );
+        ));
         const managerSinEstadoPrevio = { ...m };
         delete managerSinEstadoPrevio.estadoAntesCierreLiquidacion;
         return {
           ...managerSinEstadoPrevio,
           estado: estadoRestaurado || 'Activo',
+          isGraduado: estadoRestaurado === 'Graduado',
+          estadoReactivadoManual: (estadoRestaurado || 'Activo') === 'Activo',
+          estadoReactivadoFecha: nowISO,
+          estadoReactivadoPorEmail: userEmail,
           cierreLiquidacionActivo: false,
           cierreLiquidacionReabiertoFecha: nowISO,
           cierreLiquidacionReabiertoPorNombre: userName,
@@ -197852,7 +197925,7 @@ export default function CentroManagers() {
         nombre: m.nombre || '',
         rol: (m.rol || '').toLowerCase().includes('capitan') ? 'Capitan' : 'Manager',
         telefono: m.telefono || '',
-        estado: m.estado || 'Activo',
+        estado: resolveManagerEstado(m, events),
         entrenador: m.entrenador || '',
         llamadaFecha: m.llamadaFecha || '',
         llamadaAsistio: m.llamadaAsistio || ''
@@ -197889,10 +197962,10 @@ export default function CentroManagers() {
       for (const tName of trainersToCheck) {
         const outsideActive = managers.filter(m => 
           !teamMemberIds.has(String(m.id || m.docId || '')) &&
-          (m.estado || 'Activo') === 'Activo' &&
+          resolveManagerEstado(m, events) === 'Activo' &&
           parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(tName)
         ).length;
-        const insideActive = validMembers.filter(m => (m.estado || 'Activo') === 'Activo').length;
+        const insideActive = validMembers.filter(m => normalizeManagerEstado(m.estado || 'Activo') === 'Activo').length;
         if (outsideActive + insideActive > MAX_TRAINER_LOAD) {
           return showToast(`Límite de Carga Excedido: Asignar este equipo a ${tName} superaría el límite de ${MAX_TRAINER_LOAD} mánagers activos (tendría ${outsideActive + insideActive}).`, 'error');
         }
@@ -197915,11 +197988,19 @@ export default function CentroManagers() {
         }
       });
       
+      const nowISO = new Date().toISOString();
       const updatedMembers = validMembers.map(m => {
         const memberId = m.id || m.docId || Date.now() + Math.floor(Math.random() * 10000);
+        const existing = managers.find(ex => String(ex.docId || ex.id) === String(m.docId || m.id));
         const trainerToUse = userCanAssign ? finalTrainers : (m.entrenador || finalTrainers);
-        assertLegacyTrainerEdit(managers.find(existing => String(existing.docId || existing.id) === String(m.docId || m.id)), trainerToUse);
-        return {
+        assertLegacyTrainerEdit(existing, trainerToUse);
+        const prevEffectiveState = existing ? resolveManagerEstado(existing, events) : 'Activo';
+        const nextState = canChangeStatus
+          ? normalizeManagerEstado(m.estado || 'Activo')
+          : prevEffectiveState;
+        const stateChanged = Boolean(existing && prevEffectiveState !== nextState);
+        const baseMember = {
+          ...(existing || {}),
           id: memberId,
           docId: m.docId || memberId.toString(),
           nombre: m.nombre.trim(),
@@ -197931,10 +198012,26 @@ export default function CentroManagers() {
           coordinador: newCoordinador,
           entrenador: trainerToUse,
           tieneEntrenador: trainerToUse ? 'Si' : 'No',
-          estado: m.estado || 'Activo',
+          estado: nextState,
           llamadaFecha: m.llamadaFecha || '',
           llamadaAsistio: m.llamadaAsistio || ''
         };
+        if (canChangeStatus) {
+          if (nextState === 'Activo' && (stateChanged || existing?.cierreLiquidacionActivo || existing?.isGraduado || existing?.estadoReactivadoManual)) {
+            baseMember.cierreLiquidacionActivo = false;
+            baseMember.isGraduado = false;
+            baseMember.estadoReactivadoManual = true;
+            baseMember.estadoReactivadoFecha = nowISO;
+            baseMember.estadoReactivadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
+          } else if (nextState !== 'Activo' && stateChanged) {
+            baseMember.estadoReactivadoManual = false;
+            baseMember.isGraduado = nextState === 'Graduado';
+            if (nextState === 'Desertor' || nextState === 'Archivado') {
+              baseMember.cierreLiquidacionActivo = false;
+            }
+          }
+        }
+        return baseMember;
       });
 
       updatedMembers.forEach(member => {
@@ -198169,6 +198266,7 @@ export default function CentroManagers() {
   const handleOpenEditIndividual = (m) => {
     setEditIndividualModal({
       ...m,
+      estado: resolveManagerEstado(m, events),
       rol: (m.rol || '').toLowerCase().includes('capitan') ? 'Capitan' : 'Manager',
       selectedTrainers: parseTrainersList(m.entrenador)
     });
@@ -198189,7 +198287,7 @@ export default function CentroManagers() {
       for (const tName of trainersToCheck) {
         const activeCount = managers.filter(m => 
           String(m.id) !== String(editIndividualModal.id) &&
-          normalizeManagerEstado(m.estado) === 'Activo' &&
+          resolveManagerEstado(m, events) === 'Activo' &&
           parseTrainersList(m.entrenador).map(t => normalizeTrainer(t)).includes(tName)
         ).length;
         if (activeCount >= MAX_TRAINER_LOAD) {
@@ -198204,11 +198302,12 @@ export default function CentroManagers() {
       const trainerToUse = userCanAssign ? finalTrainers : editIndividualModal.entrenador;
       assertLegacyTrainerEdit(original, trainerToUse);
 
-      const estadoAnterior = normalizeManagerEstado(original?.estado || 'Activo');
+      const estadoAnterior = resolveManagerEstado(original, events);
       const nuevoEstado = canChangeStatus 
         ? normalizeManagerEstado(editIndividualModal.estado || 'Activo')
         : estadoAnterior;
       const hasStatusChange = estadoAnterior !== nuevoEstado;
+      const nowISO = new Date().toISOString();
 
       const updatedData = {
         nombre: editIndividualModal.nombre.trim(),
@@ -198223,13 +198322,29 @@ export default function CentroManagers() {
         estado: nuevoEstado
       };
 
+      if (canChangeStatus) {
+        if (nuevoEstado === 'Activo' && (hasStatusChange || original?.cierreLiquidacionActivo || original?.isGraduado || original?.estadoReactivadoManual)) {
+          updatedData.cierreLiquidacionActivo = false;
+          updatedData.isGraduado = false;
+          updatedData.estadoReactivadoManual = true;
+          updatedData.estadoReactivadoFecha = nowISO;
+          updatedData.estadoReactivadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
+        } else if (nuevoEstado !== 'Activo') {
+          updatedData.estadoReactivadoManual = false;
+          updatedData.isGraduado = nuevoEstado === 'Graduado';
+          if (nuevoEstado === 'Desertor' || nuevoEstado === 'Archivado') {
+            updatedData.cierreLiquidacionActivo = false;
+          }
+        }
+      }
+
       if (hasStatusChange) {
         updatedData.estadoAnterior = estadoAnterior;
-        updatedData.estadoActualizadoFecha = new Date().toISOString();
+        updatedData.estadoActualizadoFecha = nowISO;
         updatedData.estadoActualizadoPorEmail = currentUser?.email || 'admin@crearpsl.net';
         updatedData.estadoActualizadoPorNombre = currentUser?.name || 'Usuario';
         updatedData.historialEstados = arrayUnion({
-          fecha: new Date().toISOString(),
+          fecha: nowISO,
           estadoAnterior,
           estadoNuevo: nuevoEstado,
           cambiadoPorEmail: currentUser?.email || 'admin@crearpsl.net',
@@ -210629,6 +210744,8 @@ const editableFields = [
   'entrenador', 'tieneEntrenador', 'coordinador', 'estado',
   'estadoAnterior', 'estadoActualizadoFecha', 'estadoActualizadoPorEmail',
   'estadoActualizadoPorNombre', 'historialEstados',
+  'cierreLiquidacionActivo', 'isGraduado',
+  'estadoReactivadoManual', 'estadoReactivadoFecha', 'estadoReactivadoPorEmail',
 ];
 
 export function managerSourceIdentities(manager) {

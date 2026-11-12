@@ -5,6 +5,8 @@ const editableFields = [
   'entrenador', 'tieneEntrenador', 'coordinador', 'estado',
   'estadoAnterior', 'estadoActualizadoFecha', 'estadoActualizadoPorEmail',
   'estadoActualizadoPorNombre', 'historialEstados',
+  'cierreLiquidacionActivo', 'isGraduado',
+  'estadoReactivadoManual', 'estadoReactivadoFecha', 'estadoReactivadoPorEmail',
 ];
 
 export function managerSourceIdentities(manager) {

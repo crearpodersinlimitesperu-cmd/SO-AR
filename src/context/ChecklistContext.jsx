@@ -371,7 +371,7 @@ export function ChecklistProvider({ children }) {
           const initialData = {
             ...(baseTask || {}),
             id: taskId,
-            ...(baseTask ? { catalogTask: true } : {}),
+            ...(baseTask ? { catalogTask: true, isCustom: false } : {}),
             completed: false,
             status: 'Pendiente',
             priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',

@@ -18,7 +18,7 @@ test('calendar load failures cannot be rendered as an empty collection', () => {
 test('task modal and snapshots share scoped progress persistence', () => {
   assert.match(modal, /const initialProgress = getTaskProgress\(task\)/);
   assert.match(modal, /const cycleScope = checklistData\.some\(base => base\.id === task\.id\)/);
-  assert.match(context, /return applyCycleCompletion\(data,/);
+  assert.match(context, /return applyCycleCompletion\((?:mergedData|data),/);
   assert.match(context, /const effectiveTask = applyCycleCompletion\(task,/);
   assert.match(context, /completionId: completionTransition[\s\S]*?,\s*updates: completionUpdates\s*\}\)/);
   assert.match(context, /const resolvedScope = resolveTaskCycleScope\(prevData,/);

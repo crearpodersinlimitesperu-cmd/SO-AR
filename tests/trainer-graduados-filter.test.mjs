@@ -102,3 +102,65 @@ test('buildTeamKeyResolver: unifica capitán con nombre placeholder "-" en el eq
   assert.equal(resolveKey(rows[0]), 'Lima_TINKUY RURAY#30');
   assert.equal(resolveKey(rows[1]), 'Lima_TINKUY RURAY#30');
 });
+
+test('resolveManagerEstado: Cuenca #22 JAGUARUNDIS KAWSAY (Bryan Montero) con EL VIAJE el 2026-11-20 permanece Activo', () => {
+  const bryan = {
+    id: '1788360620000',
+    nombre: 'Bryan Montero',
+    rol: 'Capitan',
+    equipo: 'JAGUARUNDIS KAWSAY',
+    numEquipo: 22,
+    sede: 'Cuenca',
+    entrenador: 'Lourdes Patiño',
+    estado: 'Activo',
+    cierreLiquidacionActivo: false
+  };
+  const cuencaEvents = [
+    {
+      nombre: 'EL VIAJE',
+      sede: 'CUE',
+      equipo: '22',
+      fecha_inicio: '2026-11-20T00:00:00',
+      fecha_fin: '2026-11-22T00:00:00'
+    }
+  ];
+  assert.equal(resolveManagerEstado(bryan, cuencaEvents), 'Activo');
+});
+
+test('resolveManagerEstado: respeta estadoReactivadoManual cuando Coordinación reactiva a un integrante por llamada pendiente o graduación reprogramada', () => {
+  const reactivado = {
+    id: 'm-reactivado',
+    nombre: 'Integrante Reprogramado',
+    equipo: 'LOTUS IKIGAI',
+    numEquipo: 21,
+    sede: 'Cuenca',
+    estado: 'Activo',
+    cierreLiquidacionActivo: false,
+    isGraduado: false,
+    estadoReactivadoManual: true
+  };
+  const pastEvents = [
+    {
+      nombre: 'EL VIAJE',
+      sede: 'CUE',
+      equipo: '21',
+      fecha_inicio: '2026-10-30T00:00:00',
+      fecha_fin: '2026-11-01T00:00:00'
+    }
+  ];
+  assert.equal(resolveManagerEstado(reactivado, pastEvents), 'Activo');
+
+  // Al cerrar liquidación o marcar Graduado explícitamente, vuelve a ser Graduado
+  assert.equal(resolveManagerEstado({ ...reactivado, cierreLiquidacionActivo: true }, pastEvents), 'Graduado');
+  assert.equal(resolveManagerEstado({ ...reactivado, estado: 'Graduado' }, pastEvents), 'Graduado');
+});
+
+test('CentroManagers UI: handleOpenEditIndividual y handleOpenEditTeam inicializan estado con resolveManagerEstado(m, events)', () => {
+  const editIndMatch = source.match(/const handleOpenEditIndividual = \(m\) => \{[\s\S]+?\n  \};/);
+  assert.ok(editIndMatch, 'handleOpenEditIndividual debe existir');
+  assert.match(editIndMatch[0], /estado:\s*resolveManagerEstado\(m,\s*events\)/);
+
+  const editTeamMatch = source.match(/const handleOpenEditTeam = \(team\) => \{[\s\S]+?\n  \};/);
+  assert.ok(editTeamMatch, 'handleOpenEditTeam debe existir');
+  assert.match(editTeamMatch[0], /estado:\s*resolveManagerEstado\(m,\s*events\)/);
+});

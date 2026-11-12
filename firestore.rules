@@ -52,18 +52,45 @@ service cloud.firestore {
       return request.auth.token.email.lower();
     }
 
+    function normalizedCorpEmail(addr) {
+      return addr.lower()
+        .replace('@crearpls[.]com$', '@crearpsl.net')
+        .replace('@crearpsl[.]com$', '@crearpsl.net');
+    }
+
+    function participantEmail(key) {
+      let normalized = normalizedCorpEmail(key);
+      return {
+        'milacampuzano21@gmail.com': 'emily.campuzano@crearpsl.net',
+        'ricardogavilanez1021@gmail.com': 'ricardo.gavilanez@crearpsl.net',
+        'brunische66@gmail.com': 'leandro.brunis@crearpsl.net',
+        'gomeznueve@gmail.com': 'andres.gomez@crearpsl.net',
+        'jorgeramirezmorejon@gmail.com': 'jorge.ramirez@crearpsl.net',
+        'cardenasgina29@gmail.com': 'gina.cardenas@crearpsl.net',
+        'cardenaslopezgina@gmail.com': 'gina.cardenas@crearpsl.net',
+        'santiago.proao527@gmail.com': 'sso@crearpsl.net',
+        'maboadar@gmail.com': 'direccion@bmbgbrokers.com'
+      }.get(normalized, normalized);
+    }
+
     function emailAliases(addr) {
       let e = addr.lower();
-      let mila = ['milacampuzano21@gmail.com', 'emily.campuzano@crearpsl.net', 'emily.campuzano@crearpsl.com', 'emily.campuzano@crearpls.com'];
-      let ricardo = ['ricardogavilanez1021@gmail.com', 'ricardo.gavilanez@crearpsl.net', 'ricardo.gavilanez@crearpsl.com', 'ricardo.gavilanez@crearpls.com'];
-      let leandro = ['brunische66@gmail.com', 'leandro.brunis@crearpsl.net', 'leandro.brunis@crearpsl.com', 'leandro.brunis@crearpls.com'];
       let parts = e.split('@');
-      return e in mila ? mila :
-        e in ricardo ? ricardo :
-        e in leandro ? leandro :
-        parts.size() == 2 && parts[1] in ['crearpsl.net', 'crearpsl.com', 'crearpls.com']
-          ? [parts[0] + '@crearpsl.net', parts[0] + '@crearpsl.com', parts[0] + '@crearpls.com']
-          : [e];
+      let fallback = parts.size() == 2 && parts[1] in ['crearpsl.net', 'crearpsl.com', 'crearpls.com']
+        ? [parts[0] + '@crearpsl.net', parts[0] + '@crearpsl.com', parts[0] + '@crearpls.com']
+        : [e];
+      let brunis = ['brunische66@gmail.com', 'carlos.brunis@crearpsl.net', 'carlos.brunis@crearpsl.com', 'leandro.brunis@crearpsl.net', 'leandro.brunis@crearpsl.com', 'leandro.brunis@crearpls.com'];
+      return {
+        'emily.campuzano@crearpsl.net': ['milacampuzano21@gmail.com', 'emily.campuzano@crearpsl.net', 'emily.campuzano@crearpsl.com', 'emily.campuzano@crearpls.com'],
+        'ricardo.gavilanez@crearpsl.net': ['ricardogavilanez1021@gmail.com', 'ricardo.gavilanez@crearpsl.net', 'ricardo.gavilanez@crearpsl.com', 'ricardo.gavilanez@crearpls.com'],
+        'leandro.brunis@crearpsl.net': brunis,
+        'carlos.brunis@crearpsl.net': brunis,
+        'andres.gomez@crearpsl.net': ['gomeznueve@gmail.com', 'andres.gomez@crearpsl.net', 'andres.gomez@crearpsl.com', 'andres.gomez@crearpls.com'],
+        'jorge.ramirez@crearpsl.net': ['jorgeramirezmorejon@gmail.com', 'jorge.ramirez@crearpsl.net', 'jorge.ramirez@crearpsl.com', 'jorge.ramirez@crearpls.com'],
+        'gina.cardenas@crearpsl.net': ['cardenasgina29@gmail.com', 'cardenaslopezgina@gmail.com', 'gina.cardenas@crearpsl.net', 'gina.cardenas@crearpsl.com', 'gina.cardenas@crearpls.com'],
+        'sso@crearpsl.net': ['santiago.proao527@gmail.com', 'sso@crearpsl.net', 'sso@crearpsl.com', 'sso@crearpls.com'],
+        'direccion@bmbgbrokers.com': ['maboadar@gmail.com', 'direccion@bmbgbrokers.com']
+      }.get(participantEmail(e), fallback);
     }
 
     function callerEmailAliases() {
@@ -72,49 +99,32 @@ service cloud.firestore {
 
     // Debe coincidir con SUPER_ADMIN_EMAILS en src/config/permissions.js
     function isSuperAdmin() {
-      return isAuthenticated() && (
-        email() in [
-          'jose.sanchez@crearpsl.net',
-          'jose.sanchez@crearpsl.com',
-          'armando.pilacuan@gmail.com',
-          'paul.sosa@crearpsl.net'
-        ] ||
-        callerEmailAliases().hasAny([
-          'jose.sanchez@crearpsl.net',
-          'armando.pilacuan@gmail.com',
-          'paul.sosa@crearpsl.net'
-        ])
-      );
+      return isAuthenticated() && participantEmail(email()) in [
+        'jose.sanchez@crearpsl.net',
+        'armando.pilacuan@gmail.com',
+        'paul.sosa@crearpsl.net'
+      ];
     }
 
     // Lista extra├¡da de usersToImport.js (snapshot GitHub, roles gerente/direccion/
     // cfo/cco/ceo/director_maestria/socio). VERIFICAR Y CORREGIR antes de desplegar.
     function isGerenteODireccion() {
-      let managerEmails = [
+      return isSuperAdmin() || (isAuthenticated() && participantEmail(email()) in [
         'ricardo.gavilanez@crearpsl.net',
-        'ricardogavilanez1021@gmail.com',
         'fer.aragon@crearpsl.net',
         'andres.gomez@crearpsl.net',
-        'gomeznueve@gmail.com',
         'contabilidad.global@crearpsl.net',
         'leandro.brunis@crearpsl.net',
-        'brunische66@gmail.com',
         'josue.vera@crearpsl.net',
         'yurany.gonzalez@crearpsl.net',
         'nora.zamora@crearpsl.net',
         'emily.campuzano@crearpsl.net',
-        'milacampuzano21@gmail.com',
         'freddy.sosa@crearpsl.net',
         'diana.moscoso@crearpsl.net'
-      ];
-      return isSuperAdmin() || (isAuthenticated() && (
-        email() in managerEmails ||
-        callerEmailAliases().hasAny(managerEmails)
-      ));
+      ]);
     }
 
-    function isOwner(resourceData) {
-      let callerEmails = isAuthenticated() ? callerEmailAliases() : [];
+    function isOwnerWithAliases(resourceData, callerEmails) {
       let assignedToEmail = resourceData.get('assignedToEmail', '');
       let assignedTo = resourceData.get('assigned_to', '');
       let ownerId = resourceData.get('ownerId', '');
@@ -122,65 +132,230 @@ service cloud.firestore {
       let createdBy = resourceData.get('createdBy', '');
       let createdByEmail = resourceData.get('createdByEmail', '');
       let createdByLegacy = resourceData.get('created_by', '');
+      let assignedList = resourceData.get('assignedToEmails', []);
       return isAuthenticated() && (
-        (assignedToEmail is string && assignedToEmail.lower() in callerEmails) ||
-        (assignedTo is string && assignedTo.lower() in callerEmails) ||
-        // FIX (16/09/2026): las tareas "Personalizada (Directa)" compartidas entre
-        // varias personas (ej. un mismo aviso mandado a varios gerentes a la vez)
-        // usan el campo assignedToEmails (arreglo), nunca el singular
-        // assignedToEmail. Antes, alguien que solo estaba en ese arreglo (y no era
-        // SuperAdmin ni estaba en la lista fija de isGerenteODireccion()) no
-        // cumplía isOwner() ni isCollaborator() con nada, así que Firestore
-        // rechazaba el guardado de su evidencia/avance en esas tareas. Ahora
-        // cuenta como dueño igual que si estuviera en el campo singular.
-        (resourceData.get('assignedToEmails', []) is list &&
-         (email() in resourceData.get('assignedToEmails', []) ||
-          resourceData.get('assignedToEmails', []).hasAny(callerEmails))) ||
-        // Se conserva por compatibilidad si alg├║n flujo futuro s├¡ llega a usar el uid real:
+        (assignedToEmail is string && assignedToEmail != '' && assignedToEmail.lower() in callerEmails) ||
+        (assignedTo is string && assignedTo != '' && assignedTo.lower() in callerEmails) ||
+        (assignedList is list && (email() in assignedList || assignedList.hasAny(callerEmails))) ||
         ownerId == request.auth.uid ||
-        (assignedByEmail is string && assignedByEmail.lower() in callerEmails) ||
-        (createdBy is string && createdBy.lower() in callerEmails) ||
-        (createdByEmail is string && createdByEmail.lower() in callerEmails) ||
-        (createdByLegacy is string && createdByLegacy.lower() in callerEmails)
+        (assignedByEmail is string && assignedByEmail != '' && assignedByEmail.lower() in callerEmails) ||
+        (createdBy is string && createdBy != '' && createdBy.lower() in callerEmails) ||
+        (createdByEmail is string && createdByEmail != '' && createdByEmail.lower() in callerEmails) ||
+        (createdByLegacy is string && createdByLegacy != '' && createdByLegacy.lower() in callerEmails)
       );
     }
 
-    function isCollaborator(resourceData) {
+    function isOwner(resourceData) {
+      return isOwnerWithAliases(resourceData, callerEmailAliases());
+    }
+
+    function isCollaboratorWithAliases(resourceData, callerEmails) {
       let collaborators = resourceData.get('collaborators', []);
       return isAuthenticated() &&
         collaborators is list &&
-        collaborators.hasAny(callerEmailAliases());
+        collaborators.hasAny(callerEmails);
     }
 
-    function isTaskRecipient(resourceData) {
+    function isCollaborator(resourceData) {
+      return isCollaboratorWithAliases(resourceData, callerEmailAliases());
+    }
+
+    function isTaskRecipientWithAliases(resourceData, aliases) {
       let callerEmail = isAuthenticated() ? email() : '';
-      let aliases = isAuthenticated() ? callerEmailAliases() : [''];
-      let a0 = aliases.size() > 0 ? aliases[0] : callerEmail;
-      let a1 = aliases.size() > 1 ? aliases[1] : callerEmail;
-      let a2 = aliases.size() > 2 ? aliases[2] : callerEmail;
-      let a3 = aliases.size() > 3 ? aliases[3] : callerEmail;
+      let al = aliases;
+      let rawAssigned = resourceData.get('assignedToEmail', '');
+      let a0 = al.size() > 0 ? al[0] : callerEmail;
+      let a1 = al.size() > 1 ? al[1] : callerEmail;
+      let a2 = al.size() > 2 ? al[2] : callerEmail;
+      let a3 = al.size() > 3 ? al[3] : callerEmail;
+      let a4 = al.size() > 4 ? al[4] : callerEmail;
+      let a5 = al.size() > 5 ? al[5] : callerEmail;
       return isAuthenticated() && (
-        resourceData.get('assignedToEmail', '').lower() == callerEmail ||
-        resourceData.get('assignedToEmail', '').lower() in aliases ||
+        (rawAssigned is string && rawAssigned != '' &&
+         (rawAssigned.lower() == callerEmail || rawAssigned.lower() in al)) ||
         (resourceData.keys().hasAny(['assignedToEmails']) &&
          (callerEmail in resourceData.assignedToEmails ||
           a0 in resourceData.assignedToEmails ||
           a1 in resourceData.assignedToEmails ||
           a2 in resourceData.assignedToEmails ||
-          a3 in resourceData.assignedToEmails))
+          a3 in resourceData.assignedToEmails ||
+          a4 in resourceData.assignedToEmails ||
+          a5 in resourceData.assignedToEmails))
+      );
+    }
+
+    function isTaskRecipient(resourceData) {
+      return isTaskRecipientWithAliases(resourceData, isAuthenticated() ? callerEmailAliases() : ['']);
+    }
+
+    function hasNonEmptyStr(d, k) {
+      let v = d.get(k, '');
+      return v is string && v != '';
+    }
+
+    function isProfileInactive(u) {
+      let status = u.get('status', '');
+      let rolesList = u.get('roles', []);
+      return u.get('active', true) == false ||
+        u.get('isActive', true) == false ||
+        u.get('role', '') == 'inactivo' ||
+        u.get('rol', '') == 'inactivo' ||
+        u.get('appRole', '') == 'inactivo' ||
+        (rolesList is list && 'inactivo' in rolesList) ||
+        (status is string && status in ['inactive', 'inactivo', 'baja', 'renuncia', 'desvinculado']);
+    }
+
+    function hasProfileRoleFields(u) {
+      let r = u.get('roles', []);
+      return u.keys().hasAny(['role', 'rol', 'appRole', 'roles']) && (
+        hasNonEmptyStr(u, 'role') ||
+        hasNonEmptyStr(u, 'rol') ||
+        hasNonEmptyStr(u, 'appRole') ||
+        (r is list && r.size() > 0)
+      );
+    }
+
+    function roleAliasesFor(targetRole) {
+      return {
+        'coord_c1': ['coord_c1', 'coordinador_c1', 'coordinador_c1c2', 'coord_c1_c2', 'coord_jr'],
+        'coord_maestria': ['coord_maestria', 'coordinador_mj', 'coordinador_maestria', 'director_maestria'],
+        'qt': ['qt', 'quantum_team', 'coord_qt', 'coordinador_qt'],
+        'entrenador': ['entrenador', 'coach', 'entrenador_llamadas']
+      }.get(targetRole, [targetRole]);
+    }
+
+    function rosterCoordC1(e) {
+      return e.matches('^(adrianna[.]guarochico@crearpsl[.]net|alfonso[.]trujillo@crearpsl[.]net|brenda[.]rodriguez@crearpsl[.]net|cardenasgina29@gmail[.]com|cardenaslopezgina@gmail[.]com|daniela[.]esposito@crearpsl[.]net|danna[.]guaman@crearpsl[.]net|david[.]gonzalez@crearpsl[.]net|diana[.]macas@crearpsl[.]net|diana[.]moscoso@crearpsl[.]net|evelyn[.]cedillo@crearpsl[.]net|gina[.]cardenas@crearpsl[.]net|jorge[.]ramirez@crearpsl[.]net|jorgeramirezmorejon@gmail[.]com|joyce[.]marin@crearpsl[.]net|karla[.]pastrano@crearpsl[.]net|katherine[.]aguirre@crearpsl[.]net|marco[.]gonzalez@crearpsl[.]net|naomi[.]campos@crearpsl[.]net|valentina[.]r@crearpsl[.]net|viviana[.]catota@crearpsl[.]net)$');
+    }
+
+    function rosterCoordMaestria(e) {
+      return e.matches('^(andres[.]gomez@crearpsl[.]net|daniela[.]monroy@crearpsl[.]net|erika[.]gavilanez@crearpsl[.]net|gomeznueve@gmail[.]com|ibetancourth@crearpsl[.]net|jonathan[.]larosa@crearpsl[.]net|juan[.]reinoso@crearpsl[.]net|judith[.]romero@crearpsl[.]net|kerly[.]carrillo@crearpsl[.]net|liliana[.]cubillo@crearpsl[.]net|lili[.]cubillo@crearpsl[.]net|linid[.]valencia@crearpsl[.]net|mauricio[.]ramirez@crearpsl[.]net)$');
+    }
+
+    function rosterDirectorMaestria(e) {
+      return e.matches('^(andres[.]gomez@crearpsl[.]net|gomeznueve@gmail[.]com)$');
+    }
+
+    function rosterQt(e) {
+      return e.matches('^(alemunoz160@gmail[.]com|alexandra[.]vivas2714@gmail[.]com|anahirp04@gmail[.]com|ar2887493@gmail[.]com|belengarciavm@gmail[.]com|brunische66@gmail[.]com|cardenasgina29@gmail[.]com|cardenaslopezgina@gmail[.]com|carlos[.]brunis@crearpsl[.]net|darwindelgado@hotmail[.]com|dayapamae[.]villarodriguez14@gmail[.]com|dayizambrano24@gmail[.]com|deniseins[.]de@gmail[.]com|ferchas_tk@gmail[.]com|gabriela[.]altuna@crearpsl[.]net|gaveroba@gmail[.]com|geovyta79@gmail[.]com|gina[.]cardenas@crearpsl[.]net|hackerxavi@gmail[.]com|jorge[.]ramirez@crearpsl[.]net|jorgeramirezmorejon@gmail[.]com|josseth2008@gmail[.]com|joysherva@gmail[.]com|juandiegojarar@gmail[.]com|kathi[.]pereira2002@gmail[.]com|lizarate1977@gmail[.]com|maferflores2013@gmail[.]com|magymqm70@gmail[.]com|marobel[.]studio@gmail[.]com|marthanal216@hotmail[.]com|merleyudaza@gmail[.]com|mguerrero[.]technetca@gmail[.]com|mmartinezxg@gmail[.]com|myriampamelat@gmail[.]com|ninoska01051978@gmail[.]com|prunaluis@gmail[.]com|ricardo[.]gavilanez@crearpsl[.]net|ricardogavilanez1021@gmail[.]com|rocio81rocio@gmail[.]com|rouz1414@gmail[.]com|salarcons@gmail[.]com|vanessadelcisne@gmail[.]com|vascosofy@gmail[.]com|willocse87@gmail[.]com)$');
+    }
+
+    function rosterEntrenador(e) {
+      return e.matches('^(anamonroyt@gmail[.]com|andres[.]gomez@crearpsl[.]net|brunische66@gmail[.]com|carlos[.]brunis@crearpsl[.]net|chuyacostar88@gmail[.]com|jesus[.]acosta@crearpsl[.]net|jesusadrianacosta@gmail[.]com|ciriloagustin21@gmail[.]com|coor[.]operaciones2023@gmail[.]com|daniela[.]monroy@crearpsl[.]net|dibrafi@gmail[.]com|direccion@bmbgbrokers[.]com|e[.]andresid@gmail[.]com|emalejodiaz@gmail[.]com|emily[.]campuzano@crearpsl[.]net|erika[.]gavilanez@crearpsl[.]net|fer[.]aragon@crearpsl[.]net|fernandomendozaclavijo22@gmail[.]com|gomeznueve@gmail[.]com|jarreolamorales@gmail[.]com|jose[.]sanchez@crearpsl[.]net|josue[.]vera@crearpsl[.]net|judith[.]romero@crearpsl[.]net|kerly[.]carrillo@crearpsl[.]net|leandro[.]brunis@crearpsl[.]net|liliana[.]cubillo@crearpsl[.]net|lili[.]cubillo@crearpsl[.]net|linid[.]valencia@crearpsl[.]net|maboadar@gmail[.]com|marylourdespat@gmail[.]com|mauricio[.]ramirez@crearpsl[.]net|milacampuzano21@gmail[.]com|mildredmunozv@gmail[.]com|mperez[.]ttw@gmail[.]com|paul[.]sosa@crearpsl[.]net|solaresalonso@gmail[.]com)$');
+    }
+
+    function rosterEntrenadorLlamadas(e) {
+      return e.matches('^(anamonroyt@gmail[.]com|andres[.]gomez@crearpsl[.]net|dibrafi@gmail[.]com|emalejodiaz@gmail[.]com|emily[.]campuzano@crearpsl[.]net|fernandomendozaclavijo22@gmail[.]com|gomeznueve@gmail[.]com|josue[.]vera@crearpsl[.]net|judith[.]romero@crearpsl[.]net|kerly[.]carrillo@crearpsl[.]net|liliana[.]cubillo@crearpsl[.]net|lili[.]cubillo@crearpsl[.]net|marylourdespat@gmail[.]com|milacampuzano21@gmail[.]com|mauricio[.]ramirez@crearpsl[.]net|daniela[.]monroy@crearpsl[.]net|erika[.]gavilanez@crearpsl[.]net|direccion@bmbgbrokers[.]com|maboadar@gmail[.]com)$');
+    }
+
+    function rosterGerente(e) {
+      return e.matches('^(armando[.]pilacuan@gmail[.]com|diana[.]moscoso@crearpsl[.]net|emily[.]campuzano@crearpsl[.]net|freddy[.]sosa@crearpsl[.]net|jose[.]sanchez@crearpsl[.]net|josue[.]vera@crearpsl[.]net|milacampuzano21@gmail[.]com|nora[.]zamora@crearpsl[.]net|ricardo[.]gavilanez@crearpsl[.]net|ricardogavilanez1021@gmail[.]com|yurany[.]gonzalez@crearpsl[.]net)$');
+    }
+
+    function rosterDireccion(e) {
+      return e.matches('^(andres[.]gomez@crearpsl[.]net|armando[.]pilacuan@gmail[.]com|contabilidad[.]global@crearpsl[.]net|fer[.]aragon@crearpsl[.]net|gomeznueve@gmail[.]com|leandro[.]brunis@crearpsl[.]net|paul[.]sosa@crearpsl[.]net)$');
+    }
+
+    function officialRosterHasRole(targetRole) {
+      let e = normalizedCorpEmail(email());
+      return (targetRole == 'coord_c1' && rosterCoordC1(e)) ||
+        (targetRole == 'coord_maestria' && rosterCoordMaestria(e)) ||
+        (targetRole == 'director_maestria' && rosterDirectorMaestria(e)) ||
+        (targetRole == 'qt' && rosterQt(e)) ||
+        (targetRole == 'entrenador' && rosterEntrenador(e)) ||
+        (targetRole == 'entrenador_llamadas' && rosterEntrenadorLlamadas(e)) ||
+        (targetRole == 'gerente' && rosterGerente(e)) ||
+        (targetRole == 'direccion' && rosterDireccion(e));
+    }
+
+    function officialRosterHasAnyRole(roleNames) {
+      let e = normalizedCorpEmail(email());
+      return ('coord_c1' in roleNames && rosterCoordC1(e)) ||
+        ('coord_maestria' in roleNames && rosterCoordMaestria(e)) ||
+        ('director_maestria' in roleNames && rosterDirectorMaestria(e)) ||
+        ('gerente' in roleNames && rosterGerente(e)) ||
+        ('direccion' in roleNames && rosterDireccion(e)) ||
+        ('qt' in roleNames && rosterQt(e)) ||
+        ('entrenador' in roleNames && rosterEntrenador(e)) ||
+        ('entrenador_llamadas' in roleNames && rosterEntrenadorLlamadas(e)) ||
+        ('staff' in roleNames && e.matches('^.+@crearpsl[.]net$') &&
+         !e.matches('^(nuevo|emely[.]leon|talento[.]humano|leyla[.]pasquel|leylakellypasquel)@crearpsl[.]net$'));
+    }
+
+    function profileExplicitHasAnyRole(u, roleNames) {
+      let rolesList = u.get('roles', []);
+      return (u.get('role', '') is string && u.get('role', '') in roleNames) ||
+        (u.get('rol', '') is string && u.get('rol', '') in roleNames) ||
+        (u.get('appRole', '') is string && u.get('appRole', '') in roleNames) ||
+        (rolesList is list && rolesList.hasAny(roleNames));
+    }
+
+    function authedCallerHasTaskRole(targetRole) {
+      let p = /databases/$(database)/documents/users/$(request.auth.uid);
+      let u = exists(p) ? get(p).data : {};
+      return !isProfileInactive(u) && (
+        hasProfileRoleFields(u)
+          ? profileExplicitHasAnyRole(u, roleAliasesFor(targetRole))
+          : officialRosterHasRole(targetRole)
       );
     }
 
     function callerHasTaskRole(roleName) {
-      return isAuthenticated() &&
-         exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-         (
-           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == roleName ||
-           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('rol', '') == roleName ||
-           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('appRole', '') == roleName ||
-           (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []) is list &&
-            roleName in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles)
-         );
+      return isAuthenticated() && authedCallerHasTaskRole(roleName);
+    }
+
+    function authedCallerHasAnyRole(roleNames) {
+      let p = /databases/$(database)/documents/users/$(request.auth.uid);
+      let u = exists(p) ? get(p).data : {};
+      return !isProfileInactive(u) && (
+        hasProfileRoleFields(u)
+          ? profileExplicitHasAnyRole(u, roleNames)
+          : officialRosterHasAnyRole(roleNames)
+      );
+    }
+
+    function callerHasAnyRole(roleNames) {
+      return isAuthenticated() && authedCallerHasAnyRole(roleNames);
+    }
+
+    function officialCoordinatorSede(addr) {
+      let e = normalizedCorpEmail(addr);
+      return {
+        'brenda.rodriguez@crearpsl.net': 'Guayaquil',
+        'diana.macas@crearpsl.net': 'Guayaquil',
+        'jorge.ramirez@crearpsl.net': 'Guayaquil',
+        'jorgeramirezmorejon@gmail.com': 'Guayaquil',
+        'joyce.marin@crearpsl.net': 'Lima',
+        'gina.cardenas@crearpsl.net': 'Lima',
+        'cardenasgina29@gmail.com': 'Lima',
+        'cardenaslopezgina@gmail.com': 'Lima',
+        'evelyn.cedillo@crearpsl.net': 'Cuenca',
+        'viviana.catota@crearpsl.net': 'Cuenca',
+        'alfonso.trujillo@crearpsl.net': 'Cuenca',
+        'valentina.r@crearpsl.net': 'Medellín',
+        'david.gonzalez@crearpsl.net': 'Medellín',
+        'naomi.campos@crearpsl.net': 'México',
+        'adrianna.guarochico@crearpsl.net': 'Quito',
+        'danna.guaman@crearpsl.net': 'Quito',
+        'karla.pastrano@crearpsl.net': 'Quito',
+        'marco.gonzalez@crearpsl.net': 'Quito',
+        'katherine.aguirre@crearpsl.net': 'Quito',
+        'daniela.esposito@crearpsl.net': 'Quito'
+      }.get(e, '');
+    }
+
+    function isPersonalTask(taskData) {
+      let emails = taskData.get('assignedToEmails', []);
+      return taskData.get('isCustom', false) == true ||
+        (taskData.get('id', '') is string && taskData.get('id', '').matches('custom_.*')) ||
+        hasNonEmptyStr(taskData, 'assignedToEmail') ||
+        (emails is list && emails.size() > 0) ||
+        hasNonEmptyStr(taskData, 'assigned_to') ||
+        hasNonEmptyStr(taskData, 'ownerId') ||
+        hasNonEmptyStr(taskData, 'assignedByEmail') ||
+        hasNonEmptyStr(taskData, 'createdBy') ||
+        hasNonEmptyStr(taskData, 'createdByEmail') ||
+        hasNonEmptyStr(taskData, 'created_by');
     }
 
     function isKnownChecklistTaskIdForRole(taskId, roleName) {
@@ -226,50 +401,72 @@ service cloud.firestore {
       );
     }
 
-    function isPersonalTask(taskData) {
-      return taskData.get('isCustom', false) == true ||
-        (taskData.get('id', '') is string && taskData.get('id', '').matches('custom_.*')) ||
-        taskData.keys().hasAny([
-          'assignedToEmail', 'assignedToEmails', 'assigned_to', 'ownerId',
-          'assignedByEmail', 'createdBy', 'createdByEmail', 'created_by'
-        ]);
-    }
-
     function isChecklistCatalogTask(taskData, personalTask) {
       let taskRole = taskData.get('role', '');
       return isAuthenticated() &&
-        taskData.get('isCustom', false) == false &&
+        taskData.get('isCustom', false) != true &&
         !personalTask &&
         taskRole is string &&
         callerHasTaskRole(taskRole) &&
         isKnownChecklistTaskIdForRole(taskData.get('id', ''), taskRole);
     }
 
-    function canReadTask(taskData) {
+    function hasExplicitProfileAnyRole(roleNames) {
+      let p = /databases/$(database)/documents/users/$(request.auth.uid);
+      let u = isAuthenticated() && exists(p) ? get(p).data : {};
+      return isAuthenticated() && !isProfileInactive(u) && profileExplicitHasAnyRole(u, roleNames);
+    }
+
+    function pendingCollabMatches(p, i, callerEmails) {
+      let item = p.size() > i && p[i] is map ? p[i] : {};
+      let em = item.get('email', '');
+      return em is string && em != '' && em.lower() in callerEmails;
+    }
+
+    function hasPendingCollabWithAliases(resourceData, callerEmails) {
+      let p = resourceData.get('pendingCollaborations', []);
+      return isAuthenticated() && p is list && (
+        pendingCollabMatches(p, 0, callerEmails) ||
+        pendingCollabMatches(p, 1, callerEmails) ||
+        pendingCollabMatches(p, 2, callerEmails)
+      );
+    }
+
+    function canReadTaskWithContext(taskData, aliases, owner, collab) {
       let personalTask = isPersonalTask(taskData);
-      return isTaskRecipient(taskData) ||
-        isOwner(taskData) ||
+      return isTaskRecipientWithAliases(taskData, aliases) ||
+        owner ||
         (!personalTask && (
-          isSuperAdmin() ||
           isGerenteODireccion() ||
-          isCollaborator(taskData) ||
+          collab ||
+          hasPendingCollabWithAliases(taskData, aliases) ||
           isChecklistCatalogTask(taskData, personalTask) ||
-          ((callerHasTaskRole('gerente') || callerHasTaskRole('direccion')) &&
-           taskData.get('isValidation', false) == true)
+          (taskData.get('isValidation', false) == true &&
+           hasExplicitProfileAnyRole(['gerente', 'direccion']))
         ));
     }
 
-    function canReadDualTask(taskData) {
-      let callerSede = isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('sede', '')
-        : '';
+    function canReadTask(taskData) {
+      let aliases = callerEmailAliases();
+      return canReadTaskWithContext(
+        taskData,
+        aliases,
+        isOwnerWithAliases(taskData, aliases),
+        isCollaboratorWithAliases(taskData, aliases)
+      );
+    }
+
+    function authedCanReadDualTask(taskData) {
+      let p = /databases/$(database)/documents/users/$(request.auth.uid);
+      let u = exists(p) ? get(p).data : {};
+      let callerSede = hasNonEmptyStr(u, 'sede') ? u.sede : officialCoordinatorSede(email());
       return !isPersonalTask(taskData) &&
-        isAuthenticated() &&
         taskData.get('isDualTask', false) == true &&
         (isGerenteODireccion() ||
-         callerHasTaskRole('manager') ||
-         callerHasTaskRole('entrenador') ||
-         callerHasTaskRole('entrenador_llamadas')) &&
+         (!isProfileInactive(u) &&
+          (hasProfileRoleFields(u)
+            ? profileExplicitHasAnyRole(u, ['manager', 'entrenador', 'coach', 'entrenador_llamadas'])
+            : officialRosterHasAnyRole(['entrenador', 'entrenador_llamadas'])))) &&
         (
           taskData.get('sede', '') == 'Global' ||
           taskData.get('sede', '') == 'Sede Global' ||
@@ -277,41 +474,23 @@ service cloud.firestore {
         );
     }
 
-    // (29/08/2026) FIX: las tareas del catálogo base (checklistData.js) son compartidas por
-    // sede vía el mapa "completions" — nunca tienen assignedToEmail/ownerId ni un arreglo
-    // "collaborators" explícito. Un Coordinador marcando su propio checklist (toggleTask,
-    // % de avance, evidencia) nunca cumplía isOwner() ni isCollaborator(), así que Firestore
-    // rechazaba la escritura con permission-denied ("Revisa los permisos de Firestore") en
-    // cuanto el documento de la tarea ya existía (después del primer toque, o si "Reiniciar
-    // Ciclo" ya corrió). Este helper solo permite cambios al rol dueño del catálogo de tareas.
-    // operativos de progreso/completitud — nunca campos estructurales (dueño, rol, sede,
-    // plazo, título), que siguen exigiendo isOwner()/isGerenteODireccion()/isSuperAdmin().
-    //
-    // FIX (16/09/2026): José reportó que los adjuntos/evidencia y las notas de
-    // avance "no se guardan". Causa real (verificada leyendo el código): el botón
-    // "Guardar Avances" de TaskDetailModal.jsx (handleSaveAll) manda SIEMPRE un
-    // solo update con estos campos: progressPercentage, completed, status,
-    // completedAt, assigneeProgress, evidenceUrl, evidence_url, evidences,
-    // comments, notes, description, progressNotes, lastUpdated, lastUpdatedBy.
-    // Esta lista solo permitía 9 de esos campos — le faltaban assigneeProgress,
-    // evidences (el arreglo real de adjuntos, evidence_url es solo el legado de
-    // uno solo), comments, notes, description, progressNotes, completedAt,
-    // lastUpdated y lastUpdatedBy. Cualquier persona que guardara evidencia sin
-    // ser SuperAdmin, sin estar en la lista fija de isGerenteODireccion(), y sin
-    // ser dueño/colaborador de esa tarea puntual, era rechazada por Firestore en
-    // cuanto intentaba guardar evidencia o una nota — sin importar que el propio
-    // modal ya avisara "guarda tus avances antes de salir". Se agregan esos 9
-    // campos, que son de bitácora/progreso propio, nunca estructurales (título,
-    // asignación, rol, sede, plazo siguen exigiendo isOwner()/isGerenteODireccion()/
-    // isSuperAdmin() como hasta ahora).
+    function canReadDualTask(taskData) {
+      return isAuthenticated() && authedCanReadDualTask(taskData);
+    }
+
     function isOperationalProgressUpdate() {
       return isAuthenticated() &&
+        (request.resource.data.get('isCustom', false) != true ||
+         resource.data.get('isCustom', false) == true) &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'completed', 'status', 'completions', 'progress', 'progressPercentage',
           'evidence_url', 'evidenceUrl', 'date', 'googleSynced',
           'assigneeProgress', 'evidences', 'comments', 'notes', 'description',
           'progressNotes', 'completedAt', 'lastUpdated', 'lastUpdatedBy',
-          'updatedAt', 'updated_at', 'deadline', 'lifecycleMutation', 'closedAssigneeKeys'
+          'updatedAt', 'updated_at', 'deadline', 'lifecycleMutation', 'closedAssigneeKeys',
+          'hasManualDeadline', 'isManualDeadline', 'manualDeadline',
+          'pendingCollaborations', 'collaborators', 'collaboratorDetails',
+          'catalogTask', 'isCustom'
         ]);
     }
 
@@ -322,17 +501,21 @@ service cloud.firestore {
 
     function participantBeforeState(taskId, key, taskData) {
       let path = /databases/$(database)/documents/tasks/$(taskId)/participant_states/$(key);
-      return exists(path) ? get(path).data.state : taskData.get('assigneeProgress', {}).get(key, {});
+      let ap = taskData.get('assigneeProgress', {});
+      return exists(path) ? get(path).data.state : (ap is map && ap.get(key, {}) is map ? ap.get(key, {}) : {});
     }
 
     function participantAfterState(taskId, key, taskData) {
       let path = /databases/$(database)/documents/tasks/$(taskId)/participant_states/$(key);
-      return existsAfter(path) ? getAfter(path).data.state : taskData.get('assigneeProgress', {}).get(key, {});
+      let ap = taskData.get('assigneeProgress', {});
+      return existsAfter(path) ? getAfter(path).data.state : (ap is map && ap.get(key, {}) is map ? ap.get(key, {}) : {});
     }
 
     function lifecycleEventState(taskId, taskData, scope, after) {
+      let comp = taskData.get('completions', {});
+      let compKey = scope.get('sede', '') + '__' + scope.get('cycleId', '');
       return scope.keys().hasAll(['sede', 'cycleId'])
-        ? taskData.get('completions', {}).get(scope.sede + '__' + scope.cycleId, {})
+        ? (comp is map && comp.get(compKey, {}) is map ? comp.get(compKey, {}) : {})
         : scope.keys().hasAll(['assigneeEmail'])
           ? (after ? participantAfterState(taskId, scope.assigneeEmail, taskData)
              : participantBeforeState(taskId, scope.assigneeEmail, taskData))
@@ -342,7 +525,7 @@ service cloud.firestore {
     function hasNewLifecycleEvent(taskId, mutation, action) {
       let eventId = mutation.get('eventId', '');
       let eventPath = /databases/$(database)/documents/task_completion_events/$(eventId);
-      let event = eventId != '' && existsAfter(eventPath) ? getAfter(eventPath).data : {};
+      let event = eventId is string && eventId != '' && existsAfter(eventPath) ? getAfter(eventPath).data : {};
       return eventId is string && eventId != '' && !exists(eventPath) &&
         event.get('taskId', '') == taskId && event.get('action', '') == action &&
         event.get('actorEmail', '') == email() && event.get('source', '') == 'manual' &&
@@ -371,9 +554,11 @@ service cloud.firestore {
       let validScope = field == 'completions'
         ? scope.keys().hasAll(['sede', 'cycleId']) && scope.sede != '' && scope.cycleId != ''
         : scope.keys().hasAll(['assigneeEmail']) && scope.assigneeEmail != '';
+      let bEntry = before.get(key, {}) is map ? before.get(key, {}) : {};
+      let aEntry = after.get(key, {}) is map ? after.get(key, {}) : {};
       return validScope && after.diff(before).affectedKeys().hasOnly([key]) &&
-          (preservesClosedEntry(before.get(key, {}), after.get(key, {})) ||
-           (!lifecycleClosed(after.get(key, {})) && scope == mutation.get('scope', {}) &&
+          (preservesClosedEntry(bEntry, aEntry) ||
+           (!lifecycleClosed(aEntry) && scope == mutation.get('scope', {}) &&
             hasNewReopenEvent(taskId, mutation)));
     }
 
@@ -383,75 +568,95 @@ service cloud.firestore {
         safeChangedLifecycleMap(before, after, scope, field, taskId, mutation);
     }
 
-    function participantEmail(key) {
-      let normalized = key.lower()
-        .replace('@crearpls[.]com$', '@crearpsl.net')
-        .replace('@crearpsl[.]com$', '@crearpsl.net');
-      return normalized == 'milacampuzano21@gmail.com' ? 'emily.campuzano@crearpsl.net' :
-        normalized == 'ricardogavilanez1021@gmail.com' ? 'ricardo.gavilanez@crearpsl.net' :
-        normalized == 'brunische66@gmail.com' ? 'leandro.brunis@crearpsl.net' : normalized;
-    }
-
-    function canChangeParticipant(taskData, key) {
-      return participantEmail(key) == participantEmail(email()) ||
-        isGerenteODireccion() || isOwner(taskData) || isCollaborator(taskData);
-    }
-
-    function isTaskParticipant(taskData, key) {
+    function isTaskParticipant(taskData, key, pk, owner) {
       let keyAliases = emailAliases(key);
       let assignedToEmail = taskData.get('assignedToEmail', '');
       let assignedTo = taskData.get('assigned_to', '');
       let assignedToEmails = taskData.get('assignedToEmails', []);
       let collaborators = taskData.get('collaborators', []);
-      return (taskData.get('assigneeProgress', {}) is map && key in taskData.get('assigneeProgress', {})) ||
+      let ap = taskData.get('assigneeProgress', {});
+      return (ap is map && key in ap) ||
         (assignedToEmails is list && (key in assignedToEmails || assignedToEmails.hasAny(keyAliases))) ||
         key == assignedToEmail ||
-        (assignedToEmail is string && assignedToEmail != '' && participantEmail(key) == participantEmail(assignedToEmail)) ||
+        (assignedToEmail is string && assignedToEmail != '' && pk == participantEmail(assignedToEmail)) ||
         key == assignedTo ||
-        (assignedTo is string && assignedTo != '' && participantEmail(key) == participantEmail(assignedTo)) ||
+        (assignedTo is string && assignedTo != '' && pk == participantEmail(assignedTo)) ||
         (collaborators is list && (key in collaborators || collaborators.hasAny(keyAliases))) ||
-        (participantEmail(key) == participantEmail(email()) && isOwner(taskData));
+        (pk == participantEmail(email()) && owner);
     }
 
     function validParticipantState(taskId, key, taskData, before) {
       let data = request.resource.data;
-      let mutation = { 'eventId': data.get('lifecycleMutation', {}).get('eventId', ''),
+      let callerAliases = callerEmailAliases();
+      let owner = isOwnerWithAliases(taskData, callerAliases);
+      let collab = isCollaboratorWithAliases(taskData, callerAliases);
+      let pk = participantEmail(key);
+      let rawMut = data.get('lifecycleMutation', {});
+      let mutMap = rawMut is map ? rawMut : {};
+      let mutation = { 'eventId': mutMap.get('eventId', ''),
         'scope': { 'assigneeEmail': key } };
-      return canReadTask(taskData) && isTaskParticipant(taskData, key) &&
+      return canReadTaskWithContext(taskData, callerAliases, owner, collab) &&
+        isTaskParticipant(taskData, key, pk, owner) &&
         data.keys().hasAll(['taskId', 'assigneeEmail', 'state', 'lifecycleMutation']) &&
         data.keys().hasOnly(['taskId', 'assigneeEmail', 'state', 'lifecycleMutation']) &&
         data.taskId == taskId && data.assigneeEmail == key && data.state is map &&
-        (data.state == before || canChangeParticipant(taskData, key)) &&
+        (data.state == before || pk == participantEmail(email()) || isGerenteODireccion() || owner || collab) &&
         (preservesClosedEntry(before, data.state) ||
           (!lifecycleClosed(data.state) && hasNewReopenEvent(taskId, mutation))) &&
         (lifecycleClosed(before) || !lifecycleClosed(data.state) ||
           hasNewLifecycleEvent(taskId, mutation, 'completed'));
     }
 
+    function validParticipantStateCreate(taskId, key) {
+      let taskData = get(/databases/$(database)/documents/tasks/$(taskId)).data;
+      let ap = taskData.get('assigneeProgress', {});
+      let before = ap is map && ap.get(key, {}) is map ? ap.get(key, {}) : {};
+      return validParticipantState(taskId, key, taskData, before);
+    }
+
+    function validParticipantStateUpdate(taskId, key) {
+      let taskData = get(/databases/$(database)/documents/tasks/$(taskId)).data;
+      return validParticipantState(taskId, key, taskData, resource.data.state);
+    }
+
     function safeTaskLifecycleUpdate(taskId) {
       let before = resource.data;
       let after = request.resource.data;
-      let mutation = after.get('lifecycleMutation', {});
-      let scope = mutation.get('mapScope', mutation.get('scope', {}));
+      let rawMutation = after.get('lifecycleMutation', {});
+      let mutation = rawMutation is map ? rawMutation : {};
+      let rawScope = mutation.get('mapScope', mutation.get('scope', {}));
+      let scope = rawScope is map ? rawScope : {};
+      let beforeCompletions = before.get('completions', {}) is map ? before.get('completions', {}) : {};
+      let afterCompletions = after.get('completions', {}) is map ? after.get('completions', {}) : {};
+      let beforeAssignees = before.get('assigneeProgress', {}) is map ? before.get('assigneeProgress', {}) : {};
+      let afterAssignees = after.get('assigneeProgress', {}) is map ? after.get('assigneeProgress', {}) : {};
       return (preservesClosedEntry(before, after) ||
           (!lifecycleClosed(after) && hasNewReopenEvent(taskId, {
             'eventId': mutation.get('eventId', ''), 'scope': {}
           }))) &&
-        safeLifecycleMap(before.get('completions', {}), after.get('completions', {}),
+        safeLifecycleMap(beforeCompletions, afterCompletions,
           scope, 'completions', taskId, mutation) &&
-        after.get('assigneeProgress', {}) == before.get('assigneeProgress', {});
+        afterAssignees == beforeAssignees;
     }
 
     function validClosureContext(event, taskData) {
-      let context = event.get('closureContext', {});
+      let rawContext = event.get('closureContext', {});
+      let context = rawContext is map ? rawContext : {};
+      let rawComments = taskData.get('comments', '');
+      let taskComments = rawComments == null ? '' : rawComments;
+      let rawEvUrl = taskData.get('evidenceUrl', null);
+      let rawEvUrlLegacy = taskData.get('evidence_url', '');
+      let taskEvUrl = rawEvUrl != null ? rawEvUrl : (rawEvUrlLegacy == null ? '' : rawEvUrlLegacy);
+      let rawEvidences = taskData.get('evidences', []);
+      let taskEvidences = rawEvidences == null ? [] : rawEvidences;
       return context.keys().hasAll(['comments', 'evidenceUrl', 'evidences']) &&
         context.keys().hasOnly(['comments', 'evidenceUrl', 'evidences']) &&
         context.comments is string && context.comments.size() <= 500000 &&
-        context.comments == taskData.get('comments', '') &&
+        context.comments == taskComments &&
         context.evidenceUrl is string && context.evidenceUrl.size() <= 8192 &&
-        context.evidenceUrl == taskData.get('evidenceUrl', taskData.get('evidence_url', '')) &&
+        context.evidenceUrl == taskEvUrl &&
         context.evidences is list && context.evidences.size() <= 100 &&
-        context.evidences == taskData.get('evidences', []);
+        context.evidences == taskEvidences;
     }
 
     function validTaskCompletionEvent() {
@@ -475,7 +680,7 @@ service cloud.firestore {
            scope.cycleId is string && scope.cycleId.size() > 0) ||
           (scope.keys().hasOnly(['assigneeEmail']) && scope.assigneeEmail is string &&
             (participantEmail(scope.assigneeEmail) == participantEmail(email()) || isSuperAdmin() || isGerenteODireccion() ||
-             beforeTask.get('createdBy', '') == email() || beforeTask.get('assignedByEmail', '') == email()))) &&
+             emailIsCaller(beforeTask.get('createdBy', '')) || emailIsCaller(beforeTask.get('assignedByEmail', ''))))) &&
         existsAfter(taskPath) &&
         (event.action == 'completed' ? validClosureContext(event, afterTask) :
           !event.keys().hasAny(['closureContext'])) &&
@@ -483,20 +688,8 @@ service cloud.firestore {
          (event.action == 'reopened' && lifecycleClosed(beforeState) && !lifecycleClosed(afterState)));
     }
 
-    // (29/08/2026) MJ_CALENDARS: el rol operativo del usuario (coord_maestria,
-    // director_maestria, etc.) no viaja en el token de autenticación ni se
-    // puede inferir de una lista fija de correos como isGerenteODireccion().
-    // El perfil users/{uid} es la fuente de roles administrada; las reglas de
-    // users impiden que el propio usuario pueda cambiar sus roles.
     function callerRole() {
-      return isAuthenticated() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        (
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '')
-            in ['coord_maestria', 'director_maestria'] ||
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', [])
-            .hasAny(['coord_maestria', 'director_maestria'])
-        );
+      return callerHasTaskRole('coord_maestria') || callerHasTaskRole('director_maestria');
     }
 
     // HOJA EN BLANCO: Funciones de transversalidad
@@ -542,14 +735,7 @@ service cloud.firestore {
     // C-01: tareas críticas/masivas solo las crean SuperAdmin o perfiles gerenciales verificados.
     // Los documentos con forma de catálogo (isChecklistCatalogTask) se aceptan antes, sin verificar perfil.
     function hasVerifiedTaskAdminProfile() {
-      let profilePath = /databases/$(database)/documents/users/$(request.auth.uid);
-      let adminRoles = ['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio'];
-      return isAuthenticated() && exists(profilePath) &&
-        (get(profilePath).data.get('role', '') in adminRoles ||
-         get(profilePath).data.get('rol', '') in adminRoles ||
-         get(profilePath).data.get('appRole', '') in adminRoles ||
-         (get(profilePath).data.get('roles', []) is list &&
-          get(profilePath).data.roles.hasAny(adminRoles)));
+      return callerHasAnyRole(['gerente', 'direccion', 'director_maestria', 'cfo', 'cco', 'ceo', 'socio']);
     }
 
     function requiresTaskAdminForCreate(taskData) {
@@ -559,36 +745,56 @@ service cloud.firestore {
                taskData.get('assignedToEmails', []).size() > 1));
     }
 
+    function canCreateTask(taskData) {
+      let personalTask = isPersonalTask(taskData);
+      let aliases = callerEmailAliases();
+      return (taskData.get('isCustom', false) != true &&
+              isChecklistCatalogTask(taskData, personalTask)) ||
+        (requiresTaskAdminForCreate(taskData)
+          ? (isGerenteODireccion() || hasVerifiedTaskAdminProfile())
+          : (isGerenteODireccion() ||
+             (isOwnerWithAliases(taskData, aliases) &&
+              !isReservedChecklistTaskId(taskData.get('id', ''))) ||
+             isCollaboratorWithAliases(taskData, aliases)));
+    }
+
+    function canAcceptTaskCollaboration(before, after, personalTask, aliases) {
+      let prevCollabs = before.get('collaborators', []);
+      return !personalTask &&
+        after.diff(before).affectedKeys().hasOnly(['collaborators', 'collaboratorDetails', 'updatedAt']) &&
+        isCollaboratorWithAliases(after, aliases) &&
+        (!(prevCollabs is list) || after.collaborators.hasAll(prevCollabs));
+    }
+
+    function canUpdateTask(taskId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      let personalTask = isPersonalTask(before);
+      let aliases = callerEmailAliases();
+      let opUpdate = isOperationalProgressUpdate();
+      return safeTaskLifecycleUpdate(taskId) && (
+        (before.get('isCustom', false) != true &&
+         isChecklistCatalogTask(before, personalTask) &&
+         opUpdate) ||
+        isGerenteODireccion() ||
+        isOwnerWithAliases(before, aliases) ||
+        isTaskRecipientWithAliases(before, aliases) ||
+        (isCollaboratorWithAliases(before, aliases) && opUpdate) ||
+        canAcceptTaskCollaboration(before, after, personalTask, aliases)
+      );
+    }
+
     // TASKS
     match /tasks/{taskId} {
       allow read: if canReadTask(resource.data);
-      allow create: if (request.resource.data.get('isCustom', false) == false &&
-                        isChecklistCatalogTask(request.resource.data, isPersonalTask(request.resource.data))) ||
-                    (requiresTaskAdminForCreate(request.resource.data)
-                      ? (isGerenteODireccion() || hasVerifiedTaskAdminProfile())
-                      : (isSuperAdmin() || isGerenteODireccion() ||
-                         (isOwner(request.resource.data) &&
-                          !isReservedChecklistTaskId(request.resource.data.get('id', ''))) ||
-                         isCollaborator(request.resource.data)));
-      allow update: if safeTaskLifecycleUpdate(taskId) && (
-                    (resource.data.get('isCustom', false) == false &&
-                     isChecklistCatalogTask(resource.data, isPersonalTask(resource.data)) &&
-                     isOperationalProgressUpdate()) ||
-                    isSuperAdmin() || isGerenteODireccion() ||
-                    isOwner(resource.data) ||
-                    isTaskRecipient(resource.data) ||
-                    (isCollaborator(resource.data) &&
-                     request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
-                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])));
+      allow create: if canCreateTask(request.resource.data);
+      allow update: if canUpdateTask(taskId);
       allow delete: if isGerenteODireccion() || isSuperAdmin();
 
       match /participant_states/{assigneeEmail} {
         allow read: if canReadTask(get(/databases/$(database)/documents/tasks/$(taskId)).data);
-        allow create: if validParticipantState(taskId, assigneeEmail,
-          get(/databases/$(database)/documents/tasks/$(taskId)).data,
-          get(/databases/$(database)/documents/tasks/$(taskId)).data.get('assigneeProgress', {}).get(assigneeEmail, {}));
-        allow update: if validParticipantState(taskId, assigneeEmail,
-          get(/databases/$(database)/documents/tasks/$(taskId)).data, resource.data.state);
+        allow create: if validParticipantStateCreate(taskId, assigneeEmail);
+        allow update: if validParticipantStateUpdate(taskId, assigneeEmail);
         allow delete: if false;
       }
     }
@@ -605,7 +811,7 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated(); // igual que antes: sin restringir por rol
       allow update: if isSuperAdmin() || isGerenteODireccion() || isOwner(resource.data) ||
-        (callerHasAnyRole(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'coord_jr', 'coordinador']) &&
+        (callerHasAnyRole(['coord_c1', 'coord_c2', 'coordinador_c1', 'coordinador_c1c2', 'coord_c1_c2', 'coord_maestria', 'coordinador_mj', 'coordinador_maestria', 'coord_jr', 'coordinador']) &&
          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['assignedCoordinators', 'currentValue', 'progress', 'updatedAt']));
       allow delete: if isSuperAdmin();
     }
@@ -624,18 +830,28 @@ service cloud.firestore {
         sede in ['medellín', 'medellin', 'med'] ? 'Medellín' : value;
     }
 
-    function reportScopeAllowed(data) {
-      let profile = exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data : {};
+    function authedReportScopeAllowed(data) {
+      let p = /databases/$(database)/documents/users/$(request.auth.uid);
+      let profile = exists(p) ? get(p).data : {};
+      let e = normalizedCorpEmail(email());
+      let hasRoles = hasProfileRoleFields(profile);
+      let rawSede = hasNonEmptyStr(profile, 'sede') ? profile.sede : officialCoordinatorSede(e);
       let stage = data.get('stage', '');
-      return isReportAdmin() || (
-        isAuthenticated() &&
-        reportSedeName(profile.get('sede', '')) == data.get('sede', '') &&
-        ((stage == 'C1' && callerHasTaskRole('coord_c1')) ||
-         (stage == 'C2' && callerHasTaskRole('coord_c2')) ||
-         (stage in ['C1', 'C2'] && callerHasTaskRole('coordinador_c1c2')) ||
-         callerHasTaskRole('gerente'))
-      );
+      return isSuperAdmin() || (!isProfileInactive(profile) && (
+        (hasRoles ? profileExplicitHasAnyRole(profile, roleAliasesFor('direccion')) : rosterDireccion(e)) ||
+        (reportSedeName(rawSede) == data.get('sede', '') && (
+          hasRoles
+            ? ((stage == 'C1' && profileExplicitHasAnyRole(profile, roleAliasesFor('coord_c1'))) ||
+               (stage == 'C2' && profileExplicitHasAnyRole(profile, roleAliasesFor('coord_c2'))) ||
+               (stage in ['C1', 'C2'] && profileExplicitHasAnyRole(profile, roleAliasesFor('coordinador_c1c2'))) ||
+               profileExplicitHasAnyRole(profile, roleAliasesFor('gerente')))
+            : ((stage == 'C1' && rosterCoordC1(e)) || rosterGerente(e))
+        ))
+      ));
+    }
+
+    function reportScopeAllowed(data) {
+      return isAuthenticated() && authedReportScopeAllowed(data);
     }
 
     match /nodus_report_sources/{sourceId} {
@@ -696,8 +912,8 @@ service cloud.firestore {
         isAuthenticated() ||
         (request.resource.data != null && request.resource.data.get('robot_token', '') == "NODUS_ROBOT_CPSL_2026_SECRET")
       );
-      allow update: if isAuthenticated() && resource.data.userId == email();
-      allow delete: if isAuthenticated() && resource.data.userId == email();
+      allow update: if isAuthenticated() && (resource.data.userId == email() || emailIsCaller(resource.data.get('userId', '')));
+      allow delete: if isAuthenticated() && (resource.data.userId == email() || emailIsCaller(resource.data.get('userId', '')));
     }
 
     // VENUES (sede, hotel, sal├│n)
@@ -948,18 +1164,6 @@ service cloud.firestore {
     }
 
     // A-01: roles administrados en users/{uid} (nunca datos enviados por el cliente).
-    function callerHasAnyRole(roleNames) {
-      let profilePath = /databases/$(database)/documents/users/$(request.auth.uid);
-      return isAuthenticated() &&
-        exists(profilePath) &&
-        (
-          get(profilePath).data.get('role', '') in roleNames ||
-          get(profilePath).data.get('rol', '') in roleNames ||
-          get(profilePath).data.get('appRole', '') in roleNames ||
-          (get(profilePath).data.get('roles', []) is list &&
-           get(profilePath).data.get('roles', []).hasAny(roleNames))
-        );
-    }
     function isManagementRole() {
       return isGerenteODireccion() || callerHasAnyRole([
         'gerente', 'direccion', 'cfo', 'cco', 'ceo',
@@ -968,8 +1172,8 @@ service cloud.firestore {
     }
     function isLearningReaderRole() {
       return isManagementRole() || callerHasAnyRole([
-        'coord_c1', 'coord_c2', 'coordinador_c1c2',
-        'coord_maestria', 'coordinador_mj'
+        'coord_c1', 'coord_c2', 'coordinador_c1', 'coordinador_c1c2', 'coord_c1_c2', 'coord_jr',
+        'coord_maestria', 'coordinador_mj', 'coordinador_maestria'
       ]);
     }
     function isStaffOrCoordinatorOrManagement() {
@@ -978,13 +1182,13 @@ service cloud.firestore {
         isSuperAdmin() ||
         callerHasAnyRole([
           'gerente', 'direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'consolidado', 'superadmin',
-          'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'coord_jr', 'coordinador',
-          'staff', 'manager', 'capitan', 'qt', 'entrenador', 'entrenador_llamadas', 'talento_humano', 'aliado'
+          'coord_c1', 'coord_c2', 'coordinador_c1', 'coordinador_c1c2', 'coord_c1_c2', 'coord_maestria', 'coordinador_mj', 'coordinador_maestria', 'coord_jr', 'coordinador',
+          'staff', 'manager', 'capitan', 'qt', 'quantum_team', 'coord_qt', 'coordinador_qt', 'entrenador', 'coach', 'entrenador_llamadas', 'talento_humano', 'aliado'
         ])
       );
     }
     function emailIsCaller(value) {
-      return value is string && value.lower() in callerEmailAliases();
+      return value is string && value != '' && value.lower() in callerEmailAliases();
     }
 
     // ------------------------------------------------------------------------
@@ -1104,17 +1308,10 @@ service cloud.firestore {
     // Roles autorizados en la ruta /monitor-imos (App.jsx). El rol se lee del
     // perfil users/{uid}, que el propio usuario no puede modificar.
     function isImoStaff() {
-      return isGerenteODireccion() || (isAuthenticated() &&
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-        (
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') in IMO_STAFF_ROLES() ||
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('rol', '') in IMO_STAFF_ROLES() ||
-          (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []) is list &&
-           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []).hasAny(IMO_STAFF_ROLES()))
-        ));
+      return isGerenteODireccion() || callerHasAnyRole(IMO_STAFF_ROLES());
     }
     function IMO_STAFF_ROLES() {
-      return ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_jr', 'coord_maestria'];
+      return ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coordinador_c1', 'coordinador_c1c2', 'coord_c1_c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coordinador_maestria'];
     }
     // Shared capability links: a random 20-character campaign id grants access
     // only to that campaign. Profile selection is self-declared, NOT Firebase identity.
@@ -1253,9 +1450,7 @@ service cloud.firestore {
       allow write: if isGerenteODireccion() || isSuperAdmin();
     }
     match /checklist_tasks/{document=**} {
-      allow read: if isPersonalTask(resource.data)
-        ? canReadTask(resource.data)
-        : canReadDualTask(resource.data) || canReadTask(resource.data);
+      allow read: if canReadTask(resource.data) || canReadDualTask(resource.data);
       allow write: if isSuperAdmin() || isGerenteODireccion();
     }
     match /settings/{document=**} {

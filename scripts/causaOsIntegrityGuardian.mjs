@@ -35,6 +35,7 @@ import {
   resolveOfficialMailFrom
 } from '../src/config/officialMailConfig.js';
 import { runTaskRoleCoherenceAgent } from './auditTaskRoleCoherenceAgent.mjs';
+import { syncUsersUidProfilesAndCatalogTasks } from './syncUsersUidProfiles.mjs';
 
 dotenv.config();
 
@@ -319,8 +320,15 @@ async function checkFirestoreIntegrity(db) {
   const mjDupes = findDupes(mjSnap);
   const fwDupes = findDupes(fwSnap);
 
-  // 5.4 Coherencia de tareas vs roles
+  // 5.4 Coherencia de tareas vs roles y sincronización de perfiles users/{uid}
   let coherenceCritical = 0;
+  let syncedUidProfiles = 0;
+  try {
+    const syncRes = await syncUsersUidProfilesAndCatalogTasks({ dryRun: false });
+    syncedUidProfiles = syncRes?.updatedUsersCount || 0;
+  } catch (err) {
+    console.warn(`⚠️ [Guardián 3H] Aviso en syncUsersUidProfiles: ${err.message}`);
+  }
   try {
     const coherenceReport = await runTaskRoleCoherenceAgent({ autoFix: false, jsonOutput: true });
     coherenceCritical = coherenceReport?.summary?.criticalCount || 0;

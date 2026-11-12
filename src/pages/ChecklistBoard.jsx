@@ -485,7 +485,7 @@ export default function ChecklistBoard() {
     const current = task.deadline || "";
     const newDeadline = await showPrompt("⏰ Establecer Fecha y Hora Límite obligatoria:\n(Ejemplo: 2026-08-22 18:00 o Lunes 09:00)", current);
     if (newDeadline !== null && newDeadline.trim() !== "") {
-      updateTaskDetails(task.id, { deadline: newDeadline.trim() });
+      updateTaskDetails(task.id, { deadline: newDeadline.trim(), hasManualDeadline: true });
     }
   };
 

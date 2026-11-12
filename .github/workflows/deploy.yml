@@ -121,6 +121,11 @@ jobs:
 
           exit "$DEPLOY_EXIT"
 
+      - name: 🔐 Sincronizar perfiles users/{uid} y metadatos de catálogo en Firestore
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/centro-operativo-cpsl-65ad52160f45.json
+        run: node scripts/syncUsersUidProfiles.mjs || echo "⚠️ Aviso no bloqueante en syncUsersUidProfiles"
+
       - name: 🗑️ Borrar la llave del runner
         if: always()
         run: rm -f centro-operativo-cpsl-65ad52160f45.json
