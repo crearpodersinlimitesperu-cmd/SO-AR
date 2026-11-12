@@ -21,7 +21,8 @@ import {
   Trash2,
   ArrowLeft
 } from 'lucide-react';
-import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
@@ -51,6 +52,7 @@ export default function MonitorMaestriaLima() {
   const [selectedRecordForAudit, setSelectedRecordForAudit] = useState(null);
   const [sendingEmailId, setSendingEmailId] = useState(null);
   const [emailStatusMap, setEmailStatusMap] = useState({});
+  const [mailDeliveryByCode, setMailDeliveryByCode] = useState({});
   const [deletingId, setDeletingId] = useState(null);
 
   const normalizeStr = (str) => {
@@ -60,6 +62,46 @@ export default function MonitorMaestriaLima() {
 
   useEffect(() => {
     document.title = 'Panel de Supervisión Lima · Reglas de Maestría del Juego | Causa OS';
+  }, []);
+
+  // Escuchar estado real de despacho de correos de Maestría en Firestore (`mail`)
+  useEffect(() => {
+    if (!db) return;
+    try {
+      const mailQ = query(collection(db, 'mail'), where('type', '==', 'contrato_maestria_confirmacion'));
+      const unsubMail = onSnapshot(
+        mailQ,
+        (snap) => {
+          const bestByKey = {};
+          snap.forEach((docSnap) => {
+            const d = docSnap.data() || {};
+            const codeKey = String(d.codigoRegistro || '').trim();
+            const emailKey = String(d.recipientEmail || (Array.isArray(d.to) ? d.to[0] : d.to) || '').trim().toLowerCase();
+            const rawTs = d.delivery?.endTime || d.delivery?.startTime || d.createdAt || d.created_at || '';
+            const ts = rawTs?.toMillis ? rawTs.toMillis() : (Date.parse(rawTs) || 0);
+            const rawState = d.delivery?.state || 'PENDING';
+            const mapped =
+              rawState === 'SUCCESS'
+                ? 'DELIVERED'
+                : rawState === 'PENDING' || rawState === 'SENDING'
+                ? 'QUEUED'
+                : 'ERROR';
+            for (const key of [codeKey, emailKey].filter(Boolean)) {
+              if (!bestByKey[key] || ts >= bestByKey[key].ts) {
+                bestByKey[key] = { status: mapped, ts, rawState };
+              }
+            }
+          });
+          setMailDeliveryByCode(bestByKey);
+        },
+        (err) => {
+          console.warn('Listener de estado de correo Maestría omitido:', err?.message || err);
+        }
+      );
+      return () => unsubMail();
+    } catch {
+      // Ignorar si no hay sesión
+    }
   }, []);
 
   // Escuchar firmas en tiempo real desde Firestore
@@ -238,7 +280,7 @@ export default function MonitorMaestriaLima() {
   // Reenviar Contrato + Pase por Correo
   const handleResendEmail = async (item) => {
     if (!item.email) {
-      alert('Este registro no cuenta con un correo electrónico válido.');
+      toast.error('Este registro no cuenta con un correo electrónico válido.');
       return;
     }
     const rowKey = item.id || item.code;
@@ -273,18 +315,21 @@ export default function MonitorMaestriaLima() {
         ip: item.ip || 'Registrada',
         geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
         coordinates: item.coordinates || '',
-        device: item.dispositivo || '',
+        device: item.dispositivo || item.device || '',
         sha256Hash: item.sha256Hash || ''
       });
 
       if (ok) {
-        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'SENT' }));
+        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'QUEUED' }));
+        toast.success(`Contrato y Pase enviados a ${item.email}`);
       } else {
         setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+        toast.error(`No se pudo encolar el correo para ${item.email}. Intenta nuevamente.`);
       }
     } catch (e) {
       console.error('Error al reenviar correo:', e);
       setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+      toast.error(`Error al reenviar correo: ${e?.message || 'verifica tu conexión'}`);
     } finally {
       setSendingEmailId(null);
     }
@@ -747,8 +792,16 @@ export default function MonitorMaestriaLima() {
                   const ip = item.ip || 'No detectada';
                   const geo = item.geoLocation || 'Lima, Perú 🇵🇪';
                   const coords = item.coordinates || '';
-                  const device = item.dispositivo || 'Web';
-                  const emailStatus = emailStatusMap[rowKey];
+                  const device = item.dispositivo || item.device || 'Web';
+                  const cleanRecordEmail = String(item.email || '').trim().toLowerCase();
+                  const liveDelivery =
+                    mailDeliveryByCode[code]?.status ||
+                    (cleanRecordEmail ? mailDeliveryByCode[cleanRecordEmail]?.status : null);
+                  const localStatus = emailStatusMap[rowKey];
+                  const emailStatus =
+                    liveDelivery === 'DELIVERED'
+                      ? 'DELIVERED'
+                      : localStatus || liveDelivery || null;
 
                   return (
                     <div
@@ -841,9 +894,30 @@ export default function MonitorMaestriaLima() {
                             onClick={() => handleResendEmail(item)}
                             disabled={sendingEmailId === rowKey}
                             style={{
-                              background: emailStatus === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(56, 189, 248, 0.16)',
-                              color: emailStatus === 'SENT' ? '#34d399' : '#38bdf8',
-                              border: emailStatus === 'SENT' ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(56, 189, 248, 0.38)',
+                              background:
+                                emailStatus === 'DELIVERED'
+                                  ? 'rgba(16, 185, 129, 0.2)'
+                                  : emailStatus === 'QUEUED' || emailStatus === 'SENT'
+                                  ? 'rgba(245, 158, 11, 0.2)'
+                                  : emailStatus === 'ERROR'
+                                  ? 'rgba(244, 63, 94, 0.2)'
+                                  : 'rgba(56, 189, 248, 0.16)',
+                              color:
+                                emailStatus === 'DELIVERED'
+                                  ? '#34d399'
+                                  : emailStatus === 'QUEUED' || emailStatus === 'SENT'
+                                  ? '#fbbf24'
+                                  : emailStatus === 'ERROR'
+                                  ? '#fb7185'
+                                  : '#38bdf8',
+                              border:
+                                emailStatus === 'DELIVERED'
+                                  ? '1px solid rgba(16, 185, 129, 0.45)'
+                                  : emailStatus === 'QUEUED' || emailStatus === 'SENT'
+                                  ? '1px solid rgba(245, 158, 11, 0.45)'
+                                  : emailStatus === 'ERROR'
+                                  ? '1px solid rgba(244, 63, 94, 0.45)'
+                                  : '1px solid rgba(56, 189, 248, 0.38)',
                               borderRadius: '8px',
                               padding: '0.45rem 0.75rem',
                               fontSize: '0.74rem',
@@ -857,8 +931,12 @@ export default function MonitorMaestriaLima() {
                             <Mail size={14} />
                             {sendingEmailId === rowKey
                               ? 'Enviando...'
-                              : emailStatus === 'SENT'
-                              ? '✓ Contrato y Pase Enviados'
+                              : emailStatus === 'DELIVERED'
+                              ? '✓ Contrato y Pase Entregados'
+                              : emailStatus === 'QUEUED' || emailStatus === 'SENT'
+                              ? '⏳ En despacho al correo...'
+                              : emailStatus === 'ERROR'
+                              ? '⚠️ Error · Reenviar Contrato + Pase'
                               : 'Reenviar Contrato + Pase'}
                           </button>
 

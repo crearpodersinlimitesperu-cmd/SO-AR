@@ -1,0 +1,7 @@
+{
+  "functions": [{
+    "source": "functions-mailer",
+    "codebase": "mailer",
+    "ignore": ["node_modules", ".git", "*.local", "firebase-debug*.log"]
+  }]
+}

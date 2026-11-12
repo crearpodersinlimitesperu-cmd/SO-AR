@@ -68,3 +68,88 @@ test('4. Caminata sobre Fuego y Onboarding Legal registran IP y Geolocalización
   assert.ok(legalService.includes('getClientGeoLocation'), 'legalSignatureService debe capturar IP y Geolocalización en todas las firmas');
   assert.ok(legalService.includes('geo_location'), 'legalSignatureService debe persistir geo_location en Firestore');
 });
+
+test('5. Pases de Maestría y Caminata sobre Fuego se comprimen bajo el límite de 1 MiB de Firestore para despacho y reenvío inmediato', async () => {
+  const { default: puppeteer } = await import('puppeteer');
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
+
+  try {
+    const page = await browser.newPage();
+    await page.setContent('<html><body></body></html>');
+
+    const passModuleCode = fs.readFileSync(path.join(repoRoot, 'src/utils/maestriaPass.js'), 'utf8')
+      .replace(/^import .*$/gm, '')
+      .replace(/export async function generateMaestriaPassCanvas/g, 'window.generateMaestriaPassCanvas = async function')
+      .replace(/export async function preparePassEmailAttachment/g, 'window.preparePassEmailAttachment = async function')
+      .replace(/export function buildMaestriaEmailHtml/g, 'window.buildMaestriaEmailHtml = function')
+      .replace(/export async function sendMaestriaConfirmationEmail/g, 'window.sendMaestriaConfirmationEmail = async function')
+      .replace(/export async function generateFirewalkPassCanvas/g, 'window.generateFirewalkPassCanvas = async function')
+      .replace(/export function buildFirewalkEmailHtml/g, 'window.buildFirewalkEmailHtml = function')
+      .replace(/export async function sendFirewalkConfirmationEmail/g, 'window.sendFirewalkConfirmationEmail = async function');
+
+    await page.evaluate(passModuleCode);
+
+    const metrics = await page.evaluate(async () => {
+      const mjPng = await window.generateMaestriaPassCanvas({
+        nombre: 'José Sánchez',
+        doc: 'CE: 008362020',
+        rol: 'Participante',
+        equipo: 'Otra Cohorte / Rezagado Autorizado',
+        sede: 'Lima',
+        fecha: '11/11/2026, 4:29:10 p. m.',
+        codigo: 'CQ-MJ-CUTW6-0652',
+        ip: '2001:1388:80d:6b8f:c86d:40d2:c8e5:c4a7',
+        geoLocation: 'Lima, Lima, Peru 🇵🇪',
+        coordinates: '-12.043176, -77.028242'
+      });
+      const mjAtt = await window.preparePassEmailAttachment(
+        mjPng,
+        'COMPROMISO_MAESTRIA_LIMA',
+        'CQ-MJ-CUTW6-0652',
+        'pase_maestria_oficial'
+      );
+
+      const fwPng = await window.generateFirewalkPassCanvas({
+        nombre: 'José Sánchez',
+        documento: 'CE: 008362020',
+        rolActividad: 'Participante',
+        lugar: 'Lima - Casona Blanca (Huachipa)',
+        fecha: '11/11/2026, 4:29:10 p. m.',
+        codigo: 'CQ-FIRE-TEST-0652',
+        ip: '2001:1388:80d:6b8f:c86d:40d2:c8e5:c4a7',
+        geoLocation: 'Lima, Lima, Peru 🇵🇪',
+        coordinates: '-12.043176, -77.028242'
+      });
+      const fwAtt = await window.preparePassEmailAttachment(
+        fwPng,
+        'PASE_CAMINATA_FUEGO',
+        'CQ-FIRE-TEST-0652',
+        'pase_fuego_oficial'
+      );
+
+      return {
+        mjAttExists: Boolean(mjAtt),
+        mjContentType: mjAtt?.contentType,
+        mjFilename: mjAtt?.filename,
+        mjContentBytes: mjAtt?.content?.length || 0,
+        fwAttExists: Boolean(fwAtt),
+        fwContentType: fwAtt?.contentType,
+        fwFilename: fwAtt?.filename,
+        fwContentBytes: fwAtt?.content?.length || 0
+      };
+    });
+
+    assert.equal(metrics.mjAttExists, true, 'El adjunto de Maestría debe generarse');
+    assert.equal(metrics.mjContentType, 'image/jpeg', 'El adjunto de Maestría debe comprimirse en image/jpeg');
+    assert.ok(metrics.mjContentBytes > 20000 && metrics.mjContentBytes < 500000, `Adjunto Maestría fuera de rango seguro (<500KB): ${metrics.mjContentBytes}`);
+
+    assert.equal(metrics.fwAttExists, true, 'El adjunto de Caminata sobre Fuego debe generarse');
+    assert.equal(metrics.fwContentType, 'image/jpeg', 'El adjunto de Caminata sobre Fuego debe comprimirse en image/jpeg');
+    assert.ok(metrics.fwContentBytes > 20000 && metrics.fwContentBytes < 500000, `Adjunto Fuego fuera de rango seguro (<500KB): ${metrics.fwContentBytes}`);
+  } finally {
+    await browser.close();
+  }
+});

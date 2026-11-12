@@ -1,0 +1,49 @@
+name: ⚡ Deploy Instant Contract Mailer Function
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'functions-mailer/**'
+      - 'firebase.mailer.json'
+      - 'scripts/deployContractMailer.mjs'
+      - 'scripts/provisionImoSecrets.mjs'
+      - '.github/workflows/deploy-contract-mailer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contract-mailer-backend-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts --include=optional
+      - run: npm install --prefix functions-mailer --ignore-scripts
+      - name: Ensure mail secrets exist in Secret Manager
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: node scripts/provisionImoSecrets.mjs
+      - name: Prepare deployment credential
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          node -e "require('fs').writeFileSync(process.env.RUNNER_TEMP + '/mailer-deploy-credential.json', process.env.GOOGLE_SERVICE_ACCOUNT_JSON, {mode: 0o600})"
+      - name: Deploy isolated mailer codebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/mailer-deploy-credential.json
+        run: node scripts/deployContractMailer.mjs
+      - name: Remove temporary credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/mailer-deploy-credential.json"

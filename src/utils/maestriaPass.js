@@ -232,57 +232,96 @@ export async function generateMaestriaPassCanvas({
       ctx.font = '900 19px Montserrat, -apple-system, sans-serif';
       ctx.fillText('🏛️ ESTADO: CONTRATO VINCULANTE FIRMADO', W / 2, badgeY + 32);
 
-      // 7. Bloque de QR y Validación
+      // 7. Bloque de QR y Validación (con carga CORS-safe por Blob para evitar canvas taint)
       const qrSize = 155;
       const qrX = W / 2 - qrSize / 2;
       const qrY = 1145;
 
-      const qrImg = new Image();
-      qrImg.crossOrigin = 'anonymous';
-      const encodedUrl = encodeURIComponent(verificationUrl || `https://centro-operativo-cpsl.web.app/reglas-maestria?c=${codigo}`);
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodedUrl}`;
+      const drawFallbackQrBadge = () => {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(qrX, qrY, qrSize, qrSize);
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.65)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(qrX, qrY, qrSize, qrSize);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 14px sans-serif';
+        ctx.fillText('QR VALIDADO', W / 2, qrY + 72);
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '600 11px monospace';
+        ctx.fillText(String(codigo || '').slice(0, 18), W / 2, qrY + 96);
+      };
 
       let finished = false;
       const finishCanvas = () => {
         if (finished) return;
         finished = true;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = '800 20px "Courier New", monospace';
-        ctx.fillText(`CÓDIGO DIGITAL: ${codigo}`, W / 2, 1335);
+        try {
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = '800 20px "Courier New", monospace';
+          ctx.fillText(`CÓDIGO DIGITAL: ${codigo}`, W / 2, 1335);
 
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 15px Montserrat, -apple-system, sans-serif';
-        ctx.fillText(`Suscrito electrónicamente: ${fecha} (Lima, Perú)`, W / 2, 1365);
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '600 15px Montserrat, -apple-system, sans-serif';
+          ctx.fillText(`Suscrito electrónicamente: ${fecha} (Lima, Perú)`, W / 2, 1365);
 
-        ctx.fillStyle = '#64748b';
-        ctx.font = '500 13px Montserrat, -apple-system, sans-serif';
-        ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1395);
+          ctx.fillStyle = '#64748b';
+          ctx.font = '500 13px Montserrat, -apple-system, sans-serif';
+          ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1395);
 
-        resolve(canvas.toDataURL('image/png'));
+          resolve(canvas.toDataURL('image/png'));
+        } catch (exportErr) {
+          console.warn('Fallback de exportación de pase Maestría:', exportErr);
+          resolve(null);
+        }
       };
 
-      qrImg.onload = () => {
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
-        ctx.fill();
-        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-        finishCanvas();
-      };
+      const encodedUrl = encodeURIComponent(verificationUrl || `https://centro-operativo-cpsl.web.app/reglas-maestria?c=${codigo}`);
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodedUrl}`;
 
-      qrImg.onerror = () => {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fillRect(qrX, qrY, qrSize, qrSize);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '600 14px sans-serif';
-        ctx.fillText('QR VALIDADO', W / 2, qrY + 80);
+      const timeoutId = setTimeout(() => {
+        drawFallbackQrBadge();
         finishCanvas();
-      };
+      }, 2200);
 
-      setTimeout(() => {
+      if (typeof fetch === 'function' && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+        fetch(qrApiUrl, { mode: 'cors' })
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.blob();
+          })
+          .then((blob) => {
+            const objUrl = URL.createObjectURL(blob);
+            const qrImg = new Image();
+            qrImg.onload = () => {
+              clearTimeout(timeoutId);
+              ctx.fillStyle = '#ffffff';
+              ctx.beginPath();
+              ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
+              ctx.fill();
+              ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+              URL.revokeObjectURL(objUrl);
+              finishCanvas();
+            };
+            qrImg.onerror = () => {
+              clearTimeout(timeoutId);
+              URL.revokeObjectURL(objUrl);
+              drawFallbackQrBadge();
+              finishCanvas();
+            };
+            qrImg.src = objUrl;
+          })
+          .catch(() => {
+            clearTimeout(timeoutId);
+            drawFallbackQrBadge();
+            finishCanvas();
+          });
+      } else {
+        clearTimeout(timeoutId);
+        drawFallbackQrBadge();
         finishCanvas();
-      }, 1500);
+      }
 
     } catch (e) {
       console.error('Error al generar canvas de Maestria:', e);
@@ -292,32 +331,105 @@ export async function generateMaestriaPassCanvas({
 }
 
 /**
- * Envía el correo formal de confirmación con el contrato firmado, metadatos de IP y Geolocalización, y el pase adjunto
+ * Comprime cualquier Data URL (PNG/JPEG) a un adjunto JPEG optimizado (< 350 KB)
+ * para garantizar que el documento `mail` en Firestore jamás supere el límite de 1 MiB (1,048,576 bytes).
  */
-export async function sendMaestriaConfirmationEmail({
-  db,
-  toEmail,
+export async function preparePassEmailAttachment(passDataUrl, filenamePrefix, codigo, cid) {
+  if (!passDataUrl || typeof passDataUrl !== 'string') return null;
+
+  const MAX_SAFE_BASE64_LENGTH = 520000;
+
+  if (typeof document !== 'undefined') {
+    try {
+      const compressedDataUrl = await new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const w = img.width || 1080;
+            const h = img.height || 1440;
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = w;
+            offCanvas.height = h;
+            const offCtx = offCanvas.getContext('2d');
+            offCtx.fillStyle = '#060b17';
+            offCtx.fillRect(0, 0, w, h);
+            offCtx.drawImage(img, 0, 0, w, h);
+
+            let jpegUrl = offCanvas.toDataURL('image/jpeg', 0.85);
+            if (jpegUrl.length > MAX_SAFE_BASE64_LENGTH) {
+              jpegUrl = offCanvas.toDataURL('image/jpeg', 0.72);
+            }
+            if (jpegUrl.length > MAX_SAFE_BASE64_LENGTH) {
+              const scale = 0.75;
+              const smallCanvas = document.createElement('canvas');
+              smallCanvas.width = Math.round(w * scale);
+              smallCanvas.height = Math.round(h * scale);
+              const smallCtx = smallCanvas.getContext('2d');
+              smallCtx.fillStyle = '#060b17';
+              smallCtx.fillRect(0, 0, smallCanvas.width, smallCanvas.height);
+              smallCtx.drawImage(img, 0, 0, smallCanvas.width, smallCanvas.height);
+              jpegUrl = smallCanvas.toDataURL('image/jpeg', 0.75);
+            }
+            resolve(jpegUrl);
+          } catch {
+            resolve(null);
+          }
+        };
+        img.onerror = () => resolve(null);
+        img.src = passDataUrl;
+      });
+
+      if (compressedDataUrl && compressedDataUrl.startsWith('data:image/jpeg;base64,')) {
+        const base64Content = compressedDataUrl.replace(/^data:image\/jpeg;base64,/, '');
+        return {
+          filename: `${filenamePrefix}_${codigo}.jpg`,
+          content: base64Content,
+          contentType: 'image/jpeg',
+          encoding: 'base64',
+          cid
+        };
+      }
+    } catch (err) {
+      console.warn('Compresión JPEG en navegador no disponible, evaluando fallback:', err);
+    }
+  }
+
+  const mimeMatch = passDataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
+  const contentType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+  const ext = contentType.includes('png') ? 'png' : 'jpg';
+  const rawBase64 = passDataUrl.replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, '');
+
+  if (rawBase64.length > MAX_SAFE_BASE64_LENGTH) {
+    console.warn(`Adjunto base64 demasiado grande (${rawBase64.length} chars) sin compresor DOM; se enviará correo sin imagen pesada para no exceder 1 MiB en Firestore.`);
+    return null;
+  }
+
+  return {
+    filename: `${filenamePrefix}_${codigo}.${ext}`,
+    content: rawBase64,
+    contentType,
+    encoding: 'base64',
+    cid
+  };
+}
+
+export function buildMaestriaEmailHtml({
   nombre,
   doc,
   rol,
   equipo,
   codigo,
   fecha,
-  passDataUrl,
   telefono,
   ip = 'No detectada',
   geoLocation = 'Lima, Perú 🇵🇪',
   coordinates = '',
   device = '',
-  sha256Hash = ''
+  sha256Hash = '',
+  hasInlinePass = false
 }) {
-  if (!db || !toEmail) return false;
-
-  try {
-    const safeName = nombre || 'Participante';
-    const base64Data = passDataUrl ? passDataUrl.replace(/^data:image\/png;base64,/, '') : null;
-
-    const emailHtml = `
+  const safeName = nombre || 'Participante';
+  return `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
         <!-- Cabecera Institucional -->
         <div style="background: linear-gradient(135deg, #091124 0%, #172554 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #f59e0b;">
@@ -407,10 +519,10 @@ export async function sendMaestriaConfirmationEmail({
           </div>
 
           <!-- Pase Oficial Adjunto -->
-          <div style="text-align: center; margin: 28px 0;">
+          ${hasInlinePass ? `<div style="text-align: center; margin: 28px 0;">
             <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Tu imagen oficial de validación ha sido generada e incluida como archivo adjunto:</p>
-            ${base64Data ? `<img src="cid:pase_maestria_oficial" alt="Pase Oficial de Maestría" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 2px solid #f59e0b;" />` : ''}
-          </div>
+            <img src="cid:pase_maestria_oficial" alt="Pase Oficial de Maestría" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 2px solid #f59e0b;" />
+          </div>` : ''}
 
           <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
             Este es un documento probatorio oficial emitido para Creación Cuántica E.I.R.L. La firma electrónica con registro de IP y geolocalización goza de plena eficacia jurídica conforme a la Ley N° 27269 y el Código Civil Peruano (Arts. 141 y 141-A).
@@ -424,13 +536,68 @@ export async function sendMaestriaConfirmationEmail({
         </div>
       </div>
     `;
+}
 
+/**
+ * Envía el correo formal de confirmación con el contrato firmado, metadatos de IP y Geolocalización, y el pase adjunto
+ */
+export async function sendMaestriaConfirmationEmail({
+  db,
+  toEmail,
+  nombre,
+  doc,
+  rol,
+  equipo,
+  codigo,
+  fecha,
+  passDataUrl,
+  telefono,
+  ip = 'No detectada',
+  geoLocation = 'Lima, Perú 🇵🇪',
+  coordinates = '',
+  device = '',
+  sha256Hash = ''
+}) {
+  const cleanEmail = String(toEmail || '').trim().toLowerCase();
+  if (!db || !cleanEmail || !cleanEmail.includes('@')) return false;
+
+  try {
+    const safeName = nombre || 'Participante';
+    const attachment = await preparePassEmailAttachment(
+      passDataUrl,
+      'COMPROMISO_MAESTRIA_LIMA',
+      codigo || 'VERIFIED',
+      'pase_maestria_oficial'
+    );
+
+    const emailHtml = buildMaestriaEmailHtml({
+      nombre: safeName,
+      doc,
+      rol,
+      equipo,
+      codigo,
+      fecha,
+      telefono,
+      ip,
+      geoLocation,
+      coordinates,
+      device,
+      sha256Hash,
+      hasInlinePass: Boolean(attachment)
+    });
+
+    const nowIso = new Date().toISOString();
     const mailDoc = {
-      to: [toEmail],
+      to: [cleanEmail],
       robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
-      created_at: new Date().toISOString(),
+      createdAt: nowIso,
+      created_at: nowIso,
+      delivery: {
+        state: 'PENDING',
+        attemptCount: 0
+      },
       type: 'contrato_maestria_confirmacion',
-      recipientEmail: toEmail,
+      recipientEmail: cleanEmail,
       recipientName: safeName,
       codigoRegistro: codigo,
       ip,
@@ -438,21 +605,12 @@ export async function sendMaestriaConfirmationEmail({
       message: {
         subject: `👑 CONTRATO & REGLAS ACEPTADAS: Maestría del Juego (Sede Lima) — ${codigo}`,
         html: emailHtml,
-        attachments: base64Data
-          ? [
-              {
-                filename: `COMPROMISO_MAESTRIA_LIMA_${codigo}.png`,
-                content: base64Data,
-                encoding: 'base64',
-                cid: 'pase_maestria_oficial'
-              }
-            ]
-          : []
+        attachments: attachment ? [attachment] : []
       }
     };
 
-    await addDoc(collection(db, 'mail'), mailDoc);
-    return true;
+    const docRef = await addDoc(collection(db, 'mail'), mailDoc);
+    return { ok: true, mailId: docRef.id };
   } catch (error) {
     console.error('Error enviando correo de confirmación de Maestría:', error);
     return false;
@@ -666,33 +824,22 @@ export async function generateFirewalkPassCanvas({
   });
 }
 
-/**
- * Envía inmediatamente por correo la imagen de confirmación y copia legal de la Caminata sobre Fuego
- */
-export async function sendFirewalkConfirmationEmail({
-  db,
-  toEmail,
+export function buildFirewalkEmailHtml({
   nombre,
   documento,
   rolActividad,
   lugar,
   codigo,
   fecha,
-  passDataUrl,
-  telefono,
   ip = 'No detectada',
   geoLocation = 'Lima, Perú 🇵🇪',
   coordinates = '',
   device = '',
-  sha256Hash = ''
+  sha256Hash = '',
+  hasInlinePass = false
 }) {
-  if (!db || !toEmail) return false;
-
-  try {
-    const safeName = nombre || 'Participante';
-    const base64Data = passDataUrl ? passDataUrl.replace(/^data:image\/png;base64,/, '') : null;
-
-    const emailHtml = `
+  const safeName = nombre || 'Participante';
+  return `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
         <div style="background: linear-gradient(135deg, #120702 0%, #431407 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #ea580c;">
           <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 800; margin-bottom: 8px;">CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811</span>
@@ -756,10 +903,10 @@ export async function sendFirewalkConfirmationEmail({
             </table>
           </div>
 
-          <div style="text-align: center; margin: 28px 0;">
+          ${hasInlinePass ? `<div style="text-align: center; margin: 28px 0;">
             <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Tu Pase Oficial de Confirmación está incluido en este correo y como imagen adjunta:</p>
-            ${base64Data ? `<img src="cid:pase_fuego_oficial" alt="Pase Oficial Caminata sobre Fuego" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 2px solid #ea580c;" />` : ''}
-          </div>
+            <img src="cid:pase_fuego_oficial" alt="Pase Oficial Caminata sobre Fuego" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 2px solid #ea580c;" />
+          </div>` : ''}
 
           <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
             Documento probatorio oficial emitido por Causa OS para Creación Cuántica E.I.R.L. (RUC 20612592811) conforme a la Ley N° 27269 y Ley N° 29733.
@@ -767,35 +914,81 @@ export async function sendFirewalkConfirmationEmail({
         </div>
       </div>
     `;
+}
 
+/**
+ * Envía inmediatamente por correo la imagen de confirmación y copia legal de la Caminata sobre Fuego
+ */
+export async function sendFirewalkConfirmationEmail({
+  db,
+  toEmail,
+  nombre,
+  documento,
+  rolActividad,
+  lugar,
+  codigo,
+  fecha,
+  passDataUrl,
+  telefono,
+  ip = 'No detectada',
+  geoLocation = 'Lima, Perú 🇵🇪',
+  coordinates = '',
+  device = '',
+  sha256Hash = ''
+}) {
+  const cleanEmail = String(toEmail || '').trim().toLowerCase();
+  if (!db || !cleanEmail || !cleanEmail.includes('@')) return false;
+
+  try {
+    const safeName = nombre || 'Participante';
+    const attachment = await preparePassEmailAttachment(
+      passDataUrl,
+      'PASE_CAMINATA_FUEGO',
+      codigo || 'VERIFIED',
+      'pase_fuego_oficial'
+    );
+
+    const emailHtml = buildFirewalkEmailHtml({
+      nombre: safeName,
+      documento,
+      rolActividad,
+      lugar,
+      codigo,
+      fecha,
+      ip,
+      geoLocation,
+      coordinates,
+      device,
+      sha256Hash,
+      hasInlinePass: Boolean(attachment)
+    });
+
+    const nowIso = new Date().toISOString();
     const mailDoc = {
-      to: [toEmail],
+      to: [cleanEmail],
       robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
-      created_at: new Date().toISOString(),
+      createdAt: nowIso,
+      created_at: nowIso,
+      delivery: {
+        state: 'PENDING',
+        attemptCount: 0
+      },
       type: 'contrato_fuego_confirmacion',
-      recipientEmail: toEmail,
+      recipientEmail: cleanEmail,
       recipientName: safeName,
       codigoRegistro: codigo,
+      telefono: telefono || '',
       ip,
       geoLocation,
       message: {
         subject: `🔥 PASE OFICIAL DE CONFIRMACIÓN: Caminata sobre Fuego (Sede Lima) — ${codigo}`,
         html: emailHtml,
-        attachments: base64Data
-          ? [
-              {
-                filename: `PASE_CAMINATA_FUEGO_${codigo}.png`,
-                content: base64Data,
-                encoding: 'base64',
-                cid: 'pase_fuego_oficial'
-              }
-            ]
-          : []
+        attachments: attachment ? [attachment] : []
       }
     };
 
-    await addDoc(collection(db, 'mail'), mailDoc);
-    return true;
+    const docRef = await addDoc(collection(db, 'mail'), mailDoc);
+    return { ok: true, mailId: docRef.id };
   } catch (error) {
     console.error('Error enviando correo de confirmación de Caminata sobre Fuego:', error);
     return false;

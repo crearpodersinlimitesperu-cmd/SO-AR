@@ -23,7 +23,8 @@ import {
   Trash2,
   ArrowLeft
 } from 'lucide-react';
-import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
@@ -47,7 +48,47 @@ export default function MonitorAcreditacionFuegoLima() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [sendingEmailId, setSendingEmailId] = useState(null);
   const [emailStatusMap, setEmailStatusMap] = useState({});
+  const [mailDeliveryByCode, setMailDeliveryByCode] = useState({});
   const [deletingId, setDeletingId] = useState(null);
+
+  useEffect(() => {
+    if (!db) return;
+    try {
+      const mailQ = query(collection(db, 'mail'), where('type', '==', 'contrato_fuego_confirmacion'));
+      const unsubMail = onSnapshot(
+        mailQ,
+        (snap) => {
+          const bestByKey = {};
+          snap.forEach((docSnap) => {
+            const d = docSnap.data() || {};
+            const codeKey = String(d.codigoRegistro || '').trim();
+            const emailKey = String(d.recipientEmail || (Array.isArray(d.to) ? d.to[0] : d.to) || '').trim().toLowerCase();
+            const rawTs = d.delivery?.endTime || d.delivery?.startTime || d.createdAt || d.created_at || '';
+            const ts = rawTs?.toMillis ? rawTs.toMillis() : (Date.parse(rawTs) || 0);
+            const rawState = d.delivery?.state || 'PENDING';
+            const mapped =
+              rawState === 'SUCCESS'
+                ? 'DELIVERED'
+                : rawState === 'PENDING' || rawState === 'SENDING'
+                ? 'QUEUED'
+                : 'ERROR';
+            for (const key of [codeKey, emailKey].filter(Boolean)) {
+              if (!bestByKey[key] || ts >= bestByKey[key].ts) {
+                bestByKey[key] = { status: mapped, ts, rawState };
+              }
+            }
+          });
+          setMailDeliveryByCode(bestByKey);
+        },
+        (err) => {
+          console.warn('Listener de estado de correo Fuego omitido:', err?.message || err);
+        }
+      );
+      return () => unsubMail();
+    } catch {
+      // Ignorar si no hay sesión
+    }
+  }, []);
 
   const handleDeleteFirewalkRecord = async (item) => {
     if (!item?.id) {
@@ -74,7 +115,7 @@ export default function MonitorAcreditacionFuegoLima() {
 
   const handleResendFirewalkEmail = async (item) => {
     if (!item.email) {
-      alert('Este registro no cuenta con correo electrónico.');
+      toast.error('Este registro no cuenta con correo electrónico.');
       return;
     }
     const rowKey = item.id || item.code;
@@ -108,14 +149,21 @@ export default function MonitorAcreditacionFuegoLima() {
         ip: item.ip || 'Registrada',
         geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
         coordinates: item.coordinates || '',
-        device: item.dispositivo || '',
+        device: item.dispositivo || item.device || '',
         sha256Hash: item.sha256Hash || ''
       });
 
-      setEmailStatusMap((prev) => ({ ...prev, [rowKey]: ok ? 'SENT' : 'ERROR' }));
+      if (ok) {
+        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'QUEUED' }));
+        toast.success(`Pase de Caminata sobre Fuego enviado a ${item.email}`);
+      } else {
+        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+        toast.error(`No se pudo encolar el correo para ${item.email}. Intenta nuevamente.`);
+      }
     } catch (e) {
       console.error('Error reenviando pase de fuego:', e);
       setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+      toast.error(`Error al reenviar pase: ${e?.message || 'verifica tu conexión'}`);
     } finally {
       setSendingEmailId(null);
     }
@@ -626,32 +674,64 @@ export default function MonitorAcreditacionFuegoLima() {
                           {nombre}
                         </h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
-                          {item.email && (
-                            <button
-                              onClick={() => handleResendFirewalkEmail(item)}
-                              disabled={sendingEmailId === (item.id || item.code)}
-                              style={{
-                                background: emailStatusMap[item.id || item.code] === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(249, 115, 22, 0.16)',
-                                color: emailStatusMap[item.id || item.code] === 'SENT' ? '#34d399' : '#fb923c',
-                                border: '1px solid rgba(249, 115, 22, 0.35)',
-                                borderRadius: '8px',
-                                padding: '0.4rem 0.75rem',
-                                fontSize: '0.73rem',
-                                fontWeight: 800,
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.35rem'
-                              }}
-                            >
-                              <Mail size={13} />
-                              {sendingEmailId === (item.id || item.code)
-                                ? 'Enviando Pase...'
-                                : emailStatusMap[item.id || item.code] === 'SENT'
-                                ? '✓ Pase Enviado al Correo'
-                                : `Reenviar Pase (${item.email})`}
-                            </button>
-                          )}
+                          {item.email && (() => {
+                            const rowKey = item.id || item.code;
+                            const cleanRecordEmail = String(item.email || '').trim().toLowerCase();
+                            const liveDelivery =
+                              mailDeliveryByCode[code]?.status ||
+                              (cleanRecordEmail ? mailDeliveryByCode[cleanRecordEmail]?.status : null);
+                            const localStatus = emailStatusMap[rowKey];
+                            const effectiveStatus =
+                              liveDelivery === 'DELIVERED'
+                                ? 'DELIVERED'
+                                : localStatus || liveDelivery || null;
+
+                            return (
+                              <button
+                                onClick={() => handleResendFirewalkEmail(item)}
+                                disabled={sendingEmailId === rowKey}
+                                style={{
+                                  background:
+                                    effectiveStatus === 'DELIVERED'
+                                      ? 'rgba(16, 185, 129, 0.2)'
+                                      : effectiveStatus === 'ERROR'
+                                      ? 'rgba(244, 63, 94, 0.2)'
+                                      : 'rgba(249, 115, 22, 0.16)',
+                                  color:
+                                    effectiveStatus === 'DELIVERED'
+                                      ? '#34d399'
+                                      : effectiveStatus === 'ERROR'
+                                      ? '#fb7185'
+                                      : '#fb923c',
+                                  border:
+                                    effectiveStatus === 'DELIVERED'
+                                      ? '1px solid rgba(16, 185, 129, 0.45)'
+                                      : effectiveStatus === 'ERROR'
+                                      ? '1px solid rgba(244, 63, 94, 0.45)'
+                                      : '1px solid rgba(249, 115, 22, 0.35)',
+                                  borderRadius: '8px',
+                                  padding: '0.4rem 0.75rem',
+                                  fontSize: '0.73rem',
+                                  fontWeight: 800,
+                                  cursor: sendingEmailId === rowKey ? 'wait' : 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem'
+                                }}
+                              >
+                                <Mail size={13} />
+                                {sendingEmailId === rowKey
+                                  ? 'Enviando Pase...'
+                                  : effectiveStatus === 'DELIVERED'
+                                  ? `✓ Pase Entregado (${item.email})`
+                                  : effectiveStatus === 'QUEUED' || effectiveStatus === 'SENT'
+                                  ? `⏳ En despacho (${item.email})`
+                                  : effectiveStatus === 'ERROR'
+                                  ? `⚠️ Error · Reenviar (${item.email})`
+                                  : `Reenviar Pase (${item.email})`}
+                              </button>
+                            );
+                          })()}
 
                           <button
                             onClick={() => handleDeleteFirewalkRecord(item)}

@@ -37499,6 +37499,28 @@ export function createNodusApiClient({
 
 ---
 
+## Archivo: functions-mailer/package.json
+
+```json
+{
+  "name": "causa-contract-mailer-backend",
+  "private": true,
+  "type": "module",
+  "main": "index.mjs",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.3.1",
+    "nodemailer": "^6.9.13"
+  }
+}
+
+```
+
+---
+
 ## Archivo: public/flight-tracker.js
 
 ```js
@@ -71603,6 +71625,7 @@ import {
   isTaskClosedForDelivery
 } from '../src/utils/taskLifecycle.js';
 import { SUPER_ADMIN_EMAILS, OBSERVER_EMAILS } from '../src/config/permissions.js';
+import { buildMaestriaEmailHtml, buildFirewalkEmailHtml } from '../src/utils/maestriaPass.js';
 
 dotenv.config();
 
@@ -71757,6 +71780,8 @@ async function sendClaimedMail(docSnap, data) {
     const isContractOrSystemMail =
       data.type === 'system_access_invite' ||
       data.type === 'contract_confirmation' ||
+      data.type === 'contrato_maestria_confirmacion' ||
+      data.type === 'contrato_fuego_confirmacion' ||
       (data.message?.subject && (
         data.message.subject.includes('Caminata sobre Fuego') ||
         data.message.subject.includes('Maestría del Juego') ||
@@ -72540,11 +72565,276 @@ async function ensureMilaTasksReadyNotification() {
   }
 }
 
+async function ensureLimaContractConfirmationEmails() {
+  let browser = null;
+  try {
+    const [mjSnap, fwSnap, existingMjMailSnap, existingFwMailSnap] = await Promise.all([
+      db.collection('contratos_maestria_lima').get(),
+      db.collection('contratos_caminata_fuego').get(),
+      db.collection('mail').where('type', '==', 'contrato_maestria_confirmacion').get(),
+      db.collection('mail').where('type', '==', 'contrato_fuego_confirmacion').get()
+    ]);
+
+    const activeOrSentCodes = new Set();
+    for (const snap of [existingMjMailSnap, existingFwMailSnap]) {
+      snap.forEach((docSnap) => {
+        const d = docSnap.data() || {};
+        const code = String(d.codigoRegistro || '').trim();
+        const st = d.delivery?.state;
+        if (code && (st === 'SUCCESS' || st === 'PENDING' || st === 'SENDING' || !st)) {
+          activeOrSentCodes.add(code);
+        }
+      });
+    }
+
+    const missingMj = [];
+    mjSnap.forEach((docSnap) => {
+      const d = docSnap.data() || {};
+      const email = String(d.email || '').trim().toLowerCase();
+      const code = String(d.code || d.verificationCode || '').trim();
+      if (email && email.includes('@') && code && !activeOrSentCodes.has(code)) {
+        missingMj.push({ id: docSnap.id, ...d, email, code });
+      }
+    });
+
+    const missingFw = [];
+    fwSnap.forEach((docSnap) => {
+      const d = docSnap.data() || {};
+      const email = String(d.email || '').trim().toLowerCase();
+      const code = String(d.code || d.verificationCode || '').trim();
+      if (email && email.includes('@') && code && !activeOrSentCodes.has(code)) {
+        missingFw.push({ id: docSnap.id, ...d, email, code });
+      }
+    });
+
+    if (missingMj.length === 0 && missingFw.length === 0) {
+      return;
+    }
+
+    console.log(
+      `📋 Recuperando correos de contrato Lima pendientes de encolar: Maestría=${missingMj.length}, Fuego=${missingFw.length}`
+    );
+
+    let page = null;
+    try {
+      const { default: puppeteer } = await import('puppeteer');
+      browser = await puppeteer.launch({
+        headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+      });
+      page = await browser.newPage();
+      await page.setContent('<html><body></body></html>');
+      const passModuleCode = readFileSync('./src/utils/maestriaPass.js', 'utf8')
+        .replace(/^import .*$/gm, '')
+        .replace(/export async function generateMaestriaPassCanvas/g, 'window.generateMaestriaPassCanvas = async function')
+        .replace(/export async function preparePassEmailAttachment/g, 'window.preparePassEmailAttachment = async function')
+        .replace(/export function buildMaestriaEmailHtml/g, 'window.buildMaestriaEmailHtml = function')
+        .replace(/export async function sendMaestriaConfirmationEmail/g, 'window.sendMaestriaConfirmationEmail = async function')
+        .replace(/export async function generateFirewalkPassCanvas/g, 'window.generateFirewalkPassCanvas = async function')
+        .replace(/export function buildFirewalkEmailHtml/g, 'window.buildFirewalkEmailHtml = function')
+        .replace(/export async function sendFirewalkConfirmationEmail/g, 'window.sendFirewalkConfirmationEmail = async function');
+      await page.evaluate(passModuleCode);
+    } catch (pupErr) {
+      console.warn('⚠️ Renderizador Chromium de pase no disponible en este entorno, se enviará contrato completo HTML:', pupErr.message);
+    }
+
+    for (const item of missingMj) {
+      const safeId = `mail_contrato_mj_${item.code.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+      const existingRef = db.collection('mail').doc(safeId);
+      const existingDoc = await existingRef.get();
+      if (existingDoc.exists && ['SUCCESS', 'PENDING', 'SENDING'].includes(existingDoc.data()?.delivery?.state)) {
+        continue;
+      }
+
+      const nombre = item.nombre || item.nombreCompleto || 'Participante';
+      const docLabel = item.doc || `${item.tipoDocumento || 'DNI'}: ${item.numeroDocumento || ''}`;
+      const rol = item.rol || item.rolActividad || 'Participante';
+      const equipo = item.equipo || item.equipoCohorte || item.cohorte || 'Equipo 32';
+      const fecha = item.fecha || item.fechaValidacionLocal || 'Registrado';
+      const ip = item.ip || 'Registrada';
+      const geoLocation = item.geoLocation || 'Lima, Perú 🇵🇪';
+      const coordinates = item.coordinates || '';
+      const device = item.device || item.dispositivo || '';
+      const sha256Hash = item.sha256Hash || '';
+
+      let attachment = null;
+      if (page) {
+        try {
+          attachment = await page.evaluate(
+            async (params) => {
+              const pngUrl = await window.generateMaestriaPassCanvas(params);
+              return window.preparePassEmailAttachment(
+                pngUrl,
+                'COMPROMISO_MAESTRIA_LIMA',
+                params.codigo,
+                'pase_maestria_oficial'
+              );
+            },
+            {
+              nombre,
+              doc: docLabel,
+              rol,
+              equipo,
+              sede: item.sede || 'Lima',
+              fecha,
+              codigo: item.code,
+              ip,
+              geoLocation,
+              coordinates,
+              verificationUrl: `https://centro-operativo-cpsl.web.app/reglas-maestria?c=${item.code}`
+            }
+          );
+        } catch (renderErr) {
+          console.warn(`⚠️ No se pudo renderizar adjunto JPEG para ${item.code}:`, renderErr.message);
+        }
+      }
+
+      const emailHtml = buildMaestriaEmailHtml({
+        nombre,
+        doc: docLabel,
+        rol,
+        equipo,
+        codigo: item.code,
+        fecha,
+        telefono: item.telefono || '',
+        ip,
+        geoLocation,
+        coordinates,
+        device,
+        sha256Hash,
+        hasInlinePass: Boolean(attachment)
+      });
+
+      const nowIso = new Date().toISOString();
+      await existingRef.set({
+        to: [item.email],
+        robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
+        createdAt: nowIso,
+        created_at: nowIso,
+        delivery: {
+          state: 'PENDING',
+          attemptCount: 0
+        },
+        type: 'contrato_maestria_confirmacion',
+        recipientEmail: item.email,
+        recipientName: nombre,
+        codigoRegistro: item.code,
+        ip,
+        geoLocation,
+        source: 'backfill_lima_contract_daemon',
+        message: {
+          subject: `👑 CONTRATO & REGLAS ACEPTADAS: Maestría del Juego (Sede Lima) — ${item.code}`,
+          html: emailHtml,
+          attachments: attachment ? [attachment] : []
+        }
+      });
+      console.log(`📨 Encolado contrato + pase Maestría para ${nombre} (${item.email}) [${item.code}]`);
+    }
+
+    for (const item of missingFw) {
+      const safeId = `mail_contrato_fw_${item.code.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
+      const existingRef = db.collection('mail').doc(safeId);
+      const existingDoc = await existingRef.get();
+      if (existingDoc.exists && ['SUCCESS', 'PENDING', 'SENDING'].includes(existingDoc.data()?.delivery?.state)) {
+        continue;
+      }
+
+      const nombre = item.nombre || item.nombreCompleto || 'Participante';
+      const docLabel = item.doc || `${item.tipoDocumento || 'DNI'}: ${item.numeroDocumento || ''}`;
+      const rolActividad = item.rol || item.rolActividad || 'Participante';
+      const lugar = item.lugar || item.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
+      const fecha = item.fecha || item.timestamp || 'Registrado';
+      const ip = item.ip || 'Registrada';
+      const geoLocation = item.geoLocation || 'Lima, Perú 🇵🇪';
+      const coordinates = item.coordinates || '';
+      const device = item.dispositivo || item.device || '';
+      const sha256Hash = item.sha256Hash || '';
+
+      let attachment = null;
+      if (page) {
+        try {
+          attachment = await page.evaluate(
+            async (params) => {
+              const pngUrl = await window.generateFirewalkPassCanvas(params);
+              return window.preparePassEmailAttachment(
+                pngUrl,
+                'PASE_CAMINATA_FUEGO',
+                params.codigo,
+                'pase_fuego_oficial'
+              );
+            },
+            {
+              nombre,
+              documento: docLabel,
+              rolActividad,
+              lugar,
+              fecha,
+              codigo: item.code,
+              ip,
+              geoLocation,
+              coordinates
+            }
+          );
+        } catch (renderErr) {
+          console.warn(`⚠️ No se pudo renderizar adjunto JPEG Firewalk para ${item.code}:`, renderErr.message);
+        }
+      }
+
+      const emailHtml = buildFirewalkEmailHtml({
+        nombre,
+        documento: docLabel,
+        rolActividad,
+        lugar,
+        codigo: item.code,
+        fecha,
+        ip,
+        geoLocation,
+        coordinates,
+        device,
+        sha256Hash,
+        hasInlinePass: Boolean(attachment)
+      });
+
+      const nowIso = new Date().toISOString();
+      await existingRef.set({
+        to: [item.email],
+        robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
+        createdAt: nowIso,
+        created_at: nowIso,
+        delivery: {
+          state: 'PENDING',
+          attemptCount: 0
+        },
+        type: 'contrato_fuego_confirmacion',
+        recipientEmail: item.email,
+        recipientName: nombre,
+        codigoRegistro: item.code,
+        ip,
+        geoLocation,
+        source: 'backfill_lima_contract_daemon',
+        message: {
+          subject: `🔥 PASE OFICIAL DE CONFIRMACIÓN: Caminata sobre Fuego (Sede Lima) — ${item.code}`,
+          html: emailHtml,
+          attachments: attachment ? [attachment] : []
+        }
+      });
+      console.log(`📨 Encolado contrato + pase Caminata sobre Fuego para ${nombre} (${item.email}) [${item.code}]`);
+    }
+  } catch (err) {
+    console.warn('⚠️ Error verificando correos de contratos Lima pendientes:', err.message);
+  } finally {
+    if (browser) {
+      await browser.close().catch(() => {});
+    }
+  }
+}
+
 // Ejecución
 if (isOneShot) {
   console.log("⚡ Ejecución en modo One-Shot (GitHub Actions / Tarea programada)...");
   await ensureArmandoObserverProfile();
   await ensureMilaTasksReadyNotification();
+  await ensureLimaContractConfirmationEmails();
   await processPendingMails();
   await checkInactivity();
   await checkOverdueTaskReminders();
@@ -89630,57 +89920,96 @@ export async function generateMaestriaPassCanvas({
       ctx.font = '900 19px Montserrat, -apple-system, sans-serif';
       ctx.fillText('🏛️ ESTADO: CONTRATO VINCULANTE FIRMADO', W / 2, badgeY + 32);
 
-      // 7. Bloque de QR y Validación
+      // 7. Bloque de QR y Validación (con carga CORS-safe por Blob para evitar canvas taint)
       const qrSize = 155;
       const qrX = W / 2 - qrSize / 2;
       const qrY = 1145;
 
-      const qrImg = new Image();
-      qrImg.crossOrigin = 'anonymous';
-      const encodedUrl = encodeURIComponent(verificationUrl || `https://centro-operativo-cpsl.web.app/reglas-maestria?c=${codigo}`);
-      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodedUrl}`;
+      const drawFallbackQrBadge = () => {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(qrX, qrY, qrSize, qrSize);
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.65)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(qrX, qrY, qrSize, qrSize);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 14px sans-serif';
+        ctx.fillText('QR VALIDADO', W / 2, qrY + 72);
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '600 11px monospace';
+        ctx.fillText(String(codigo || '').slice(0, 18), W / 2, qrY + 96);
+      };
 
       let finished = false;
       const finishCanvas = () => {
         if (finished) return;
         finished = true;
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = '800 20px "Courier New", monospace';
-        ctx.fillText(`CÓDIGO DIGITAL: ${codigo}`, W / 2, 1335);
+        try {
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#fbbf24';
+          ctx.font = '800 20px "Courier New", monospace';
+          ctx.fillText(`CÓDIGO DIGITAL: ${codigo}`, W / 2, 1335);
 
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 15px Montserrat, -apple-system, sans-serif';
-        ctx.fillText(`Suscrito electrónicamente: ${fecha} (Lima, Perú)`, W / 2, 1365);
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '600 15px Montserrat, -apple-system, sans-serif';
+          ctx.fillText(`Suscrito electrónicamente: ${fecha} (Lima, Perú)`, W / 2, 1365);
 
-        ctx.fillStyle = '#64748b';
-        ctx.font = '500 13px Montserrat, -apple-system, sans-serif';
-        ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1395);
+          ctx.fillStyle = '#64748b';
+          ctx.font = '500 13px Montserrat, -apple-system, sans-serif';
+          ctx.fillText('Creación Cuántica E.I.R.L. · RUC 20612592811 · Ley N° 27269', W / 2, 1395);
 
-        resolve(canvas.toDataURL('image/png'));
+          resolve(canvas.toDataURL('image/png'));
+        } catch (exportErr) {
+          console.warn('Fallback de exportación de pase Maestría:', exportErr);
+          resolve(null);
+        }
       };
 
-      qrImg.onload = () => {
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
-        ctx.fill();
-        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-        finishCanvas();
-      };
+      const encodedUrl = encodeURIComponent(verificationUrl || `https://centro-operativo-cpsl.web.app/reglas-maestria?c=${codigo}`);
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodedUrl}`;
 
-      qrImg.onerror = () => {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fillRect(qrX, qrY, qrSize, qrSize);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '600 14px sans-serif';
-        ctx.fillText('QR VALIDADO', W / 2, qrY + 80);
+      const timeoutId = setTimeout(() => {
+        drawFallbackQrBadge();
         finishCanvas();
-      };
+      }, 2200);
 
-      setTimeout(() => {
+      if (typeof fetch === 'function' && typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function') {
+        fetch(qrApiUrl, { mode: 'cors' })
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.blob();
+          })
+          .then((blob) => {
+            const objUrl = URL.createObjectURL(blob);
+            const qrImg = new Image();
+            qrImg.onload = () => {
+              clearTimeout(timeoutId);
+              ctx.fillStyle = '#ffffff';
+              ctx.beginPath();
+              ctx.roundRect(qrX - 8, qrY - 8, qrSize + 16, qrSize + 16, 12);
+              ctx.fill();
+              ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+              URL.revokeObjectURL(objUrl);
+              finishCanvas();
+            };
+            qrImg.onerror = () => {
+              clearTimeout(timeoutId);
+              URL.revokeObjectURL(objUrl);
+              drawFallbackQrBadge();
+              finishCanvas();
+            };
+            qrImg.src = objUrl;
+          })
+          .catch(() => {
+            clearTimeout(timeoutId);
+            drawFallbackQrBadge();
+            finishCanvas();
+          });
+      } else {
+        clearTimeout(timeoutId);
+        drawFallbackQrBadge();
         finishCanvas();
-      }, 1500);
+      }
 
     } catch (e) {
       console.error('Error al generar canvas de Maestria:', e);
@@ -89690,32 +90019,105 @@ export async function generateMaestriaPassCanvas({
 }
 
 /**
- * Envía el correo formal de confirmación con el contrato firmado, metadatos de IP y Geolocalización, y el pase adjunto
+ * Comprime cualquier Data URL (PNG/JPEG) a un adjunto JPEG optimizado (< 350 KB)
+ * para garantizar que el documento `mail` en Firestore jamás supere el límite de 1 MiB (1,048,576 bytes).
  */
-export async function sendMaestriaConfirmationEmail({
-  db,
-  toEmail,
+export async function preparePassEmailAttachment(passDataUrl, filenamePrefix, codigo, cid) {
+  if (!passDataUrl || typeof passDataUrl !== 'string') return null;
+
+  const MAX_SAFE_BASE64_LENGTH = 520000;
+
+  if (typeof document !== 'undefined') {
+    try {
+      const compressedDataUrl = await new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          try {
+            const w = img.width || 1080;
+            const h = img.height || 1440;
+            const offCanvas = document.createElement('canvas');
+            offCanvas.width = w;
+            offCanvas.height = h;
+            const offCtx = offCanvas.getContext('2d');
+            offCtx.fillStyle = '#060b17';
+            offCtx.fillRect(0, 0, w, h);
+            offCtx.drawImage(img, 0, 0, w, h);
+
+            let jpegUrl = offCanvas.toDataURL('image/jpeg', 0.85);
+            if (jpegUrl.length > MAX_SAFE_BASE64_LENGTH) {
+              jpegUrl = offCanvas.toDataURL('image/jpeg', 0.72);
+            }
+            if (jpegUrl.length > MAX_SAFE_BASE64_LENGTH) {
+              const scale = 0.75;
+              const smallCanvas = document.createElement('canvas');
+              smallCanvas.width = Math.round(w * scale);
+              smallCanvas.height = Math.round(h * scale);
+              const smallCtx = smallCanvas.getContext('2d');
+              smallCtx.fillStyle = '#060b17';
+              smallCtx.fillRect(0, 0, smallCanvas.width, smallCanvas.height);
+              smallCtx.drawImage(img, 0, 0, smallCanvas.width, smallCanvas.height);
+              jpegUrl = smallCanvas.toDataURL('image/jpeg', 0.75);
+            }
+            resolve(jpegUrl);
+          } catch {
+            resolve(null);
+          }
+        };
+        img.onerror = () => resolve(null);
+        img.src = passDataUrl;
+      });
+
+      if (compressedDataUrl && compressedDataUrl.startsWith('data:image/jpeg;base64,')) {
+        const base64Content = compressedDataUrl.replace(/^data:image\/jpeg;base64,/, '');
+        return {
+          filename: `${filenamePrefix}_${codigo}.jpg`,
+          content: base64Content,
+          contentType: 'image/jpeg',
+          encoding: 'base64',
+          cid
+        };
+      }
+    } catch (err) {
+      console.warn('Compresión JPEG en navegador no disponible, evaluando fallback:', err);
+    }
+  }
+
+  const mimeMatch = passDataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
+  const contentType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+  const ext = contentType.includes('png') ? 'png' : 'jpg';
+  const rawBase64 = passDataUrl.replace(/^data:image\/[a-zA-Z0-9.+-]+;base64,/, '');
+
+  if (rawBase64.length > MAX_SAFE_BASE64_LENGTH) {
+    console.warn(`Adjunto base64 demasiado grande (${rawBase64.length} chars) sin compresor DOM; se enviará correo sin imagen pesada para no exceder 1 MiB en Firestore.`);
+    return null;
+  }
+
+  return {
+    filename: `${filenamePrefix}_${codigo}.${ext}`,
+    content: rawBase64,
+    contentType,
+    encoding: 'base64',
+    cid
+  };
+}
+
+export function buildMaestriaEmailHtml({
   nombre,
   doc,
   rol,
   equipo,
   codigo,
   fecha,
-  passDataUrl,
   telefono,
   ip = 'No detectada',
   geoLocation = 'Lima, Perú 🇵🇪',
   coordinates = '',
   device = '',
-  sha256Hash = ''
+  sha256Hash = '',
+  hasInlinePass = false
 }) {
-  if (!db || !toEmail) return false;
-
-  try {
-    const safeName = nombre || 'Participante';
-    const base64Data = passDataUrl ? passDataUrl.replace(/^data:image\/png;base64,/, '') : null;
-
-    const emailHtml = `
+  const safeName = nombre || 'Participante';
+  return `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
         <!-- Cabecera Institucional -->
         <div style="background: linear-gradient(135deg, #091124 0%, #172554 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #f59e0b;">
@@ -89805,10 +90207,10 @@ export async function sendMaestriaConfirmationEmail({
           </div>
 
           <!-- Pase Oficial Adjunto -->
-          <div style="text-align: center; margin: 28px 0;">
+          ${hasInlinePass ? `<div style="text-align: center; margin: 28px 0;">
             <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Tu imagen oficial de validación ha sido generada e incluida como archivo adjunto:</p>
-            ${base64Data ? `<img src="cid:pase_maestria_oficial" alt="Pase Oficial de Maestría" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 2px solid #f59e0b;" />` : ''}
-          </div>
+            <img src="cid:pase_maestria_oficial" alt="Pase Oficial de Maestría" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); border: 2px solid #f59e0b;" />
+          </div>` : ''}
 
           <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
             Este es un documento probatorio oficial emitido para Creación Cuántica E.I.R.L. La firma electrónica con registro de IP y geolocalización goza de plena eficacia jurídica conforme a la Ley N° 27269 y el Código Civil Peruano (Arts. 141 y 141-A).
@@ -89822,13 +90224,68 @@ export async function sendMaestriaConfirmationEmail({
         </div>
       </div>
     `;
+}
 
+/**
+ * Envía el correo formal de confirmación con el contrato firmado, metadatos de IP y Geolocalización, y el pase adjunto
+ */
+export async function sendMaestriaConfirmationEmail({
+  db,
+  toEmail,
+  nombre,
+  doc,
+  rol,
+  equipo,
+  codigo,
+  fecha,
+  passDataUrl,
+  telefono,
+  ip = 'No detectada',
+  geoLocation = 'Lima, Perú 🇵🇪',
+  coordinates = '',
+  device = '',
+  sha256Hash = ''
+}) {
+  const cleanEmail = String(toEmail || '').trim().toLowerCase();
+  if (!db || !cleanEmail || !cleanEmail.includes('@')) return false;
+
+  try {
+    const safeName = nombre || 'Participante';
+    const attachment = await preparePassEmailAttachment(
+      passDataUrl,
+      'COMPROMISO_MAESTRIA_LIMA',
+      codigo || 'VERIFIED',
+      'pase_maestria_oficial'
+    );
+
+    const emailHtml = buildMaestriaEmailHtml({
+      nombre: safeName,
+      doc,
+      rol,
+      equipo,
+      codigo,
+      fecha,
+      telefono,
+      ip,
+      geoLocation,
+      coordinates,
+      device,
+      sha256Hash,
+      hasInlinePass: Boolean(attachment)
+    });
+
+    const nowIso = new Date().toISOString();
     const mailDoc = {
-      to: [toEmail],
+      to: [cleanEmail],
       robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
-      created_at: new Date().toISOString(),
+      createdAt: nowIso,
+      created_at: nowIso,
+      delivery: {
+        state: 'PENDING',
+        attemptCount: 0
+      },
       type: 'contrato_maestria_confirmacion',
-      recipientEmail: toEmail,
+      recipientEmail: cleanEmail,
       recipientName: safeName,
       codigoRegistro: codigo,
       ip,
@@ -89836,21 +90293,12 @@ export async function sendMaestriaConfirmationEmail({
       message: {
         subject: `👑 CONTRATO & REGLAS ACEPTADAS: Maestría del Juego (Sede Lima) — ${codigo}`,
         html: emailHtml,
-        attachments: base64Data
-          ? [
-              {
-                filename: `COMPROMISO_MAESTRIA_LIMA_${codigo}.png`,
-                content: base64Data,
-                encoding: 'base64',
-                cid: 'pase_maestria_oficial'
-              }
-            ]
-          : []
+        attachments: attachment ? [attachment] : []
       }
     };
 
-    await addDoc(collection(db, 'mail'), mailDoc);
-    return true;
+    const docRef = await addDoc(collection(db, 'mail'), mailDoc);
+    return { ok: true, mailId: docRef.id };
   } catch (error) {
     console.error('Error enviando correo de confirmación de Maestría:', error);
     return false;
@@ -90064,33 +90512,22 @@ export async function generateFirewalkPassCanvas({
   });
 }
 
-/**
- * Envía inmediatamente por correo la imagen de confirmación y copia legal de la Caminata sobre Fuego
- */
-export async function sendFirewalkConfirmationEmail({
-  db,
-  toEmail,
+export function buildFirewalkEmailHtml({
   nombre,
   documento,
   rolActividad,
   lugar,
   codigo,
   fecha,
-  passDataUrl,
-  telefono,
   ip = 'No detectada',
   geoLocation = 'Lima, Perú 🇵🇪',
   coordinates = '',
   device = '',
-  sha256Hash = ''
+  sha256Hash = '',
+  hasInlinePass = false
 }) {
-  if (!db || !toEmail) return false;
-
-  try {
-    const safeName = nombre || 'Participante';
-    const base64Data = passDataUrl ? passDataUrl.replace(/^data:image\/png;base64,/, '') : null;
-
-    const emailHtml = `
+  const safeName = nombre || 'Participante';
+  return `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 650px; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 14px; overflow: hidden; background-color: #ffffff; color: #1e293b;">
         <div style="background: linear-gradient(135deg, #120702 0%, #431407 100%); color: #ffffff; padding: 30px 24px; text-align: center; border-bottom: 4px solid #ea580c;">
           <span style="display: inline-block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #fbbf24; font-weight: 800; margin-bottom: 8px;">CREACIÓN CUÁNTICA E.I.R.L. · RUC 20612592811</span>
@@ -90154,10 +90591,10 @@ export async function sendFirewalkConfirmationEmail({
             </table>
           </div>
 
-          <div style="text-align: center; margin: 28px 0;">
+          ${hasInlinePass ? `<div style="text-align: center; margin: 28px 0;">
             <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">Tu Pase Oficial de Confirmación está incluido en este correo y como imagen adjunta:</p>
-            ${base64Data ? `<img src="cid:pase_fuego_oficial" alt="Pase Oficial Caminata sobre Fuego" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 2px solid #ea580c;" />` : ''}
-          </div>
+            <img src="cid:pase_fuego_oficial" alt="Pase Oficial Caminata sobre Fuego" style="max-width: 340px; width: 100%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); border: 2px solid #ea580c;" />
+          </div>` : ''}
 
           <p style="font-size: 12.5px; color: #64748b; line-height: 1.5; margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
             Documento probatorio oficial emitido por Causa OS para Creación Cuántica E.I.R.L. (RUC 20612592811) conforme a la Ley N° 27269 y Ley N° 29733.
@@ -90165,35 +90602,81 @@ export async function sendFirewalkConfirmationEmail({
         </div>
       </div>
     `;
+}
 
+/**
+ * Envía inmediatamente por correo la imagen de confirmación y copia legal de la Caminata sobre Fuego
+ */
+export async function sendFirewalkConfirmationEmail({
+  db,
+  toEmail,
+  nombre,
+  documento,
+  rolActividad,
+  lugar,
+  codigo,
+  fecha,
+  passDataUrl,
+  telefono,
+  ip = 'No detectada',
+  geoLocation = 'Lima, Perú 🇵🇪',
+  coordinates = '',
+  device = '',
+  sha256Hash = ''
+}) {
+  const cleanEmail = String(toEmail || '').trim().toLowerCase();
+  if (!db || !cleanEmail || !cleanEmail.includes('@')) return false;
+
+  try {
+    const safeName = nombre || 'Participante';
+    const attachment = await preparePassEmailAttachment(
+      passDataUrl,
+      'PASE_CAMINATA_FUEGO',
+      codigo || 'VERIFIED',
+      'pase_fuego_oficial'
+    );
+
+    const emailHtml = buildFirewalkEmailHtml({
+      nombre: safeName,
+      documento,
+      rolActividad,
+      lugar,
+      codigo,
+      fecha,
+      ip,
+      geoLocation,
+      coordinates,
+      device,
+      sha256Hash,
+      hasInlinePass: Boolean(attachment)
+    });
+
+    const nowIso = new Date().toISOString();
     const mailDoc = {
-      to: [toEmail],
+      to: [cleanEmail],
       robot_token: 'NODUS_ROBOT_CPSL_2026_SECRET',
-      created_at: new Date().toISOString(),
+      createdAt: nowIso,
+      created_at: nowIso,
+      delivery: {
+        state: 'PENDING',
+        attemptCount: 0
+      },
       type: 'contrato_fuego_confirmacion',
-      recipientEmail: toEmail,
+      recipientEmail: cleanEmail,
       recipientName: safeName,
       codigoRegistro: codigo,
+      telefono: telefono || '',
       ip,
       geoLocation,
       message: {
         subject: `🔥 PASE OFICIAL DE CONFIRMACIÓN: Caminata sobre Fuego (Sede Lima) — ${codigo}`,
         html: emailHtml,
-        attachments: base64Data
-          ? [
-              {
-                filename: `PASE_CAMINATA_FUEGO_${codigo}.png`,
-                content: base64Data,
-                encoding: 'base64',
-                cid: 'pase_fuego_oficial'
-              }
-            ]
-          : []
+        attachments: attachment ? [attachment] : []
       }
     };
 
-    await addDoc(collection(db, 'mail'), mailDoc);
-    return true;
+    const docRef = await addDoc(collection(db, 'mail'), mailDoc);
+    return { ok: true, mailId: docRef.id };
   } catch (error) {
     console.error('Error enviando correo de confirmación de Caminata sobre Fuego:', error);
     return false;
@@ -139436,7 +139919,8 @@ import {
   Trash2,
   ArrowLeft
 } from 'lucide-react';
-import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
@@ -139466,6 +139950,7 @@ export default function MonitorMaestriaLima() {
   const [selectedRecordForAudit, setSelectedRecordForAudit] = useState(null);
   const [sendingEmailId, setSendingEmailId] = useState(null);
   const [emailStatusMap, setEmailStatusMap] = useState({});
+  const [mailDeliveryByCode, setMailDeliveryByCode] = useState({});
   const [deletingId, setDeletingId] = useState(null);
 
   const normalizeStr = (str) => {
@@ -139475,6 +139960,46 @@ export default function MonitorMaestriaLima() {
 
   useEffect(() => {
     document.title = 'Panel de Supervisión Lima · Reglas de Maestría del Juego | Causa OS';
+  }, []);
+
+  // Escuchar estado real de despacho de correos de Maestría en Firestore (`mail`)
+  useEffect(() => {
+    if (!db) return;
+    try {
+      const mailQ = query(collection(db, 'mail'), where('type', '==', 'contrato_maestria_confirmacion'));
+      const unsubMail = onSnapshot(
+        mailQ,
+        (snap) => {
+          const bestByKey = {};
+          snap.forEach((docSnap) => {
+            const d = docSnap.data() || {};
+            const codeKey = String(d.codigoRegistro || '').trim();
+            const emailKey = String(d.recipientEmail || (Array.isArray(d.to) ? d.to[0] : d.to) || '').trim().toLowerCase();
+            const rawTs = d.delivery?.endTime || d.delivery?.startTime || d.createdAt || d.created_at || '';
+            const ts = rawTs?.toMillis ? rawTs.toMillis() : (Date.parse(rawTs) || 0);
+            const rawState = d.delivery?.state || 'PENDING';
+            const mapped =
+              rawState === 'SUCCESS'
+                ? 'DELIVERED'
+                : rawState === 'PENDING' || rawState === 'SENDING'
+                ? 'QUEUED'
+                : 'ERROR';
+            for (const key of [codeKey, emailKey].filter(Boolean)) {
+              if (!bestByKey[key] || ts >= bestByKey[key].ts) {
+                bestByKey[key] = { status: mapped, ts, rawState };
+              }
+            }
+          });
+          setMailDeliveryByCode(bestByKey);
+        },
+        (err) => {
+          console.warn('Listener de estado de correo Maestría omitido:', err?.message || err);
+        }
+      );
+      return () => unsubMail();
+    } catch {
+      // Ignorar si no hay sesión
+    }
   }, []);
 
   // Escuchar firmas en tiempo real desde Firestore
@@ -139653,7 +140178,7 @@ export default function MonitorMaestriaLima() {
   // Reenviar Contrato + Pase por Correo
   const handleResendEmail = async (item) => {
     if (!item.email) {
-      alert('Este registro no cuenta con un correo electrónico válido.');
+      toast.error('Este registro no cuenta con un correo electrónico válido.');
       return;
     }
     const rowKey = item.id || item.code;
@@ -139688,18 +140213,21 @@ export default function MonitorMaestriaLima() {
         ip: item.ip || 'Registrada',
         geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
         coordinates: item.coordinates || '',
-        device: item.dispositivo || '',
+        device: item.dispositivo || item.device || '',
         sha256Hash: item.sha256Hash || ''
       });
 
       if (ok) {
-        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'SENT' }));
+        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'QUEUED' }));
+        toast.success(`Contrato y Pase enviados a ${item.email}`);
       } else {
         setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+        toast.error(`No se pudo encolar el correo para ${item.email}. Intenta nuevamente.`);
       }
     } catch (e) {
       console.error('Error al reenviar correo:', e);
       setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+      toast.error(`Error al reenviar correo: ${e?.message || 'verifica tu conexión'}`);
     } finally {
       setSendingEmailId(null);
     }
@@ -140162,8 +140690,16 @@ export default function MonitorMaestriaLima() {
                   const ip = item.ip || 'No detectada';
                   const geo = item.geoLocation || 'Lima, Perú 🇵🇪';
                   const coords = item.coordinates || '';
-                  const device = item.dispositivo || 'Web';
-                  const emailStatus = emailStatusMap[rowKey];
+                  const device = item.dispositivo || item.device || 'Web';
+                  const cleanRecordEmail = String(item.email || '').trim().toLowerCase();
+                  const liveDelivery =
+                    mailDeliveryByCode[code]?.status ||
+                    (cleanRecordEmail ? mailDeliveryByCode[cleanRecordEmail]?.status : null);
+                  const localStatus = emailStatusMap[rowKey];
+                  const emailStatus =
+                    liveDelivery === 'DELIVERED'
+                      ? 'DELIVERED'
+                      : localStatus || liveDelivery || null;
 
                   return (
                     <div
@@ -140256,9 +140792,30 @@ export default function MonitorMaestriaLima() {
                             onClick={() => handleResendEmail(item)}
                             disabled={sendingEmailId === rowKey}
                             style={{
-                              background: emailStatus === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(56, 189, 248, 0.16)',
-                              color: emailStatus === 'SENT' ? '#34d399' : '#38bdf8',
-                              border: emailStatus === 'SENT' ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(56, 189, 248, 0.38)',
+                              background:
+                                emailStatus === 'DELIVERED'
+                                  ? 'rgba(16, 185, 129, 0.2)'
+                                  : emailStatus === 'QUEUED' || emailStatus === 'SENT'
+                                  ? 'rgba(245, 158, 11, 0.2)'
+                                  : emailStatus === 'ERROR'
+                                  ? 'rgba(244, 63, 94, 0.2)'
+                                  : 'rgba(56, 189, 248, 0.16)',
+                              color:
+                                emailStatus === 'DELIVERED'
+                                  ? '#34d399'
+                                  : emailStatus === 'QUEUED' || emailStatus === 'SENT'
+                                  ? '#fbbf24'
+                                  : emailStatus === 'ERROR'
+                                  ? '#fb7185'
+                                  : '#38bdf8',
+                              border:
+                                emailStatus === 'DELIVERED'
+                                  ? '1px solid rgba(16, 185, 129, 0.45)'
+                                  : emailStatus === 'QUEUED' || emailStatus === 'SENT'
+                                  ? '1px solid rgba(245, 158, 11, 0.45)'
+                                  : emailStatus === 'ERROR'
+                                  ? '1px solid rgba(244, 63, 94, 0.45)'
+                                  : '1px solid rgba(56, 189, 248, 0.38)',
                               borderRadius: '8px',
                               padding: '0.45rem 0.75rem',
                               fontSize: '0.74rem',
@@ -140272,8 +140829,12 @@ export default function MonitorMaestriaLima() {
                             <Mail size={14} />
                             {sendingEmailId === rowKey
                               ? 'Enviando...'
-                              : emailStatus === 'SENT'
-                              ? '✓ Contrato y Pase Enviados'
+                              : emailStatus === 'DELIVERED'
+                              ? '✓ Contrato y Pase Entregados'
+                              : emailStatus === 'QUEUED' || emailStatus === 'SENT'
+                              ? '⏳ En despacho al correo...'
+                              : emailStatus === 'ERROR'
+                              ? '⚠️ Error · Reenviar Contrato + Pase'
                               : 'Reenviar Contrato + Pase'}
                           </button>
 
@@ -156924,7 +157485,8 @@ import {
   Trash2,
   ArrowLeft
 } from 'lucide-react';
-import { collection, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
@@ -156948,7 +157510,47 @@ export default function MonitorAcreditacionFuegoLima() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [sendingEmailId, setSendingEmailId] = useState(null);
   const [emailStatusMap, setEmailStatusMap] = useState({});
+  const [mailDeliveryByCode, setMailDeliveryByCode] = useState({});
   const [deletingId, setDeletingId] = useState(null);
+
+  useEffect(() => {
+    if (!db) return;
+    try {
+      const mailQ = query(collection(db, 'mail'), where('type', '==', 'contrato_fuego_confirmacion'));
+      const unsubMail = onSnapshot(
+        mailQ,
+        (snap) => {
+          const bestByKey = {};
+          snap.forEach((docSnap) => {
+            const d = docSnap.data() || {};
+            const codeKey = String(d.codigoRegistro || '').trim();
+            const emailKey = String(d.recipientEmail || (Array.isArray(d.to) ? d.to[0] : d.to) || '').trim().toLowerCase();
+            const rawTs = d.delivery?.endTime || d.delivery?.startTime || d.createdAt || d.created_at || '';
+            const ts = rawTs?.toMillis ? rawTs.toMillis() : (Date.parse(rawTs) || 0);
+            const rawState = d.delivery?.state || 'PENDING';
+            const mapped =
+              rawState === 'SUCCESS'
+                ? 'DELIVERED'
+                : rawState === 'PENDING' || rawState === 'SENDING'
+                ? 'QUEUED'
+                : 'ERROR';
+            for (const key of [codeKey, emailKey].filter(Boolean)) {
+              if (!bestByKey[key] || ts >= bestByKey[key].ts) {
+                bestByKey[key] = { status: mapped, ts, rawState };
+              }
+            }
+          });
+          setMailDeliveryByCode(bestByKey);
+        },
+        (err) => {
+          console.warn('Listener de estado de correo Fuego omitido:', err?.message || err);
+        }
+      );
+      return () => unsubMail();
+    } catch {
+      // Ignorar si no hay sesión
+    }
+  }, []);
 
   const handleDeleteFirewalkRecord = async (item) => {
     if (!item?.id) {
@@ -156975,7 +157577,7 @@ export default function MonitorAcreditacionFuegoLima() {
 
   const handleResendFirewalkEmail = async (item) => {
     if (!item.email) {
-      alert('Este registro no cuenta con correo electrónico.');
+      toast.error('Este registro no cuenta con correo electrónico.');
       return;
     }
     const rowKey = item.id || item.code;
@@ -157009,14 +157611,21 @@ export default function MonitorAcreditacionFuegoLima() {
         ip: item.ip || 'Registrada',
         geoLocation: item.geoLocation || 'Lima, Perú 🇵🇪',
         coordinates: item.coordinates || '',
-        device: item.dispositivo || '',
+        device: item.dispositivo || item.device || '',
         sha256Hash: item.sha256Hash || ''
       });
 
-      setEmailStatusMap((prev) => ({ ...prev, [rowKey]: ok ? 'SENT' : 'ERROR' }));
+      if (ok) {
+        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'QUEUED' }));
+        toast.success(`Pase de Caminata sobre Fuego enviado a ${item.email}`);
+      } else {
+        setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+        toast.error(`No se pudo encolar el correo para ${item.email}. Intenta nuevamente.`);
+      }
     } catch (e) {
       console.error('Error reenviando pase de fuego:', e);
       setEmailStatusMap((prev) => ({ ...prev, [rowKey]: 'ERROR' }));
+      toast.error(`Error al reenviar pase: ${e?.message || 'verifica tu conexión'}`);
     } finally {
       setSendingEmailId(null);
     }
@@ -157527,32 +158136,64 @@ export default function MonitorAcreditacionFuegoLima() {
                           {nombre}
                         </h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
-                          {item.email && (
-                            <button
-                              onClick={() => handleResendFirewalkEmail(item)}
-                              disabled={sendingEmailId === (item.id || item.code)}
-                              style={{
-                                background: emailStatusMap[item.id || item.code] === 'SENT' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(249, 115, 22, 0.16)',
-                                color: emailStatusMap[item.id || item.code] === 'SENT' ? '#34d399' : '#fb923c',
-                                border: '1px solid rgba(249, 115, 22, 0.35)',
-                                borderRadius: '8px',
-                                padding: '0.4rem 0.75rem',
-                                fontSize: '0.73rem',
-                                fontWeight: 800,
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.35rem'
-                              }}
-                            >
-                              <Mail size={13} />
-                              {sendingEmailId === (item.id || item.code)
-                                ? 'Enviando Pase...'
-                                : emailStatusMap[item.id || item.code] === 'SENT'
-                                ? '✓ Pase Enviado al Correo'
-                                : `Reenviar Pase (${item.email})`}
-                            </button>
-                          )}
+                          {item.email && (() => {
+                            const rowKey = item.id || item.code;
+                            const cleanRecordEmail = String(item.email || '').trim().toLowerCase();
+                            const liveDelivery =
+                              mailDeliveryByCode[code]?.status ||
+                              (cleanRecordEmail ? mailDeliveryByCode[cleanRecordEmail]?.status : null);
+                            const localStatus = emailStatusMap[rowKey];
+                            const effectiveStatus =
+                              liveDelivery === 'DELIVERED'
+                                ? 'DELIVERED'
+                                : localStatus || liveDelivery || null;
+
+                            return (
+                              <button
+                                onClick={() => handleResendFirewalkEmail(item)}
+                                disabled={sendingEmailId === rowKey}
+                                style={{
+                                  background:
+                                    effectiveStatus === 'DELIVERED'
+                                      ? 'rgba(16, 185, 129, 0.2)'
+                                      : effectiveStatus === 'ERROR'
+                                      ? 'rgba(244, 63, 94, 0.2)'
+                                      : 'rgba(249, 115, 22, 0.16)',
+                                  color:
+                                    effectiveStatus === 'DELIVERED'
+                                      ? '#34d399'
+                                      : effectiveStatus === 'ERROR'
+                                      ? '#fb7185'
+                                      : '#fb923c',
+                                  border:
+                                    effectiveStatus === 'DELIVERED'
+                                      ? '1px solid rgba(16, 185, 129, 0.45)'
+                                      : effectiveStatus === 'ERROR'
+                                      ? '1px solid rgba(244, 63, 94, 0.45)'
+                                      : '1px solid rgba(249, 115, 22, 0.35)',
+                                  borderRadius: '8px',
+                                  padding: '0.4rem 0.75rem',
+                                  fontSize: '0.73rem',
+                                  fontWeight: 800,
+                                  cursor: sendingEmailId === rowKey ? 'wait' : 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem'
+                                }}
+                              >
+                                <Mail size={13} />
+                                {sendingEmailId === rowKey
+                                  ? 'Enviando Pase...'
+                                  : effectiveStatus === 'DELIVERED'
+                                  ? `✓ Pase Entregado (${item.email})`
+                                  : effectiveStatus === 'QUEUED' || effectiveStatus === 'SENT'
+                                  ? `⏳ En despacho (${item.email})`
+                                  : effectiveStatus === 'ERROR'
+                                  ? `⚠️ Error · Reenviar (${item.email})`
+                                  : `Reenviar Pase (${item.email})`}
+                              </button>
+                            );
+                          })()}
 
                           <button
                             onClick={() => handleDeleteFirewalkRecord(item)}
