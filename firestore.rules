@@ -156,6 +156,7 @@ service cloud.firestore {
          (
            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', '') == roleName ||
            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('rol', '') == roleName ||
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('appRole', '') == roleName ||
            (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', []) is list &&
             roleName in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles)
          );
@@ -543,6 +544,7 @@ service cloud.firestore {
                      isOperationalProgressUpdate()) ||
                     isSuperAdmin() || isGerenteODireccion() ||
                     isOwner(resource.data) ||
+                    isTaskRecipient(resource.data) ||
                     (isCollaborator(resource.data) &&
                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])));

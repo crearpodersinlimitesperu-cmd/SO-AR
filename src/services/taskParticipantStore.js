@@ -14,7 +14,8 @@ export async function loadTaskParticipants(db, taskId, task) {
 export function stageTaskParticipants(transaction, db, taskId, previous, nextMap, eventIds) {
   for (const [key, record] of previous.records) {
     const state = nextMap[key] || record.state;
-    if (record.exists && JSON.stringify(state) === JSON.stringify(record.state)) continue;
+    const hasEvent = Boolean(eventIds && eventIds[key]);
+    if (!hasEvent && JSON.stringify(state) === JSON.stringify(record.state)) continue;
     transaction.set(participantStateRef(db, taskId, key), {
       taskId, assigneeEmail: key, state,
       lifecycleMutation: { eventId: eventIds[key] || '' }
