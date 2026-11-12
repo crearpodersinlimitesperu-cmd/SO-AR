@@ -86,6 +86,7 @@ function checkStaticRoutesAndCoreTests() {
     'tests/sede-datos-permissions.test.mjs',
     'tests/checklist-cycle-completion-persistence.test.mjs',
     'tests/legal-signature-save.test.mjs',
+    'tests/lima-contract-anti-duplicate.test.mjs',
     'tests/mail-queue.test.mjs'
   ].filter((f) => fs.existsSync(path.join(REPO_ROOT, f)));
 

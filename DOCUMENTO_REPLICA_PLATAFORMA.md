@@ -95109,6 +95109,366 @@ export async function updatePaidAmountInTransaction(tx, ref, input, user, edited
 
 ---
 
+## Archivo: src/utils/limaContractUniqueness.js
+
+```js
+import { doc, runTransaction } from 'firebase/firestore';
+
+const FIRESTORE_PROJECT_ID = 'centro-operativo-cpsl';
+const FIRESTORE_REST_BASE = `https://firestore.googleapis.com/v1/projects/${FIRESTORE_PROJECT_ID}/databases/(default)/documents`;
+
+/**
+ * Normaliza el número de documento (DNI, CE, Pasaporte, PTP):
+ * - Elimina prefijos accidentales ("DNI:", "CE-", "PASAPORTE ", etc.)
+ * - Elimina espacios, guiones, puntos y símbolos no alfanuméricos
+ * - Convierte a MAYÚSCULAS canónicas (ej. "08130068", "008362020", "A9919241")
+ */
+export function normalizeLimaDocNumber(raw) {
+  const cleanedPrefix = String(raw || '')
+    .trim()
+    .replace(/^(?:DNI|C\.?E\.?|CARNE\s*DE\s*EXTRANJERIA|PASAPORTE|PASS|PTP|RUC|DOC(?:UMENTO)?)[\s:.\-#]*/i, '');
+  return cleanedPrefix.replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 24);
+}
+
+/**
+ * Extrae el documento normalizado desde un registro de Firestore, incluso si es
+ * un registro legado donde solo existe `doc: "DNI: 45892147"` y `numeroDocumento` está vacío.
+ */
+export function extractRecordNormalizedDoc(record = {}) {
+  const fromNum = normalizeLimaDocNumber(record.numeroDocumentoNorm || record.numeroDocumento || '');
+  if (fromNum) return fromNum;
+  if (record.doc) {
+    const afterColon = String(record.doc).includes(':')
+      ? String(record.doc).split(':').slice(1).join(':')
+      : String(record.doc);
+    return normalizeLimaDocNumber(afterColon);
+  }
+  return '';
+}
+
+/**
+ * Para documentos puramente numéricos (>= 7 dígitos, ej. DNI/CE), obtiene el núcleo
+ * sin ceros a la izquierda para bloquear duplicados tipo "08130068" vs "8130068".
+ */
+export function numericDocCore(normDoc) {
+  if (!normDoc || !/^\d{7,15}$/.test(normDoc)) return '';
+  return normDoc.replace(/^0+/, '') || '0';
+}
+
+export function normalizeLimaEmail(raw) {
+  return String(raw || '').trim().toLowerCase();
+}
+
+export function normalizeLimaPersonName(raw) {
+  return String(raw || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * ID determinístico de documento en Firestore para garantizar unicidad ACID en motor de base de datos:
+ * `contratos_caminata_fuego/doc_08130068` o `contratos_maestria_lima/doc_008362020`
+ */
+export function buildDeterministicContractDocId(rawDoc) {
+  const norm = normalizeLimaDocNumber(rawDoc);
+  if (!norm || norm.length < 4) {
+    throw new Error('Número de documento inválido para registro único.');
+  }
+  return `doc_${norm.slice(0, 24)}`;
+}
+
+/**
+ * Verifica si dos números de documento representan a la misma persona.
+ */
+export function isSameNormalizedDoc(docA, docB) {
+  if (!docA || !docB) return false;
+  if (docA === docB) return true;
+  const coreA = numericDocCore(docA);
+  const coreB = numericDocCore(docB);
+  return Boolean(coreA && coreB && coreA.length >= 6 && coreA === coreB);
+}
+
+/**
+ * Busca si un participante ya tiene un contrato firmado en la colección por:
+ * 1) Número de Documento (exacto o equivalente sin ceros iniciales)
+ * 2) Correo electrónico personal
+ * 3) Nombre y apellidos completos exactos (mínimo 2 palabras y >= 8 caracteres)
+ */
+export function findMatchingLimaContract(existingRecords = [], candidate = {}) {
+  const candDoc = normalizeLimaDocNumber(candidate.numeroDocumento || candidate.doc || '');
+  const candEmail = normalizeLimaEmail(candidate.email || '');
+  const candName = normalizeLimaPersonName(candidate.nombreCompleto || candidate.nombre || '');
+  const candNameTokens = candName ? candName.split(' ').filter(Boolean) : [];
+
+  for (const item of existingRecords) {
+    if (!item) continue;
+    const dbDoc = extractRecordNormalizedDoc(item);
+    const dbEmail = normalizeLimaEmail(item.email || '');
+    const dbName = normalizeLimaPersonName(item.nombreCompleto || item.nombre || '');
+
+    if (candDoc && dbDoc && isSameNormalizedDoc(candDoc, dbDoc)) {
+      return { record: item, matchReason: 'número de documento' };
+    }
+    if (candEmail && dbEmail && candEmail === dbEmail) {
+      return { record: item, matchReason: 'correo electrónico' };
+    }
+    if (
+      candNameTokens.length >= 2 &&
+      candName.length >= 8 &&
+      dbName &&
+      candName === dbName
+    ) {
+      return { record: item, matchReason: 'nombre completo' };
+    }
+  }
+
+  return null;
+}
+
+function withPromiseTimeout(promise, ms = 5500) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`FIRESTORE_TIMEOUT_${ms}MS`)), ms);
+    promise.then(
+      (val) => {
+        clearTimeout(timer);
+        resolve(val);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+}
+
+function parseFirestoreRestDoc(item) {
+  if (!item || !item.fields) return null;
+  const id = String(item.name || '').split('/').pop();
+  const out = { id, _createTime: item.createTime };
+  for (const [k, v] of Object.entries(item.fields)) {
+    if ('stringValue' in v) out[k] = v.stringValue;
+    else if ('booleanValue' in v) out[k] = v.booleanValue;
+    else if ('integerValue' in v) out[k] = Number(v.integerValue);
+    else if ('doubleValue' in v) out[k] = Number(v.doubleValue);
+    else if ('timestampValue' in v) out[k] = v.timestampValue;
+    else if ('nullValue' in v) out[k] = null;
+  }
+  return out;
+}
+
+function toFirestoreRestFields(obj) {
+  const fields = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v === undefined || typeof v === 'function') continue;
+    // Omitir sentinelas serverTimestamp() de Firebase SDK; añadimos createdAt ISO
+    if (v && typeof v === 'object' && ('_methodName' in v || 'isEqual' in v)) {
+      fields[k] = { timestampValue: new Date().toISOString() };
+      continue;
+    }
+    if (v === null) fields[k] = { nullValue: null };
+    else if (typeof v === 'boolean') fields[k] = { booleanValue: v };
+    else if (typeof v === 'number') {
+      fields[k] = Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+    } else {
+      fields[k] = { stringValue: String(v) };
+    }
+  }
+  if (!fields.createdAt) {
+    fields.createdAt = { timestampValue: new Date().toISOString() };
+  }
+  return fields;
+}
+
+/**
+ * Obtiene TODOS los registros de una colección de contratos Lima de forma fail-closed:
+ * intenta primero el SDK de Firestore y, si tarda o falla, consulta paginadamente la API REST.
+ */
+export async function fetchAllLimaContractsFailClosed(collectionName, sdkGetter = null) {
+  if (typeof sdkGetter === 'function') {
+    try {
+      const snap = await withPromiseTimeout(sdkGetter(), 5000);
+      const records = [];
+      snap.forEach((docSnap) => {
+        records.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      return records;
+    } catch (sdkErr) {
+      console.warn(`[Anti-Duplicados] Lectura SDK omitida (${sdkErr?.message || sdkErr}); usando respaldo REST paginado.`);
+    }
+  }
+
+  const allDocs = [];
+  let pageToken = '';
+  do {
+    const url = `${FIRESTORE_REST_BASE}/${collectionName}?pageSize=300${pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ''}`;
+    const res = await withPromiseTimeout(fetch(url), 6500);
+    if (!res.ok) {
+      throw new Error(`REST_LIST_FAILED_${res.status}`);
+    }
+    const json = await res.json();
+    for (const item of json.documents || []) {
+      const parsed = parseFirestoreRestDoc(item);
+      if (parsed) allDocs.push(parsed);
+    }
+    pageToken = json.nextPageToken || '';
+  } while (pageToken);
+
+  return allDocs;
+}
+
+async function fetchSingleLimaContractRest(collectionName, docId) {
+  const res = await withPromiseTimeout(fetch(`${FIRESTORE_REST_BASE}/${collectionName}/${encodeURIComponent(docId)}`), 5000);
+  if (!res.ok) return null;
+  const json = await res.json();
+  return parseFirestoreRestDoc(json);
+}
+
+/**
+ * Registra de manera ATÓMICA e IRREPETIBLE un contrato en `contratos_caminata_fuego` o `contratos_maestria_lima`.
+ * - Paso 1: Verificación fail-closed contra todos los registros previos (Documento, Correo o Nombre completo).
+ * - Paso 2: Creación determinística en `doc_<NUMERO_DOCUMENTO_NORM>` mediante transacción ACID
+ *   y respaldo REST `createDocument?documentId=doc_<NORM>` (HTTP 409 si ya existe, cero doble escritura).
+ *
+ * Retorna:
+ * - `{ status: 'CREATED', docId }` si se creó por primera y única vez.
+ * - `{ status: 'DUPLICATE', existingRecord, matchReason }` si ya estaba registrado.
+ */
+export async function registerUniqueLimaContract({ db, collectionName, payload, sdkCollectionGetter }) {
+  const numeroDocumentoNorm = normalizeLimaDocNumber(payload.numeroDocumento || payload.doc || '');
+  const deterministicId = buildDeterministicContractDocId(numeroDocumentoNorm);
+  const enrichedPayload = {
+    ...payload,
+    numeroDocumentoNorm,
+    email: normalizeLimaEmail(payload.email || '')
+  };
+
+  // 1. Pre-verificación integral fail-closed (incluye registros legados con ID aleatorio)
+  const existingRecords = await fetchAllLimaContractsFailClosed(collectionName, sdkCollectionGetter);
+  const match = findMatchingLimaContract(existingRecords, enrichedPayload);
+  if (match) {
+    return {
+      status: 'DUPLICATE',
+      existingRecord: match.record,
+      matchReason: match.matchReason
+    };
+  }
+
+  // 2. Escritura atómica determinística sobre `doc_<NUMERO_DOCUMENTO_NORM>`
+  if (db) {
+    try {
+      await withPromiseTimeout(
+        runTransaction(db, async (tx) => {
+          const targetRef = doc(db, collectionName, deterministicId);
+          const snap = await tx.get(targetRef);
+          if (snap.exists()) {
+            const dupError = new Error('ALREADY_REGISTERED');
+            dupError.code = 'already-exists';
+            dupError.existingRecord = { id: snap.id, ...snap.data() };
+            throw dupError;
+          }
+          tx.set(targetRef, enrichedPayload);
+        }),
+        6000
+      );
+      return { status: 'CREATED', docId: deterministicId, payload: enrichedPayload };
+    } catch (txErr) {
+      if (txErr?.code === 'already-exists' && txErr.existingRecord) {
+        return {
+          status: 'DUPLICATE',
+          existingRecord: txErr.existingRecord,
+          matchReason: 'número de documento'
+        };
+      }
+      // Si falló por reglas (ej. el doc ya fue creado en otra pestaña milisegundos antes), verificar si ya existe
+      if (txErr?.code === 'permission-denied') {
+        const current = await fetchSingleLimaContractRest(collectionName, deterministicId).catch(() => null);
+        if (current) {
+          return {
+            status: 'DUPLICATE',
+            existingRecord: current,
+            matchReason: 'número de documento'
+          };
+        }
+      }
+      console.warn(`[Anti-Duplicados] Transacción SDK en ${collectionName} no completada (${txErr?.message || txErr}); ejecutando createDocument REST atómico.`);
+    }
+  }
+
+  // 3. Respaldo REST atómico (`POST ?documentId=doc_<NORM>` jamás sobrescribe ni duplica; devuelve 409 si ya existe)
+  const createUrl = `${FIRESTORE_REST_BASE}/${collectionName}?documentId=${encodeURIComponent(deterministicId)}`;
+  const restRes = await withPromiseTimeout(
+    fetch(createUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: toFirestoreRestFields(enrichedPayload) })
+    }),
+    6500
+  );
+
+  if (restRes.status === 409 || restRes.status === 403) {
+    const existing = await fetchSingleLimaContractRest(collectionName, deterministicId);
+    if (existing) {
+      return {
+        status: 'DUPLICATE',
+        existingRecord: existing,
+        matchReason: 'número de documento'
+      };
+    }
+  }
+
+  if (!restRes.ok) {
+    const errTxt = await restRes.text().catch(() => '');
+    throw new Error(`Error persistiendo contrato único (${restRes.status}): ${errTxt.slice(0, 180)}`);
+  }
+
+  return { status: 'CREATED', docId: deterministicId, payload: enrichedPayload };
+}
+
+function getRecordTimestampMs(item = {}) {
+  if (item.createdAt?.toMillis) return item.createdAt.toMillis();
+  for (const field of ['fechaValidacionIso', 'isoTimestamp', 'createdAt', '_createTime']) {
+    if (item[field]) {
+      const parsed = Date.parse(item[field]);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return 0;
+}
+
+/**
+ * Deduplica en tiempo real la lista mostrada en los Monitores de Lima (`/monitor-imos?tab=monitores_lima`),
+ * conservando 1 único registro canónico por persona (el primero firmado) y adjuntando `_allDocIds`
+ * para que si oficina elimina el registro desde el monitor, se borren también posibles copias legadas.
+ */
+export function deduplicateSignedContracts(rawRecords = []) {
+  // Ordenar cronológicamente ascendente para conservar el primer registro original válido
+  const chronological = [...rawRecords].sort((a, b) => getRecordTimestampMs(a) - getRecordTimestampMs(b));
+  const uniqueList = [];
+
+  for (const item of chronological) {
+    const match = findMatchingLimaContract(uniqueList, item);
+    if (!match) {
+      uniqueList.push({
+        ...item,
+        _allDocIds: item.id ? [item.id] : []
+      });
+    } else if (item.id && !match.record._allDocIds.includes(item.id)) {
+      match.record._allDocIds.push(item.id);
+    }
+  }
+
+  // Devolver ordenados por más reciente primero para la tabla del Monitor
+  return uniqueList.sort((a, b) => getRecordTimestampMs(b) - getRecordTimestampMs(a));
+}
+
+```
+
+---
+
 ## Archivo: src/utils/phoneUtils.js
 
 ```js
@@ -141525,6 +141885,7 @@ import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
+import { deduplicateSignedContracts } from '../utils/limaContractUniqueness';
 
 export default function MonitorMaestriaLima() {
   const navigate = useNavigate();
@@ -141620,13 +141981,7 @@ export default function MonitorMaestriaLima() {
             list.push({ id: doc.id, ...doc.data() });
           });
 
-          list.sort((a, b) => {
-            const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : (a.fechaValidacionIso ? new Date(a.fechaValidacionIso).getTime() : 0);
-            const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : (b.fechaValidacionIso ? new Date(b.fechaValidacionIso).getTime() : 0);
-            return tB - tA;
-          });
-
-          setSignedContracts(list);
+          setSignedContracts(deduplicateSignedContracts(list));
           setLoading(false);
         },
         (error) => {
@@ -141850,7 +142205,11 @@ export default function MonitorMaestriaLima() {
 
     setDeletingId(item.id);
     try {
-      await deleteDoc(doc(db, 'contratos_maestria_lima', item.id));
+      const idsToDelete = Array.isArray(item._allDocIds) && item._allDocIds.length > 0
+        ? item._allDocIds
+        : [item.id];
+      await Promise.all(idsToDelete.map((docId) => deleteDoc(doc(db, 'contratos_maestria_lima', docId))));
+      toast.success(`Registro de ${nombre} eliminado correctamente.`);
     } catch (err) {
       console.error('Error al eliminar registro en contratos_maestria_lima:', err);
       alert('No se pudo eliminar el registro. Verifica tus permisos en Causa OS.');
@@ -159142,6 +159501,7 @@ import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 import { downloadFirewalkContractPdf } from '../utils/contractPdfGenerator';
+import { deduplicateSignedContracts } from '../utils/limaContractUniqueness';
 
 export default function MonitorAcreditacionFuegoLima() {
   const navigate = useNavigate();
@@ -159218,7 +159578,11 @@ export default function MonitorAcreditacionFuegoLima() {
 
     setDeletingId(item.id);
     try {
-      await deleteDoc(doc(db, 'contratos_caminata_fuego', item.id));
+      const idsToDelete = Array.isArray(item._allDocIds) && item._allDocIds.length > 0
+        ? item._allDocIds
+        : [item.id];
+      await Promise.all(idsToDelete.map((docId) => deleteDoc(doc(db, 'contratos_caminata_fuego', docId))));
+      toast.success(`Registro de ${nombre} eliminado correctamente.`);
     } catch (err) {
       console.error('Error al eliminar registro en contratos_caminata_fuego:', err);
       alert('No se pudo eliminar el registro. Verifica tus permisos en Causa OS.');
@@ -159307,14 +159671,7 @@ export default function MonitorAcreditacionFuegoLima() {
             list.push({ id: doc.id, ...doc.data() });
           });
 
-          // Ordenar por más reciente primero
-          list.sort((a, b) => {
-            const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
-            const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
-            return tB - tA;
-          });
-
-          setSignedContracts(list);
+          setSignedContracts(deduplicateSignedContracts(list));
           setLoading(false);
         },
         (error) => {
@@ -160359,17 +160716,23 @@ import {
   Building2,
   FileCheck2
 } from 'lucide-react';
-import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 import { downloadFirewalkContractPdf } from '../utils/contractPdfGenerator';
+import {
+  normalizeLimaDocNumber,
+  normalizeLimaEmail,
+  registerUniqueLimaContract
+} from '../utils/limaContractUniqueness';
 
 export default function ContratoCaminataFuego() {
   const [activeTab, setActiveTab] = useState('todo');
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
   const [signedSuccess, setSignedSuccess] = useState(null);
   const [duplicateNotice, setDuplicateNotice] = useState(null);
   const [passDataUrl, setPassDataUrl] = useState(null);
@@ -160479,8 +160842,9 @@ export default function ContratoCaminataFuego() {
 
   const validateForm = () => {
     const errors = {};
+    const cleanDoc = normalizeLimaDocNumber(formData.numeroDocumento);
     if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es obligatorio.';
-    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El documento de identidad es obligatorio.';
+    if (!cleanDoc || cleanDoc.length < 4) errors.numeroDocumento = 'Ingresa un número de documento válido (mínimo 4 caracteres alfanuméricos).';
     if (!formData.email.trim() || !formData.email.includes('@')) errors.email = 'Ingresa un correo electrónico válido.';
     if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es obligatorio.';
     if (!formData.aceptoRiesgos) errors.aceptoRiesgos = 'Debes aceptar de forma obligatoria la Exoneración de Responsabilidad y Asunción de Riesgos (Checkbox 1).';
@@ -160491,6 +160855,7 @@ export default function ContratoCaminataFuego() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitLockRef.current || isSubmitting) return;
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -160500,75 +160865,13 @@ export default function ContratoCaminataFuego() {
       return;
     }
 
+    submitLockRef.current = true;
     setIsSubmitting(true);
     setEmailStatus('SENDING');
     setDuplicateNotice(null);
     try {
-      const normalizedDocInput = formData.numeroDocumento.trim().replace(/\s+/g, '').toUpperCase();
-      const normalizedEmailInput = formData.email.trim().toLowerCase();
-
-      // Anti-duplicados: Verificar si la persona ya se registró por N° de Documento o Correo Electrónico
-      try {
-        const snap = await getDocs(collection(db, 'contratos_caminata_fuego'));
-        let existingDoc = null;
-        snap.forEach((docSnap) => {
-          const d = docSnap.data();
-          const dDoc = String(d.numeroDocumento || '')
-            .trim()
-            .replace(/\s+/g, '')
-            .toUpperCase();
-          const dEmail = String(d.email || '').trim().toLowerCase();
-          if (
-            (normalizedDocInput && dDoc && dDoc === normalizedDocInput) ||
-            (normalizedEmailInput && dEmail && dEmail === normalizedEmailInput)
-          ) {
-            existingDoc = { id: docSnap.id, ...d };
-          }
-        });
-
-        if (existingDoc) {
-          const existingCode = existingDoc.code || existingDoc.verificationCode || 'CQ-FIRE-VERIFIED';
-          const existingDocLabel = existingDoc.doc || `${existingDoc.tipoDocumento || 'DNI'}: ${existingDoc.numeroDocumento || normalizedDocInput}`;
-          const existingFecha = existingDoc.fecha || existingDoc.timestamp || new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
-          const existingLugar = existingDoc.lugar || existingDoc.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
-          const existingPass = await generateFirewalkPassCanvas({
-            nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
-            documento: existingDocLabel,
-            rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
-            lugar: existingLugar,
-            fecha: existingFecha,
-            codigo: existingCode,
-            ip: existingDoc.ip || geoInfo.ip,
-            geoLocation: existingDoc.geoLocation || geoInfo.locationString,
-            coordinates: existingDoc.coordinates || geoInfo.coordinates
-          });
-          if (existingPass) {
-            setPassDataUrl(existingPass);
-          }
-          setDuplicateNotice(
-            `Ya existe un registro firmado con el documento (${normalizedDocInput}) o correo (${normalizedEmailInput}). No es posible registrarse dos veces. A continuación te mostramos tu pase oficial vigente. Si necesitas corregir algún dato erróneo, solicita al equipo de coordinación u oficina que elimine tu registro anterior.`
-          );
-          setEmailStatus('SENT');
-          setSignedSuccess({
-            ...existingDoc,
-            nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
-            documento: existingDocLabel,
-            codigo: existingCode,
-            fecha: existingFecha,
-            rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
-            sedeLocacion: existingLugar,
-            lugar: existingLugar
-          });
-          setIsSubmitting(false);
-          setTimeout(() => {
-            const confirmEl = document.getElementById('constancia-firmada');
-            if (confirmEl) confirmEl.scrollIntoView({ behavior: 'smooth' });
-          }, 120);
-          return;
-        }
-      } catch (dupErr) {
-        console.warn('Verificación de duplicados omitida temporalmente:', dupErr);
-      }
+      const normalizedDocInput = normalizeLimaDocNumber(formData.numeroDocumento);
+      const normalizedEmailInput = normalizeLimaEmail(formData.email);
 
       const freshGeo = await getClientGeoLocation().catch(() => geoInfo);
       const finalGeo = freshGeo || geoInfo;
@@ -160577,14 +160880,17 @@ export default function ContratoCaminataFuego() {
       const timestamp = new Date().toISOString();
       const localFecha = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
       const verificationCode = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
-      const docDisplay = `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`;
+      const docDisplay = `${formData.tipoDocumento}: ${normalizedDocInput}`;
       const sha256Hash = await computeSha256(
         `${verificationCode}|${formData.nombreCompleto.trim()}|${docDisplay}|${finalGeo.ip}|${finalGeo.coordinates || finalGeo.locationString}|${timestamp}`
       );
       const lugarConfirmado = formData.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)';
-      
+
       const payload = {
         ...formData,
+        numeroDocumento: normalizedDocInput,
+        numeroDocumentoNorm: normalizedDocInput,
+        email: normalizedEmailInput,
         nombre: formData.nombreCompleto.trim(),
         nombreCompleto: formData.nombreCompleto.trim(),
         doc: docDisplay,
@@ -160620,17 +160926,59 @@ export default function ContratoCaminataFuego() {
         createdAt: serverTimestamp()
       };
 
-      // Guardar en Firestore
-      try {
-        await addDoc(collection(db, 'contratos_caminata_fuego'), payload);
-      } catch (err) {
-        console.warn('Registro procesado y resguardado digitalmente:', err);
+      // Registro único atómico (verifica Documento, Correo y Nombre completo + ID determinístico doc_<NORM>)
+      const registrationResult = await registerUniqueLimaContract({
+        db,
+        collectionName: 'contratos_caminata_fuego',
+        payload,
+        sdkCollectionGetter: () => getDocs(collection(db, 'contratos_caminata_fuego'))
+      });
+
+      if (registrationResult.status === 'DUPLICATE') {
+        const existingDoc = registrationResult.existingRecord || {};
+        const existingCode = existingDoc.code || existingDoc.verificationCode || 'CQ-FIRE-VERIFIED';
+        const existingDocLabel = existingDoc.doc || `${existingDoc.tipoDocumento || 'DNI'}: ${existingDoc.numeroDocumento || normalizedDocInput}`;
+        const existingFecha = existingDoc.fecha || existingDoc.timestamp || localFecha;
+        const existingLugar = existingDoc.lugar || existingDoc.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
+        const existingPass = await generateFirewalkPassCanvas({
+          nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
+          documento: existingDocLabel,
+          rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
+          lugar: existingLugar,
+          fecha: existingFecha,
+          codigo: existingCode,
+          ip: existingDoc.ip || finalGeo.ip,
+          geoLocation: existingDoc.geoLocation || finalGeo.locationString,
+          coordinates: existingDoc.coordinates || finalGeo.coordinates
+        });
+        if (existingPass) {
+          setPassDataUrl(existingPass);
+        }
+        setDuplicateNotice(
+          `Ya existe un registro firmado coincidente por ${registrationResult.matchReason || 'documento o correo'} (${normalizedDocInput} / ${normalizedEmailInput}). No está permitido registrarse dos veces. A continuación te mostramos tu pase oficial vigente. Si necesitas corregir algún dato erróneo, solicita al equipo de coordinación u oficina que elimine tu registro anterior.`
+        );
+        setEmailStatus('SENT');
+        setSignedSuccess({
+          ...existingDoc,
+          nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
+          documento: existingDocLabel,
+          codigo: existingCode,
+          fecha: existingFecha,
+          rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
+          sedeLocacion: existingLugar,
+          lugar: existingLugar
+        });
+        setTimeout(() => {
+          const confirmEl = document.getElementById('constancia-firmada');
+          if (confirmEl) confirmEl.scrollIntoView({ behavior: 'smooth' });
+        }, 120);
+        return;
       }
 
       // Generar Pase Oficial PNG con IP y Geolocalización e iniciar envío inmediato por correo
       const generatedPass = await generateFirewalkPassCanvas({
         nombre: formData.nombreCompleto.trim(),
-        documento: `${formData.tipoDocumento} ${formData.numeroDocumento.trim()}`,
+        documento: `${formData.tipoDocumento} ${normalizedDocInput}`,
         rolActividad: formData.rolActividad,
         lugar: lugarConfirmado,
         fecha: localFecha,
@@ -160646,7 +160994,7 @@ export default function ContratoCaminataFuego() {
 
       const emailSent = await sendFirewalkConfirmationEmail({
         db,
-        toEmail: formData.email.trim().toLowerCase(),
+        toEmail: normalizedEmailInput,
         nombre: formData.nombreCompleto.trim(),
         documento: docDisplay,
         rolActividad: formData.rolActividad,
@@ -160669,7 +161017,7 @@ export default function ContratoCaminataFuego() {
       setSignedSuccess({
         ...payload,
         nombre: formData.nombreCompleto.trim(),
-        documento: `${formData.tipoDocumento} ${formData.numeroDocumento.trim()}`,
+        documento: `${formData.tipoDocumento} ${normalizedDocInput}`,
         codigo: verificationCode,
         fecha: localFecha
       });
@@ -160682,8 +161030,9 @@ export default function ContratoCaminataFuego() {
     } catch (err) {
       console.error('Error al registrar firma digital:', err);
       setEmailStatus('ERROR');
-      alert('Hubo un inconveniente al validar la firma. Por favor verifica los datos e intenta nuevamente.');
+      alert('Hubo un inconveniente al validar la firma. Por favor verifica tu conexión y los datos ingresados e intenta nuevamente.');
     } finally {
+      submitLockRef.current = false;
       setIsSubmitting(false);
     }
   };
@@ -185010,11 +185359,16 @@ import {
   Check,
   Award
 } from 'lucide-react';
-import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
+import {
+  normalizeLimaDocNumber,
+  normalizeLimaEmail,
+  registerUniqueLimaContract
+} from '../utils/limaContractUniqueness';
 
 // Generador de Hash SHA-256 usando Web Crypto API
 async function computeSha256(message) {
@@ -185163,6 +185517,7 @@ export default function ContratoMaestriaLima() {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
   const [signedSuccess, setSignedSuccess] = useState(null);
   const [duplicateNotice, setDuplicateNotice] = useState('');
   const [passDataUrl, setPassDataUrl] = useState(null);
@@ -185255,8 +185610,9 @@ export default function ContratoMaestriaLima() {
 
   const validateForm = () => {
     const errors = {};
+    const cleanDoc = normalizeLimaDocNumber(formData.numeroDocumento);
     if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es obligatorio.';
-    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El número de documento (DNI/CE/Pasaporte) es obligatorio.';
+    if (!cleanDoc || cleanDoc.length < 4) errors.numeroDocumento = 'Ingresa un número de documento válido (DNI/CE/Pasaporte, mín. 4 caracteres alfanuméricos).';
     if (!formData.email.trim() || !formData.email.includes('@')) errors.email = 'Ingresa un correo electrónico válido para recibir tu contrato.';
     if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es obligatorio.';
     if (!formData.casilla1_TerminosNDA) {
@@ -185274,11 +185630,9 @@ export default function ContratoMaestriaLima() {
     return errors;
   };
 
-  const normalizeDocNum = (val) => String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase().trim();
-  const normalizeEmail = (val) => String(val || '').toLowerCase().trim();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitLockRef.current || isSubmitting) return;
     setDuplicateNotice('');
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
@@ -185289,54 +185643,11 @@ export default function ContratoMaestriaLima() {
       return;
     }
 
+    submitLockRef.current = true;
     setIsSubmitting(true);
     try {
-      const inputDocNorm = normalizeDocNum(formData.numeroDocumento);
-      const inputEmailNorm = normalizeEmail(formData.email);
-
-      // 0. VERIFICACIÓN ANTI-DUPLICADOS: Impedir que una misma persona se registre dos veces
-      if (db) {
-        const snap = await getDocs(collection(db, 'contratos_maestria_lima'));
-        let existingRecord = null;
-        snap.forEach((docSnap) => {
-          const d = docSnap.data();
-          const dbDocNorm = normalizeDocNum(d.numeroDocumento || (d.doc ? d.doc.split(':').pop() : ''));
-          const dbEmailNorm = normalizeEmail(d.email);
-          if ((inputDocNorm && dbDocNorm && inputDocNorm === dbDocNorm) || (inputEmailNorm && dbEmailNorm && inputEmailNorm === dbEmailNorm)) {
-            existingRecord = { id: docSnap.id, ...d };
-          }
-        });
-
-        if (existingRecord) {
-          const existingCode = existingRecord.code || existingRecord.verificationCode || 'CQ-MJ-VERIFIED';
-          const existingPassUrl = await generateMaestriaPassCanvas({
-            nombre: existingRecord.nombre || existingRecord.nombreCompleto || formData.nombreCompleto.trim(),
-            doc: existingRecord.doc || `${existingRecord.tipoDocumento || 'DNI'}: ${existingRecord.numeroDocumento || ''}`,
-            rol: existingRecord.rol || existingRecord.rolActividad || 'Participante',
-            equipo: existingRecord.equipo || existingRecord.equipoCohorte || 'Equipo 32',
-            sede: 'Lima',
-            fecha: existingRecord.fecha || 'Registrado',
-            codigo: existingCode,
-            ip: existingRecord.ip || 'Registrada',
-            geoLocation: existingRecord.geoLocation || 'Lima, Perú 🇵🇪',
-            coordinates: existingRecord.coordinates || '',
-            verificationUrl: `${pageUrl}?verify=${existingCode}`
-          });
-
-          setPassDataUrl(existingPassUrl);
-          setDuplicateNotice(
-            '⚠️ Ya cuentas con un registro legal firmado con este número de documento o correo electrónico. No está permitido registrarse dos veces. A continuación te mostramos tu constancia y Pase Oficial vigente. (Si registraste algún dato por error, solicita al equipo en sala eliminar tu registro previo para poder volver a firmar).'
-          );
-          setSignedSuccess({
-            ...existingRecord,
-            nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre,
-            codigo: existingCode
-          });
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          setIsSubmitting(false);
-          return;
-        }
-      }
+      const inputDocNorm = normalizeLimaDocNumber(formData.numeroDocumento);
+      const inputEmailNorm = normalizeLimaEmail(formData.email);
 
       // Asegurar IP y Geolocalización fresca sin excepción
       const currentGeo = geoInfo || await getClientGeoLocation({ forceFresh: true, tryGps: true });
@@ -185346,8 +185657,8 @@ export default function ContratoMaestriaLima() {
 
       const rawStringToHash = JSON.stringify({
         nombre: formData.nombreCompleto.trim(),
-        doc: `${formData.tipoDocumento}:${formData.numeroDocumento.trim()}`,
-        email: formData.email.trim().toLowerCase(),
+        doc: `${formData.tipoDocumento}:${inputDocNorm}`,
+        email: inputEmailNorm,
         rol: formData.rolActividad,
         equipo: formData.equipoCohorte,
         c1: formData.casilla1_TerminosNDA,
@@ -185361,31 +185672,14 @@ export default function ContratoMaestriaLima() {
 
       const verificationUrl = `${pageUrl}?verify=${verificationCode}`;
 
-      // 1. Generar imagen oficial de validación con QR, IP y Geolocalización
-      const generatedPassUrl = await generateMaestriaPassCanvas({
-        nombre: formData.nombreCompleto.trim(),
-        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
-        rol: formData.rolActividad,
-        equipo: formData.equipoCohorte,
-        sede: 'Lima',
-        fecha: localFecha,
-        codigo: verificationCode,
-        ip: currentGeo?.ip || 'No detectada',
-        geoLocation: currentGeo?.locationString || 'Lima, Perú 🇵🇪',
-        coordinates: currentGeo?.coordinates || '',
-        verificationUrl
-      });
-
-      setPassDataUrl(generatedPassUrl);
-
-      // 2. Guardar registro inalterable en Firestore (con IP y Geolocalización obligatorias)
+      // 1. Preparar payload inalterable con clave normalizada para ID determinístico doc_<NORM>
       const payload = {
         nombre: formData.nombreCompleto.trim(),
         nombreCompleto: formData.nombreCompleto.trim(),
         tipoDocumento: formData.tipoDocumento,
-        numeroDocumento: formData.numeroDocumento.trim(),
+        numeroDocumento: inputDocNorm,
         numeroDocumentoNorm: inputDocNorm,
-        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
+        doc: `${formData.tipoDocumento}: ${inputDocNorm}`,
         email: inputEmailNorm,
         telefono: formData.telefono.trim(),
         rol: formData.rolActividad,
@@ -185426,16 +185720,67 @@ export default function ContratoMaestriaLima() {
         createdAt: serverTimestamp()
       };
 
-      if (db) {
-        await addDoc(collection(db, 'contratos_maestria_lima'), payload);
+      // 2. VERIFICACIÓN Y ESCRITURA ATÓMICA ANTI-DUPLICADOS (Documento, Correo, Nombre + doc_<NORM>)
+      const registrationResult = await registerUniqueLimaContract({
+        db,
+        collectionName: 'contratos_maestria_lima',
+        payload,
+        sdkCollectionGetter: () => getDocs(collection(db, 'contratos_maestria_lima'))
+      });
+
+      if (registrationResult.status === 'DUPLICATE') {
+        const existingRecord = registrationResult.existingRecord || {};
+        const existingCode = existingRecord.code || existingRecord.verificationCode || 'CQ-MJ-VERIFIED';
+        const existingPassUrl = await generateMaestriaPassCanvas({
+          nombre: existingRecord.nombre || existingRecord.nombreCompleto || formData.nombreCompleto.trim(),
+          doc: existingRecord.doc || `${existingRecord.tipoDocumento || 'DNI'}: ${existingRecord.numeroDocumento || inputDocNorm}`,
+          rol: existingRecord.rol || existingRecord.rolActividad || 'Participante',
+          equipo: existingRecord.equipo || existingRecord.equipoCohorte || 'Equipo 32',
+          sede: 'Lima',
+          fecha: existingRecord.fecha || 'Registrado',
+          codigo: existingCode,
+          ip: existingRecord.ip || 'Registrada',
+          geoLocation: existingRecord.geoLocation || 'Lima, Perú 🇵🇪',
+          coordinates: existingRecord.coordinates || '',
+          verificationUrl: `${pageUrl}?verify=${existingCode}`
+        });
+
+        setPassDataUrl(existingPassUrl);
+        setDuplicateNotice(
+          `⚠️ Ya cuentas con un registro legal firmado coincidente por ${registrationResult.matchReason || 'documento o correo'} (${inputDocNorm} / ${inputEmailNorm}). No está permitido registrarse dos veces. A continuación te mostramos tu constancia y Pase Oficial vigente. (Si registraste algún dato por error, solicita al equipo en sala eliminar tu registro previo para poder volver a firmar).`
+        );
+        setSignedSuccess({
+          ...existingRecord,
+          nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre,
+          codigo: existingCode
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
 
-      // 3. Envío automático inmediato del contrato firmado (PDF) y pase de validación por correo electrónico
+      // 3. Generar imagen oficial de validación con QR, IP y Geolocalización
+      const generatedPassUrl = await generateMaestriaPassCanvas({
+        nombre: formData.nombreCompleto.trim(),
+        doc: `${formData.tipoDocumento}: ${inputDocNorm}`,
+        rol: formData.rolActividad,
+        equipo: formData.equipoCohorte,
+        sede: 'Lima',
+        fecha: localFecha,
+        codigo: verificationCode,
+        ip: currentGeo?.ip || 'No detectada',
+        geoLocation: currentGeo?.locationString || 'Lima, Perú 🇵🇪',
+        coordinates: currentGeo?.coordinates || '',
+        verificationUrl
+      });
+
+      setPassDataUrl(generatedPassUrl);
+
+      // 4. Envío automático inmediato del contrato firmado (PDF) y pase de validación por correo electrónico
       const sent = await sendMaestriaConfirmationEmail({
         db,
         toEmail: inputEmailNorm,
         nombre: formData.nombreCompleto.trim(),
-        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
+        doc: `${formData.tipoDocumento}: ${inputDocNorm}`,
         rol: formData.rolActividad,
         equipo: formData.equipoCohorte,
         codigo: verificationCode,
@@ -185461,6 +185806,7 @@ export default function ContratoMaestriaLima() {
       console.error('Error al registrar firma de Maestría:', err);
       alert('Ocurrió un inconveniente al registrar tu firma. Por favor verifica tu conexión e inténtalo nuevamente.');
     } finally {
+      submitLockRef.current = false;
       setIsSubmitting(false);
     }
   };

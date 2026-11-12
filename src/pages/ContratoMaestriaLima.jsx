@@ -12,11 +12,16 @@ import {
   Check,
   Award
 } from 'lucide-react';
-import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
+import {
+  normalizeLimaDocNumber,
+  normalizeLimaEmail,
+  registerUniqueLimaContract
+} from '../utils/limaContractUniqueness';
 
 // Generador de Hash SHA-256 usando Web Crypto API
 async function computeSha256(message) {
@@ -165,6 +170,7 @@ export default function ContratoMaestriaLima() {
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
   const [signedSuccess, setSignedSuccess] = useState(null);
   const [duplicateNotice, setDuplicateNotice] = useState('');
   const [passDataUrl, setPassDataUrl] = useState(null);
@@ -257,8 +263,9 @@ export default function ContratoMaestriaLima() {
 
   const validateForm = () => {
     const errors = {};
+    const cleanDoc = normalizeLimaDocNumber(formData.numeroDocumento);
     if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es obligatorio.';
-    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El número de documento (DNI/CE/Pasaporte) es obligatorio.';
+    if (!cleanDoc || cleanDoc.length < 4) errors.numeroDocumento = 'Ingresa un número de documento válido (DNI/CE/Pasaporte, mín. 4 caracteres alfanuméricos).';
     if (!formData.email.trim() || !formData.email.includes('@')) errors.email = 'Ingresa un correo electrónico válido para recibir tu contrato.';
     if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es obligatorio.';
     if (!formData.casilla1_TerminosNDA) {
@@ -276,11 +283,9 @@ export default function ContratoMaestriaLima() {
     return errors;
   };
 
-  const normalizeDocNum = (val) => String(val || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase().trim();
-  const normalizeEmail = (val) => String(val || '').toLowerCase().trim();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitLockRef.current || isSubmitting) return;
     setDuplicateNotice('');
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
@@ -291,54 +296,11 @@ export default function ContratoMaestriaLima() {
       return;
     }
 
+    submitLockRef.current = true;
     setIsSubmitting(true);
     try {
-      const inputDocNorm = normalizeDocNum(formData.numeroDocumento);
-      const inputEmailNorm = normalizeEmail(formData.email);
-
-      // 0. VERIFICACIÓN ANTI-DUPLICADOS: Impedir que una misma persona se registre dos veces
-      if (db) {
-        const snap = await getDocs(collection(db, 'contratos_maestria_lima'));
-        let existingRecord = null;
-        snap.forEach((docSnap) => {
-          const d = docSnap.data();
-          const dbDocNorm = normalizeDocNum(d.numeroDocumento || (d.doc ? d.doc.split(':').pop() : ''));
-          const dbEmailNorm = normalizeEmail(d.email);
-          if ((inputDocNorm && dbDocNorm && inputDocNorm === dbDocNorm) || (inputEmailNorm && dbEmailNorm && inputEmailNorm === dbEmailNorm)) {
-            existingRecord = { id: docSnap.id, ...d };
-          }
-        });
-
-        if (existingRecord) {
-          const existingCode = existingRecord.code || existingRecord.verificationCode || 'CQ-MJ-VERIFIED';
-          const existingPassUrl = await generateMaestriaPassCanvas({
-            nombre: existingRecord.nombre || existingRecord.nombreCompleto || formData.nombreCompleto.trim(),
-            doc: existingRecord.doc || `${existingRecord.tipoDocumento || 'DNI'}: ${existingRecord.numeroDocumento || ''}`,
-            rol: existingRecord.rol || existingRecord.rolActividad || 'Participante',
-            equipo: existingRecord.equipo || existingRecord.equipoCohorte || 'Equipo 32',
-            sede: 'Lima',
-            fecha: existingRecord.fecha || 'Registrado',
-            codigo: existingCode,
-            ip: existingRecord.ip || 'Registrada',
-            geoLocation: existingRecord.geoLocation || 'Lima, Perú 🇵🇪',
-            coordinates: existingRecord.coordinates || '',
-            verificationUrl: `${pageUrl}?verify=${existingCode}`
-          });
-
-          setPassDataUrl(existingPassUrl);
-          setDuplicateNotice(
-            '⚠️ Ya cuentas con un registro legal firmado con este número de documento o correo electrónico. No está permitido registrarse dos veces. A continuación te mostramos tu constancia y Pase Oficial vigente. (Si registraste algún dato por error, solicita al equipo en sala eliminar tu registro previo para poder volver a firmar).'
-          );
-          setSignedSuccess({
-            ...existingRecord,
-            nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre,
-            codigo: existingCode
-          });
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          setIsSubmitting(false);
-          return;
-        }
-      }
+      const inputDocNorm = normalizeLimaDocNumber(formData.numeroDocumento);
+      const inputEmailNorm = normalizeLimaEmail(formData.email);
 
       // Asegurar IP y Geolocalización fresca sin excepción
       const currentGeo = geoInfo || await getClientGeoLocation({ forceFresh: true, tryGps: true });
@@ -348,8 +310,8 @@ export default function ContratoMaestriaLima() {
 
       const rawStringToHash = JSON.stringify({
         nombre: formData.nombreCompleto.trim(),
-        doc: `${formData.tipoDocumento}:${formData.numeroDocumento.trim()}`,
-        email: formData.email.trim().toLowerCase(),
+        doc: `${formData.tipoDocumento}:${inputDocNorm}`,
+        email: inputEmailNorm,
         rol: formData.rolActividad,
         equipo: formData.equipoCohorte,
         c1: formData.casilla1_TerminosNDA,
@@ -363,31 +325,14 @@ export default function ContratoMaestriaLima() {
 
       const verificationUrl = `${pageUrl}?verify=${verificationCode}`;
 
-      // 1. Generar imagen oficial de validación con QR, IP y Geolocalización
-      const generatedPassUrl = await generateMaestriaPassCanvas({
-        nombre: formData.nombreCompleto.trim(),
-        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
-        rol: formData.rolActividad,
-        equipo: formData.equipoCohorte,
-        sede: 'Lima',
-        fecha: localFecha,
-        codigo: verificationCode,
-        ip: currentGeo?.ip || 'No detectada',
-        geoLocation: currentGeo?.locationString || 'Lima, Perú 🇵🇪',
-        coordinates: currentGeo?.coordinates || '',
-        verificationUrl
-      });
-
-      setPassDataUrl(generatedPassUrl);
-
-      // 2. Guardar registro inalterable en Firestore (con IP y Geolocalización obligatorias)
+      // 1. Preparar payload inalterable con clave normalizada para ID determinístico doc_<NORM>
       const payload = {
         nombre: formData.nombreCompleto.trim(),
         nombreCompleto: formData.nombreCompleto.trim(),
         tipoDocumento: formData.tipoDocumento,
-        numeroDocumento: formData.numeroDocumento.trim(),
+        numeroDocumento: inputDocNorm,
         numeroDocumentoNorm: inputDocNorm,
-        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
+        doc: `${formData.tipoDocumento}: ${inputDocNorm}`,
         email: inputEmailNorm,
         telefono: formData.telefono.trim(),
         rol: formData.rolActividad,
@@ -428,16 +373,67 @@ export default function ContratoMaestriaLima() {
         createdAt: serverTimestamp()
       };
 
-      if (db) {
-        await addDoc(collection(db, 'contratos_maestria_lima'), payload);
+      // 2. VERIFICACIÓN Y ESCRITURA ATÓMICA ANTI-DUPLICADOS (Documento, Correo, Nombre + doc_<NORM>)
+      const registrationResult = await registerUniqueLimaContract({
+        db,
+        collectionName: 'contratos_maestria_lima',
+        payload,
+        sdkCollectionGetter: () => getDocs(collection(db, 'contratos_maestria_lima'))
+      });
+
+      if (registrationResult.status === 'DUPLICATE') {
+        const existingRecord = registrationResult.existingRecord || {};
+        const existingCode = existingRecord.code || existingRecord.verificationCode || 'CQ-MJ-VERIFIED';
+        const existingPassUrl = await generateMaestriaPassCanvas({
+          nombre: existingRecord.nombre || existingRecord.nombreCompleto || formData.nombreCompleto.trim(),
+          doc: existingRecord.doc || `${existingRecord.tipoDocumento || 'DNI'}: ${existingRecord.numeroDocumento || inputDocNorm}`,
+          rol: existingRecord.rol || existingRecord.rolActividad || 'Participante',
+          equipo: existingRecord.equipo || existingRecord.equipoCohorte || 'Equipo 32',
+          sede: 'Lima',
+          fecha: existingRecord.fecha || 'Registrado',
+          codigo: existingCode,
+          ip: existingRecord.ip || 'Registrada',
+          geoLocation: existingRecord.geoLocation || 'Lima, Perú 🇵🇪',
+          coordinates: existingRecord.coordinates || '',
+          verificationUrl: `${pageUrl}?verify=${existingCode}`
+        });
+
+        setPassDataUrl(existingPassUrl);
+        setDuplicateNotice(
+          `⚠️ Ya cuentas con un registro legal firmado coincidente por ${registrationResult.matchReason || 'documento o correo'} (${inputDocNorm} / ${inputEmailNorm}). No está permitido registrarse dos veces. A continuación te mostramos tu constancia y Pase Oficial vigente. (Si registraste algún dato por error, solicita al equipo en sala eliminar tu registro previo para poder volver a firmar).`
+        );
+        setSignedSuccess({
+          ...existingRecord,
+          nombreCompleto: existingRecord.nombreCompleto || existingRecord.nombre,
+          codigo: existingCode
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
       }
 
-      // 3. Envío automático inmediato del contrato firmado (PDF) y pase de validación por correo electrónico
+      // 3. Generar imagen oficial de validación con QR, IP y Geolocalización
+      const generatedPassUrl = await generateMaestriaPassCanvas({
+        nombre: formData.nombreCompleto.trim(),
+        doc: `${formData.tipoDocumento}: ${inputDocNorm}`,
+        rol: formData.rolActividad,
+        equipo: formData.equipoCohorte,
+        sede: 'Lima',
+        fecha: localFecha,
+        codigo: verificationCode,
+        ip: currentGeo?.ip || 'No detectada',
+        geoLocation: currentGeo?.locationString || 'Lima, Perú 🇵🇪',
+        coordinates: currentGeo?.coordinates || '',
+        verificationUrl
+      });
+
+      setPassDataUrl(generatedPassUrl);
+
+      // 4. Envío automático inmediato del contrato firmado (PDF) y pase de validación por correo electrónico
       const sent = await sendMaestriaConfirmationEmail({
         db,
         toEmail: inputEmailNorm,
         nombre: formData.nombreCompleto.trim(),
-        doc: `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`,
+        doc: `${formData.tipoDocumento}: ${inputDocNorm}`,
         rol: formData.rolActividad,
         equipo: formData.equipoCohorte,
         codigo: verificationCode,
@@ -463,6 +459,7 @@ export default function ContratoMaestriaLima() {
       console.error('Error al registrar firma de Maestría:', err);
       alert('Ocurrió un inconveniente al registrar tu firma. Por favor verifica tu conexión e inténtalo nuevamente.');
     } finally {
+      submitLockRef.current = false;
       setIsSubmitting(false);
     }
   };

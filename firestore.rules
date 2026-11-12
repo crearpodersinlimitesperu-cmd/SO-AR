@@ -1645,18 +1645,42 @@ service cloud.firestore {
 
     // ============================================================================
     // CONTRATO CAMINATA SOBRE FUEGO: Registro legal y firma digital pública
+    // Unicidad atómica en motor Firestore: ID determinístico doc_<numeroDocumentoNorm>
     // ============================================================================
     match /contratos_caminata_fuego/{contratoId} {
-      allow read, create: if true;
-      allow update, delete: if isAuthenticated();
+      allow read: if true;
+      allow create: if request.resource.data.numeroDocumentoNorm is string
+        && request.resource.data.numeroDocumentoNorm.matches('^[A-Z0-9]{4,24}$')
+        && contratoId == 'doc_' + request.resource.data.numeroDocumentoNorm
+        && !exists(/databases/$(database)/documents/contratos_caminata_fuego/$(contratoId))
+        && request.resource.data.email is string
+        && request.resource.data.email.size() >= 3
+        && request.resource.data.email.size() <= 180
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 2
+        && request.resource.data.nombre.size() <= 180;
+      allow update: if isSuperAdmin();
+      allow delete: if isAuthenticated();
     }
 
     // ============================================================================
     // CONTRATO MAESTRÍA LIMA: Registro legal y firma digital pública
+    // Unicidad atómica en motor Firestore: ID determinístico doc_<numeroDocumentoNorm>
     // ============================================================================
     match /contratos_maestria_lima/{contratoId} {
-      allow read, create: if true;
-      allow update, delete: if isAuthenticated();
+      allow read: if true;
+      allow create: if request.resource.data.numeroDocumentoNorm is string
+        && request.resource.data.numeroDocumentoNorm.matches('^[A-Z0-9]{4,24}$')
+        && contratoId == 'doc_' + request.resource.data.numeroDocumentoNorm
+        && !exists(/databases/$(database)/documents/contratos_maestria_lima/$(contratoId))
+        && request.resource.data.email is string
+        && request.resource.data.email.size() >= 3
+        && request.resource.data.email.size() <= 180
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() >= 2
+        && request.resource.data.nombre.size() <= 180;
+      allow update: if isSuperAdmin();
+      allow delete: if isAuthenticated();
     }
   }
 }

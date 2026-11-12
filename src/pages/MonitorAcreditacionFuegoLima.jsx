@@ -30,6 +30,7 @@ import { db } from '../services/firebase';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 import { downloadFirewalkContractPdf } from '../utils/contractPdfGenerator';
+import { deduplicateSignedContracts } from '../utils/limaContractUniqueness';
 
 export default function MonitorAcreditacionFuegoLima() {
   const navigate = useNavigate();
@@ -106,7 +107,11 @@ export default function MonitorAcreditacionFuegoLima() {
 
     setDeletingId(item.id);
     try {
-      await deleteDoc(doc(db, 'contratos_caminata_fuego', item.id));
+      const idsToDelete = Array.isArray(item._allDocIds) && item._allDocIds.length > 0
+        ? item._allDocIds
+        : [item.id];
+      await Promise.all(idsToDelete.map((docId) => deleteDoc(doc(db, 'contratos_caminata_fuego', docId))));
+      toast.success(`Registro de ${nombre} eliminado correctamente.`);
     } catch (err) {
       console.error('Error al eliminar registro en contratos_caminata_fuego:', err);
       alert('No se pudo eliminar el registro. Verifica tus permisos en Causa OS.');
@@ -195,14 +200,7 @@ export default function MonitorAcreditacionFuegoLima() {
             list.push({ id: doc.id, ...doc.data() });
           });
 
-          // Ordenar por más reciente primero
-          list.sort((a, b) => {
-            const tA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
-            const tB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
-            return tB - tA;
-          });
-
-          setSignedContracts(list);
+          setSignedContracts(deduplicateSignedContracts(list));
           setLoading(false);
         },
         (error) => {

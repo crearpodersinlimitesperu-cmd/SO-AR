@@ -25,17 +25,23 @@ import {
   Building2,
   FileCheck2
 } from 'lucide-react';
-import { addDoc, collection, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 import { downloadFirewalkContractPdf } from '../utils/contractPdfGenerator';
+import {
+  normalizeLimaDocNumber,
+  normalizeLimaEmail,
+  registerUniqueLimaContract
+} from '../utils/limaContractUniqueness';
 
 export default function ContratoCaminataFuego() {
   const [activeTab, setActiveTab] = useState('todo');
   const [searchTerm, setSearchTerm] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
   const [signedSuccess, setSignedSuccess] = useState(null);
   const [duplicateNotice, setDuplicateNotice] = useState(null);
   const [passDataUrl, setPassDataUrl] = useState(null);
@@ -145,8 +151,9 @@ export default function ContratoCaminataFuego() {
 
   const validateForm = () => {
     const errors = {};
+    const cleanDoc = normalizeLimaDocNumber(formData.numeroDocumento);
     if (!formData.nombreCompleto.trim()) errors.nombreCompleto = 'El nombre completo es obligatorio.';
-    if (!formData.numeroDocumento.trim()) errors.numeroDocumento = 'El documento de identidad es obligatorio.';
+    if (!cleanDoc || cleanDoc.length < 4) errors.numeroDocumento = 'Ingresa un número de documento válido (mínimo 4 caracteres alfanuméricos).';
     if (!formData.email.trim() || !formData.email.includes('@')) errors.email = 'Ingresa un correo electrónico válido.';
     if (!formData.telefono.trim()) errors.telefono = 'El teléfono o WhatsApp es obligatorio.';
     if (!formData.aceptoRiesgos) errors.aceptoRiesgos = 'Debes aceptar de forma obligatoria la Exoneración de Responsabilidad y Asunción de Riesgos (Checkbox 1).';
@@ -157,6 +164,7 @@ export default function ContratoCaminataFuego() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submitLockRef.current || isSubmitting) return;
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -166,75 +174,13 @@ export default function ContratoCaminataFuego() {
       return;
     }
 
+    submitLockRef.current = true;
     setIsSubmitting(true);
     setEmailStatus('SENDING');
     setDuplicateNotice(null);
     try {
-      const normalizedDocInput = formData.numeroDocumento.trim().replace(/\s+/g, '').toUpperCase();
-      const normalizedEmailInput = formData.email.trim().toLowerCase();
-
-      // Anti-duplicados: Verificar si la persona ya se registró por N° de Documento o Correo Electrónico
-      try {
-        const snap = await getDocs(collection(db, 'contratos_caminata_fuego'));
-        let existingDoc = null;
-        snap.forEach((docSnap) => {
-          const d = docSnap.data();
-          const dDoc = String(d.numeroDocumento || '')
-            .trim()
-            .replace(/\s+/g, '')
-            .toUpperCase();
-          const dEmail = String(d.email || '').trim().toLowerCase();
-          if (
-            (normalizedDocInput && dDoc && dDoc === normalizedDocInput) ||
-            (normalizedEmailInput && dEmail && dEmail === normalizedEmailInput)
-          ) {
-            existingDoc = { id: docSnap.id, ...d };
-          }
-        });
-
-        if (existingDoc) {
-          const existingCode = existingDoc.code || existingDoc.verificationCode || 'CQ-FIRE-VERIFIED';
-          const existingDocLabel = existingDoc.doc || `${existingDoc.tipoDocumento || 'DNI'}: ${existingDoc.numeroDocumento || normalizedDocInput}`;
-          const existingFecha = existingDoc.fecha || existingDoc.timestamp || new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
-          const existingLugar = existingDoc.lugar || existingDoc.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
-          const existingPass = await generateFirewalkPassCanvas({
-            nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
-            documento: existingDocLabel,
-            rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
-            lugar: existingLugar,
-            fecha: existingFecha,
-            codigo: existingCode,
-            ip: existingDoc.ip || geoInfo.ip,
-            geoLocation: existingDoc.geoLocation || geoInfo.locationString,
-            coordinates: existingDoc.coordinates || geoInfo.coordinates
-          });
-          if (existingPass) {
-            setPassDataUrl(existingPass);
-          }
-          setDuplicateNotice(
-            `Ya existe un registro firmado con el documento (${normalizedDocInput}) o correo (${normalizedEmailInput}). No es posible registrarse dos veces. A continuación te mostramos tu pase oficial vigente. Si necesitas corregir algún dato erróneo, solicita al equipo de coordinación u oficina que elimine tu registro anterior.`
-          );
-          setEmailStatus('SENT');
-          setSignedSuccess({
-            ...existingDoc,
-            nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
-            documento: existingDocLabel,
-            codigo: existingCode,
-            fecha: existingFecha,
-            rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
-            sedeLocacion: existingLugar,
-            lugar: existingLugar
-          });
-          setIsSubmitting(false);
-          setTimeout(() => {
-            const confirmEl = document.getElementById('constancia-firmada');
-            if (confirmEl) confirmEl.scrollIntoView({ behavior: 'smooth' });
-          }, 120);
-          return;
-        }
-      } catch (dupErr) {
-        console.warn('Verificación de duplicados omitida temporalmente:', dupErr);
-      }
+      const normalizedDocInput = normalizeLimaDocNumber(formData.numeroDocumento);
+      const normalizedEmailInput = normalizeLimaEmail(formData.email);
 
       const freshGeo = await getClientGeoLocation().catch(() => geoInfo);
       const finalGeo = freshGeo || geoInfo;
@@ -243,14 +189,17 @@ export default function ContratoCaminataFuego() {
       const timestamp = new Date().toISOString();
       const localFecha = new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' });
       const verificationCode = 'CQ-FIRE-' + Math.random().toString(36).substring(2, 8).toUpperCase() + '-' + Date.now().toString().slice(-4);
-      const docDisplay = `${formData.tipoDocumento}: ${formData.numeroDocumento.trim()}`;
+      const docDisplay = `${formData.tipoDocumento}: ${normalizedDocInput}`;
       const sha256Hash = await computeSha256(
         `${verificationCode}|${formData.nombreCompleto.trim()}|${docDisplay}|${finalGeo.ip}|${finalGeo.coordinates || finalGeo.locationString}|${timestamp}`
       );
       const lugarConfirmado = formData.sedeLocacion || 'Lima - Casona Blanca (Calle Las Perdices 1126, Huachipa)';
-      
+
       const payload = {
         ...formData,
+        numeroDocumento: normalizedDocInput,
+        numeroDocumentoNorm: normalizedDocInput,
+        email: normalizedEmailInput,
         nombre: formData.nombreCompleto.trim(),
         nombreCompleto: formData.nombreCompleto.trim(),
         doc: docDisplay,
@@ -286,17 +235,59 @@ export default function ContratoCaminataFuego() {
         createdAt: serverTimestamp()
       };
 
-      // Guardar en Firestore
-      try {
-        await addDoc(collection(db, 'contratos_caminata_fuego'), payload);
-      } catch (err) {
-        console.warn('Registro procesado y resguardado digitalmente:', err);
+      // Registro único atómico (verifica Documento, Correo y Nombre completo + ID determinístico doc_<NORM>)
+      const registrationResult = await registerUniqueLimaContract({
+        db,
+        collectionName: 'contratos_caminata_fuego',
+        payload,
+        sdkCollectionGetter: () => getDocs(collection(db, 'contratos_caminata_fuego'))
+      });
+
+      if (registrationResult.status === 'DUPLICATE') {
+        const existingDoc = registrationResult.existingRecord || {};
+        const existingCode = existingDoc.code || existingDoc.verificationCode || 'CQ-FIRE-VERIFIED';
+        const existingDocLabel = existingDoc.doc || `${existingDoc.tipoDocumento || 'DNI'}: ${existingDoc.numeroDocumento || normalizedDocInput}`;
+        const existingFecha = existingDoc.fecha || existingDoc.timestamp || localFecha;
+        const existingLugar = existingDoc.lugar || existingDoc.sedeLocacion || 'Lima - Casona Blanca (Huachipa)';
+        const existingPass = await generateFirewalkPassCanvas({
+          nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
+          documento: existingDocLabel,
+          rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
+          lugar: existingLugar,
+          fecha: existingFecha,
+          codigo: existingCode,
+          ip: existingDoc.ip || finalGeo.ip,
+          geoLocation: existingDoc.geoLocation || finalGeo.locationString,
+          coordinates: existingDoc.coordinates || finalGeo.coordinates
+        });
+        if (existingPass) {
+          setPassDataUrl(existingPass);
+        }
+        setDuplicateNotice(
+          `Ya existe un registro firmado coincidente por ${registrationResult.matchReason || 'documento o correo'} (${normalizedDocInput} / ${normalizedEmailInput}). No está permitido registrarse dos veces. A continuación te mostramos tu pase oficial vigente. Si necesitas corregir algún dato erróneo, solicita al equipo de coordinación u oficina que elimine tu registro anterior.`
+        );
+        setEmailStatus('SENT');
+        setSignedSuccess({
+          ...existingDoc,
+          nombre: existingDoc.nombre || existingDoc.nombreCompleto || formData.nombreCompleto.trim(),
+          documento: existingDocLabel,
+          codigo: existingCode,
+          fecha: existingFecha,
+          rolActividad: existingDoc.rol || existingDoc.rolActividad || formData.rolActividad,
+          sedeLocacion: existingLugar,
+          lugar: existingLugar
+        });
+        setTimeout(() => {
+          const confirmEl = document.getElementById('constancia-firmada');
+          if (confirmEl) confirmEl.scrollIntoView({ behavior: 'smooth' });
+        }, 120);
+        return;
       }
 
       // Generar Pase Oficial PNG con IP y Geolocalización e iniciar envío inmediato por correo
       const generatedPass = await generateFirewalkPassCanvas({
         nombre: formData.nombreCompleto.trim(),
-        documento: `${formData.tipoDocumento} ${formData.numeroDocumento.trim()}`,
+        documento: `${formData.tipoDocumento} ${normalizedDocInput}`,
         rolActividad: formData.rolActividad,
         lugar: lugarConfirmado,
         fecha: localFecha,
@@ -312,7 +303,7 @@ export default function ContratoCaminataFuego() {
 
       const emailSent = await sendFirewalkConfirmationEmail({
         db,
-        toEmail: formData.email.trim().toLowerCase(),
+        toEmail: normalizedEmailInput,
         nombre: formData.nombreCompleto.trim(),
         documento: docDisplay,
         rolActividad: formData.rolActividad,
@@ -335,7 +326,7 @@ export default function ContratoCaminataFuego() {
       setSignedSuccess({
         ...payload,
         nombre: formData.nombreCompleto.trim(),
-        documento: `${formData.tipoDocumento} ${formData.numeroDocumento.trim()}`,
+        documento: `${formData.tipoDocumento} ${normalizedDocInput}`,
         codigo: verificationCode,
         fecha: localFecha
       });
@@ -348,8 +339,9 @@ export default function ContratoCaminataFuego() {
     } catch (err) {
       console.error('Error al registrar firma digital:', err);
       setEmailStatus('ERROR');
-      alert('Hubo un inconveniente al validar la firma. Por favor verifica los datos e intenta nuevamente.');
+      alert('Hubo un inconveniente al validar la firma. Por favor verifica tu conexión y los datos ingresados e intenta nuevamente.');
     } finally {
+      submitLockRef.current = false;
       setIsSubmitting(false);
     }
   };
