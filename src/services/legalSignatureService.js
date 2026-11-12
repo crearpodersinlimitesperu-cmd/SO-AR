@@ -76,7 +76,20 @@ export const generateSignatureHash = async (signatureDataUrl, participantId, tim
  * @returns {Promise<{ipAddress: string, userAgent: string, timestamp: string}>}
  */
 export const captureAuditMetadata = async () => {
-  const geo = await getClientGeoLocation();
+  let geo = null;
+  try {
+    if (typeof getClientGeoLocation === 'function') {
+      geo = await getClientGeoLocation();
+    } else if (typeof fetch === 'function') {
+      const res = await fetch('https://api.ipify.org?format=json');
+      if (res && res.ok) {
+        const d = await res.json();
+        geo = { ip: d?.ip || 'Registrada' };
+      }
+    }
+  } catch {
+    geo = null;
+  }
   return {
     ipAddress: geo?.ip || 'Registrada',
     geoLocation: geo?.locationString || 'Lima, Perú 🇵🇪',

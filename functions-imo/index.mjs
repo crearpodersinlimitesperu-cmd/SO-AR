@@ -30,8 +30,8 @@ export const imoDeliverCode=onDocumentCreated({...options,document:'imo_private_
   if(!acquired)return;
   try{
     const payload=decryptDelivery(secret.value(),id,event.data.data().encrypted);
-    const transport=nodemailer.createTransport({service:'gmail',auth:{user:mailUser.value(),pass:mailPass.value()}});
-    await transport.sendMail({from:mailUser.value(),to:payload.email,subject:'Tu código de acceso a Misión IMO',text:`Tu código de acceso es: ${payload.code}\nVence en 10 minutos desde que lo solicitaste. No lo compartas.\nSi no solicitaste este código, ignora este correo.`});
+    const transport=nodemailer.createTransport({host:'smtp.gmail.com',port:465,secure:true,family:4,connectionTimeout:15000,greetingTimeout:15000,auth:{user:mailUser.value(),pass:mailPass.value()}});
+    await transport.sendMail({from:'"CREAR PODER SIN LÍMITES — Causa OS" <no-reply@crearpsl.net>',replyTo:'no-reply@crearpsl.net',to:payload.email,subject:'Tu código de acceso a Misión IMO',text:`Tu código de acceso es: ${payload.code}\nVence en 10 minutos desde que lo solicitaste. No lo compartas.\nSi no solicitaste este código, ignora este correo.`});
     const batch=db.batch();batch.update(challengeRef,{delivery:'sent'});batch.set(ref,{status:'sent',sentAt:Date.now()});await batch.commit();
   }catch{
     const batch=db.batch();batch.update(challengeRef,{delivery:'failed'});batch.set(ref,{status:'failed',failedAt:Date.now()});await batch.commit();

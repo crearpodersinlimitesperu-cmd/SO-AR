@@ -6,10 +6,12 @@ function getAdminDb() {
     const rawServiceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
     let serviceAccount;
     if (!rawServiceAccount) {
-      if (fs.existsSync('centro-operativo-cpsl-3d05655c949c.json')) {
+      if (fs.existsSync('centro-operativo-cpsl-65ad52160f45.json')) {
+        serviceAccount = JSON.parse(fs.readFileSync('centro-operativo-cpsl-65ad52160f45.json', 'utf8'));
+      } else if (fs.existsSync('centro-operativo-cpsl-3d05655c949c.json')) {
         serviceAccount = JSON.parse(fs.readFileSync('centro-operativo-cpsl-3d05655c949c.json', 'utf8'));
       } else {
-        throw new Error('Falta FIREBASE_SERVICE_ACCOUNT_KEY/GOOGLE_SERVICE_ACCOUNT_JSON o el archivo local centro-operativo-cpsl-3d05655c949c.json.');
+        throw new Error('Falta FIREBASE_SERVICE_ACCOUNT_KEY/GOOGLE_SERVICE_ACCOUNT_JSON o archivo local de Service Account.');
       }
     } else {
       serviceAccount = JSON.parse(rawServiceAccount);

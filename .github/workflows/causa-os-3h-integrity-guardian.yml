@@ -1,0 +1,51 @@
+name: 🛡️ Causa OS 3H Integrity & Coherency Guardian
+
+on:
+  schedule:
+    # Ejecución automática cada 3 horas sin intervención humana (minuto :23 para no colisionar con workflows :00/:15/:30)
+    - cron: '23 */3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: causa-os-3h-integrity-guardian
+  cancel-in-progress: false
+
+jobs:
+  guardian-3h:
+    name: Supervisión Integral 3H (Módulos, Avances, Trazabilidad y Correo Oficial)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm install --ignore-scripts --include=optional
+
+      - name: 🔑 Preparar Service Account temporal
+        run: echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+      - name: 🛡️ Ejecutar Guardián Autónomo 3H de Causa OS
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CAUSA_OFFICIAL_FROM_EMAIL: ${{ secrets.CAUSA_OFFICIAL_FROM_EMAIL }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: node scripts/causaOsIntegrityGuardian.mjs
+
+      - name: 🗑️ Borrar Service Account temporal del runner
+        if: always()
+        run: rm -f centro-operativo-cpsl-65ad52160f45.json

@@ -14,8 +14,12 @@ def dump_codebase():
     print(f"Generando {output_file_1}...")
     
     with open(output_file_1, 'w', encoding='utf-8') as outfile:
-        outfile.write("# Código Completo y Detalles de la Plataforma SO-AR\n\n")
-        outfile.write("Este documento contiene el código fuente completo para duplicar y maximizar la plataforma.\n\n")
+        outfile.write("# Código Completo y Detalles de la Plataforma SO-AR (Causa OS)\n\n")
+        outfile.write("Este documento contiene el código fuente completo para duplicar, auditar y mantener la trazabilidad integral de Causa OS.\n\n")
+        outfile.write("## Política Oficial de Comunicación y Seguridad de Credenciales\n\n")
+        outfile.write("- **Canal Oficial Único de Comunicaciones Causa OS**: `no-reply@crearpsl.net` (`\"CREAR PODER SIN LÍMITES — Causa OS\" <no-reply@crearpsl.net>`).\n")
+        outfile.write("- **Protección Cero-Texto-Plano**: Ninguna clave de aplicación, llave privada ni token se vuelca jamás en este documento ni en el repositorio; residen cifrados exclusivamente en GitHub Actions Secrets (`GMAIL_USER`, `GMAIL_PASS`, `CAUSA_OFFICIAL_FROM_EMAIL`), Google Cloud Secret Manager (`IMO_MAIL_USER`, `IMO_MAIL_PASS`) y `.env` local con permisos `0600`.\n")
+        outfile.write("- **Guardián Autónomo 3H**: Supervisión continua cada 3 horas mediante `.github/workflows/causa-os-3h-integrity-guardian.yml` y `scripts/causaOsIntegrityGuardian.mjs`.\n\n")
         
         for root, dirs, files in os.walk(source_dir):
             # Modificamos dirs en el lugar para saltar directorios excluidos
@@ -23,10 +27,16 @@ def dump_codebase():
             
             for file in files:
                 ext = os.path.splitext(file)[1]
+                lower_file = file.lower()
                 
-                # Omitir archivos que puedan contener secretos o que no aporten al código fuente útil
+                # Omitir estrictamente cualquier archivo de entorno, llaves o secretos
                 file_full = os.path.join(root, file)
-                if (file == "package-lock.json" or 
+                if (file.startswith(".env") or
+                    "credential" in lower_file or
+                    "serviceaccount" in lower_file or
+                    "service-account" in lower_file or
+                    lower_file.endswith((".pem", ".key", ".p12")) or
+                    file == "package-lock.json" or 
                     (file.endswith(".json") and (root == "." or "backup" in file or "raw" in file or "vuelos" in file or "centro-operativo" in file or os.path.getsize(file_full) > 200000))):
                     continue
 

@@ -798,7 +798,7 @@ class NodusExtractorAgent {
  * AGENTE 2: NORMALIZADOR E INTELIGENCIA DE KPIS (NodusNormalizerAgent)
  * =========================================================================
  */
-class NodusNormalizerAgent {
+export class NodusNormalizerAgent {
   normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte) {
     console.log("🧠 [Agente 2 - Normalizador] Procesando y correlacionando información...");
     // NUEVO (29/09/2026): Inferir sede de cada equipo para verificar coherencia de asignaciones
@@ -1016,6 +1016,7 @@ class NodusNormalizerAgent {
 
       const hasC1 = (c1Value ?? 0) > 0;
       const hasC2 = (c2Value ?? 0) > 0;
+      const isC2Coord = (hasC2 && !hasC1) || ciclo === 'Ciclo 2' || coordinatorRole === 'Coordinador C2';
       const totalCallsC1C2 = (c1Value ?? 0) + (c2Value ?? 0);
 
       let sentadosC1 = 0;

@@ -38,9 +38,10 @@ const SMTP_CONFIG = {
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.SMTP_PORT || '465', 10),
   secure: true,
+  family: 4,
   auth: {
-    user: process.env.GMAIL_USER || '',
-    pass: process.env.GMAIL_PASS || ''
+    user: process.env.GMAIL_USER || process.env.GMAIL_SERVER_EMAIL || '',
+    pass: process.env.GMAIL_PASS || process.env.GMAIL_SERVER_APP_PASSWORD || ''
   }
 };
 
@@ -280,8 +281,10 @@ export class NodusMarketingAgencyAgent {
         resultados.detalles.push({ email: emailDestino, status: 'simulado' });
       } else {
         try {
+          const officialFrom = process.env.CAUSA_OFFICIAL_FROM_EMAIL || 'no-reply@crearpsl.net';
           const info = await this.transporter.sendMail({
-            from: '"Crear PSL Global" <servidorcrearpsl@gmail.com>',
+            from: `"CREAR PODER SIN LÍMITES — Causa OS" <${officialFrom}>`,
+            replyTo: officialFrom,
             to: emailDestino,
             subject: subject,
             html: htmlContent,

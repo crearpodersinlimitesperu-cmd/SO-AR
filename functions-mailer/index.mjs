@@ -112,8 +112,10 @@ export const deliverContractMail = onDocumentCreated(
         }
       });
 
+      const officialFromEmail = process.env.CAUSA_OFFICIAL_FROM_EMAIL || 'no-reply@crearpsl.net';
       const mailOptions = {
-        from: `"CREAR PODER SIN LÍMITES" <${senderEmail}>`,
+        from: `"CREAR PODER SIN LÍMITES — Causa OS" <${officialFromEmail}>`,
+        replyTo: officialFromEmail,
         to: validRecipients,
         subject: claimedData.message?.subject || 'Confirmación Oficial — CREAR PODER SIN LÍMITES',
         html: claimedData.message?.html || '<p>Confirmación oficial registrada.</p>'

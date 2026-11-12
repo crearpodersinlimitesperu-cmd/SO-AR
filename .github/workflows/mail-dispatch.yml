@@ -64,6 +64,7 @@ jobs:
 
       - name: 🚀 Run Mailer Daemon (One-Shot)
         env:
+          CAUSA_OFFICIAL_FROM_EMAIL: ${{ secrets.CAUSA_OFFICIAL_FROM_EMAIL }}
           GMAIL_SERVER_EMAIL: ${{ secrets.GMAIL_USER }}
           GMAIL_SERVER_APP_PASSWORD: ${{ secrets.GMAIL_PASS }}
           LIMA_GMAIL_USER: ${{ secrets.LIMA_GMAIL_USER }}

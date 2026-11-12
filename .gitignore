@@ -25,10 +25,13 @@ dist-ssr
 
 # Environment variables — NEVER commit real credentials
 .env
+.env.*
 .env.local
 .env.*.local
 ACCESOS.md
 *credentials*
+*.pem
+*.key
 
 # Temp scripts & data files
 *.py

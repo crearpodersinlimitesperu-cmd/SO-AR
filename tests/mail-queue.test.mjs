@@ -571,6 +571,7 @@ test('the actual daemon sender passes only open recipients to mocked sendMail an
     } else {
       assert.equal(deliveries.length, 1);
       assert.deepEqual(Array.from(deliveries[0].to), ['open@crearpsl.net']);
+      assert.ok(deliveries[0].from.includes('no-reply@crearpsl.net'), 'El remitente oficial debe ser no-reply@crearpsl.net');
       assert.equal(docs.get('mail/sender').delivery.suppressedClosedRecipients, 1);
     }
   }

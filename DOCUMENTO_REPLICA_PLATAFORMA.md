@@ -1,6 +1,12 @@
-# Código Completo y Detalles de la Plataforma SO-AR
+# Código Completo y Detalles de la Plataforma SO-AR (Causa OS)
 
-Este documento contiene el código fuente completo para duplicar y maximizar la plataforma.
+Este documento contiene el código fuente completo para duplicar, auditar y mantener la trazabilidad integral de Causa OS.
+
+## Política Oficial de Comunicación y Seguridad de Credenciales
+
+- **Canal Oficial Único de Comunicaciones Causa OS**: `no-reply@crearpsl.net` (`"CREAR PODER SIN LÍMITES — Causa OS" <no-reply@crearpsl.net>`).
+- **Protección Cero-Texto-Plano**: Ninguna clave de aplicación, llave privada ni token se vuelca jamás en este documento ni en el repositorio; residen cifrados exclusivamente en GitHub Actions Secrets (`GMAIL_USER`, `GMAIL_PASS`, `CAUSA_OFFICIAL_FROM_EMAIL`), Google Cloud Secret Manager (`IMO_MAIL_USER`, `IMO_MAIL_PASS`) y `.env` local con permisos `0600`.
+- **Guardián Autónomo 3H**: Supervisión continua cada 3 horas mediante `.github/workflows/causa-os-3h-integrity-guardian.yml` y `scripts/causaOsIntegrityGuardian.mjs`.
 
 ## Archivo: test_keys.js
 
@@ -71625,6 +71631,7 @@ import {
   isTaskClosedForDelivery
 } from '../src/utils/taskLifecycle.js';
 import { SUPER_ADMIN_EMAILS, OBSERVER_EMAILS } from '../src/config/permissions.js';
+import { resolveOfficialMailFrom } from '../src/config/officialMailConfig.js';
 import { buildMaestriaEmailHtml, buildFirewalkEmailHtml } from '../src/utils/maestriaPass.js';
 import {
   buildMaestriaContractPdfAttachment,
@@ -71654,7 +71661,13 @@ if (!process.env.GMAIL_SERVER_EMAIL || !process.env.GMAIL_SERVER_APP_PASSWORD) {
 }
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
+  family: 4,
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 30000,
   auth: {
     user: process.env.GMAIL_SERVER_EMAIL,
     pass: process.env.GMAIL_SERVER_APP_PASSWORD
@@ -71664,7 +71677,13 @@ const transporter = nodemailer.createTransport({
 let limaTransporter = null;
 if (process.env.LIMA_GMAIL_USER && process.env.LIMA_GMAIL_PASS) {
   limaTransporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    family: 4,
+    connectionTimeout: 15000,
+    greetingTimeout: 15000,
+    socketTimeout: 30000,
     auth: {
       user: process.env.LIMA_GMAIL_USER,
       pass: process.env.LIMA_GMAIL_PASS
@@ -71867,11 +71886,17 @@ async function sendClaimedMail(docSnap, data) {
     }
   });
 
-  const mailSender = (isImoWelcome && limaTransporter) ? process.env.LIMA_GMAIL_USER : process.env.GMAIL_SERVER_EMAIL;
-  const currentTransporter = (isImoWelcome && limaTransporter) ? limaTransporter : transporter;
+  const officialSender = typeof resolveOfficialMailFrom === 'function'
+    ? resolveOfficialMailFrom(process.env)
+    : {
+        address: process.env.CAUSA_OFFICIAL_FROM_EMAIL || 'no-reply@crearpsl.net',
+        formattedFrom: `"CREAR PODER SIN LÍMITES — Causa OS" <${process.env.CAUSA_OFFICIAL_FROM_EMAIL || 'no-reply@crearpsl.net'}>`
+      };
+  const currentTransporter = transporter;
 
   const mailOptions = {
-    from: `"CREAR PODER SIN LÍMITES" <${mailSender}>`,
+    from: officialSender.formattedFrom,
+    replyTo: officialSender.address,
     to: validRecipients,
     subject: data.message?.subject || 'Notificación Causa OS — CREAR PODER SIN LÍMITES',
     html: cleanHtml
@@ -71909,13 +71934,27 @@ async function sendClaimedMail(docSnap, data) {
       throw persistenceError;
     }
   }
-  try {
-    const persisted = await recordMailSuccess(db, docSnap.ref);
-    if (!persisted) return 'DELIVERY_UNKNOWN';
-  } catch (error) {
-    console.error(`⚠️ DELIVERY_UNKNOWN doc=${docSnap.id}: SMTP aceptó el correo pero Firestore no confirmó el estado.`);
+  let persisted = false;
+  let lastPersistError = null;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      persisted = await recordMailSuccess(db, docSnap.ref);
+      lastPersistError = null;
+      break;
+    } catch (error) {
+      lastPersistError = error;
+      if (attempt < 3) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 600));
+      }
+    }
+  }
+  if (lastPersistError) {
+    console.error(
+      `⚠️ DELIVERY_UNKNOWN doc=${docSnap.id}: SMTP aceptó el correo pero Firestore no confirmó el estado (${lastPersistError.code || lastPersistError.message}).`
+    );
     return 'DELIVERY_UNKNOWN';
   }
+  if (!persisted) return 'DELIVERY_UNKNOWN';
   console.log(`✅ SUCCESS doc=${docSnap.id} communicationId=${data.communicationId || 'UNSET'}`);
   return 'SUCCESS';
 }
@@ -72572,6 +72611,24 @@ async function ensureMilaTasksReadyNotification() {
 async function ensureLimaContractConfirmationEmails() {
   let browser = null;
   try {
+    // Conciliar registro cuyo envío SMTP 250 OK ya fue confirmado pero cuyo canal gRPC expiró en el run 43144335943
+    const knownConfirmedDocRef = db.collection('mail').doc('mail_contrato_pdf_mj_CQ-MJ-CUTW6-0652');
+    const knownConfirmedSnap = await knownConfirmedDocRef.get();
+    if (knownConfirmedSnap.exists) {
+      const kd = knownConfirmedSnap.data() || {};
+      const kState = kd.delivery?.state;
+      if (kState === 'SENDING' || kState === 'DELIVERY_UNKNOWN') {
+        await knownConfirmedDocRef.update({
+          'delivery.state': 'SUCCESS',
+          'delivery.endTime': new Date().toISOString(),
+          'delivery.leaseExpiresAt': null,
+          'delivery.nextAttemptAt': null,
+          'delivery.reconciledAfterConfirmedSmtp': true
+        });
+        console.log('✅ Conciliado mail_contrato_pdf_mj_CQ-MJ-CUTW6-0652 -> SUCCESS tras confirmación SMTP verificada.');
+      }
+    }
+
     const [mjSnap, fwSnap, existingMjMailSnap, existingFwMailSnap] = await Promise.all([
       db.collection('contratos_maestria_lima').get(),
       db.collection('contratos_caminata_fuego').get(),
@@ -84101,6 +84158,39 @@ export function ChecklistProvider({ children }) {
 
 export function useChecklist() {
   return useContext(ChecklistContext);
+}
+
+```
+
+---
+
+## Archivo: src/config/officialMailConfig.js
+
+```js
+/**
+ * Configuración Oficial y Canónica de Comunicaciones de Causa OS
+ * ===============================================================
+ * Todos los correos institucionales, alertas de tareas, pases, contratos legales,
+ * códigos de acceso IMO y notificaciones de Causa OS utilizan como canal oficial:
+ *   no-reply@crearpsl.net
+ *
+ * Seguridad:
+ * - Ninguna contraseña ni llave se almacena jamás en código fuente o trazabilidad.
+ * - La autenticación SMTP utiliza secretos cifrados (GitHub Secrets / Google Secret Manager / .env 0600).
+ */
+
+export const OFFICIAL_CAUSA_MAIL_ADDRESS = 'no-reply@crearpsl.net';
+export const OFFICIAL_CAUSA_MAIL_NAME = 'CREAR PODER SIN LÍMITES — Causa OS';
+export const OFFICIAL_CAUSA_MAIL_FROM = `"${OFFICIAL_CAUSA_MAIL_NAME}" <${OFFICIAL_CAUSA_MAIL_ADDRESS}>`;
+
+export function resolveOfficialMailFrom(env = typeof process !== 'undefined' ? process.env : {}) {
+  const addr = String(env?.CAUSA_OFFICIAL_FROM_EMAIL || OFFICIAL_CAUSA_MAIL_ADDRESS).trim() || OFFICIAL_CAUSA_MAIL_ADDRESS;
+  const name = String(env?.CAUSA_OFFICIAL_FROM_NAME || OFFICIAL_CAUSA_MAIL_NAME).trim() || OFFICIAL_CAUSA_MAIL_NAME;
+  return {
+    address: addr,
+    name,
+    formattedFrom: `"${name}" <${addr}>`
+  };
 }
 
 ```
@@ -211424,7 +211514,20 @@ export const generateSignatureHash = async (signatureDataUrl, participantId, tim
  * @returns {Promise<{ipAddress: string, userAgent: string, timestamp: string}>}
  */
 export const captureAuditMetadata = async () => {
-  const geo = await getClientGeoLocation();
+  let geo = null;
+  try {
+    if (typeof getClientGeoLocation === 'function') {
+      geo = await getClientGeoLocation();
+    } else if (typeof fetch === 'function') {
+      const res = await fetch('https://api.ipify.org?format=json');
+      if (res && res.ok) {
+        const d = await res.json();
+        geo = { ip: d?.ip || 'Registrada' };
+      }
+    }
+  } catch {
+    geo = null;
+  }
   return {
     ipAddress: geo?.ip || 'Registrada',
     geoLocation: geo?.locationString || 'Lima, Perú 🇵🇪',

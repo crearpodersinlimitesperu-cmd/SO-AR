@@ -20,6 +20,7 @@ import {
   isTaskClosedForDelivery
 } from '../src/utils/taskLifecycle.js';
 import { SUPER_ADMIN_EMAILS, OBSERVER_EMAILS } from '../src/config/permissions.js';
+import { resolveOfficialMailFrom } from '../src/config/officialMailConfig.js';
 import { buildMaestriaEmailHtml, buildFirewalkEmailHtml } from '../src/utils/maestriaPass.js';
 import {
   buildMaestriaContractPdfAttachment,
@@ -274,11 +275,17 @@ async function sendClaimedMail(docSnap, data) {
     }
   });
 
-  const mailSender = (isImoWelcome && limaTransporter) ? process.env.LIMA_GMAIL_USER : process.env.GMAIL_SERVER_EMAIL;
-  const currentTransporter = (isImoWelcome && limaTransporter) ? limaTransporter : transporter;
+  const officialSender = typeof resolveOfficialMailFrom === 'function'
+    ? resolveOfficialMailFrom(process.env)
+    : {
+        address: process.env.CAUSA_OFFICIAL_FROM_EMAIL || 'no-reply@crearpsl.net',
+        formattedFrom: `"CREAR PODER SIN LÍMITES — Causa OS" <${process.env.CAUSA_OFFICIAL_FROM_EMAIL || 'no-reply@crearpsl.net'}>`
+      };
+  const currentTransporter = transporter;
 
   const mailOptions = {
-    from: `"CREAR PODER SIN LÍMITES" <${mailSender}>`,
+    from: officialSender.formattedFrom,
+    replyTo: officialSender.address,
     to: validRecipients,
     subject: data.message?.subject || 'Notificación Causa OS — CREAR PODER SIN LÍMITES',
     html: cleanHtml
