@@ -48,13 +48,16 @@ const FORCE_FULL_SYNC = process.argv.includes('--full') || process.env.FORCE_FUL
 
 // Inicialización resiliente de Firestore Admin
 function initDb() {
+  if (getApps().length > 0) {
+    return getFirestore(getApps()[0]);
+  }
   const rawServiceAccount = process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
   if (!rawServiceAccount) {
     return null;
   }
   try {
     const serviceAccount = JSON.parse(rawServiceAccount);
-    const app = getApps().length ? getApps()[0] : initializeApp({ credential: cert(serviceAccount) });
+    const app = initializeApp({ credential: cert(serviceAccount) });
     return getFirestore(app);
   } catch (e) {
     console.warn("⚠️ [DeltaSync] Error inicializando Firebase Admin:", e.message);
@@ -304,7 +307,7 @@ export async function runCausaNodusCRMSync() {
   console.log(`🤖 [CausaNodusCRMSyncAgent] Iniciando Delta Sync Horario (SO-AR)...`);
   console.log(`   ID Corrida:    ${SYNC_LOG_ID}`);
   console.log(`   Timestamp:     ${SYNC_TIMESTAMP}`);
-  console.log(`   Token Robot:   ${ROBOT_SECRET.substring(0, 10)}... (Validado)`);
+  console.log(`   Token Robot:   ${ROBOT_SECRET ? `${ROBOT_SECRET.substring(0, 10)}... (Validado)` : 'Admin SDK IAM (Zero-Trust)'}`);
   console.log(`=========================================================================\n`);
 
   const db = initDb();
@@ -382,7 +385,7 @@ export async function runCausaNodusCRMSync() {
       total_ramas: totalRamas,
       checksum: contentHash,
       ramas: treeByImo,
-      robot_token: ROBOT_SECRET
+      ...(ROBOT_SECRET ? { robot_token: ROBOT_SECRET } : {})
     }, { merge: true });
 
     // Guardar historial inmutable en sync_history/crm_agent
@@ -394,7 +397,7 @@ export async function runCausaNodusCRMSync() {
       ramas_lineage: totalRamas,
       checksum: contentHash,
       status: 'SUCCESS',
-      robot_token: ROBOT_SECRET
+      ...(ROBOT_SECRET ? { robot_token: ROBOT_SECRET } : {})
     }, { merge: true });
 
     await batch.commit();
