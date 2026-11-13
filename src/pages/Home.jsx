@@ -2434,8 +2434,8 @@ export default function Home() {
 
                 {canAccessMonitorContratoLima(currentUser) && (
                   <>
-                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos?tab=maestria'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
-                      👑 Supervisión Reglas Maestría (Lima)
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/monitor-maestria-lima'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.14)', borderColor: 'rgba(245, 158, 11, 0.4)', fontWeight: 'bold' }}>
+                      👑 Panel Maestría Lima (Nodus + Reglas)
                     </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/reglas-maestria'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
                       📜 Landing Contrato Maestría + QR
@@ -2655,9 +2655,14 @@ export default function Home() {
             </ModuleHelpButton>
           )}
           {canAccessMonitorContratoLima(currentUser) && (
-            <ModuleHelpButton helpKey="monitoresLima" onClick={() => navigate('/monitor-imos?tab=monitores_lima')} className="home-module-card" style={{ borderColor: 'rgba(245, 158, 11, 0.45)', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(124, 45, 18, 0.22) 100%)' }} title="Monitores de Caminata sobre Fuego y Reglas de Maestría (Sede Lima) integrados en Monitor de IMOs">
-              🔥⚖️ Monitores Caminata y Maestría (Lima)
-            </ModuleHelpButton>
+            <>
+              <ModuleHelpButton helpKey="monitorMaestriaLima" onClick={() => navigate('/monitor-maestria-lima')} className="home-module-card" style={{ borderColor: 'rgba(245, 158, 11, 0.72)', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.24) 0%, rgba(120, 53, 15, 0.36) 100%)', fontWeight: 800 }} title="Panel independiente de Maestría Lima: firmas legales, cruce en vivo con Nodus por FDS (PFD/SFD/TFD) y verificación de asistencia">
+                👑 Maestría Lima (Nodus + Reglas)
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="monitoresLima" onClick={() => navigate('/monitor-imos?tab=monitores_lima')} className="home-module-card" style={{ borderColor: 'rgba(245, 158, 11, 0.45)', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(124, 45, 18, 0.22) 100%)' }} title="Monitores de Caminata sobre Fuego y Reglas de Maestría (Sede Lima) integrados en Monitor de IMOs">
+                🔥⚖️ Monitores Caminata y Maestría (Lima)
+              </ModuleHelpButton>
+            </>
           )}
 
           {/* (20/09/2026) Asignador Oficial de Entrenadores — solo Fer, Paul y José

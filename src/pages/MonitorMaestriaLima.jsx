@@ -19,15 +19,18 @@ import {
   X,
   Check,
   Trash2,
-  ArrowLeft
+  ArrowLeft,
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 import { collection, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { db } from '../services/firebase';
-import padronLima111 from '../data/padron_fuego_lima_111.json';
+import { getLiveNodusEquipos, getLiveNodusParticipantes } from '../services/nodusLiveApiService';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
 import { deduplicateSignedContracts } from '../utils/limaContractUniqueness';
+import { buildMaestriaNodusCross, selectActiveLimaMaestriaTeams } from '../utils/maestriaNodusCross';
 
 export default function MonitorMaestriaLima() {
   const navigate = useNavigate();
@@ -39,11 +42,20 @@ export default function MonitorMaestriaLima() {
   const [regSearch, setRegSearch] = useState('');
   const [regRoleFilter, setRegRoleFilter] = useState('TODOS');
   const [regTeamFilter, setRegTeamFilter] = useState('TODOS');
+  const [regNodusFilter, setRegNodusFilter] = useState('TODOS');
 
-  // Filtros Padrón
+  // Filtros Padrón Vivo Nodus
   const [padronSearch, setPadronSearch] = useState('');
   const [padronTeamFilter, setPadronTeamFilter] = useState('TODOS');
+  const [padronRoleFilter, setPadronRoleFilter] = useState('TODOS');
   const [padronStatusFilter, setPadronStatusFilter] = useState('TODOS');
+
+  // Estado Integración en Vivo Nodus (/api/equipos + /api/participantes/{id})
+  const [nodusEquipos, setNodusEquipos] = useState([]);
+  const [nodusRosterByTeam, setNodusRosterByTeam] = useState({});
+  const [nodusLoading, setNodusLoading] = useState(true);
+  const [nodusError, setNodusError] = useState(null);
+  const [nodusLastSync, setNodusLastSync] = useState(null);
 
   // Modales y Estados de Acción
   const [qrModalType, setQrModalType] = useState(null); // 'contract' | null
@@ -139,37 +151,64 @@ export default function MonitorMaestriaLima() {
     }
   }, []);
 
-  // Cruce con el padrón oficial de 111 integrantes de Lima
-  const enrichedPadron = useMemo(() => {
-    return padronLima111.map((person) => {
-      const normPersonName = normalizeStr(person.nombre);
-      const personTokens = normPersonName.split(/\s+/).filter((t) => t.length > 2);
+  // Sincronización en vivo con Nodus API (Equipos activos de Lima en PFD/SFD/TFD + Rosters)
+  const syncNodusLive = async ({ manual = false } = {}) => {
+    setNodusLoading(true);
+    setNodusError(null);
+    try {
+      const eqRes = await getLiveNodusEquipos({ enActividad: true });
+      if (!eqRes.ok || !Array.isArray(eqRes.data)) {
+        throw new Error(eqRes.error || 'No se pudo consultar equipos en Nodus');
+      }
+      const activeLima = selectActiveLimaMaestriaTeams(eqRes.data);
+      const rosterEntries = await Promise.all(
+        activeLima.map(async (eq) => {
+          const r = await getLiveNodusParticipantes(eq.id);
+          return [eq.id, r.ok && Array.isArray(r.participantes) ? r.participantes : []];
+        })
+      );
+      setNodusEquipos(eqRes.data);
+      setNodusRosterByTeam(Object.fromEntries(rosterEntries));
+      setNodusLastSync(new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      if (manual) {
+        toast.success(`Nodus sincronizado (${activeLima.length} equipos activos de Maestría Lima)`);
+      }
+    } catch (err) {
+      const msg = err?.message || 'Error consultando API de Nodus';
+      setNodusError(msg);
+      if (manual) {
+        toast.error(`Error al sincronizar Nodus: ${msg}`);
+      }
+    } finally {
+      setNodusLoading(false);
+    }
+  };
 
-      const signature = signedContracts.find((c) => {
-        const normSigName = normalizeStr(c.nombre || c.nombreCompleto || '');
-        if (normSigName === normPersonName) return true;
-        const matchTokens = personTokens.filter((t) => normSigName.includes(t));
-        return matchTokens.length >= 2;
-      });
+  useEffect(() => {
+    syncNodusLive();
+  }, []);
 
-      return {
-        ...person,
-        isSigned: !!signature,
-        signature
-      };
-    });
-  }, [signedContracts]);
+  // Cruce integral en vivo: Contratos Firmados (Firestore) <-> Padrón y Asistencia Maestría (Nodus)
+  const nodusCrossResult = useMemo(
+    () =>
+      buildMaestriaNodusCross({
+        signedContracts,
+        nodusEquipos,
+        nodusRosterByTeam
+      }),
+    [signedContracts, nodusEquipos, nodusRosterByTeam]
+  );
 
   // Indicadores Ejecutivos para Oficina Lima
   const stats = useMemo(() => {
-    const totalPadron = enrichedPadron.length;
-    const firmadosPadron = enrichedPadron.filter((p) => p.isSigned).length;
-    const pendientesPadron = totalPadron - firmadosPadron;
+    const { summary, nodusPadronCross } = nodusCrossResult;
+    const totalPadron = nodusPadronCross.length;
+    const firmadosPadron = nodusPadronCross.filter((p) => p.isSigned).length;
+    const pendientesPadron = nodusPadronCross.filter((p) => !p.isSigned).length;
     const porcentaje = totalPadron > 0 ? Math.round((firmadosPadron / totalPadron) * 100) : 0;
     const totalRegistradosFirestore = signedContracts.length;
     const totalParticipantes = signedContracts.filter((c) => (c.rol || c.rolActividad || '').toLowerCase().includes('participante')).length;
     const totalManagers = signedContracts.filter((c) => (c.rol || c.rolActividad || '').toLowerCase().includes('manager')).length;
-    const conGeoIp = signedContracts.filter((c) => Boolean(c.ip && c.geoLocation)).length;
 
     return {
       totalPadron,
@@ -179,58 +218,73 @@ export default function MonitorMaestriaLima() {
       totalRegistradosFirestore,
       totalParticipantes,
       totalManagers,
-      conGeoIp
+      ...summary
     };
-  }, [enrichedPadron, signedContracts]);
+  }, [nodusCrossResult, signedContracts]);
 
-  // Filtrado Tab 1 (Registros y Auditoría Forense)
+  // Filtrado Tab 1 (Registros y Auditoría Forense + Cruce Nodus)
   const filteredRegistros = useMemo(() => {
-    return signedContracts.filter((item) => {
+    return nodusCrossResult.enrichedContracts.filter((item) => {
       if (regRoleFilter !== 'TODOS') {
         const itemRole = item.rol || item.rolActividad || '';
         if (itemRole !== regRoleFilter) return false;
       }
       if (regTeamFilter !== 'TODOS') {
-        const itemTeam = item.equipo || item.cohorte || '';
-        if (!itemTeam.includes(regTeamFilter)) return false;
+        const itemTeam = item.equipo || item.cohorte || item.nodusCross?.nodusTeamName || '';
+        if (!normalizeStr(itemTeam).includes(normalizeStr(regTeamFilter))) return false;
+      }
+      if (regNodusFilter !== 'TODOS') {
+        if (item.nodusCross?.estadoCruce !== regNodusFilter) return false;
       }
       if (regSearch) {
         const term = normalizeStr(regSearch);
         const name = normalizeStr(item.nombre || item.nombreCompleto || '');
-        const doc = normalizeStr(item.numeroDocumento || item.doc || '');
+        const docNum = normalizeStr(item.numeroDocumento || item.doc || '');
         const email = normalizeStr(item.email || '');
         const code = normalizeStr(item.code || item.verificationCode || '');
         const ip = normalizeStr(item.ip || '');
         const geo = normalizeStr(item.geoLocation || '');
+        const coord = normalizeStr(item.nodusCross?.coordinador || '');
         return (
           name.includes(term) ||
-          doc.includes(term) ||
+          docNum.includes(term) ||
           email.includes(term) ||
           code.includes(term) ||
           ip.includes(term) ||
-          geo.includes(term)
+          geo.includes(term) ||
+          coord.includes(term)
         );
       }
       return true;
     });
-  }, [signedContracts, regRoleFilter, regTeamFilter, regSearch]);
+  }, [nodusCrossResult.enrichedContracts, regRoleFilter, regTeamFilter, regNodusFilter, regSearch]);
 
-  // Filtrado Tab 2 (Padrón Oficial Lima)
+  // Filtrado Tab 2 (Padrón Vivo Nodus Lima)
   const filteredPadron = useMemo(() => {
-    return enrichedPadron.filter((item) => {
-      if (padronTeamFilter !== 'TODOS' && item.equipo !== padronTeamFilter) return false;
-      if (padronStatusFilter === 'PENDIENTES' && item.isSigned) return false;
-      if (padronStatusFilter === 'FIRMADOS' && !item.isSigned) return false;
+    return nodusCrossResult.nodusPadronCross.filter((item) => {
+      if (padronTeamFilter !== 'TODOS' && String(item.equipoId) !== String(padronTeamFilter)) return false;
+      if (padronRoleFilter !== 'TODOS' && item.rolLabel !== padronRoleFilter) return false;
+      if (padronStatusFilter !== 'TODOS' && item.estadoOperativo !== padronStatusFilter) return false;
       if (padronSearch) {
         const term = normalizeStr(padronSearch);
         const nameNorm = normalizeStr(item.nombre);
-        const rolNorm = normalizeStr(item.rol);
-        const cohorteNorm = normalizeStr(item.cohorte);
-        return nameNorm.includes(term) || rolNorm.includes(term) || cohorteNorm.includes(term);
+        const docNorm = normalizeStr(item.identificacion);
+        const emailNorm = normalizeStr(item.email);
+        const rolNorm = normalizeStr(item.rolLabel);
+        const coordNorm = normalizeStr(item.coordinador);
+        const teamNorm = normalizeStr(item.equipoNombre);
+        return (
+          nameNorm.includes(term) ||
+          docNorm.includes(term) ||
+          emailNorm.includes(term) ||
+          rolNorm.includes(term) ||
+          coordNorm.includes(term) ||
+          teamNorm.includes(term)
+        );
       }
       return true;
     });
-  }, [enrichedPadron, padronTeamFilter, padronStatusFilter, padronSearch]);
+  }, [nodusCrossResult.nodusPadronCross, padronTeamFilter, padronRoleFilter, padronStatusFilter, padronSearch]);
 
   const originUrl = typeof window !== 'undefined' ? window.location.origin : 'https://centro-operativo-cpsl.web.app';
   const contractUrl = `${originUrl}/reglas-maestria`;
@@ -360,7 +414,7 @@ export default function MonitorMaestriaLima() {
     }
   };
 
-  // Exportar CSV con Auditoría de IP y Geolocalización
+  // Exportar CSV con Auditoría de IP, Geolocalización y Cruce en Vivo Nodus
   const handleExportCsv = () => {
     const headers = [
       'Codigo_Digital',
@@ -368,8 +422,15 @@ export default function MonitorMaestriaLima() {
       'Documento',
       'Email',
       'Telefono',
-      'Rol',
-      'Equipo_Cohorte',
+      'Rol_Contrato',
+      'Equipo_Contrato',
+      'Nodus_Equipo',
+      'Nodus_FDS_Vigente',
+      'Nodus_Rol',
+      'Nodus_Coordinador',
+      'Nodus_Asistio_C1',
+      'Nodus_Maestria_Checkin',
+      'Estado_Cruce_Nodus',
       'Casilla1_NDA_Reglas',
       'Casilla2_Salud_Exoneracion',
       'Casilla3_Datos_Imagen',
@@ -381,30 +442,40 @@ export default function MonitorMaestriaLima() {
       'Fecha_Hora_Lima'
     ];
 
-    const rows = signedContracts.map((c) => [
-      c.code || c.verificationCode || '',
-      `"${(c.nombre || c.nombreCompleto || '').replace(/"/g, '""')}"`,
-      `"${(c.doc || `${c.tipoDocumento || ''} ${c.numeroDocumento || ''}`).replace(/"/g, '""')}"`,
-      `"${(c.email || '').replace(/"/g, '""')}"`,
-      `"${(c.telefono || '').replace(/"/g, '""')}"`,
-      `"${(c.rol || c.rolActividad || '').replace(/"/g, '""')}"`,
-      `"${(c.equipo || c.cohorte || c.equipoCohorte || '').replace(/"/g, '""')}"`,
-      (c.casilla1_TerminosNDA || c.aceptoTerminosNda) ? 'ACEPTADO' : 'NO',
-      (c.casilla2_SaludExoneracion || c.aceptoSaludExoneracion) ? 'ACEPTADO' : 'NO',
-      (c.casilla3_DatosImagen || c.aceptoDatosImagen) ? 'ACEPTADO' : 'NO',
-      `"${(c.ip || 'No detectada').replace(/"/g, '""')}"`,
-      `"${(c.geoLocation || 'Lima, Peru').replace(/"/g, '""')}"`,
-      `"${(c.coordinates || '').replace(/"/g, '""')}"`,
-      `"${(c.dispositivo || '').replace(/"/g, '""')}"`,
-      `"${(c.sha256Hash || '').replace(/"/g, '""')}"`,
-      `"${(c.fecha || c.fechaValidacionLocal || '').replace(/"/g, '""')}"`
-    ]);
+    const rows = nodusCrossResult.enrichedContracts.map((c) => {
+      const nc = c.nodusCross || {};
+      return [
+        c.code || c.verificationCode || '',
+        `"${(c.nombre || c.nombreCompleto || '').replace(/"/g, '""')}"`,
+        `"${(c.doc || `${c.tipoDocumento || ''} ${c.numeroDocumento || ''}`).replace(/"/g, '""')}"`,
+        `"${(c.email || '').replace(/"/g, '""')}"`,
+        `"${(c.telefono || '').replace(/"/g, '""')}"`,
+        `"${(c.rol || c.rolActividad || '').replace(/"/g, '""')}"`,
+        `"${(c.equipo || c.cohorte || c.equipoCohorte || '').replace(/"/g, '""')}"`,
+        `"${(nc.nodusTeamName || '').replace(/"/g, '""')}"`,
+        `"${(nc.fdsVigente || '').replace(/"/g, '""')}"`,
+        `"${(nc.nodusRole || '').replace(/"/g, '""')}"`,
+        `"${(nc.coordinador || '').replace(/"/g, '""')}"`,
+        nc.matched ? (nc.asistioC1 ? 'SI' : 'NO') : 'SIN_CRUCE',
+        nc.matched ? (nc.maestriaNodus ? 'SI' : 'NO') : 'SIN_CRUCE',
+        `"${(nc.estadoCruce || '').replace(/"/g, '""')}"`,
+        (c.casilla1_TerminosNDA || c.aceptoTerminosNda) ? 'ACEPTADO' : 'NO',
+        (c.casilla2_SaludExoneracion || c.aceptoSaludExoneracion) ? 'ACEPTADO' : 'NO',
+        (c.casilla3_DatosImagen || c.aceptoDatosImagen) ? 'ACEPTADO' : 'NO',
+        `"${(c.ip || 'No detectada').replace(/"/g, '""')}"`,
+        `"${(c.geoLocation || 'Lima, Peru').replace(/"/g, '""')}"`,
+        `"${(c.coordinates || '').replace(/"/g, '""')}"`,
+        `"${(c.dispositivo || '').replace(/"/g, '""')}"`,
+        `"${(c.sha256Hash || '').replace(/"/g, '""')}"`,
+        `"${(c.fecha || c.fechaValidacionLocal || '').replace(/"/g, '""')}"`
+      ];
+    });
 
     const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `AUDITORIA_REGLAS_MAESTRIA_LIMA_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `AUDITORIA_MAESTRIA_LIMA_NODUS_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -498,6 +569,26 @@ export default function MonitorMaestriaLima() {
                 <ArrowLeft size={14} /> Volver a Causa OS
               </button>
               <button
+                onClick={() => syncNodusLive({ manual: true })}
+                disabled={nodusLoading}
+                style={{
+                  background: nodusError ? 'rgba(244, 63, 94, 0.16)' : 'rgba(16, 185, 129, 0.14)',
+                  color: nodusError ? '#fb7185' : '#34d399',
+                  border: nodusError ? '1px solid rgba(244, 63, 94, 0.4)' : '1px solid rgba(16, 185, 129, 0.38)',
+                  borderRadius: '8px',
+                  padding: '0.5rem 0.85rem',
+                  fontSize: '0.76rem',
+                  fontWeight: 800,
+                  cursor: nodusLoading ? 'wait' : 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                <RefreshCw size={14} className={nodusLoading ? 'animate-spin' : ''} />
+                {nodusLoading ? 'Sincronizando Nodus...' : nodusLastSync ? `Nodus Sync (${nodusLastSync})` : 'Sincronizar Nodus'}
+              </button>
+              <button
                 onClick={handleExportCsv}
                 style={{
                   background: 'rgba(56, 189, 248, 0.14)',
@@ -513,7 +604,7 @@ export default function MonitorMaestriaLima() {
                   gap: '0.35rem'
                 }}
               >
-                <Download size={14} /> Exportar CSV Forense (IP/Geo)
+                <Download size={14} /> Exportar CSV Forense + Nodus
               </button>
             </div>
           </div>
@@ -612,26 +703,124 @@ export default function MonitorMaestriaLima() {
             <div style={{ background: 'rgba(6, 78, 59, 0.32)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✓ Contratos Firmados</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '0.15rem' }}>{stats.totalRegistradosFirestore}</div>
-            </div>
-            <div style={{ background: '#0b1325', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid #1e293b' }}>
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Participantes / Managers</span>
-              <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff', marginTop: '0.2rem' }}>
-                {stats.totalParticipantes} <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Part.</span> · {stats.totalManagers} <span style={{ fontSize: '0.8rem', color: '#fbbf24' }}>Mgr.</span>
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
+                {stats.totalParticipantes} Part. · {stats.totalManagers} Mgr.
               </div>
             </div>
-            <div style={{ background: '#0b1325', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid #1e293b' }}>
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Padrón Oficial Lima</span>
-              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fff', marginTop: '0.15rem' }}>{stats.totalPadron}</div>
+            <div style={{ background: '#0b1325', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.35)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🌐 En Nodus Maestría</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#38bdf8', marginTop: '0.15rem' }}>
+                {nodusLoading ? '...' : stats.totalNodusMaestria}
+              </div>
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
+                Incluye {stats.totalNodusManagers} Managers en vivo
+              </div>
+            </div>
+            <div style={{ background: 'rgba(16, 185, 129, 0.14)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✅ Completo (Firma + Nodus)</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#6ee7b7', marginTop: '0.15rem' }}>{stats.totalCompletos}</div>
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
+                Contrato + Check-in ok
+              </div>
+            </div>
+            <div style={{ background: 'rgba(245, 158, 11, 0.16)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.45)' }}>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Falta Check-in Nodus</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>{stats.totalFaltaCheckinNodus}</div>
+              <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
+                Ya firmaron · sin marca Nodus
+              </div>
             </div>
             <div style={{ background: 'rgba(136, 19, 55, 0.28)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(244, 63, 94, 0.4)' }}>
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Pendientes Padrón</span>
-              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.pendientesPadron}</div>
-            </div>
-            <div style={{ background: 'rgba(120, 53, 15, 0.3)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
-              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🌐 Trazabilidad IP + Geo</span>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>100%</div>
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🚨 En Nodus · Falta Firma</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.totalFaltaFirmaContrato}</div>
+              <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
+                Asistieron sin firmar reglas
+              </div>
             </div>
           </div>
+
+          {/* Resumen en Vivo por Equipo + FDS Vigente en Nodus */}
+          {nodusCrossResult.teamSummaries.length > 0 && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '0.75rem',
+              marginTop: '1rem'
+            }}>
+              {nodusCrossResult.teamSummaries.map((tm) => (
+                <div
+                  key={tm.equipoId}
+                  style={{
+                    background: 'rgba(5, 8, 17, 0.78)',
+                    border: '1px solid rgba(56, 189, 248, 0.28)',
+                    borderRadius: '12px',
+                    padding: '0.85rem 1rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.45rem'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+                    <strong style={{ color: '#f8fafc', fontSize: '0.9rem', fontWeight: 900 }}>{tm.equipoNombre}</strong>
+                    <span style={{
+                      background: 'linear-gradient(90deg, #f59e0b, #ea580c)',
+                      color: '#050811',
+                      fontSize: '0.68rem',
+                      fontWeight: 900,
+                      padding: '0.18rem 0.55rem',
+                      borderRadius: '999px'
+                    }}>
+                      FDS VIGENTE: {tm.fdsVigente}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', fontSize: '0.74rem', color: '#cbd5e1' }}>
+                    <span>Nodus Maestría: <strong style={{ color: '#38bdf8' }}>{tm.nodusMaestriaCount}</strong> ({tm.nodusParticipantesMaestria} Part · {tm.nodusManagersMaestria} Mgr)</span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', fontSize: '0.73rem', color: '#94a3b8' }}>
+                    <span>✅ Completos: <strong style={{ color: '#34d399' }}>{tm.completos}</strong></span>
+                    <span>⚠️ Falta Nodus: <strong style={{ color: '#fbbf24' }}>{tm.faltaCheckin}</strong></span>
+                    <span>🚨 Falta Firma: <strong style={{ color: '#fb7185' }}>{tm.faltaFirma}</strong></span>
+                  </div>
+                  {tm.checkinUrl && (
+                    <a
+                      href={tm.checkinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        marginTop: '0.2rem',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        color: '#38bdf8',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <ExternalLink size={12} /> Abrir Check-in Nodus {tm.fdsVigente}
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {nodusError && (
+            <div style={{
+              marginTop: '0.85rem',
+              padding: '0.65rem 0.9rem',
+              borderRadius: '10px',
+              background: 'rgba(244, 63, 94, 0.14)',
+              border: '1px solid rgba(244, 63, 94, 0.4)',
+              color: '#fecdd3',
+              fontSize: '0.78rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <AlertTriangle size={15} /> No se pudo leer la API de Nodus en vivo ({nodusError}). Los contratos de Firestore siguen activos.
+            </div>
+          )}
         </div>
 
         {/* SELECTOR DE PESTAÑAS */}
@@ -651,7 +840,7 @@ export default function MonitorMaestriaLima() {
               transition: 'all 0.15s ease'
             }}
           >
-            🛡️ Auditoría de Contratos Firmados, IP y Geolocalización ({signedContracts.length})
+            🛡️ Contratos Firmados + Cruce Nodus ({signedContracts.length})
           </button>
           <button
             onClick={() => setActiveTab('PADRON')}
@@ -668,7 +857,7 @@ export default function MonitorMaestriaLima() {
               transition: 'all 0.15s ease'
             }}
           >
-            👥 Cruce con Padrón Oficial Lima ({stats.firmadosPadron}/{stats.totalPadron})
+            🌐 Padrón Vivo Nodus Lima · FDS Actual ({stats.firmadosPadron}/{stats.totalPadron})
           </button>
         </div>
 
@@ -765,6 +954,36 @@ export default function MonitorMaestriaLima() {
                   })}
                 </div>
               </div>
+
+              <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                {[
+                  { id: 'TODOS', label: 'Nodus: Todos' },
+                  { id: 'COMPLETO', label: '✅ Nodus Maestría Confirmada' },
+                  { id: 'FALTA_CHECKIN_NODUS', label: '⚠️ Falta Check-in Nodus' },
+                  { id: 'NO_ENCONTRADO_NODUS', label: '❓ No encontrado en Nodus' }
+                ].map((nf) => {
+                  const active = regNodusFilter === nf.id;
+                  return (
+                    <button
+                      key={nf.id}
+                      onClick={() => setRegNodusFilter(nf.id)}
+                      style={{
+                        background: active ? '#10b981' : '#111c38',
+                        color: active ? '#050811' : '#cbd5e1',
+                        border: active ? 'none' : '1px solid #334155',
+                        borderRadius: '8px',
+                        padding: '0.32rem 0.68rem',
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {nf.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 0.5rem', fontSize: '0.78rem', color: '#94a3b8' }}>
@@ -852,6 +1071,43 @@ export default function MonitorMaestriaLima() {
                           }}>
                             {equipo}
                           </span>
+                          {item.nodusCross?.estadoCruce === 'COMPLETO' ? (
+                            <span style={{
+                              background: 'rgba(16, 185, 129, 0.2)',
+                              color: '#6ee7b7',
+                              border: '1px solid rgba(16, 185, 129, 0.5)',
+                              fontSize: '0.68rem',
+                              fontWeight: 900,
+                              padding: '0.2rem 0.55rem',
+                              borderRadius: '5px'
+                            }}>
+                              ✅ NODUS {item.nodusCross.fdsVigente} OK ({item.nodusCross.matchBy})
+                            </span>
+                          ) : item.nodusCross?.estadoCruce === 'FALTA_CHECKIN_NODUS' ? (
+                            <span style={{
+                              background: 'rgba(245, 158, 11, 0.22)',
+                              color: '#fde047',
+                              border: '1px solid rgba(245, 158, 11, 0.55)',
+                              fontSize: '0.68rem',
+                              fontWeight: 900,
+                              padding: '0.2rem 0.55rem',
+                              borderRadius: '5px'
+                            }}>
+                              ⚠️ FALTA CHECK-IN NODUS ({item.nodusCross.fdsVigente})
+                            </span>
+                          ) : (
+                            <span style={{
+                              background: 'rgba(148, 163, 184, 0.15)',
+                              color: '#cbd5e1',
+                              border: '1px solid rgba(148, 163, 184, 0.35)',
+                              fontSize: '0.68rem',
+                              fontWeight: 800,
+                              padding: '0.2rem 0.55rem',
+                              borderRadius: '5px'
+                            }}>
+                              ❓ NO ENCONTRADO EN NODUS LIMA
+                            </span>
+                          )}
                         </div>
 
                         <span style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#fbbf24', fontWeight: 800 }}>
@@ -1032,6 +1288,31 @@ export default function MonitorMaestriaLima() {
                           <span style={{ color: '#64748b', fontWeight: 700 }}>🛡️ Consentimiento: </span>
                           <span style={{ color: '#34d399', fontWeight: 700 }}>DOC 1 (NDA) · DOC 2 (Salud) · DOC 3 (Imagen)</span>
                         </div>
+                        <div>
+                          <span style={{ color: '#64748b', fontWeight: 700 }}>🌐 Nodus ({item.nodusCross?.fdsVigente || 'FDS'}): </span>
+                          {item.nodusCross?.matched ? (
+                            <span style={{ color: item.nodusCross.maestriaNodus ? '#34d399' : '#fde047', fontWeight: 800 }}>
+                              {item.nodusCross.nodusTeamName} · {item.nodusCross.nodusRole}
+                              {item.nodusCross.coordinador ? ` (${item.nodusCross.coordinador})` : ''} ·{' '}
+                              {item.nodusCross.maestriaNodus ? 'Asistencia Maestría ✅' : 'Sin Check-in Nodus ⚠️'}
+                            </span>
+                          ) : (
+                            <span style={{ color: '#94a3b8' }}>Sin coincidencia en equipos activos de Lima</span>
+                          )}
+                          {item.nodusCross?.estadoCruce === 'FALTA_CHECKIN_NODUS' && item.nodusCross?.checkinUrl && (
+                            <>
+                              {' · '}
+                              <a
+                                href={item.nodusCross.checkinUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: '#38bdf8', fontWeight: 900, textDecoration: 'underline' }}
+                              >
+                                Abrir Check-in Nodus ↗
+                              </a>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -1041,7 +1322,7 @@ export default function MonitorMaestriaLima() {
           </div>
         )}
 
-        {/* TAB 2: PADRÓN OFICIAL LIMA (111 MIEMBROS) */}
+        {/* TAB 2: PADRÓN VIVO NODUS LIMA + CRUCE DE ASISTENCIA POR FDS */}
         {activeTab === 'PADRON' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{
@@ -1058,7 +1339,7 @@ export default function MonitorMaestriaLima() {
                   type="text"
                   value={padronSearch}
                   onChange={(e) => setPadronSearch(e.target.value)}
-                  placeholder="🔍 Buscar en el padrón oficial de Lima por nombre, equipo o rol..."
+                  placeholder="🔍 Buscar en Padrón Vivo Nodus Lima por nombre, DNI, correo, coordinador, equipo o rol..."
                   style={{
                     width: '100%',
                     padding: '0.75rem 1rem 0.75rem 2.6rem',
@@ -1075,43 +1356,82 @@ export default function MonitorMaestriaLima() {
                 <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
               </div>
 
-              <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto' }}>
-                {[
-                  { id: 'TODOS', label: `Todos (${padronLima111.length})` },
-                  { id: 'Equipo 29', label: 'E29 · Phoenix (16)' },
-                  { id: 'Equipo 30', label: 'E30 · Tinkuy (34)' },
-                  { id: 'Equipo 31', label: 'E31 · Imperio (19)' },
-                  { id: 'Equipo 32', label: 'E32 · C2 Lima (42)' }
-                ].map((t) => {
-                  const active = padronTeamFilter === t.id;
-                  return (
-                    <button
-                      key={t.id}
-                      onClick={() => setPadronTeamFilter(t.id)}
-                      style={{
-                        background: active ? '#f59e0b' : '#111c38',
-                        color: active ? '#050811' : '#cbd5e1',
-                        border: active ? 'none' : '1px solid #334155',
-                        borderRadius: '8px',
-                        padding: '0.4rem 0.75rem',
-                        fontSize: '0.75rem',
-                        fontWeight: 800,
-                        whiteSpace: 'nowrap',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {t.label}
-                    </button>
-                  );
-                })}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto' }}>
+                  <button
+                    onClick={() => setPadronTeamFilter('TODOS')}
+                    style={{
+                      background: padronTeamFilter === 'TODOS' ? '#f59e0b' : '#111c38',
+                      color: padronTeamFilter === 'TODOS' ? '#050811' : '#cbd5e1',
+                      border: padronTeamFilter === 'TODOS' ? 'none' : '1px solid #334155',
+                      borderRadius: '8px',
+                      padding: '0.4rem 0.75rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 800,
+                      whiteSpace: 'nowrap',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Todos ({nodusCrossResult.nodusPadronCross.length})
+                  </button>
+                  {nodusCrossResult.teamSummaries.map((t) => {
+                    const active = String(padronTeamFilter) === String(t.equipoId);
+                    return (
+                      <button
+                        key={t.equipoId}
+                        onClick={() => setPadronTeamFilter(String(t.equipoId))}
+                        style={{
+                          background: active ? '#f59e0b' : '#111c38',
+                          color: active ? '#050811' : '#cbd5e1',
+                          border: active ? 'none' : '1px solid #334155',
+                          borderRadius: '8px',
+                          padding: '0.4rem 0.75rem',
+                          fontSize: '0.75rem',
+                          fontWeight: 800,
+                          whiteSpace: 'nowrap',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {t.equipoNombre} · {t.fdsVigente} ({t.totalPadronNodus})
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto' }}>
+                  {['TODOS', 'Participante', 'Manager', 'Capitán'].map((roleOpt) => {
+                    const active = padronRoleFilter === roleOpt;
+                    return (
+                      <button
+                        key={roleOpt}
+                        onClick={() => setPadronRoleFilter(roleOpt)}
+                        style={{
+                          background: active ? '#38bdf8' : '#111c38',
+                          color: active ? '#050811' : '#cbd5e1',
+                          border: active ? 'none' : '1px solid #334155',
+                          borderRadius: '8px',
+                          padding: '0.35rem 0.7rem',
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          whiteSpace: 'nowrap',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {roleOpt}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Estado:</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Cruce Operativo:</span>
                 {[
                   { id: 'TODOS', label: 'Todos' },
-                  { id: 'PENDIENTES', label: '🚨 Pendientes de Firma' },
-                  { id: 'FIRMADOS', label: '✓ Reglas Aceptadas' }
+                  { id: 'COMPLETO', label: '✅ Completo (Firma + Nodus)' },
+                  { id: 'FALTA_CHECKIN_NODUS', label: '⚠️ Firmó · Falta Check-in Nodus' },
+                  { id: 'FALTA_FIRMA_CONTRATO', label: '🚨 En Nodus · Falta Firma Contrato' },
+                  { id: 'PENDIENTE_AMBOS', label: '⏳ Pendiente Ambos' }
                 ].map((s) => {
                   const active = padronStatusFilter === s.id;
                   return (
@@ -1119,7 +1439,7 @@ export default function MonitorMaestriaLima() {
                       key={s.id}
                       onClick={() => setPadronStatusFilter(s.id)}
                       style={{
-                        background: active ? (s.id === 'PENDIENTES' ? '#881337' : s.id === 'FIRMADOS' ? '#064e3b' : '#334155') : '#111c38',
+                        background: active ? (s.id === 'FALTA_FIRMA_CONTRATO' ? '#881337' : s.id === 'COMPLETO' ? '#064e3b' : s.id === 'FALTA_CHECKIN_NODUS' ? '#78350f' : '#334155') : '#111c38',
                         color: active ? '#fff' : '#94a3b8',
                         border: active ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #334155',
                         borderRadius: '6px',
@@ -1136,16 +1456,21 @@ export default function MonitorMaestriaLima() {
               </div>
             </div>
 
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0 0.5rem', fontSize: '0.78rem', color: '#94a3b8' }}>
+              <span>Mostrando <strong>{filteredPadron.length}</strong> de {nodusCrossResult.nodusPadronCross.length} integrantes en seguimiento Nodus Lima</span>
+              <span style={{ color: '#38bdf8' }}>Fuente: API Nodus en vivo + Firestore</span>
+            </div>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
               {filteredPadron.map((item) => {
                 if (item.isSigned) {
                   const sig = item.signature;
                   return (
                     <div
-                      key={item.id}
+                      key={`${item.equipoId}-${item.nodusId}`}
                       style={{
                         background: 'rgba(9, 17, 36, 0.92)',
-                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        border: item.maestriaNodus ? '1px solid rgba(16, 185, 129, 0.45)' : '1px solid rgba(245, 158, 11, 0.5)',
                         borderRadius: '12px',
                         padding: '1rem',
                         display: 'flex',
@@ -1166,25 +1491,58 @@ export default function MonitorMaestriaLima() {
                             padding: '0.15rem 0.45rem',
                             borderRadius: '4px'
                           }}>
-                            ✓ REGLAS Y CONTRATO FIRMADOS
+                            ✓ CONTRATO FIRMADO ({item.contractMatchBy})
+                          </span>
+                          <span style={{
+                            background: item.maestriaNodus ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.22)',
+                            color: item.maestriaNodus ? '#6ee7b7' : '#fde047',
+                            border: item.maestriaNodus ? '1px solid rgba(16, 185, 129, 0.45)' : '1px solid rgba(245, 158, 11, 0.5)',
+                            fontSize: '0.65rem',
+                            fontWeight: 900,
+                            padding: '0.15rem 0.45rem',
+                            borderRadius: '4px'
+                          }}>
+                            {item.maestriaNodus ? `✅ NODUS ${item.fdsVigente} OK` : `⚠️ FALTA CHECK-IN NODUS (${item.fdsVigente})`}
                           </span>
                           <span style={{ background: '#111c38', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                            {item.equipo} · {item.cohorte}
+                            {item.equipoNombre} · {item.fdsVigente}
                           </span>
                           <span style={{ background: 'rgba(245, 158, 11, 0.14)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)', fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                            {sig.rol || item.rol}
+                            {item.rolLabel} {item.coordinador ? `· Coord: ${item.coordinador}` : ''}
                           </span>
                         </div>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>
-                          <span>🆔 <strong style={{ color: '#e2e8f0' }}>{sig.doc || sig.numeroDocumento}</strong></span>
+                          <span>🆔 <strong style={{ color: '#e2e8f0' }}>{item.identificacion || sig.numeroDocumento}</strong></span>
+                          {item.email && <span>✉️ <strong style={{ color: '#cbd5e1' }}>{item.email}</strong></span>}
                           <span>🌐 IP: <strong style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{sig.ip || 'Registrada'}</strong></span>
-                          <span>📍 <strong style={{ color: '#fde047' }}>{sig.geoLocation || 'Lima, Perú'}</strong></span>
                           <span style={{ color: '#fbbf24', fontFamily: 'monospace' }}>{sig.code || sig.verificationCode}</span>
                         </div>
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {!item.maestriaNodus && item.checkinUrl && (
+                          <a
+                            href={item.checkinUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              background: 'rgba(245, 158, 11, 0.2)',
+                              color: '#fde047',
+                              border: '1px solid rgba(245, 158, 11, 0.5)',
+                              borderRadius: '8px',
+                              padding: '0.45rem 0.75rem',
+                              fontSize: '0.74rem',
+                              fontWeight: 800,
+                              textDecoration: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem'
+                            }}
+                          >
+                            <ExternalLink size={14} /> Check-in Nodus
+                          </a>
+                        )}
                         <button
                           onClick={() => handleViewPass(sig)}
                           style={{
@@ -1228,15 +1586,15 @@ export default function MonitorMaestriaLima() {
                   );
                 } else {
                   const waMessage = encodeURIComponent(
-                    `Hola ${item.nombre}, te saluda la Oficina de CREAR PSL Lima. Para tu acreditación en Maestría del Juego es obligatorio firmar digitalmente el Contrato Unificado y Reglas de Sala aquí: ${contractUrl}`
+                    `Hola ${item.nombre}, te saluda la Oficina de CREAR PSL Lima. Para tu acreditación en ${item.equipoNombre} (${item.fdsVigente}) es obligatorio firmar digitalmente el Contrato Unificado y Reglas de Sala aquí: ${contractUrl}`
                   );
 
                   return (
                     <div
-                      key={item.id}
+                      key={`${item.equipoId}-${item.nodusId}`}
                       style={{
                         background: 'rgba(9, 17, 36, 0.85)',
-                        border: '1px solid rgba(244, 63, 94, 0.35)',
+                        border: item.maestriaNodus ? '1px solid rgba(244, 63, 94, 0.55)' : '1px solid rgba(148, 163, 184, 0.25)',
                         borderRadius: '12px',
                         padding: '1rem',
                         display: 'flex',
@@ -1249,27 +1607,29 @@ export default function MonitorMaestriaLima() {
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
                           <span style={{
-                            background: 'rgba(244, 63, 94, 0.2)',
-                            color: '#fb7185',
-                            border: '1px solid rgba(244, 63, 94, 0.4)',
+                            background: item.maestriaNodus ? 'rgba(244, 63, 94, 0.22)' : 'rgba(148, 163, 184, 0.16)',
+                            color: item.maestriaNodus ? '#fb7185' : '#cbd5e1',
+                            border: item.maestriaNodus ? '1px solid rgba(244, 63, 94, 0.45)' : '1px solid rgba(148, 163, 184, 0.35)',
                             fontSize: '0.65rem',
                             fontWeight: 900,
                             padding: '0.15rem 0.45rem',
                             borderRadius: '4px'
                           }}>
-                            🚨 PENDIENTE DE ACEPTACIÓN
+                            {item.maestriaNodus ? '🚨 EN NODUS MAESTRÍA · FALTA FIRMA CONTRATO' : '⏳ SIN FIRMA NI CHECK-IN NODUS'}
                           </span>
                           <span style={{ background: '#111c38', color: '#cbd5e1', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                            {item.equipo} · {item.cohorte}
+                            {item.equipoNombre} · {item.fdsVigente}
                           </span>
-                          <span style={{ background: '#111c38', color: '#94a3b8', border: '1px solid #334155', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
-                            {item.rol}
+                          <span style={{ background: 'rgba(56, 189, 248, 0.14)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.3)', fontSize: '0.65rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
+                            {item.rolLabel} {item.coordinador ? `· Coord: ${item.coordinador}` : ''}
                           </span>
                         </div>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>{item.nombre}</h3>
-                        <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
-                          Requiere aceptación de las 3 casillas legales (NDA, Salud y Datos) antes de ingresar a sala.
-                        </p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.25rem', fontSize: '0.75rem', color: '#94a3b8' }}>
+                          {item.identificacion && <span>🆔 {item.identificacion}</span>}
+                          {item.email && <span>✉️ {item.email}</span>}
+                          <span>{item.maestriaNodus ? '✅ Ya tiene asistencia/marca Maestría en Nodus, pero aún no firma reglas.' : 'Requiere firma de reglas y check-in Nodus.'}</span>
+                        </div>
                       </div>
 
                       <a
