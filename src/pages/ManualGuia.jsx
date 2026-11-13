@@ -645,15 +645,9 @@ export default function ManualGuia() {
               <ModuleCard icon={<BookMarked />} color="#8b5cf6" title="Portafolio & Estrategia"
                 desc="Repositorio de proyectos estrategicos, OKRs de ciclo y documentos de alineamiento institucional. Acceso por rol y sede."
                 onClick={() => navigate('/portafolio')} />
-              <ModuleCard icon={<Star />} color="#f59e0b" title="Dashboard de Excelencia"
-                desc="Indicadores de desempeno individual y de equipo. Muestra quien esta en zona verde, amarilla o roja segun sus metricas del ciclo."
-                onClick={() => navigate('/excelencia')} />
               <ModuleCard icon={<Calendar />} color="#10b981" title="Calendario de Equipo"
                 desc="Vista mensual de eventos, entrenamientos, Fines de Semana de Calibracion y fechas clave del ciclo por sede."
                 onClick={() => navigate('/calendario-equipo')} />
-              <ModuleCard icon={<AlertOctagon />} color="#ef4444" title="Protocolo de Emergencias"
-                desc="Modulo interactivo con los 7 pasos de oro, cadena de mando en crisis, matriz de gravedad y checklist de seguridad por sede."
-                onClick={() => navigate('/protocolo-emergencias')} />
             </div>
 
             <div style={{ padding: '1.4rem', background: 'rgba(16,185,129,0.07)', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.2)' }}>
@@ -861,10 +855,6 @@ export default function ManualGuia() {
                 <li><strong>Protocolo de Emergencias:</strong> Ten siempre ubicado el botiquin, salidas de evacuacion y el checklist de seguridad. Accede desde Causa OS antes de cada sesion.</li>
                 <li><strong>Reporte Diario:</strong> Al cerrar cada jornada, completa tu checklist en Causa OS e informa el estado animico del grupo al Coordinador.</li>
               </ul>
-              <button onClick={() => navigate('/protocolo-emergencias')} className="btn-secondary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', fontWeight: 700, fontSize: '0.88rem' }}>
-                Revisar Protocolo de Emergencias <ExternalLink size={13} />
-              </button>
             </div>
           )}
 
@@ -903,7 +893,6 @@ export default function ManualGuia() {
                 { icon: '📅', color: '#8b5cf6', label: 'Calendario MJ', route: '/calendario-mj', desc: 'Genera y exporta el calendario de Maestria del Juego por equipo.' },
                 { icon: '📈', color: '#22c55e', label: 'Reportes', route: '/reportes', desc: 'Dashboards por sede, rol y ciclo.' },
                 { icon: '⚡', color: 'var(--crear-gold)', label: 'Directorio QT', route: '/directorio-qt', desc: 'Equipo Quantum en tiempo real.' },
-                { icon: '🚨', color: '#ef4444', label: 'Protocolo Crisis', route: '/protocolo-emergencias', desc: '7 pasos de actuacion en emergencias.' },
               ].map(item => (
                 <button key={item.label} onClick={() => navigate(item.route)} className="hover-glow"
                   style={{ padding: '1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)', textAlign: 'left', cursor: 'pointer', transition: 'all 0.2s' }}>
@@ -930,10 +919,6 @@ export default function ManualGuia() {
                 Protocolo de Seguridad & Manejo de Emergencias en Salon
               </h2>
             </div>
-            <button onClick={() => navigate('/protocolo-emergencias')} className="btn-primary"
-              style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff', padding: '0.55rem 1rem', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
-              Modulo Interactivo
-            </button>
           </div>
 
           <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.95rem', color: 'var(--text-main)', lineHeight: '1.65' }}>

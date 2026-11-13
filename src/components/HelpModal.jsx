@@ -190,13 +190,6 @@ export default function HelpModal({ isOpen, onClose }) {
                     Aplicación obligatoria en todas las sedes de Crear Poder Sin Límites.
                   </p>
                 </div>
-                <button 
-                  onClick={() => { onClose(); navigate('/protocolo-emergencias'); }}
-                  className="btn-primary"
-                  style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.82rem', fontWeight: 700 }}
-                >
-                  Ver Pantalla Completa ↗
-                </button>
               </div>
 
               {/* Principio Operativo */}
@@ -226,16 +219,6 @@ export default function HelpModal({ isOpen, onClose }) {
                 <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><FlagIcon country="Peru" size={16} /> Lima: <strong style={{ color: '#ef4444' }}>106 / 116</strong></div>
                 <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><FlagIcon country="Colombia" size={16} /> Medellín: <strong style={{ color: '#ef4444' }}>123</strong></div>
                 <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><FlagIcon country="Mexico" size={16} /> México: <strong style={{ color: '#ef4444' }}>911</strong></div>
-              </div>
-
-              <div style={{ textAlign: 'center' }}>
-                <button 
-                  onClick={() => { onClose(); navigate('/protocolo-emergencias'); }}
-                  className="btn-primary"
-                  style={{ width: '100%', padding: '0.8rem', fontSize: '0.95rem', background: '#ef4444', borderColor: '#ef4444', color: '#fff', fontWeight: 800 }}
-                >
-                  🚨 Ir al Módulo Interactivo de Emergencias y Checklist
-                </button>
               </div>
             </div>
           ) : activeTab === 'manual' ? (
@@ -301,15 +284,8 @@ export default function HelpModal({ isOpen, onClose }) {
                   <h4 style={{ color: '#ef4444', margin: '0 0 0.3rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <ShieldAlert size={20} /> Protocolo Global de Emergencias Médicas
                   </h4>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)' }}>Módulo interactivo completo con los 7 pasos de oro, cadena de mando, triage y checklist por sede.</p>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)' }}>Los 7 pasos de oro, cadena de mando, triage y checklist por sede.</p>
                 </div>
-                <button 
-                  onClick={() => { onClose(); navigate('/protocolo-emergencias'); }}
-                  className="btn-primary" 
-                  style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff', padding: '0.5rem 1.2rem', fontSize: '0.85rem', cursor: 'pointer', borderRadius: '6px', fontWeight: 800 }}
-                >
-                  🚨 Abrir Protocolo Interactivo ↗
-                </button>
               </div>
 
               <div style={{ background: 'rgba(239, 68, 68, 0.08)', borderLeft: '4px solid #ef4444', padding: '1rem', margin: '1.5rem 0', borderRadius: '4px' }}>

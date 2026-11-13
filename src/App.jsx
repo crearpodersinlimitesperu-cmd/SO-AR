@@ -20,7 +20,6 @@ import Home from './pages/Home';
 import CentroManagers from './pages/CentroManagers';
 import SuperAdminPanel from './pages/SuperAdminPanel';
 import GuiaAliadosC1 from './pages/GuiaAliadosC1';
-import ContrasteNodusSheets from './pages/ContrasteNodusSheets';
 
 const ContratoCaminataFuego = lazy(() => import('./pages/ContratoCaminataFuego'));
 const MonitorAcreditacionFuegoLima = lazy(() => import('./pages/MonitorAcreditacionFuegoLima'));
@@ -29,15 +28,9 @@ const MonitorMaestriaLima = lazy(() => import('./pages/MonitorMaestriaLima'));
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
-const QuantumTeamHub = lazy(() => import('./pages/QuantumTeamHub'));
-const HrCommandCenter = lazy(() => import('./pages/HrCommandCenter'));
-const LegalCommandCenter = lazy(() => import('./pages/LegalCommandCenter'));
 const AndresCommandCenter = lazy(() => import('./pages/AndresCommandCenter'));
 const DatosSedesCartas = lazy(() => import('./pages/DatosSedesCartas'));
-const LearningDashboard = lazy(() => import('./pages/LearningDashboard'));
-const ExcellenceDashboard = lazy(() => import('./pages/ExcellenceDashboard'));
 const LegalStatusPanel = lazy(() => import('./pages/LegalStatusPanel'));
-const OnboardingLegal = lazy(() => import('./pages/OnboardingLegal'));
 const Login = lazy(() => import('./pages/Login'));
 const OptOutPage = lazy(() => import('./pages/OptOutPage'));
 const ElizabethDashboard = lazy(() => import('./pages/ElizabethDashboard'));
@@ -53,20 +46,15 @@ const MisKPIs = lazy(() => import('./pages/MisKPIs'));
 const AuditoriaKPIs = lazy(() => import('./pages/AuditoriaKPIs'));
 const ManagerGuide = lazy(() => import('./pages/ManagerGuide'));
 const DirectorioQT = lazy(() => import('./pages/DirectorioQT'));
-const ProtocoloEmergencias = lazy(() => import('./pages/ProtocoloEmergencias'));
 const PortfolioBoard = lazy(() => import('./pages/PortfolioBoard'));
-const StrategyBoard = lazy(() => import('./pages/StrategyBoard'));
 const OfficialAgreements = lazy(() => import('./pages/OfficialAgreements'));
 const TeamCalendar = lazy(() => import('./pages/TeamCalendar'));
 const EmbudoConversionBoard = lazy(() => import('./pages/EmbudoConversionBoard'));
-const BrandScriptBoard = lazy(() => import('./pages/BrandScriptBoard'));
 const NodusDataMap = lazy(() => import('./pages/NodusDataMap'));
 const CalendarioMJ = lazy(() => import('./pages/CalendarioMJ'));
 const GeneradorFlyer = lazy(() => import('./pages/GeneradorFlyer'));
 const VideoC2ImoReel = lazy(() => import('./pages/VideoC2ImoReel'));
 const MonitorVuelosCartas = lazy(() => import('./pages/MonitorVuelosCartas'));
-const VendeSinVender = lazy(() => import('./pages/VendeSinVender'));
-const MasterclassDistinciones = lazy(() => import('./pages/MasterclassDistinciones'));
 const DashboardKpisLima = lazy(() => import('./pages/DashboardKpisLima'));
 const CRMBaseMaster = lazy(() => import('./pages/CRMBaseMaster'));
 const MonitorImos = lazy(() => import('./pages/MonitorImos'));
@@ -96,7 +84,7 @@ function PrivateRoute({ children }) {
   }
   
   if (currentUser?.isParticipantOnly) {
-    return <Navigate to="/onboarding-legal" replace />;
+    return <Navigate to="/login" replace />;
   }
   return currentUser ? <ModuleVisit>{children}</ModuleVisit> : <Navigate to={`/login?from=${encodeURIComponent(window.location.pathname + window.location.search)}`} replace />;
 }
@@ -127,7 +115,7 @@ function RoleRoute({ children, allowedRoles = [], allowedEmails = [], requireSup
   }
 
   if (currentUser.isParticipantOnly) {
-    return <Navigate to="/onboarding-legal" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // ACCESO TOTAL INCONDICIONAL PARA SUPER ADMIN:
@@ -321,31 +309,10 @@ function App() {
           <Route path="/maestria-global" element={<Navigate to="/andres-command-center" replace />} />
           <Route path="/trainer-hub" element={<Navigate to="/home" replace />} />
           <Route path="/call-coach-crm" element={<Navigate to="/home" replace />} />
-          <Route path="/qt-hub" element={
-            <RoleRoute allowedRoles={['qt', 'gerente', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
-              <QuantumTeamHub />
-            </RoleRoute>
-          } />
-          <Route path="/hr-command-center" element={
-            <RoleRoute allowedRoles={['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
-              <HrCommandCenter />
-            </RoleRoute>
-          } />
-          <Route path="/legal-hub" element={
-            <RoleRoute allowedRoles={['legal', 'juridico', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
-              <LegalCommandCenter />
-            </RoleRoute>
-          } />
           <Route path="/andres-command-center" element={
             <RoleRoute allowedRoles={['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']} requireSuperAdmin={false}>
               <AndresCommandCenter />
             </RoleRoute>
-          } />
-          <Route path="/onboarding-legal" element={
-            <OnboardingLegal />
-          } />
-          <Route path="/dna" element={
-            <OnboardingLegal />
           } />
           <Route path="/home" element={
             <PrivateRoute>
@@ -381,29 +348,9 @@ function App() {
             </RoleRoute>
           } />
 
-          <Route path="/masterclass-distinciones" element={
-            <PrivateRoute>
-              <MasterclassDistinciones />
-            </PrivateRoute>
-          } />
-
           <Route path="/roles" element={
             <PrivateRoute>
               <RoleSelector />
-            </PrivateRoute>
-          } />
-          
-          <Route path="/learning" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coord_maestria_global', 'director_maestria', 'coordinador', 'entrenador', 'entrenador_llamadas', 'capitan', 'finanzas', 'facturacion', 'contador', 'talento_humano', 'rrhh', 'legal', 'juridico']}>
-              <LearningDashboard />
-            </RoleRoute>
-          } />
-
-
-
-          <Route path="/excelencia" element={
-            <PrivateRoute>
-              <ExcellenceDashboard />
             </PrivateRoute>
           } />
           
@@ -486,14 +433,6 @@ function App() {
           } />
           <Route path="/guias/aliados-c1" element={<Navigate to="/guia-aliados-c1" replace />} />
 
-          <Route path="/contraste-nodus" element={
-            <PrivateRoute>
-              <ContrasteNodusSheets />
-            </PrivateRoute>
-          } />
-          <Route path="/nodus-contraste" element={<Navigate to="/contraste-nodus" replace />} />
-          <Route path="/nodus-aliados" element={<Navigate to="/contraste-nodus" replace />} />
-
           <Route path="/centro-managers" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'observador', 'consolidado', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
               <CentroManagers />
@@ -504,12 +443,6 @@ function App() {
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'qt', 'director_maestria']} requireSuperAdmin={false}>
               <DirectorioQT />
             </RoleRoute>
-          } />
-
-          <Route path="/protocolo-emergencias" element={
-            <PrivateRoute>
-              <ProtocoloEmergencias />
-            </PrivateRoute>
           } />
 
           {/* PMO Culture Integrations */}
@@ -529,24 +462,12 @@ function App() {
           } />
           <Route path="/futuros-imposibles" element={<Navigate to="/resultados-imposibles" replace />} />
 
-          <Route path="/estrategia" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
-              <StrategyBoard />
-            </RoleRoute>
-          } />
-
           <Route path="/embudo-conversion" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <EmbudoConversionBoard />
             </RoleRoute>
           } />
           <Route path="/embudo" element={<Navigate to="/embudo-conversion" replace />} />
-
-          <Route path="/brandscript" element={
-            <PrivateRoute>
-              <BrandScriptBoard />
-            </PrivateRoute>
-          } />
 
           <Route path="/acuerdos" element={
             <PrivateRoute>
@@ -646,13 +567,6 @@ function App() {
             </PrivateRoute>
           } />
 
-          {/* Best-Seller Causa OS: Vende Sin Vender */}
-          <Route path="/vende-sin-vender" element={
-            <PrivateRoute>
-              <VendeSinVender />
-            </PrivateRoute>
-          } />
-          <Route path="/causa-vende" element={<Navigate to="/vende-sin-vender" replace />} />
           <Route path="/actividadcoordinadores" element={<Navigate to="/auditoria-kpis" replace />} />
           <Route path="/coordinadores-nodus" element={<Navigate to="/auditoria-kpis" replace />} />
 

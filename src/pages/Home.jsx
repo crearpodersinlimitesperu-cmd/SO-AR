@@ -233,17 +233,6 @@ const CAUSA_OPTIONS_REGISTRY = [
     visible: user => ['jose.sanchez@crearpsl.net', 'fer.aragon@crearpsl.net', 'fer.aragon@crearpsl.com', 'paul.sosa@crearpsl.net', 'andres.gomez@crearpsl.net', 'gomeznueve@gmail.com'].includes((user?.email || '').toLowerCase())
   },
   {
-    id: 'opt-brandscript',
-    title: '📜 BrandScript & Guiones MJ',
-    category: 'Ventas y Enrolamiento',
-    badge: 'Manual Oficial',
-    emoji: '📜',
-    desc: 'Manual Oficial de Enrolamiento Narrativo para Mánagers y Entrenadores.',
-    keywords: ['guiones', 'brandscript', 'storybrand', 'neuromarketing', 'conversion', 'ventas', 'enrolamiento', 'mj'],
-    route: '/brandscript',
-    roles: null
-  },
-  {
     id: 'opt-reporte-relampago',
     title: '⚡ Reporte Relámpago Post-FDS (Gerentes de Sede)',
     category: 'Reportes Operativos',
@@ -405,17 +394,6 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
   {
-    id: 'opt-masterclass-distinciones',
-    title: 'Masterclass: Distinciones de Liderazgo',
-    category: 'Formación',
-    badge: 'Nuevo',
-    emoji: '🌟',
-    desc: '5 Distinciones Cuánticas: Empatía vs Comodidad, Causa vs Efecto, Hecho vs Interpretación, Rigor vs Agresión, Compromiso vs Obligación.',
-    keywords: ['masterclass', 'distinciones', 'liderazgo', 'empatia', 'causa', 'efecto', 'interpretacion', 'rigor', 'agresion', 'compromiso'],
-    route: '/masterclass-distinciones',
-    roles: null
-  },
-  {
     id: 'opt-horarios-entrenamientos',
     title: 'Horarios de Entrenamientos y Código de Vestimenta',
     category: 'Operaciones',
@@ -506,17 +484,6 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
-    id: 'opt-estrategia',
-    title: 'Estrategia OKRs (Cascade)',
-    category: 'Estrategia',
-    badge: 'OKRs',
-    emoji: '🎯',
-    desc: 'Mapa estratégico y seguimiento de objetivos clave y resultados',
-    keywords: ['estrategia', 'okrs', 'cascade', 'objetivos', 'iniciativas'],
-    route: '/estrategia',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
-  },
-  {
     id: 'opt-resultados-imposibles',
     title: 'Resultados Imposibles (IA)',
     category: 'Gobernanza',
@@ -561,28 +528,6 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
   {
-    id: 'opt-learning',
-    title: 'Inteligencia Colectiva (Learning)',
-    category: 'Conocimiento',
-    badge: 'Learning',
-    emoji: '🧠',
-    desc: 'Repositorio de lecciones aprendidas, mejoras operativas e ideas del equipo',
-    keywords: ['learning', 'aprendizaje', 'lecciones aprendidas', 'inteligencia colectiva', 'ideas'],
-    route: '/learning',
-    roles: null
-  },
-  {
-    id: 'opt-excelencia',
-    title: 'Excelencia Operativa',
-    category: 'Calidad',
-    badge: 'Estándares',
-    emoji: '👑',
-    desc: 'Reconocimientos, estándares de ejecución y manual de buenas prácticas',
-    keywords: ['excelencia', 'excelencia operativa', 'calidad', 'estandares', 'reconocimientos'],
-    route: '/excelencia',
-    roles: null
-  },
-  {
     id: 'opt-superadmin',
     title: 'Centro de Mando (Super Admin)',
     category: 'Administración',
@@ -610,17 +555,6 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
   {
-    id: 'opt-emergencias',
-    title: 'Protocolo de Emergencias',
-    category: 'Seguridad',
-    badge: 'SOS',
-    emoji: '🚨',
-    desc: 'Flujo de actuación ante emergencias médicas, logísticas o de seguridad',
-    keywords: ['emergencia', 'emergencias', 'protocolo emergencias', 'sos', 'urgencias', 'medico'],
-    route: '/protocolo-emergencias',
-    roles: null
-  },
-  {
     id: 'opt-manual',
     title: 'Manual / Guía Causa OS / QT',
     category: 'Ayuda',
@@ -644,17 +578,6 @@ const CAUSA_OPTIONS_REGISTRY = [
     // MANUAL_NODUS_ROLES / la Matriz Oficial: Directivos, Gerentes,
     // Coordinadores C1Y2 y Coordinadores de MJ únicamente (08/09/2026).
     roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria']
-  },
-  {
-    id: 'opt-vende-sin-vender',
-    title: '📖 Vende Sin Vender (Best-Seller Causa OS)',
-    category: 'Formación y Liderazgo',
-    badge: 'Best-Seller 2026',
-    emoji: '📖',
-    desc: 'El Arte de Enrolar y Despertar Gigantes: Neuromarketing Ético, Alex Hormozi y Causa OS con 8 gráficas narrativas interactivas',
-    keywords: ['vende sin vender', 'libro', 'best seller', 'hormozi', 'yoda', 'perro guardian', 'ecuacion de valor', 'ticket verde', 'rezagados', 'enrolamiento', 'storybrand'],
-    route: '/vende-sin-vender',
-    roles: null
   },
   {
     id: 'opt-campus',
@@ -704,39 +627,6 @@ const CAUSA_OPTIONS_REGISTRY = [
   },
 
 
-  {
-    id: 'opt-qt-hub',
-    title: 'Hub Operativo Pit-Stop Quantum Team (QT)',
-    category: 'Operaciones de Piso',
-    badge: 'Mobile-First',
-    emoji: '⚡',
-    desc: 'Checklists tácticos de alta velocidad para sala, auditoría de atención con tareas trampa y control de salón',
-    keywords: ['qt', 'quantum team', 'pit-stop', 'tareas trampa', 'operaciones de piso', 'logistica sala'],
-    route: '/qt-hub',
-    roles: ['qt', 'gerente', 'superadmin', 'ceo', 'direccion']
-  },
-  {
-    id: 'opt-hr-command',
-    title: 'HR Command Center (Talento Humano Global)',
-    category: 'Talento Humano',
-    badge: 'Talento Humano',
-    emoji: '🏢',
-    desc: 'Directorio de colaboradores, índice de atención, pipeline de reclutamiento y radar de pólizas/seguros',
-    keywords: ['talento humano', 'lennin chasi', 'rrhh', 'directorio', 'reclutamiento', 'seguros', 'personal'],
-    route: '/hr-command-center',
-    roles: ['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']
-  },
-  {
-    id: 'opt-legal-hub',
-    title: 'Torre de Riesgo y Cumplimiento Legal',
-    category: 'Legal y Riesgo',
-    badge: 'Zero-Trust',
-    emoji: '⚖️',
-    desc: 'Bóveda Zero-Trust, registro de marcas (NEC, Noda, Neck), panel ARCO y matriz de bloqueo por NDAs',
-    keywords: ['legal', 'pablo mendieta', 'juridico', 'marcas', 'arco', 'nda', 'confidencialidad', 'riesgo'],
-    route: '/legal-hub',
-    roles: ['legal', 'juridico', 'superadmin', 'ceo', 'direccion']
-  },
   {
     id: 'opt-tema',
     title: 'Cambiar Modo de Tema (Claro / Oscuro / Auto)',
@@ -2334,17 +2224,11 @@ export default function Home() {
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/portafolio'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
                       📈 Portafolio PMO (Planview)
                     </button>
-                    <button onClick={() => { setShowToolsDropdown(false); navigate('/estrategia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}>
-                      🎯 Estrategia OKRs (Cascade)
-                    </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/auditoria-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       📉 Auditoría de KPIs
                     </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/nodus-data-map'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
                       🗺️ Nodus Data Map
-                    </button>
-                    <button onClick={() => { setShowToolsDropdown(false); navigate('/contraste-nodus'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', fontWeight: 'bold' }}>
-                      📊 Contraste Nodus vs Sheets
                     </button>
                   </>
                 ) : (
@@ -2368,18 +2252,6 @@ export default function Home() {
                       ⏰ Horarios de Entrenamientos
                     </button>
                   </>
-                )}
-
-                {(currentUser?.appRole !== 'qt') && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
-                    🧠 Inteligencia Colectiva (Learning)
-                  </button>
-                )}
-
-                {(currentUser?.appRole !== 'qt') && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
-                    👑 Excelencia Operativa
-                  </button>
                 )}
 
                 {canAccessFlyersC1(currentUser) && (
@@ -2454,21 +2326,6 @@ export default function Home() {
                     🌐 Comando Maestría (Andrés)
                   </button>
                 )}
-                {hasRoleAccess(['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']) && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/hr-command-center'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a78bfa', background: 'rgba(167, 139, 250, 0.1)', fontWeight: 'bold' }}>
-                    🏢 Talento Humano Global
-                  </button>
-                )}
-                {hasRoleAccess(['legal', 'juridico', 'superadmin', 'ceo', 'direccion']) && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/legal-hub'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)', fontWeight: 'bold' }}>
-                    ⚖️ Torre de Riesgo (Legal)
-                  </button>
-                )}
-                {hasRoleAccess(['qt', 'gerente', 'superadmin', 'ceo', 'direccion']) && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/qt-hub'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)', fontWeight: 'bold' }}>
-                    ⚡ Hub Pit-Stop QT
-                  </button>
-                )}
 
 
                 {isDataAdmin(currentUser) && (
@@ -2519,10 +2376,6 @@ export default function Home() {
                   </button>
                 )}
 
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/protocolo-emergencias'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)', fontWeight: 'bold' }}>
-                  🚨 Protocolo de Emergencias
-                </button>
-
                 {canAccessManualQT(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📘 Manual / Guía Causa OS / QT
@@ -2534,14 +2387,6 @@ export default function Home() {
                     📗 Manual Práctico Nodus
                   </button>
                 )}
-
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/vende-sin-vender'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-gold)', borderColor: 'rgba(255, 183, 3, 0.4)', background: 'rgba(255, 183, 3, 0.1)', fontWeight: 'bold' }}>
-                  📖 Vende Sin Vender (Causa OS)
-                </button>
-
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/brandscript'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.4)', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
-                  📜 BrandScript & Guiones MJ
-                </button>
               </div>
             )}
           </div>
@@ -2561,12 +2406,12 @@ export default function Home() {
               🏦 Dirección Financiera (CFO)
             </ModuleHelpButton>
           ) : currentUser?.appRole === 'legal' || currentUser?.appRole === 'juridico' ? (
-            <ModuleHelpButton helpKey="legal" onClick={() => navigate('/legal-hub')} className="home-module-card">
-              ⚖️ Torre Legal
+            <ModuleHelpButton helpKey="auditoriaLegal" onClick={() => navigate('/legal-admin')} className="home-module-card">
+              ⚖️ Auditoría Legal
             </ModuleHelpButton>
           ) : currentUser?.appRole === 'talento_humano' || currentUser?.appRole === 'rrhh' ? (
-            <ModuleHelpButton helpKey="talento" onClick={() => navigate('/hr-command-center')} className="home-module-card">
-              🏢 Talento Humano
+            <ModuleHelpButton helpKey="mando" onClick={() => navigate('/superadmin')} className="home-module-card">
+              🌐 Centro de Mando
             </ModuleHelpButton>
           ) : currentUser?.appRole === 'coord_maestria_global' ? (
             <ModuleHelpButton helpKey="maestria" onClick={() => navigate('/andres-command-center')} className="home-module-card">
@@ -2590,9 +2435,6 @@ export default function Home() {
             <>
               <ModuleHelpButton helpKey="portafolio" onClick={() => navigate('/portafolio')} className="home-module-card">
                 📈 Portafolio PMO
-              </ModuleHelpButton>
-              <ModuleHelpButton helpKey="estrategia" onClick={() => navigate('/estrategia')} className="home-module-card">
-                🎯 OKRs (Cascade)
               </ModuleHelpButton>
               <ModuleHelpButton helpKey="auditoria" onClick={() => navigate('/auditoria-kpis')} className="home-module-card">
                 📉 Auditoría KPIs
@@ -2659,21 +2501,6 @@ export default function Home() {
           {hasRoleAccess(['coord_maestria_global', 'director_maestria', 'superadmin', 'ceo', 'direccion']) && (
             <ModuleHelpButton helpKey="maestria" onClick={() => navigate('/andres-command-center')} className="home-module-card">
               🌐 Maestría (Andrés)
-            </ModuleHelpButton>
-          )}
-          {hasRoleAccess(['talento_humano', 'rrhh', 'superadmin', 'ceo', 'direccion']) && (
-            <ModuleHelpButton helpKey="talento" onClick={() => navigate('/hr-command-center')} className="home-module-card">
-              🏢 Talento Humano
-            </ModuleHelpButton>
-          )}
-          {hasRoleAccess(['legal', 'juridico', 'superadmin', 'ceo', 'direccion']) && (
-            <ModuleHelpButton helpKey="legal" onClick={() => navigate('/legal-hub')} className="home-module-card">
-              ⚖️ Torre Legal
-            </ModuleHelpButton>
-          )}
-          {hasRoleAccess(['qt', 'gerente', 'superadmin', 'ceo', 'direccion']) && (
-            <ModuleHelpButton helpKey="hubQT" onClick={() => navigate('/qt-hub')} className="home-module-card">
-              ⚡ Hub QT
             </ModuleHelpButton>
           )}
 

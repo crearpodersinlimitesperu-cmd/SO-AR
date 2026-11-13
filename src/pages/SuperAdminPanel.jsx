@@ -1607,20 +1607,11 @@ export default function SuperAdminPanel() {
           <button onClick={() => navigate('/andres-command-center')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.4)', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', fontWeight: 600 }}>
             🌐 Maestría Global (Andrés)
           </button>
-          <button onClick={() => navigate('/hr-command-center')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(167, 139, 250, 0.4)', background: 'rgba(167, 139, 250, 0.1)', color: '#a78bfa', fontWeight: 600 }}>
-            🏢 Talento Humano
-          </button>
-          <button onClick={() => navigate('/legal-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(245, 158, 11, 0.4)', background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', fontWeight: 600 }}>
-            ⚖️ Torre Legal (Pablo Mendieta)
-          </button>
           <button onClick={() => navigate('/cfo-dashboard')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(16, 185, 129, 0.4)', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', fontWeight: 600 }}>
             🏦 Dirección Financiera (CFO)
           </button>
           <button onClick={() => navigate('/finance-workspace')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(52, 211, 153, 0.4)', background: 'rgba(52, 211, 153, 0.1)', color: '#34d399', fontWeight: 600 }}>
             💸 Operativa Finanzas
-          </button>
-          <button onClick={() => navigate('/qt-hub')} className="btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', borderRadius: '8px', border: '1px solid rgba(249, 115, 22, 0.4)', background: 'rgba(249, 115, 22, 0.1)', color: '#f97316', fontWeight: 600 }}>
-            ⚡ Hub Pit-Stop QT
           </button>
 
 
@@ -1876,13 +1867,6 @@ export default function SuperAdminPanel() {
                     Auditoría viva multiequipo: contraste de PX, declaraciones C2, pagos totales (C2 + MJ), desertores y Matriz Histórica de Graduados (E4–E39).
                   </p>
                 </div>
-                <button
-                  onClick={() => navigate('/contraste-nodus')}
-                  className="btn-primary"
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
-                >
-                  Abrir Pantalla Completa ↗
-                </button>
               </div>
               <NodusLiveModulesDashboard />
             </div>

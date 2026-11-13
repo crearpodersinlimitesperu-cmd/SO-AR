@@ -1224,11 +1224,11 @@ export default function AliadosC2AdminPanel({ currentUser }) {
           </div>
         </div>
         <button
-          onClick={() => navigate('/contraste-nodus')}
+          onClick={() => navigate('/auditoria-kpis')}
           className="btn-primary"
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', padding: '0.55rem 1.1rem' }}
         >
-          Abrir Módulo de Contraste ↗
+          Ir a Auditoría de KPIs ↗
         </button>
       </div>
 

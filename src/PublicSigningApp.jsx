@@ -1,6 +1,6 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import OnboardingLegal from './pages/OnboardingLegal'
+import OnboardingLegal from './components/OnboardingLegal'
 
 // Entrada ligera para el link público de firma (/dna, /onboarding-legal): no carga
 // el resto de Causa OS (módulos, contextos de tareas/ciclos), solo lo necesario

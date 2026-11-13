@@ -79,10 +79,10 @@ export default function ManagerGuide() {
           <li>Revisa en tiempo real la sumatoria de "Gestiones Realizadas", el índice de contactabilidad y la salud de las llamadas de los Managers.</li>
         </ol>
         <button 
-          onClick={() => navigate('/estrategia')}
+          onClick={() => navigate('/centro-managers')}
           style={{ padding: '0.8rem 1.5rem', background: 'var(--crear-gold)', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
-          Ir al Tablero de Estrategia <ArrowRight size={18} />
+          Ir al Centro de Managers <ArrowRight size={18} />
         </button>
       </div>
 

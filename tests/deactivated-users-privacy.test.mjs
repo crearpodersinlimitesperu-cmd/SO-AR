@@ -120,7 +120,7 @@ test('Talento Humano activo conserva sus permisos por rol, no por el correo dado
   };
   assert.equal(canViewInactiveUsers(activeHr), true);
   assert.equal(canManageUserStatus(activeHr), true);
-  assert.equal(isModuleVisible(MODULE_REGISTRY.find(module => module.id === 'hr-command-center'), activeHr), true);
+  assert.equal(MODULE_REGISTRY.find(module => module.id === 'hr-command-center'), undefined);
   assert.equal(canViewInactiveUsers({ email: 'talento.humano@crearpsl.net', role: 'colaborador' }), false);
   assert.equal(canManageUserStatus({ email: 'talento.humano@crearpsl.net', role: 'colaborador' }), false);
 });
