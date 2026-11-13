@@ -294,9 +294,8 @@ service cloud.firestore {
       let p = /databases/$(database)/documents/users/$(request.auth.uid);
       let u = exists(p) ? get(p).data : {};
       return !isProfileInactive(u) && (
-        hasProfileRoleFields(u)
-          ? profileExplicitHasAnyRole(u, roleAliasesFor(targetRole))
-          : officialRosterHasRole(targetRole)
+        officialRosterHasRole(targetRole) ||
+        (hasProfileRoleFields(u) && profileExplicitHasAnyRole(u, roleAliasesFor(targetRole)))
       );
     }
 
@@ -308,9 +307,8 @@ service cloud.firestore {
       let p = /databases/$(database)/documents/users/$(request.auth.uid);
       let u = exists(p) ? get(p).data : {};
       return !isProfileInactive(u) && (
-        hasProfileRoleFields(u)
-          ? profileExplicitHasAnyRole(u, roleNames)
-          : officialRosterHasAnyRole(roleNames)
+        officialRosterHasAnyRole(roleNames) ||
+        (hasProfileRoleFields(u) && profileExplicitHasAnyRole(u, roleNames))
       );
     }
 
