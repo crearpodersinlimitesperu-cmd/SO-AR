@@ -141619,6 +141619,13 @@ export default function MonitorMaestriaLima() {
   const [nodusError, setNodusError] = useState(null);
   const [nodusLastSync, setNodusLastSync] = useState(null);
   const fetchedDnisRef = useRef(new Set());
+  const resultsSectionRef = useRef(null);
+
+  const scrollToResults = () => {
+    setTimeout(() => {
+      resultsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 40);
+  };
 
   // Modales y Estados de Acción
   const [qrModalType, setQrModalType] = useState(null); // 'contract' | null
@@ -141965,7 +141972,11 @@ export default function MonitorMaestriaLima() {
     return nodusCrossResult.nodusPadronCross.filter((item) => {
       if (padronTeamFilter !== 'TODOS' && String(item.equipoId) !== String(padronTeamFilter)) return false;
       if (padronRoleFilter !== 'TODOS' && item.rolLabel !== padronRoleFilter) return false;
-      if (padronStatusFilter !== 'TODOS' && item.estadoOperativo !== padronStatusFilter) return false;
+      if (padronStatusFilter === 'EN_NODUS_MAESTRIA') {
+        if (!item.maestriaNodus) return false;
+      } else if (padronStatusFilter !== 'TODOS' && item.estadoOperativo !== padronStatusFilter) {
+        return false;
+      }
       if (padronSearch) {
         const term = normalizeStr(padronSearch);
         const nameNorm = normalizeStr(item.nombre);
@@ -142401,14 +142412,36 @@ export default function MonitorMaestriaLima() {
             paddingTop: '1.25rem',
             borderTop: '1px solid rgba(255, 255, 255, 0.08)'
           }}>
-            <div style={{ background: 'rgba(6, 78, 59, 0.32)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+            <div
+              onClick={() => {
+                setActiveTab('REGISTROS');
+                setRegRoleFilter('TODOS');
+                setRegTeamFilter('TODOS');
+                setRegSearch('');
+                setRegNodusFilter('TODOS');
+                scrollToResults();
+              }}
+              title="Clic para ver todos los contratos firmados"
+              style={{ background: 'rgba(6, 78, 59, 0.32)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)', cursor: 'pointer' }}
+            >
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✓ Contratos Firmados</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '0.15rem' }}>{stats.totalRegistradosFirestore}</div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
                 {stats.totalParticipantes} Part. · {stats.totalManagers} Mgr.{stats.totalOtrosRoles > 0 ? ` · ${stats.totalOtrosRoles} Otros` : ''}
               </div>
             </div>
-            <div style={{ background: '#0b1325', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.35)' }}>
+            <div
+              onClick={() => {
+                setActiveTab('PADRON');
+                setPadronTeamFilter('TODOS');
+                setPadronRoleFilter('TODOS');
+                setPadronSearch('');
+                setPadronStatusFilter('EN_NODUS_MAESTRIA');
+                scrollToResults();
+              }}
+              title="Clic para ver todas las personas con asistencia Maestría en Nodus"
+              style={{ background: '#0b1325', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.35)', cursor: 'pointer' }}
+            >
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#38bdf8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🌐 En Nodus Maestría</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#38bdf8', marginTop: '0.15rem' }}>
                 {nodusLoading ? '...' : stats.totalNodusMaestria}
@@ -142418,7 +142451,14 @@ export default function MonitorMaestriaLima() {
               </div>
             </div>
             <div
-              onClick={() => { setActiveTab('REGISTROS'); setRegNodusFilter('COMPLETO'); }}
+              onClick={() => {
+                setActiveTab('REGISTROS');
+                setRegRoleFilter('TODOS');
+                setRegTeamFilter('TODOS');
+                setRegSearch('');
+                setRegNodusFilter('COMPLETO');
+                scrollToResults();
+              }}
               title="Clic para filtrar los contratos completos"
               style={{ background: 'rgba(16, 185, 129, 0.14)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)', cursor: 'pointer' }}
             >
@@ -142429,7 +142469,14 @@ export default function MonitorMaestriaLima() {
               </div>
             </div>
             <div
-              onClick={() => { setActiveTab('REGISTROS'); setRegNodusFilter('FALTA_CHECKIN_NODUS'); }}
+              onClick={() => {
+                setActiveTab('REGISTROS');
+                setRegRoleFilter('TODOS');
+                setRegTeamFilter('TODOS');
+                setRegSearch('');
+                setRegNodusFilter('FALTA_CHECKIN_NODUS');
+                scrollToResults();
+              }}
               title="Clic para ver quién firmó y falta check-in en Nodus"
               style={{ background: 'rgba(245, 158, 11, 0.16)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.45)', cursor: 'pointer' }}
             >
@@ -142440,7 +142487,14 @@ export default function MonitorMaestriaLima() {
               </div>
             </div>
             <div
-              onClick={() => { setActiveTab('REGISTROS'); setRegNodusFilter('NO_ENCONTRADO_NODUS'); }}
+              onClick={() => {
+                setActiveTab('REGISTROS');
+                setRegRoleFilter('TODOS');
+                setRegTeamFilter('TODOS');
+                setRegSearch('');
+                setRegNodusFilter('NO_ENCONTRADO_NODUS');
+                scrollToResults();
+              }}
               title="Clic para revisar los contratos sin cruce en Nodus"
               style={{ background: 'rgba(148, 163, 184, 0.12)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(148, 163, 184, 0.35)', cursor: 'pointer' }}
             >
@@ -142451,7 +142505,14 @@ export default function MonitorMaestriaLima() {
               </div>
             </div>
             <div
-              onClick={() => { setActiveTab('PADRON'); setPadronStatusFilter('FALTA_FIRMA_CONTRATO'); }}
+              onClick={() => {
+                setActiveTab('PADRON');
+                setPadronTeamFilter('TODOS');
+                setPadronRoleFilter('TODOS');
+                setPadronSearch('');
+                setPadronStatusFilter('FALTA_FIRMA_CONTRATO');
+                scrollToResults();
+              }}
               title="Clic para ver quién está en Nodus sin firmar reglas"
               style={{ background: 'rgba(136, 19, 55, 0.28)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(244, 63, 94, 0.4)', cursor: 'pointer' }}
             >
@@ -142548,7 +142609,7 @@ export default function MonitorMaestriaLima() {
         </div>
 
         {/* SELECTOR DE PESTAÑAS */}
-        <div style={{ display: 'flex', gap: '0.5rem', background: '#091124', padding: '0.4rem', borderRadius: '14px', border: '1px solid #1e293b' }}>
+        <div ref={resultsSectionRef} style={{ display: 'flex', gap: '0.5rem', background: '#091124', padding: '0.4rem', borderRadius: '14px', border: '1px solid #1e293b' }}>
           <button
             onClick={() => setActiveTab('REGISTROS')}
             style={{
@@ -143176,6 +143237,7 @@ export default function MonitorMaestriaLima() {
                 <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' }}>Cruce Operativo:</span>
                 {[
                   { id: 'TODOS', label: 'Todos' },
+                  { id: 'EN_NODUS_MAESTRIA', label: '🌐 En Nodus Maestría' },
                   { id: 'COMPLETO', label: '✅ Completo (Firma + Nodus)' },
                   { id: 'FALTA_CHECKIN_NODUS', label: '⚠️ Firmó · Falta Check-in Nodus' },
                   { id: 'FALTA_FIRMA_CONTRATO', label: '🚨 En Nodus · Falta Firma Contrato' },
