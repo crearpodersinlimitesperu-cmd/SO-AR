@@ -182981,6 +182981,12 @@ export default function ContratoMaestriaLima() {
         codigo: verificationCode
       });
 
+      const checkinInfo = getLimaMaestriaCheckinInfo(formData.equipoCohorte);
+      if (checkinInfo?.url) {
+        window.location.assign(checkinInfo.url);
+        return;
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error('Error al registrar firma de Maestría:', err);
