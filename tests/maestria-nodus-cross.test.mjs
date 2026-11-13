@@ -124,3 +124,50 @@ test('buildMaestriaNodusCross cruza contratos firmados con Nodus para participan
   assert.equal(result.summary.totalFaltaFirmaContrato, 1);
   assert.equal(result.summary.totalNoEncontradoNodus, 1);
 });
+
+test('buildMaestriaNodusCross resuelve rezagados vía nodusByDni exhaustivo y etapas', () => {
+  const result = buildMaestriaNodusCross({
+    signedContracts: [
+      {
+        id: 'c-rezagado',
+        nombre: 'JULIA CESARIA ROMERO ALARCON',
+        numeroDocumento: '09519791',
+        email: 'julia@test.com',
+        rol: 'Participante',
+        equipo: 'Equipo 30 — Tinkuy Ruray'
+      }
+    ],
+    nodusEquipos: MOCK_EQUIPOS,
+    nodusRosterByTeam: { 134: [], 141: [], 149: [] },
+    nodusByDni: {
+      '09519791': {
+        id: 888,
+        identificacion: '09519791',
+        nombres: 'JULIA CESARIA',
+        apellidos: 'ROMERO ALARCON',
+        email: 'julia@test.com',
+        tipo_persona: 'participante',
+        sede: { id: 7, nombre: 'LIMA CICLO 1' },
+        equipo_actual: { id: 134, nombre: 'EQUIPO 30' },
+        capitulo1: true,
+        capitulo2: true,
+        maestria: true,
+        etapas: [
+          { equipo: 'EQUIPO 21', etapa: 'PFD', tipo: 'px', asistio: true, desertor: false, fecha_registro: '2026-08-01' },
+          { equipo: 'EQUIPO 30', etapa: 'TFD', tipo: 'px', asistio: true, desertor: false, fecha_registro: '2026-11-13' }
+        ]
+      }
+    }
+  });
+
+  const c = result.enrichedContracts[0];
+  assert.equal(c.nodusCross.matched, true);
+  assert.equal(c.nodusCross.matchBy, 'DNI');
+  assert.equal(c.nodusCross.estadoCruce, 'COMPLETO');
+  assert.equal(c.nodusCross.fdsVigente, 'TFD');
+  assert.equal(c.nodusCross.nodusTeamId, 134);
+  assert.equal(c.nodusCross.exhaustiveLookup, true);
+  assert.equal(c.nodusCross.etapas.length, 2);
+  assert.equal(result.summary.totalCompletos, 1);
+  assert.equal(result.summary.totalNoEncontradoNodus, 0);
+});

@@ -2,6 +2,11 @@ name: Deploy authenticated Nodus JSON Worker
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'cloudflare-worker/**'
 
 permissions:
   contents: read

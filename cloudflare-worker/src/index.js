@@ -611,6 +611,98 @@ async function handleNodusJson(request, env, origin, path) {
       }, 200, origin);
     }
 
+    if (path === '/nodus-json/participante') {
+      const body = await request.json().catch(() => ({}));
+      const identificacion = String(body?.identificacion || '').trim();
+      if (!identificacion) {
+        return json({ error: 'invalid-argument', message: 'Debes indicar el número de documento (identificacion).' }, 400, origin);
+      }
+      try {
+        const res = await client.getParticipante(identificacion);
+        if (scope.type === 'sede' && res?.data?.sede?.id) {
+          const allowed = visibleSedes.some((s) => Number(s.id) === Number(res.data.sede.id));
+          if (!allowed) {
+            return json({ error: 'permission-denied', message: 'El participante pertenece a una sede fuera de tu alcance.' }, 403, origin);
+          }
+        }
+        return json({
+          ok: true,
+          source: res.source,
+          participante: res.data,
+          meta: res.meta,
+          retrievedAt: res.retrievedAt
+        }, 200, origin);
+      } catch (lookupErr) {
+        if (lookupErr?.status === 404 || lookupErr?.code === 'not_found') {
+          return json({ ok: false, notFound: true, identificacion }, 200, origin);
+        }
+        throw lookupErr;
+      }
+    }
+
+    if (path === '/nodus-json/maestria-lima') {
+      if (scope.type === 'sede') {
+        const hasLima = visibleSedes.some((s) => Number(s.id) === 7 || String(s.nombre || '').toLowerCase().includes('lima'));
+        if (!hasLima) {
+          return json({ error: 'permission-denied', message: 'Tu cuenta no tiene acceso a la sede Lima en Nodus.' }, 403, origin);
+        }
+      }
+      const body = await request.json().catch(() => ({}));
+      const rawDnis = Array.isArray(body?.dnis) ? body.dnis : [];
+      const uniqueDnis = [...new Set(rawDnis.map((d) => String(d || '').trim()).filter(Boolean))].slice(0, 150);
+
+      const equiposRes = await client.getEquipos({ sedeId: 7, activeOnly: true });
+      const equipos = Array.isArray(equiposRes?.data) ? equiposRes.data : [];
+      const maestriaTeams = equipos.filter((eq) => {
+        const etapa = String(eq?.etapa_vigente || '').toUpperCase().trim();
+        return etapa === 'PFD' || etapa === 'SFD' || etapa === 'TFD';
+      });
+
+      const rosterByTeam = {};
+      await Promise.all(
+        maestriaTeams.map(async (eq) => {
+          try {
+            const rosterRes = await client.getParticipantes(eq.id);
+            const list = Array.isArray(rosterRes?.data?.participantes)
+              ? rosterRes.data.participantes
+              : Array.isArray(rosterRes?.data)
+                ? rosterRes.data
+                : [];
+            rosterByTeam[String(eq.id)] = list;
+          } catch {
+            rosterByTeam[String(eq.id)] = [];
+          }
+        })
+      );
+
+      const participantesByDni = {};
+      const BATCH_SIZE = 15;
+      for (let i = 0; i < uniqueDnis.length; i += BATCH_SIZE) {
+        const chunk = uniqueDnis.slice(i, i + BATCH_SIZE);
+        await Promise.all(
+          chunk.map(async (dni) => {
+            try {
+              const pRes = await client.getParticipante(dni);
+              if (pRes?.data) {
+                participantesByDni[dni] = pRes.data;
+              }
+            } catch {
+              // Not found or transient lookup miss for this DNI
+            }
+          })
+        );
+      }
+
+      return json({
+        ok: true,
+        source: equiposRes.source,
+        retrievedAt: equiposRes.retrievedAt,
+        equipos,
+        rosterByTeam,
+        participantesByDni
+      }, 200, origin);
+    }
+
     let body;
     try {
       body = await request.json();
@@ -1494,7 +1586,7 @@ export default {
     if (url.pathname === '/calendar-assignments') {
       return handleCalendarAssignments(request, env, origin);
     }
-    if (url.pathname === '/nodus-json/catalog' || url.pathname === '/nodus-json/team-metrics') {
+    if (url.pathname === '/nodus-json/catalog' || url.pathname === '/nodus-json/team-metrics' || url.pathname === '/nodus-json/maestria-lima' || url.pathname === '/nodus-json/participante') {
       return handleNodusJson(request, env, origin, url.pathname);
     }
 

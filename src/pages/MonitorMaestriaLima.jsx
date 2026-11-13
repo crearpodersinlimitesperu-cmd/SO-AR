@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Crown,
@@ -25,12 +25,13 @@ import {
 } from 'lucide-react';
 import { collection, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
 import toast from 'react-hot-toast';
-import { db } from '../services/firebase';
-import { getLiveNodusEquipos, getLiveNodusParticipantes } from '../services/nodusLiveApiService';
+import { db, auth } from '../services/firebase';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
 import { deduplicateSignedContracts } from '../utils/limaContractUniqueness';
 import { buildMaestriaNodusCross, selectActiveLimaMaestriaTeams } from '../utils/maestriaNodusCross';
+
+const NODUS_WORKER_BASE = 'https://so-ar-copiloto.crearpsl-cpsl.workers.dev';
 
 export default function MonitorMaestriaLima() {
   const navigate = useNavigate();
@@ -50,12 +51,15 @@ export default function MonitorMaestriaLima() {
   const [padronRoleFilter, setPadronRoleFilter] = useState('TODOS');
   const [padronStatusFilter, setPadronStatusFilter] = useState('TODOS');
 
-  // Estado Integración en Vivo Nodus (/api/equipos + /api/participantes/{id})
+  // Estado Integración en Vivo Nodus (/nodus-json/maestria-lima + /nodus-json/participante vía Worker)
   const [nodusEquipos, setNodusEquipos] = useState([]);
   const [nodusRosterByTeam, setNodusRosterByTeam] = useState({});
+  const [nodusByDni, setNodusByDni] = useState({});
+  const [searchingDniNodus, setSearchingDniNodus] = useState(false);
   const [nodusLoading, setNodusLoading] = useState(true);
   const [nodusError, setNodusError] = useState(null);
   const [nodusLastSync, setNodusLastSync] = useState(null);
+  const fetchedDnisRef = useRef(new Set());
 
   // Modales y Estados de Acción
   const [qrModalType, setQrModalType] = useState(null); // 'contract' | null
@@ -151,27 +155,44 @@ export default function MonitorMaestriaLima() {
     }
   }, []);
 
-  // Sincronización en vivo con Nodus API (Equipos activos de Lima en PFD/SFD/TFD + Rosters)
-  const syncNodusLive = async ({ manual = false } = {}) => {
+  // Sincronización exhaustiva en vivo con Nodus vía Cloudflare Worker (Equipos + Rosters + Búsqueda por DNI)
+  const syncNodusLive = async ({ manual = false, contractsList = signedContracts } = {}) => {
+    const user = auth?.currentUser;
+    if (!user) return;
     setNodusLoading(true);
     setNodusError(null);
     try {
-      const eqRes = await getLiveNodusEquipos({ enActividad: true });
-      if (!eqRes.ok || !Array.isArray(eqRes.data)) {
-        throw new Error(eqRes.error || 'No se pudo consultar equipos en Nodus');
+      const idToken = await user.getIdToken();
+      const dnis = [...new Set(
+        (Array.isArray(contractsList) ? contractsList : [])
+          .map((c) => String(c.numeroDocumento || c.doc || '').trim())
+          .filter((d) => d.length >= 5)
+      )];
+      dnis.forEach((d) => fetchedDnisRef.current.add(d));
+
+      const resp = await fetch(`${NODUS_WORKER_BASE}/nodus-json/maestria-lima`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ dnis })
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok || !data?.ok) {
+        throw new Error(data?.message || data?.error || `HTTP ${resp.status} consultando Nodus`);
       }
-      const activeLima = selectActiveLimaMaestriaTeams(eqRes.data);
-      const rosterEntries = await Promise.all(
-        activeLima.map(async (eq) => {
-          const r = await getLiveNodusParticipantes(eq.id);
-          return [eq.id, r.ok && Array.isArray(r.participantes) ? r.participantes : []];
-        })
-      );
-      setNodusEquipos(eqRes.data);
-      setNodusRosterByTeam(Object.fromEntries(rosterEntries));
+
+      const equipos = Array.isArray(data.equipos) ? data.equipos : [];
+      const activeLima = selectActiveLimaMaestriaTeams(equipos);
+      setNodusEquipos(equipos);
+      setNodusRosterByTeam(data.rosterByTeam && typeof data.rosterByTeam === 'object' ? data.rosterByTeam : {});
+      if (data.participantesByDni && typeof data.participantesByDni === 'object') {
+        setNodusByDni((prev) => ({ ...prev, ...data.participantesByDni }));
+      }
       setNodusLastSync(new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
       if (manual) {
-        toast.success(`Nodus sincronizado (${activeLima.length} equipos activos de Maestría Lima)`);
+        toast.success(`Nodus sincronizado (${activeLima.length} equipos Lima + ${Object.keys(data.participantesByDni || {}).length} DNIs verificados)`);
       }
     } catch (err) {
       const msg = err?.message || 'Error consultando API de Nodus';
@@ -184,9 +205,65 @@ export default function MonitorMaestriaLima() {
     }
   };
 
+  const searchSingleDniInNodus = async (rawDni) => {
+    const dni = String(rawDni || '').trim();
+    const user = auth?.currentUser;
+    if (!dni || !user) return;
+    setSearchingDniNodus(true);
+    try {
+      const idToken = await user.getIdToken();
+      const resp = await fetch(`${NODUS_WORKER_BASE}/nodus-json/participante`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ identificacion: dni })
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        throw new Error(data?.message || data?.error || `HTTP ${resp.status}`);
+      }
+      if (data?.notFound || !data?.participante) {
+        toast.error(`DNI ${dni} no existe en Nodus.`);
+        return;
+      }
+      fetchedDnisRef.current.add(dni);
+      setNodusByDni((prev) => ({ ...prev, [dni]: data.participante }));
+      const p = data.participante;
+      toast.success(`Encontrado en Nodus: ${p.nombres || ''} ${p.apellidos || ''} (${p.equipo_actual?.nombre || 'Nodus'})`);
+    } catch (err) {
+      toast.error(`Error buscando DNI ${dni} en Nodus: ${err?.message || 'Error'}`);
+    } finally {
+      setSearchingDniNodus(false);
+    }
+  };
+
   useEffect(() => {
-    syncNodusLive();
+    const unsub = auth?.onAuthStateChanged?.((user) => {
+      if (user) {
+        syncNodusLive({ contractsList: signedContracts });
+      }
+    });
+    if (auth?.currentUser) {
+      syncNodusLive({ contractsList: signedContracts });
+    }
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
   }, []);
+
+  // Re-sincronizar DNIs nuevos si llegan contratos desde Firestore después del sync inicial
+  useEffect(() => {
+    if (!auth?.currentUser || signedContracts.length === 0) return;
+    const hasUnfetched = signedContracts.some((c) => {
+      const d = String(c.numeroDocumento || c.doc || '').trim();
+      return d.length >= 5 && !fetchedDnisRef.current.has(d);
+    });
+    if (hasUnfetched) {
+      syncNodusLive({ contractsList: signedContracts });
+    }
+  }, [signedContracts]);
 
   // Cruce integral en vivo: Contratos Firmados (Firestore) <-> Padrón y Asistencia Maestría (Nodus)
   const nodusCrossResult = useMemo(
@@ -194,9 +271,10 @@ export default function MonitorMaestriaLima() {
       buildMaestriaNodusCross({
         signedContracts,
         nodusEquipos,
-        nodusRosterByTeam
+        nodusRosterByTeam,
+        nodusByDni
       }),
-    [signedContracts, nodusEquipos, nodusRosterByTeam]
+    [signedContracts, nodusEquipos, nodusRosterByTeam, nodusByDni]
   );
 
   // Indicadores Ejecutivos para Oficina Lima
@@ -1334,26 +1412,47 @@ export default function MonitorMaestriaLima() {
               flexDirection: 'column',
               gap: '0.75rem'
             }}>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="text"
-                  value={padronSearch}
-                  onChange={(e) => setPadronSearch(e.target.value)}
-                  placeholder="🔍 Buscar en Padrón Vivo Nodus Lima por nombre, DNI, correo, coordinador, equipo o rol..."
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem 0.75rem 2.6rem',
-                    background: '#050811',
-                    border: '1px solid #334155',
-                    borderRadius: '10px',
-                    color: '#fff',
-                    fontSize: '0.86rem',
-                    fontWeight: 600,
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-                <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <div style={{ position: 'relative', flex: 1 }}>
+                  <input
+                    type="text"
+                    value={padronSearch}
+                    onChange={(e) => setPadronSearch(e.target.value)}
+                    placeholder="🔍 Buscar en Padrón Vivo Nodus Lima por nombre, DNI, correo, coordinador, equipo o rol..."
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 1rem 0.75rem 2.6rem',
+                      background: '#050811',
+                      border: '1px solid #334155',
+                      borderRadius: '10px',
+                      color: '#fff',
+                      fontSize: '0.86rem',
+                      fontWeight: 600,
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  <Search size={16} color="#64748b" style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                </div>
+                {padronSearch.trim().length >= 5 && (
+                  <button
+                    onClick={() => searchSingleDniInNodus(padronSearch.trim())}
+                    disabled={searchingDniNodus}
+                    style={{
+                      background: 'rgba(14, 165, 233, 0.2)',
+                      color: '#38bdf8',
+                      border: '1px solid rgba(56, 189, 248, 0.45)',
+                      borderRadius: '10px',
+                      padding: '0.72rem 1rem',
+                      fontSize: '0.8rem',
+                      fontWeight: 800,
+                      cursor: searchingDniNodus ? 'wait' : 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {searchingDniNodus ? 'Buscando en Nodus...' : '🔎 Buscar DNI en todo Nodus'}
+                  </button>
+                )}
               </div>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'space-between', alignItems: 'center' }}>

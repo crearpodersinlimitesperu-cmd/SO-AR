@@ -86,7 +86,8 @@ function findContractForNodusPerson(person, signedContracts) {
 export function buildMaestriaNodusCross({
   signedContracts = [],
   nodusEquipos = [],
-  nodusRosterByTeam = {}
+  nodusRosterByTeam = {},
+  nodusByDni = {}
 } = {}) {
   const activeTeams = selectActiveLimaMaestriaTeams(nodusEquipos);
 
@@ -132,7 +133,9 @@ export function buildMaestriaNodusCross({
         desertorC1,
         pagadoC2,
         maestriaNodus,
-        checkinUrl: checkinInfo?.url || null
+        checkinUrl: checkinInfo?.url || null,
+        etapas: [],
+        exhaustiveLookup: false
       };
 
       allNodusEntries.push(entry);
@@ -140,6 +143,87 @@ export function buildMaestriaNodusCross({
       if (emailNorm.includes('@') && !byEmail.has(emailNorm)) byEmail.set(emailNorm, entry);
       if (nameNorm && !byName.has(nameNorm)) byName.set(nameNorm, entry);
     }
+  }
+
+  // 0.5 Fusionar resultados de búsqueda exhaustiva por DNI (/api/participante?identificacion=...)
+  for (const [rawKey, p] of Object.entries(nodusByDni || {})) {
+    if (!p || typeof p !== 'object') continue;
+    const docNorm = normalizeNodusDoc(p.identificacion || rawKey);
+    if (docNorm.length < 5) continue;
+
+    const etapas = Array.isArray(p.etapas) ? p.etapas : [];
+    const equipoObj = p.equipo_actual && typeof p.equipo_actual === 'object' ? p.equipo_actual : null;
+    const matchedActiveTeam =
+      activeTeams.find((eq) => {
+        if (equipoObj?.id && Number(eq.id) === Number(equipoObj.id)) return true;
+        const eqNum = extractTeamNumber(eq.nombre);
+        const pNum = extractTeamNumber(equipoObj?.nombre);
+        if (eqNum && pNum && eqNum === pNum) return true;
+        return etapas.some(
+          (e) =>
+            extractTeamNumber(e?.equipo) === eqNum &&
+            String(e?.etapa || '').toUpperCase().trim() === String(eq.etapa_vigente || '').toUpperCase().trim()
+        );
+      }) || null;
+
+    const activeFdsEtapa = matchedActiveTeam
+      ? etapas.find(
+          (e) =>
+            String(e?.etapa || '').toUpperCase().trim() === String(matchedActiveTeam.etapa_vigente || '').toUpperCase().trim() &&
+            (!extractTeamNumber(e?.equipo) || extractTeamNumber(e?.equipo) === extractTeamNumber(matchedActiveTeam.nombre))
+        )
+      : null;
+
+    const anyMaestriaAsistio = etapas.some(
+      (e) => ACTIVE_MAESTRIA_FDS.has(String(e?.etapa || '').toUpperCase().trim()) && Boolean(e?.asistio) && !e?.desertor
+    );
+    const maestriaFlag = Boolean(p.maestria || p.capitulo2?.maestria || activeFdsEtapa?.asistio || anyMaestriaAsistio);
+
+    const existing = byDoc.get(docNorm);
+    if (existing) {
+      existing.etapas = etapas.length > 0 ? etapas : existing.etapas;
+      existing.exhaustiveLookup = true;
+      existing.maestriaNodus = existing.maestriaNodus || maestriaFlag;
+      continue;
+    }
+
+    const fullName = `${p.nombres || ''} ${p.apellidos || ''}`.replace(/\s+/g, ' ').trim() || p.nombre_preferido || 'Sin nombre';
+    const emailNorm = normalizeNodusEmail(p.email);
+    const nameNorm = normalizeNodusText(fullName);
+    const resolvedTeamName = matchedActiveTeam?.nombre || equipoObj?.nombre || (etapas[etapas.length - 1]?.equipo) || 'Nodus';
+    const resolvedFds = matchedActiveTeam?.etapa_vigente || (etapas[etapas.length - 1]?.etapa) || 'MAESTRIA';
+    const checkinInfo = getLimaMaestriaCheckinInfo(resolvedTeamName);
+
+    const entry = {
+      nodusId: p.id || null,
+      identificacion: p.identificacion || rawKey,
+      docNorm,
+      nombre: fullName,
+      nombrePreferido: p.nombre_preferido || '',
+      email: p.email || '',
+      emailNorm,
+      telefono: p.telefono || '',
+      tipoPersona: p.tipo_persona || 'participante',
+      rolLabel: formatRoleLabel(p.tipo_persona),
+      coordinador: p.coordinador || '',
+      equipoId: matchedActiveTeam?.id || equipoObj?.id || null,
+      equipoNombre: resolvedTeamName,
+      equipoNum: extractTeamNumber(resolvedTeamName),
+      sede: p.sede?.nombre || matchedActiveTeam?.sede || 'LIMA CICLO 1',
+      fdsVigente: String(resolvedFds).toUpperCase().trim(),
+      asistioC1: typeof p.capitulo1 === 'boolean' ? p.capitulo1 : Boolean(p.capitulo1?.asistio),
+      desertorC1: Boolean(p.capitulo1?.desertor),
+      pagadoC2: typeof p.capitulo2 === 'boolean' ? p.capitulo2 : Boolean(p.capitulo2?.pagado),
+      maestriaNodus: maestriaFlag,
+      checkinUrl: checkinInfo?.url || null,
+      etapas,
+      exhaustiveLookup: true
+    };
+
+    allNodusEntries.push(entry);
+    byDoc.set(docNorm, entry);
+    if (emailNorm.includes('@') && !byEmail.has(emailNorm)) byEmail.set(emailNorm, entry);
+    if (nameNorm && !byName.has(nameNorm)) byName.set(nameNorm, entry);
   }
 
   // 1. Cruzar cada contrato firmado en Causa OS contra Nodus en vivo
@@ -200,6 +284,8 @@ export function buildMaestriaNodusCross({
         pagadoC2: Boolean(matched?.pagadoC2),
         maestriaNodus: Boolean(matched?.maestriaNodus),
         checkinUrl: matched?.checkinUrl || fallbackCheckin?.url || null,
+        etapas: matched?.etapas || [],
+        exhaustiveLookup: Boolean(matched?.exhaustiveLookup),
         estadoCruce
       }
     };
