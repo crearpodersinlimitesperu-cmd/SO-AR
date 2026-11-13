@@ -303,6 +303,61 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']
   },
   {
+    id: 'opt-video-c2-imo',
+    title: '🎬 Video Reel Dinámico C2 IMO (Audio & Studio)',
+    category: 'Herramienta HD',
+    badge: 'Reel + Audio',
+    emoji: '🎬',
+    desc: 'Estudio de Video Reel C2 para IMOs con soundtrack, audio y exportación en alta definición.',
+    keywords: ['reel', 'video', 'audio', 'soundtrack', 'musica', 'imo', 'c2', 'studio', 'vuelos', 'video c2'],
+    route: '/video-c2-imo',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']
+  },
+  {
+    id: 'opt-aliados-c1',
+    title: '📘 Aliados C1 (Guía & Accesos)',
+    category: 'Control Operativo',
+    badge: 'Staff C1',
+    emoji: '📘',
+    desc: 'Guía, accesos, bitácora y control operativo de Aliados C1.',
+    keywords: ['aliados', 'aliados c1', 'c1', 'guia', 'accesos', 'registro'],
+    route: '/superadmin?tab=aliados_c1',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+  },
+  {
+    id: 'opt-aliados-c2',
+    title: '🛡️ Aliados C2 (Guía & Accesos)',
+    category: 'Control Operativo',
+    badge: 'Staff C2',
+    emoji: '🛡️',
+    desc: 'Guía, accesos, vigencia y control operativo de Aliados C2.',
+    keywords: ['aliados', 'aliados c2', 'c2', 'guia', 'accesos', 'vigencia'],
+    route: '/superadmin?tab=aliados_c2',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+  },
+  {
+    id: 'opt-staff-mesa',
+    title: '📋 Staff de Mesa (Guía & Accesos)',
+    category: 'Control Operativo',
+    badge: 'Conexiones & Checklist',
+    emoji: '📋',
+    desc: 'Guía, accesos, cantidad de conexiones, última conexión, checklist y alertas de Staff de Mesa.',
+    keywords: ['staff', 'staff de mesa', 'mesa', 'conexiones', 'ultima conexion', 'guia', 'accesos', 'checklist', 'escudo'],
+    route: '/superadmin?tab=staff_mesa',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+  },
+  {
+    id: 'opt-monitor-maestria-lima',
+    title: '👑 Maestría Lima (Nodus + Reglas)',
+    category: 'Supervisión Lima',
+    badge: 'En Vivo Nodus',
+    emoji: '👑',
+    desc: 'Panel independiente de Maestría Lima: firmas legales y cruce en vivo con Nodus por FDS (PFD/SFD/TFD).',
+    keywords: ['maestria', 'lima', 'nodus', 'reglas', 'pfd', 'sfd', 'tfd', 'asistencia', 'contratos', 'checkin'],
+    route: '/monitor-maestria-lima',
+    roles: ['gerente', 'coordinador_mj', 'coord_maestria', 'coordinacion', 'oficina', 'contabilidad', 'contador', 'finanzas', 'facturacion', 'legal', 'juridico', 'director_maestria', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+  },
+  {
     id: 'opt-new-task',
     title: 'Crear Nueva Tarea (+ TAREA)',
     category: 'Acción Rápida',
