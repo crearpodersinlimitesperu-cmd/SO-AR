@@ -352,9 +352,15 @@ export default function MonitorMaestriaLima() {
     const pendientesPadron = nodusPadronCross.filter((p) => !p.isSigned).length;
     const porcentaje = totalPadron > 0 ? Math.round((firmadosPadron / totalPadron) * 100) : 0;
     const totalRegistradosFirestore = signedContracts.length;
-    const totalParticipantes = signedContracts.filter((c) => (c.rol || c.rolActividad || '').toLowerCase().includes('participante')).length;
-    const totalManagers = signedContracts.filter((c) => (c.rol || c.rolActividad || '').toLowerCase().includes('manager')).length;
-    const totalOtrosRoles = Math.max(0, totalRegistradosFirestore - totalParticipantes - totalManagers);
+    const totalParticipantes = signedContracts.filter((c) => normalizeStr(c.rol || c.rolActividad || '').includes('participante')).length;
+    const totalManagers = signedContracts.filter((c) => normalizeStr(c.rol || c.rolActividad || '').includes('manager')).length;
+    const totalCapitanes = signedContracts.filter((c) => normalizeStr(c.rol || c.rolActividad || '').includes('capitan')).length;
+    const totalStaff = signedContracts.filter((c) => {
+      const r = normalizeStr(c.rol || c.rolActividad || '');
+      return r.includes('staff') || r.includes('oficina');
+    }).length;
+    const totalEntrenadores = signedContracts.filter((c) => normalizeStr(c.rol || c.rolActividad || '').includes('entrenador')).length;
+    const totalOtrosRestantes = Math.max(0, totalRegistradosFirestore - totalParticipantes - totalManagers - totalCapitanes - totalStaff - totalEntrenadores);
     const totalNodusParticipantes = Math.max(0, (summary.totalNodusMaestria || 0) - (summary.totalNodusManagers || 0));
 
     return {
@@ -365,7 +371,10 @@ export default function MonitorMaestriaLima() {
       totalRegistradosFirestore,
       totalParticipantes,
       totalManagers,
-      totalOtrosRoles,
+      totalCapitanes,
+      totalStaff,
+      totalEntrenadores,
+      totalOtrosRestantes,
       totalNodusParticipantes,
       ...summary
     };
@@ -868,7 +877,11 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✓ Contratos Firmados</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '0.15rem' }}>{stats.totalRegistradosFirestore}</div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                {stats.totalParticipantes} Part. · {stats.totalManagers} Mgr.{stats.totalOtrosRoles > 0 ? ` · ${stats.totalOtrosRoles} Otros` : ''}
+                {stats.totalParticipantes} Part. · {stats.totalManagers} Mgr.
+                {stats.totalCapitanes > 0 ? ` · ${stats.totalCapitanes} Capitán` : ''}
+                {stats.totalStaff > 0 ? ` · ${stats.totalStaff} Staff` : ''}
+                {stats.totalEntrenadores > 0 ? ` · ${stats.totalEntrenadores} Entrenador` : ''}
+                {stats.totalOtrosRestantes > 0 ? ` · ${stats.totalOtrosRestantes} Sin rol` : ''}
               </div>
             </div>
             <div
