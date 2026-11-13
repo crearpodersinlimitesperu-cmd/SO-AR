@@ -94457,6 +94457,49 @@ export const ACTIVE_MG_COHORT_TEAMS = new Set([
   'Equipo 29'
 ]);
 
+/**
+ * Asignaciones operativas confirmadas en sala por Dirección (Casona Blanca 12/11/2026).
+ * Cualquier cambio manual posterior en `control_asistencia_fuego_lima` sigue teniendo prioridad.
+ */
+export const CONFIRMED_SALA_OVERRIDES_BY_DOC = {
+  '40900527': {
+    autoEquipo: 'Equipo 30',
+    autoCategoria: 'MG',
+    rolSubgrupo: 'Manager',
+    forensicNote: 'Confirmado en sala: Manager Equipo 30'
+  },
+  '09678253': {
+    autoEquipo: 'Staff',
+    autoCategoria: 'Staff',
+    rolSubgrupo: 'Staff de Caminata',
+    forensicNote: 'Confirmado en sala: Staff de Caminata'
+  },
+  '40801629': {
+    autoEquipo: 'Staff',
+    autoCategoria: 'Staff',
+    rolSubgrupo: 'Staff de Caminata',
+    forensicNote: 'Confirmado en sala: Staff de Caminata'
+  },
+  '09733343': {
+    autoEquipo: 'Staff',
+    autoCategoria: 'Staff',
+    rolSubgrupo: 'Staff de Caminata',
+    forensicNote: 'Confirmado en sala: Staff de Caminata'
+  },
+  '41240530': {
+    autoEquipo: 'Staff',
+    autoCategoria: 'Staff',
+    rolSubgrupo: 'Staff de Caminata',
+    forensicNote: 'Confirmado en sala: Staff de Caminata'
+  },
+  '10618858': {
+    autoEquipo: 'Staff',
+    autoCategoria: 'Staff',
+    rolSubgrupo: 'Staff de Caminata',
+    forensicNote: 'Confirmado en sala: Staff de Caminata'
+  }
+};
+
 export function canonicalizeEquipoName(rawEquipo) {
   const s = String(rawEquipo || '').trim();
   if (!s) return '';
@@ -94530,6 +94573,21 @@ function getUniqueTokens(str) {
  * 4. Para Managers (`MG`), el Padrón estático nunca asigna una fila cuyo rol sea `"Participante"`.
  */
 export function resolveAutoTeamMatch(record, { padronList = [], capitanesList = [], nodusIndex = null } = {}) {
+  const normDoc = normalizeLimaDocNumber(
+    record.numeroDocumentoNorm || record.numeroDocumento || record.doc || ''
+  );
+  if (normDoc && CONFIRMED_SALA_OVERRIDES_BY_DOC[normDoc]) {
+    const ov = CONFIRMED_SALA_OVERRIDES_BY_DOC[normDoc];
+    return {
+      autoEquipo: ov.autoEquipo,
+      autoCategoria: ov.autoCategoria,
+      rolSubgrupo: ov.rolSubgrupo || '',
+      source: 'CONFIRMADO_SALA',
+      graduadoRef: '',
+      forensicNote: ov.forensicNote || ''
+    };
+  }
+
   const defaultCat = deriveDefaultCategoriaFromRol(record.rol || record.rolActividad);
   if (defaultCat === 'Aliados') {
     return { autoEquipo: 'Aliados', autoCategoria: 'Aliados', source: 'AUTO_ROL', graduadoRef: '', forensicNote: '' };
@@ -94538,9 +94596,6 @@ export function resolveAutoTeamMatch(record, { padronList = [], capitanesList = 
     return { autoEquipo: 'Staff', autoCategoria: 'Staff', source: 'AUTO_ROL', graduadoRef: '', forensicNote: '' };
   }
 
-  const normDoc = normalizeLimaDocNumber(
-    record.numeroDocumentoNorm || record.numeroDocumento || record.doc || ''
-  );
   const normName = normalizeLimaPersonName(record.nombre || record.nombreCompleto || '');
   const normFirma = normalizeLimaPersonName(
     record.firma && record.firma !== 'undefined' ? record.firma : ''
@@ -94819,6 +94874,7 @@ export function buildEnrichedFirewalkRoster({
       documentoDisplay: contract.numeroDocumento || contract.doc || '—',
       tipoDocDisplay: contract.tipoDocumento || 'DNI',
       rolOriginal: contract.rol || contract.rolActividad || 'Participante',
+      rolSubgrupo: autoMatch.rolSubgrupo || '',
       categoriaReporte,
       equipoAsignado,
       equipoSource,
@@ -95008,7 +95064,7 @@ export function computeFirewalkAttendanceSummary(
       if (r.asistio) staffAsist += 1;
       teamBucket.staffReg += 1;
       if (r.asistio) teamBucket.staffAsist += 1;
-      const subRol = r.rolOriginal || 'Staff';
+      const subRol = r.rolSubgrupo || r.rolOriginal || 'Staff';
       if (!staffBySubRole[subRol]) staffBySubRole[subRol] = { reg: 0, asist: 0 };
       staffBySubRole[subRol].reg += 1;
       if (r.asistio) staffBySubRole[subRol].asist += 1;
@@ -161976,6 +162032,8 @@ export default function MonitorAcreditacionFuegoLima() {
                             <span style={{ fontSize: '0.63rem', color: '#94a3b8', fontWeight: 700 }}>
                               [{item.equipoSource === 'MANUAL'
                                 ? 'Asignado'
+                                : item.equipoSource === 'CONFIRMADO_SALA'
+                                ? 'Confirmado Sala'
                                 : item.equipoSource === 'AUTO_NODUS_MG'
                                 ? 'Nodus: Rol MG'
                                 : item.equipoSource === 'AUTO_NODUS_TEL'

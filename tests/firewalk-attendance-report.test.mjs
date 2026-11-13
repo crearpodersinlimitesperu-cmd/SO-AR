@@ -159,7 +159,7 @@ test('Forensic safeguards: Nodus DNI precedence over surname homonyms, MG auto-c
         }
       ],
       [
-        '10618858',
+        '99918858',
         {
           equipoActual: 'GRADUADOS',
           etapas: []
@@ -186,13 +186,16 @@ test('Forensic safeguards: Nodus DNI precedence over surname homonyms, MG auto-c
     // 3. Firmó Participante por defecto pero es Manager de E30 en Nodus etapas
     { id: '3', nombre: 'Pilco Laura', firma: 'Ruth yesly pilco Laura', numeroDocumento: '73132527', rol: 'Participante' },
     // 4. Graduado histórico que firmó Participante: no debe inflar Px
-    { id: '4', nombre: 'Manuel Francisco Vivanco Saavedra', numeroDocumento: '10618858', rol: 'Participante' },
-    // 5. Error de 1 dígito en DNI (40900527 vs 40900526), recuperado por celular exacto + nombre
-    { id: '5', nombre: 'Edith Ruth pillaca huamani', numeroDocumento: '40900527', telefono: '987165681', rol: 'Participante' },
+    { id: '4', nombre: 'Graduado Historico Ejemplo', numeroDocumento: '99918858', rol: 'Participante' },
+    // 5. Error de 1 dígito en DNI, recuperado por celular exacto + nombre
+    { id: '5', nombre: 'Edith Pillaca Huamani', numeroDocumento: '99900527', telefono: '987165681', rol: 'Participante' },
     // 6. Manager graduada E22 (Charo Aponte) no debe auto-asignarse a E32 por fila errónea "Participante" del padrón
     { id: '6', nombre: 'Charo Yaneth Aponte Pérez', numeroDocumento: '45289012', rol: 'Manager' },
     // 7. Capitana oficial Lima E32 (Anita Flores) sí se asigna por capitanía oficial
-    { id: '7', nombre: 'Anita Flores', numeroDocumento: '21866212', rol: 'Capitán' }
+    { id: '7', nombre: 'Anita Flores', numeroDocumento: '21866212', rol: 'Capitán' },
+    // 8. Confirmación de Dirección en sala: Edith Ruth Pillaca Huamani (40900527) -> MG Equipo 30 y Manuel Vivanco (10618858) -> Staff de Caminata
+    { id: '8', nombre: 'Edith Ruth pillaca huamani', numeroDocumento: '40900527', rol: 'Participante' },
+    { id: '9', nombre: 'Manuel Francisco Vivanco Saavedra', numeroDocumento: '10618858', rol: 'Participante' }
   ];
 
   const roster = buildEnrichedFirewalkRoster({
@@ -228,6 +231,14 @@ test('Forensic safeguards: Nodus DNI precedence over surname homonyms, MG auto-c
   assert.equal(roster[6].equipoAsignado, 'Equipo 32');
   assert.equal(roster[6].categoriaReporte, 'MG');
 
+  assert.equal(roster[7].equipoAsignado, 'Equipo 30');
+  assert.equal(roster[7].categoriaReporte, 'MG');
+  assert.equal(roster[7].equipoSource, 'CONFIRMADO_SALA');
+
+  assert.equal(roster[8].equipoAsignado, 'Staff');
+  assert.equal(roster[8].categoriaReporte, 'Staff');
+  assert.equal(roster[8].rolSubgrupo, 'Staff de Caminata');
+
   // Verificar que computeFirewalkAttendanceSummary recalcule bloques al cambiar teamBlockMap
   const customSummary = computeFirewalkAttendanceSummary(roster, {
     countMode: 'REGISTRADOS',
@@ -236,4 +247,5 @@ test('Forensic safeguards: Nodus DNI precedence over surname homonyms, MG auto-c
   const e32Block = customSummary.blocks.find((b) => b.bloque === 'Equipo 32');
   assert.equal(e32Block.pxActive, 1);
   assert.equal(e32Block.mgActive, 1);
+  assert.equal(customSummary.staffBySubRole['Staff de Caminata'].reg, 1);
 });

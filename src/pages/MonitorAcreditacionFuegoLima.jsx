@@ -1611,6 +1611,8 @@ export default function MonitorAcreditacionFuegoLima() {
                             <span style={{ fontSize: '0.63rem', color: '#94a3b8', fontWeight: 700 }}>
                               [{item.equipoSource === 'MANUAL'
                                 ? 'Asignado'
+                                : item.equipoSource === 'CONFIRMADO_SALA'
+                                ? 'Confirmado Sala'
                                 : item.equipoSource === 'AUTO_NODUS_MG'
                                 ? 'Nodus: Rol MG'
                                 : item.equipoSource === 'AUTO_NODUS_TEL'
