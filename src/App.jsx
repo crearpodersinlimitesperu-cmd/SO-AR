@@ -29,7 +29,6 @@ const MonitorMaestriaLima = lazy(() => import('./pages/MonitorMaestriaLima'));
 const CfoDashboard = lazy(() => import('./pages/CfoDashboard'));
 const AICopilot = lazy(() => import('./components/AICopilot'));
 const FinanceWorkspace = lazy(() => import('./pages/FinanceWorkspace'));
-const MaestriaGlobalDashboard = lazy(() => import('./pages/MaestriaGlobalDashboard'));
 const QuantumTeamHub = lazy(() => import('./pages/QuantumTeamHub'));
 const HrCommandCenter = lazy(() => import('./pages/HrCommandCenter'));
 const LegalCommandCenter = lazy(() => import('./pages/LegalCommandCenter'));
@@ -319,11 +318,7 @@ function App() {
               <FinanceWorkspace />
             </RoleRoute>
           } />
-          <Route path="/maestria-global" element={
-            <RoleRoute allowedRoles={['director_maestria', 'direccion', 'superadmin', 'ceo']} requireSuperAdmin={false}>
-              <MaestriaGlobalDashboard />
-            </RoleRoute>
-          } />
+          <Route path="/maestria-global" element={<Navigate to="/andres-command-center" replace />} />
           <Route path="/trainer-hub" element={<Navigate to="/home" replace />} />
           <Route path="/call-coach-crm" element={<Navigate to="/home" replace />} />
           <Route path="/qt-hub" element={
@@ -446,16 +441,8 @@ function App() {
               <ReportesBoard />
             </RoleRoute>
           } />
-          <Route path="/micro-pulso" element={
-            <PrivateRoute>
-              <ReportesBoard />
-            </PrivateRoute>
-          } />
-          <Route path="/reporte-relampago" element={
-            <PrivateRoute>
-              <ReportesBoard />
-            </PrivateRoute>
-          } />
+          <Route path="/micro-pulso" element={<Navigate to="/reportes?type=micro-pulso" replace />} />
+          <Route path="/reporte-relampago" element={<Navigate to="/reportes?type=relampago" replace />} />
 
           <Route path="/mis-kpis" element={
             <PrivateRoute>
