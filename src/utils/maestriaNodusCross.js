@@ -362,12 +362,24 @@ export function buildMaestriaNodusCross({
       return teamNum && extractTeamNumber(c.equipo || c.cohorte || c.equipoCohorte) === teamNum;
     });
 
+    const isContractManager = (c) =>
+      String(c.nodusCross?.nodusRole || c.rol || c.rolActividad || '').toLowerCase().includes('manager');
+
     const nodusMaestriaCount = teamNodus.filter((p) => p.maestriaNodus).length;
     const nodusManagersMaestria = teamNodus.filter((p) => p.maestriaNodus && p.tipoPersona === 'manager').length;
     const nodusParticipantesMaestria = teamNodus.filter((p) => p.maestriaNodus && p.tipoPersona !== 'manager').length;
-    const completos = teamNodus.filter((p) => p.estadoOperativo === 'COMPLETO').length;
-    const faltaFirma = teamNodus.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO').length;
-    const faltaCheckin = teamSigned.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS').length;
+    const completosList = teamNodus.filter((p) => p.estadoOperativo === 'COMPLETO');
+    const completos = completosList.length;
+    const completosMgr = completosList.filter((p) => p.tipoPersona === 'manager').length;
+    const completosPart = completos - completosMgr;
+    const faltaFirmaList = teamNodus.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO');
+    const faltaFirma = faltaFirmaList.length;
+    const faltaFirmaMgr = faltaFirmaList.filter((p) => p.tipoPersona === 'manager').length;
+    const faltaFirmaPart = faltaFirma - faltaFirmaMgr;
+    const faltaCheckinList = teamSigned.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS');
+    const faltaCheckin = faltaCheckinList.length;
+    const faltaCheckinMgr = faltaCheckinList.filter(isContractManager).length;
+    const faltaCheckinPart = faltaCheckin - faltaCheckinMgr;
 
     return {
       equipoId: eq.id,
@@ -381,18 +393,42 @@ export function buildMaestriaNodusCross({
       nodusParticipantesMaestria,
       firmadosCount: teamSigned.length,
       completos,
+      completosPart,
+      completosMgr,
       faltaFirma,
-      faltaCheckin
+      faltaFirmaPart,
+      faltaFirmaMgr,
+      faltaCheckin,
+      faltaCheckinPart,
+      faltaCheckinMgr
     };
   });
+
+  const isSignedManager = (c) =>
+    String(c.nodusCross?.nodusRole || c.rol || c.rolActividad || '').toLowerCase().includes('manager');
+  const allCompletos = enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'COMPLETO');
+  const totalCompletosMgr = allCompletos.filter(isSignedManager).length;
+  const totalCompletosPart = allCompletos.length - totalCompletosMgr;
+  const allFaltaCheckin = enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS');
+  const totalFaltaCheckinMgr = allFaltaCheckin.filter(isSignedManager).length;
+  const totalFaltaCheckinPart = allFaltaCheckin.length - totalFaltaCheckinMgr;
+  const allFaltaFirma = nodusPadronCross.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO');
+  const totalFaltaFirmaMgr = allFaltaFirma.filter((p) => p.tipoPersona === 'manager').length;
+  const totalFaltaFirmaPart = allFaltaFirma.length - totalFaltaFirmaMgr;
 
   const summary = {
     totalNodusPadron: nodusPadronCross.length,
     totalNodusMaestria: nodusPadronCross.filter((p) => p.maestriaNodus).length,
     totalNodusManagers: nodusPadronCross.filter((p) => p.tipoPersona === 'manager' && p.maestriaNodus).length,
-    totalCompletos: enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'COMPLETO').length,
-    totalFaltaCheckinNodus: enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS').length,
-    totalFaltaFirmaContrato: nodusPadronCross.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO').length,
+    totalCompletos: allCompletos.length,
+    totalCompletosPart,
+    totalCompletosMgr,
+    totalFaltaCheckinNodus: allFaltaCheckin.length,
+    totalFaltaCheckinPart,
+    totalFaltaCheckinMgr,
+    totalFaltaFirmaContrato: allFaltaFirma.length,
+    totalFaltaFirmaPart,
+    totalFaltaFirmaMgr,
     totalNoEncontradoNodus: enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'NO_ENCONTRADO_NODUS').length
   };
 

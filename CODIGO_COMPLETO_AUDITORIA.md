@@ -91578,12 +91578,24 @@ export function buildMaestriaNodusCross({
       return teamNum && extractTeamNumber(c.equipo || c.cohorte || c.equipoCohorte) === teamNum;
     });
 
+    const isContractManager = (c) =>
+      String(c.nodusCross?.nodusRole || c.rol || c.rolActividad || '').toLowerCase().includes('manager');
+
     const nodusMaestriaCount = teamNodus.filter((p) => p.maestriaNodus).length;
     const nodusManagersMaestria = teamNodus.filter((p) => p.maestriaNodus && p.tipoPersona === 'manager').length;
     const nodusParticipantesMaestria = teamNodus.filter((p) => p.maestriaNodus && p.tipoPersona !== 'manager').length;
-    const completos = teamNodus.filter((p) => p.estadoOperativo === 'COMPLETO').length;
-    const faltaFirma = teamNodus.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO').length;
-    const faltaCheckin = teamSigned.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS').length;
+    const completosList = teamNodus.filter((p) => p.estadoOperativo === 'COMPLETO');
+    const completos = completosList.length;
+    const completosMgr = completosList.filter((p) => p.tipoPersona === 'manager').length;
+    const completosPart = completos - completosMgr;
+    const faltaFirmaList = teamNodus.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO');
+    const faltaFirma = faltaFirmaList.length;
+    const faltaFirmaMgr = faltaFirmaList.filter((p) => p.tipoPersona === 'manager').length;
+    const faltaFirmaPart = faltaFirma - faltaFirmaMgr;
+    const faltaCheckinList = teamSigned.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS');
+    const faltaCheckin = faltaCheckinList.length;
+    const faltaCheckinMgr = faltaCheckinList.filter(isContractManager).length;
+    const faltaCheckinPart = faltaCheckin - faltaCheckinMgr;
 
     return {
       equipoId: eq.id,
@@ -91597,18 +91609,42 @@ export function buildMaestriaNodusCross({
       nodusParticipantesMaestria,
       firmadosCount: teamSigned.length,
       completos,
+      completosPart,
+      completosMgr,
       faltaFirma,
-      faltaCheckin
+      faltaFirmaPart,
+      faltaFirmaMgr,
+      faltaCheckin,
+      faltaCheckinPart,
+      faltaCheckinMgr
     };
   });
+
+  const isSignedManager = (c) =>
+    String(c.nodusCross?.nodusRole || c.rol || c.rolActividad || '').toLowerCase().includes('manager');
+  const allCompletos = enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'COMPLETO');
+  const totalCompletosMgr = allCompletos.filter(isSignedManager).length;
+  const totalCompletosPart = allCompletos.length - totalCompletosMgr;
+  const allFaltaCheckin = enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS');
+  const totalFaltaCheckinMgr = allFaltaCheckin.filter(isSignedManager).length;
+  const totalFaltaCheckinPart = allFaltaCheckin.length - totalFaltaCheckinMgr;
+  const allFaltaFirma = nodusPadronCross.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO');
+  const totalFaltaFirmaMgr = allFaltaFirma.filter((p) => p.tipoPersona === 'manager').length;
+  const totalFaltaFirmaPart = allFaltaFirma.length - totalFaltaFirmaMgr;
 
   const summary = {
     totalNodusPadron: nodusPadronCross.length,
     totalNodusMaestria: nodusPadronCross.filter((p) => p.maestriaNodus).length,
     totalNodusManagers: nodusPadronCross.filter((p) => p.tipoPersona === 'manager' && p.maestriaNodus).length,
-    totalCompletos: enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'COMPLETO').length,
-    totalFaltaCheckinNodus: enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS').length,
-    totalFaltaFirmaContrato: nodusPadronCross.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO').length,
+    totalCompletos: allCompletos.length,
+    totalCompletosPart,
+    totalCompletosMgr,
+    totalFaltaCheckinNodus: allFaltaCheckin.length,
+    totalFaltaCheckinPart,
+    totalFaltaCheckinMgr,
+    totalFaltaFirmaContrato: allFaltaFirma.length,
+    totalFaltaFirmaPart,
+    totalFaltaFirmaMgr,
     totalNoEncontradoNodus: enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'NO_ENCONTRADO_NODUS').length
   };
 
@@ -142531,7 +142567,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✅ Completo (Firma + Nodus)</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#6ee7b7', marginTop: '0.15rem' }}>{stats.totalCompletos}</div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                Contrato + Check-in ok
+                {stats.totalCompletosPart || 0} Part. · {stats.totalCompletosMgr || 0} Mgr.
               </div>
             </div>
             <div
@@ -142549,7 +142585,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Falta Check-in Nodus</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>{stats.totalFaltaCheckinNodus}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                Ya firmaron · sin marca Nodus
+                {stats.totalFaltaCheckinPart || 0} Part. · {stats.totalFaltaCheckinMgr || 0} Mgr.
               </div>
             </div>
             <div
@@ -142585,7 +142621,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🚨 En Nodus · Falta Firma</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.totalFaltaFirmaContrato}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                Asistieron sin firmar reglas
+                {stats.totalFaltaFirmaPart || 0} Part. · {stats.totalFaltaFirmaMgr || 0} Mgr.
               </div>
             </div>
           </div>
@@ -142628,9 +142664,9 @@ export default function MonitorMaestriaLima() {
                     <span>Nodus Maestría: <strong style={{ color: '#38bdf8' }}>{tm.nodusMaestriaCount}</strong> ({tm.nodusParticipantesMaestria} Part · {tm.nodusManagersMaestria} Mgr)</span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', fontSize: '0.73rem', color: '#94a3b8' }}>
-                    <span>✅ Completos: <strong style={{ color: '#34d399' }}>{tm.completos}</strong></span>
-                    <span>⚠️ Falta Nodus: <strong style={{ color: '#fbbf24' }}>{tm.faltaCheckin}</strong></span>
-                    <span>🚨 Falta Firma: <strong style={{ color: '#fb7185' }}>{tm.faltaFirma}</strong></span>
+                    <span>✅ Completos: <strong style={{ color: '#34d399' }}>{tm.completos}</strong> ({tm.completosPart}P · {tm.completosMgr}M)</span>
+                    <span>⚠️ Falta Nodus: <strong style={{ color: '#fbbf24' }}>{tm.faltaCheckin}</strong> ({tm.faltaCheckinPart}P · {tm.faltaCheckinMgr}M)</span>
+                    <span>🚨 Falta Firma: <strong style={{ color: '#fb7185' }}>{tm.faltaFirma}</strong> ({tm.faltaFirmaPart}P · {tm.faltaFirmaMgr}M)</span>
                   </div>
                   {tm.checkinUrl && (
                     <a

@@ -922,7 +922,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✅ Completo (Firma + Nodus)</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#6ee7b7', marginTop: '0.15rem' }}>{stats.totalCompletos}</div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                Contrato + Check-in ok
+                {stats.totalCompletosPart || 0} Part. · {stats.totalCompletosMgr || 0} Mgr.
               </div>
             </div>
             <div
@@ -940,7 +940,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Falta Check-in Nodus</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>{stats.totalFaltaCheckinNodus}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                Ya firmaron · sin marca Nodus
+                {stats.totalFaltaCheckinPart || 0} Part. · {stats.totalFaltaCheckinMgr || 0} Mgr.
               </div>
             </div>
             <div
@@ -976,7 +976,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🚨 En Nodus · Falta Firma</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.totalFaltaFirmaContrato}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                Asistieron sin firmar reglas
+                {stats.totalFaltaFirmaPart || 0} Part. · {stats.totalFaltaFirmaMgr || 0} Mgr.
               </div>
             </div>
           </div>
@@ -1019,9 +1019,9 @@ export default function MonitorMaestriaLima() {
                     <span>Nodus Maestría: <strong style={{ color: '#38bdf8' }}>{tm.nodusMaestriaCount}</strong> ({tm.nodusParticipantesMaestria} Part · {tm.nodusManagersMaestria} Mgr)</span>
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem', fontSize: '0.73rem', color: '#94a3b8' }}>
-                    <span>✅ Completos: <strong style={{ color: '#34d399' }}>{tm.completos}</strong></span>
-                    <span>⚠️ Falta Nodus: <strong style={{ color: '#fbbf24' }}>{tm.faltaCheckin}</strong></span>
-                    <span>🚨 Falta Firma: <strong style={{ color: '#fb7185' }}>{tm.faltaFirma}</strong></span>
+                    <span>✅ Completos: <strong style={{ color: '#34d399' }}>{tm.completos}</strong> ({tm.completosPart}P · {tm.completosMgr}M)</span>
+                    <span>⚠️ Falta Nodus: <strong style={{ color: '#fbbf24' }}>{tm.faltaCheckin}</strong> ({tm.faltaCheckinPart}P · {tm.faltaCheckinMgr}M)</span>
+                    <span>🚨 Falta Firma: <strong style={{ color: '#fb7185' }}>{tm.faltaFirma}</strong> ({tm.faltaFirmaPart}P · {tm.faltaFirmaMgr}M)</span>
                   </div>
                   {tm.checkinUrl && (
                     <a
