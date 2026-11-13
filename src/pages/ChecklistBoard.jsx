@@ -8,7 +8,9 @@ import { useUI } from '../context/UIContext';
 
 import { roles } from '../data/checklistData';
 import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, isForeignTask, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
-import { calculateAutomaticDeadline } from '../utils/soarDates';
+import { calculateAutomaticDeadline, parseDeadlineDate } from '../utils/soarDates';
+import { getLiveNodusSedes, getLiveNodusEquipos, getLiveNodusParticipantes } from '../services/nodusLiveApiService';
+import { normalizeNodusSede, selectNodusEquipoForSede, summarizeNodusParticipants } from '../services/nodusReportSync';
 import { isTaskVisibleForUser } from '../utils/taskPrivacy';
 import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles, MapPin, Search, X, ChevronDown, ChevronUp } from 'lucide-react';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -40,8 +42,9 @@ const COORDINATOR_ROLES_WITH_PHASE_TABS = ['qt', 'coord_c1', 'coord_maestria', '
 
 const getCountdownInfo = (deadlineIso, now = new Date()) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
-  const deadline = new Date(deadlineIso).getTime();
-  if (isNaN(deadline)) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const parsedDate = parseDeadlineDate(deadlineIso);
+  if (!parsedDate) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const deadline = parsedDate.getTime();
 
   const diffMs = deadline - now.getTime();
   const absMs = Math.abs(diffMs);
@@ -118,6 +121,61 @@ export default function ChecklistBoard() {
   const { tasks, taskLoadError, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle, updateIndividualProgress, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { currentCycle, currentStage, quitoCycles } = useCycles();
   const { showPrompt } = useUI();
+  const [now, setNow] = useState(() => new Date());
+  const [nodusContext, setNodusContext] = useState({ status: 'idle', sede: '', equipoName: '', summary: null });
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const activeOperationalSede = (selectedSedeFilter && selectedSedeFilter !== 'all')
+    ? selectedSedeFilter
+    : (userSedeNorm && userSedeNorm !== 'Sede Global' ? userSedeNorm : '');
+
+  useEffect(() => {
+    let cancelled = false;
+    const targetSedeNorm = normalizeNodusSede(activeOperationalSede);
+    if (!targetSedeNorm || targetSedeNorm === 'GLOBAL' || targetSedeNorm === 'SEDE GLOBAL') {
+      setNodusContext({ status: 'global', sede: activeOperationalSede || 'Sede Global', equipoName: '', summary: null });
+      return () => { cancelled = true; };
+    }
+
+    setNodusContext(prev => ({ ...prev, status: 'loading', sede: activeOperationalSede }));
+    (async () => {
+      try {
+        const sedesRes = await getLiveNodusSedes();
+        const sedesList = Array.isArray(sedesRes?.data) ? sedesRes.data : (Array.isArray(sedesRes) ? sedesRes : []);
+        const matchedSede = sedesList.find(s => normalizeNodusSede(s?.nombre || s?.sede || s?.name) === targetSedeNorm);
+        if (!matchedSede?.id) {
+          if (!cancelled) setNodusContext({ status: 'unavailable', sede: activeOperationalSede, equipoName: '', summary: null });
+          return;
+        }
+        const equiposRes = await getLiveNodusEquipos(matchedSede.id);
+        const equiposList = Array.isArray(equiposRes?.data) ? equiposRes.data : (Array.isArray(equiposRes) ? equiposRes : []);
+        const selectedEquipo = selectNodusEquipoForSede(equiposList, currentCycle?.name);
+        if (!selectedEquipo?.id) {
+          if (!cancelled) setNodusContext({ status: 'unavailable', sede: activeOperationalSede, equipoName: '', summary: null });
+          return;
+        }
+        const partRes = await getLiveNodusParticipantes(selectedEquipo.id);
+        const participants = Array.isArray(partRes?.data) ? partRes.data : (Array.isArray(partRes) ? partRes : []);
+        const summary = summarizeNodusParticipants(participants);
+        if (!cancelled) {
+          setNodusContext({
+            status: 'live',
+            sede: activeOperationalSede,
+            equipoName: selectedEquipo.nombre || selectedEquipo.name || `Equipo ${selectedEquipo.id}`,
+            summary
+          });
+        }
+      } catch {
+        if (!cancelled) setNodusContext({ status: 'offline', sede: activeOperationalSede, equipoName: '', summary: null });
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [activeOperationalSede, currentCycle?.name]);
 
   // (14/09/2026) MULTI-EQUIPO QUITO: cuando el usuario eligió 2 equipos en su
   // perfil (ver CyclesContext.jsx/UserProfileModal.jsx), ChecklistContext.jsx ya
@@ -255,7 +313,7 @@ export default function ChecklistBoard() {
 
   // Pestañas de fases operativas: permanentemente activas para todos los usuarios de oficina (PRE-C1, C1, POST-C1, PRE-C2, C2, PRE-MJ, MJ, POST-MJ)
   const showPhaseTabs = true;
-  const isCurrentStageInRole = effectiveStage && PHASE_ORDER.includes(effectiveStage);
+  const isCurrentStageInRole = effectiveStage && (effectiveStage === 'GATE 1' || PHASE_ORDER.includes(effectiveStage));
 
   if (!isAuthorized) {
     return (
@@ -276,25 +334,25 @@ export default function ChecklistBoard() {
   };
 
   const sortByDeadline = (tasksArray) => {
-    return tasksArray.sort((a, b) => {
-      const dA = getTaskEffectiveDeadline(a);
-      const dB = getTaskEffectiveDeadline(b);
-      const timeA = dA ? new Date(dA).getTime() : Infinity;
-      const timeB = dB ? new Date(dB).getTime() : Infinity;
+    return [...tasksArray].sort((a, b) => {
+      const dA = parseDeadlineDate(getTaskEffectiveDeadline(a));
+      const dB = parseDeadlineDate(getTaskEffectiveDeadline(b));
+      const timeA = dA ? dA.getTime() : Infinity;
+      const timeB = dB ? dB.getTime() : Infinity;
       return timeA - timeB;
     });
   };
 
   // Filtro de rigor operativo: excluye tareas de ciclos/fases ya concluidos (> 14 días vencidas) en vistas activas
   const filterStalePastTasks = (taskList) => {
-    const nowMs = Date.now();
+    const nowMs = now.getTime();
     return taskList.filter(t => {
       if (t.completed || t.status === 'Completada') return true;
       const d = getTaskEffectiveDeadline(t);
       if (!d) return true;
-      const dTime = new Date(d).getTime();
-      if (isNaN(dTime)) return true;
-      const daysOverdue = (nowMs - dTime) / (1000 * 60 * 60 * 24);
+      const parsed = parseDeadlineDate(d);
+      if (!parsed) return true;
+      const daysOverdue = (nowMs - parsed.getTime()) / (1000 * 60 * 60 * 24);
       return daysOverdue <= 14;
     });
   };
@@ -602,6 +660,59 @@ export default function ChecklistBoard() {
           </div>
         </div>
         
+        {/* CONTEXTO OPERATIVO REAL (CAUSA OS + NODUS EN VIVO) */}
+        {(() => {
+          const activeCycleDisplay = (isMultiTeamQuitoView && selectedQuitoTeam !== 'all')
+            ? (quitoCyclesList.find(qc => qc.equipo === selectedQuitoTeam)?.cycle || currentCycle)
+            : currentCycle;
+          const formatShortDate = (iso) => (iso ? String(iso).split('T')[0] : null);
+          const c1Date = formatShortDate(activeCycleDisplay?.c1_start);
+          const c2Date = formatShortDate(activeCycleDisplay?.c2_start);
+          const mjDate = formatShortDate(activeCycleDisplay?.maestria_start);
+          return (
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '0.6rem',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.65rem 0.9rem',
+              marginBottom: '1rem',
+              borderRadius: '8px',
+              background: 'rgba(15, 23, 42, 0.55)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              fontSize: '0.78rem'
+            }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+                <span style={{ color: 'var(--crear-gold)', fontWeight: 700 }}>
+                  📅 {activeCycleDisplay?.name || 'Ciclo Activo'}
+                </span>
+                {effectiveStage && effectiveStage !== 'CARGANDO...' && (
+                  <span style={{ padding: '2px 7px', borderRadius: '6px', background: 'rgba(34, 197, 94, 0.14)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.35)', fontWeight: 700 }}>
+                    ⚡ Momento: {effectiveStage}
+                  </span>
+                )}
+                {c1Date && <span style={{ color: 'var(--text-muted)' }}>C1: <strong style={{ color: '#e2e8f0' }}>{c1Date}</strong></span>}
+                {c2Date && <span style={{ color: 'var(--text-muted)' }}>• C2: <strong style={{ color: '#e2e8f0' }}>{c2Date}</strong></span>}
+                {mjDate && <span style={{ color: 'var(--text-muted)' }}>• MJ: <strong style={{ color: '#e2e8f0' }}>{mjDate}</strong></span>}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                {nodusContext.status === 'live' && nodusContext.summary && (
+                  <span style={{ padding: '2px 8px', borderRadius: '6px', background: 'rgba(6, 182, 212, 0.14)', color: '#22d3ee', border: '1px solid rgba(6, 182, 212, 0.35)', fontWeight: 700 }}>
+                    🟢 Nodus ({nodusContext.sede}): {nodusContext.equipoName} · {nodusContext.summary.total} en sala (C1: {nodusContext.summary.c1Total} | C2: {nodusContext.summary.c2Total} | MJ: {nodusContext.summary.mjTotal})
+                  </span>
+                )}
+                {nodusContext.status === 'loading' && (
+                  <span style={{ color: 'var(--text-muted)' }}>⏳ Sincronizando Nodus ({nodusContext.sede})...</span>
+                )}
+                {(nodusContext.status === 'offline' || nodusContext.status === 'unavailable') && (
+                  <span style={{ color: 'var(--text-muted)' }}>⚪ Nodus ({nodusContext.sede}): sin pulso en vivo</span>
+                )}
+              </div>
+            </div>
+          );
+        })()}
+
         <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
           <div style={{ height: '100%', width: `${progress}%`, background: progress === 100 ? 'var(--color-success)' : 'var(--crear-gold)', transition: 'width 0.4s ease' }} />
         </div>
@@ -1072,7 +1183,7 @@ export default function ChecklistBoard() {
                       {/* FECHA Y HORA LÍMITE AUTOMÁTICA Causa OS */}
                       {(() => {
                         const effectiveDeadline = getTaskEffectiveDeadline(task);
-                        const countdown = getCountdownInfo(effectiveDeadline);
+                        const countdown = getCountdownInfo(effectiveDeadline, now);
                         return (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.25rem 0.6rem', borderRadius: '6px', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', fontSize: '0.8rem' }}>

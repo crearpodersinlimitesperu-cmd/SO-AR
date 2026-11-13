@@ -4,9 +4,32 @@
 import { cyclesData } from '../data/cyclesData.js';
 
 const addDays = (dateStr, days) => {
+  if (!dateStr) return '';
+  const datePart = String(dateStr).split('T')[0].trim();
+  const match = datePart.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (match) {
+    const d = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+    d.setUTCDate(d.getUTCDate() + days);
+    return d.toISOString().split('T')[0];
+  }
   const d = new Date(dateStr);
-  d.setDate(d.getDate() + days);
+  if (isNaN(d.getTime())) return '';
+  d.setUTCDate(d.getUTCDate() + days);
   return d.toISOString().split('T')[0];
+};
+
+/**
+ * Parsea de forma segura fechas límite en formato 'YYYY-MM-DD HH:mm' o ISO,
+ * evitando 'Invalid Date' en Safari/WebKit por el espacio entre fecha y hora.
+ */
+export const parseDeadlineDate = (deadlineIso) => {
+  if (!deadlineIso) return null;
+  const raw = String(deadlineIso).trim();
+  const normalized = /^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2})?$/.test(raw)
+    ? raw.replace(/\s+/, 'T')
+    : raw;
+  const d = new Date(normalized);
+  return isNaN(d.getTime()) ? null : d;
 };
 
 // Reglas relativas extraídas de los manuales del SO-AR
@@ -99,6 +122,9 @@ export const calculateAutomaticDeadline = (task, cycle = null) => {
   } else if (phase === 'POST-C1') {
     fallbackBase = activeCycle.c1_start;
     fallbackOffset = 3;
+  } else if (phase === 'PRE-C2') {
+    fallbackBase = activeCycle.c2_start || activeCycle.c1_start;
+    fallbackOffset = -3;
   } else if (phase === 'C2') {
     fallbackBase = activeCycle.c2_start || activeCycle.c1_start;
     fallbackOffset = 0;
