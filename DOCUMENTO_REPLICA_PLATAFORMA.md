@@ -141522,7 +141522,7 @@ import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
 import { deduplicateSignedContracts } from '../utils/limaContractUniqueness';
 import { buildMaestriaNodusCross, selectActiveLimaMaestriaTeams } from '../utils/maestriaNodusCross';
 
-const NODUS_WORKER_BASE = 'https://so-ar-copiloto.crearpsl-cpsl.workers.dev';
+const NODUS_WORKER_BASE = 'https://so-ar-copiloto.jose-sanchez-e01.workers.dev';
 
 export default function MonitorMaestriaLima() {
   const navigate = useNavigate();
