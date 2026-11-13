@@ -176,7 +176,11 @@ export default function MonitorMaestriaLima() {
           .trim()
       );
       const dnis = [...new Set([...contractDnis, ...extraClean].filter((d) => d.length >= 5))];
-      dnis.forEach((d) => fetchedDnisRef.current.add(d));
+      const firstBatch = dnis.slice(0, 30);
+      const remainingBatches = [];
+      for (let i = 30; i < dnis.length; i += 30) {
+        remainingBatches.push(dnis.slice(i, i + 30));
+      }
 
       const resp = await fetch(`${NODUS_WORKER_BASE}/nodus-json/maestria-lima`, {
         method: 'POST',
@@ -184,23 +188,54 @@ export default function MonitorMaestriaLima() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`
         },
-        body: JSON.stringify({ dnis })
+        body: JSON.stringify({ dnis: firstBatch })
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok || !data?.ok) {
         throw new Error(data?.message || data?.error || `HTTP ${resp.status} consultando Nodus`);
+      }
+      firstBatch.forEach((d) => fetchedDnisRef.current.add(d));
+
+      const mergedByDni = {
+        ...(data.participantesByDni && typeof data.participantesByDni === 'object' ? data.participantesByDni : {})
+      };
+
+      if (remainingBatches.length > 0) {
+        await Promise.all(
+          remainingBatches.map(async (batch) => {
+            try {
+              const bResp = await fetch(`${NODUS_WORKER_BASE}/nodus-json/participantes-batch`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${idToken}`
+                },
+                body: JSON.stringify({ dnis: batch })
+              });
+              const bData = await bResp.json().catch(() => ({}));
+              if (bResp.ok && bData?.ok) {
+                batch.forEach((d) => fetchedDnisRef.current.add(d));
+                if (bData.participantesByDni && typeof bData.participantesByDni === 'object') {
+                  Object.assign(mergedByDni, bData.participantesByDni);
+                }
+              }
+            } catch {
+              // Keep partial results if a single batch fails
+            }
+          })
+        );
       }
 
       const equipos = Array.isArray(data.equipos) ? data.equipos : [];
       const activeLima = selectActiveLimaMaestriaTeams(equipos);
       setNodusEquipos(equipos);
       setNodusRosterByTeam(data.rosterByTeam && typeof data.rosterByTeam === 'object' ? data.rosterByTeam : {});
-      if (data.participantesByDni && typeof data.participantesByDni === 'object') {
-        setNodusByDni((prev) => ({ ...prev, ...data.participantesByDni }));
+      if (Object.keys(mergedByDni).length > 0) {
+        setNodusByDni((prev) => ({ ...prev, ...mergedByDni }));
       }
       setNodusLastSync(new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
       if (manual) {
-        toast.success(`Nodus sincronizado (${activeLima.length} equipos Lima + ${Object.keys(data.participantesByDni || {}).length} DNIs verificados)`);
+        toast.success(`Nodus sincronizado (${activeLima.length} equipos Lima + ${Object.keys(mergedByDni).length} DNIs verificados)`);
       }
     } catch (err) {
       const msg = err?.message || 'Error consultando API de Nodus';

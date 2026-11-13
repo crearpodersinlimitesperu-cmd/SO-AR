@@ -649,7 +649,7 @@ async function handleNodusJson(request, env, origin, path) {
       }
       const body = await request.json().catch(() => ({}));
       const rawDnis = Array.isArray(body?.dnis) ? body.dnis : [];
-      const uniqueDnis = [...new Set(rawDnis.map((d) => String(d || '').trim()).filter(Boolean))].slice(0, 150);
+      const uniqueDnis = [...new Set(rawDnis.map((d) => String(d || '').trim()).filter(Boolean))].slice(0, 30);
 
       const equiposRes = await client.getEquipos({ sedeId: 7, activeOnly: true });
       const equipos = Array.isArray(equiposRes?.data) ? equiposRes.data : [];
@@ -699,6 +699,41 @@ async function handleNodusJson(request, env, origin, path) {
         retrievedAt: equiposRes.retrievedAt,
         equipos,
         rosterByTeam,
+        participantesByDni
+      }, 200, origin);
+    }
+
+    if (path === '/nodus-json/participantes-batch') {
+      if (scope.type === 'sede') {
+        const hasLima = visibleSedes.some((s) => Number(s.id) === 7 || String(s.nombre || '').toLowerCase().includes('lima'));
+        if (!hasLima) {
+          return json({ error: 'permission-denied', message: 'Tu cuenta no tiene acceso a la sede Lima en Nodus.' }, 403, origin);
+        }
+      }
+      const body = await request.json().catch(() => ({}));
+      const rawDnis = Array.isArray(body?.dnis) ? body.dnis : [];
+      const uniqueDnis = [...new Set(rawDnis.map((d) => String(d || '').trim()).filter(Boolean))].slice(0, 35);
+
+      const participantesByDni = {};
+      const BATCH_SIZE = 15;
+      for (let i = 0; i < uniqueDnis.length; i += BATCH_SIZE) {
+        const chunk = uniqueDnis.slice(i, i + BATCH_SIZE);
+        await Promise.all(
+          chunk.map(async (dni) => {
+            try {
+              const pRes = await client.getParticipante(dni);
+              if (pRes?.data) {
+                participantesByDni[dni] = pRes.data;
+              }
+            } catch {
+              // Not found or transient lookup miss for this DNI
+            }
+          })
+        );
+      }
+
+      return json({
+        ok: true,
         participantesByDni
       }, 200, origin);
     }
@@ -1586,7 +1621,13 @@ export default {
     if (url.pathname === '/calendar-assignments') {
       return handleCalendarAssignments(request, env, origin);
     }
-    if (url.pathname === '/nodus-json/catalog' || url.pathname === '/nodus-json/team-metrics' || url.pathname === '/nodus-json/maestria-lima' || url.pathname === '/nodus-json/participante') {
+    if (
+      url.pathname === '/nodus-json/catalog' ||
+      url.pathname === '/nodus-json/team-metrics' ||
+      url.pathname === '/nodus-json/maestria-lima' ||
+      url.pathname === '/nodus-json/participante' ||
+      url.pathname === '/nodus-json/participantes-batch'
+    ) {
       return handleNodusJson(request, env, origin, url.pathname);
     }
 
