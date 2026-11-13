@@ -160578,6 +160578,13 @@ export default function MonitorAcreditacionFuegoLima() {
       const byDoc = new Map();
       const byName = new Map();
       const rosterList = [];
+      const nodusPadronList = [];
+      const COHORTE_BY_TEAM = {
+        'Equipo 32': 'C2 Lima / Ingreso MJ',
+        'Equipo 31': 'Imperio del Éxito',
+        'Equipo 30': 'Tinkuy Ruray',
+        'Equipo 29': 'Quantum Phoenix'
+      };
       const partResults = await Promise.all(
         equipos.map((eq) => getLiveNodusParticipantes(eq.id).catch(() => ({ ok: false })))
       );
@@ -160585,6 +160592,9 @@ export default function MonitorAcreditacionFuegoLima() {
       for (const pRes of partResults) {
         if (!pRes?.ok || !Array.isArray(pRes.participantes)) continue;
         const eqName = pRes.equipo?.nombre || '';
+        const eqNumMatch = String(eqName).match(/\b(29|30|31|32)\b/);
+        const canonicalPadronTeam = eqNumMatch ? `Equipo ${eqNumMatch[1]}` : '';
+
         for (const p of pRes.participantes) {
           const cleanDoc = normalizeLimaDocNumber(p.identificacion || p.dni || '');
           const cleanName = normalizeLimaPersonName(p.nombreCompleto || p.nombre || '');
@@ -160602,10 +160612,45 @@ export default function MonitorAcreditacionFuegoLima() {
           if (cleanDoc && !byDoc.has(cleanDoc)) byDoc.set(cleanDoc, info);
           if (cleanName && !byName.has(cleanName)) byName.set(cleanName, info);
           rosterList.push(info);
+
+          const isActiveC2OrMj =
+            Boolean(p.capitulo2?.pagado || p.capitulo2?.asistio || p.capitulo2?.maestria) &&
+            !p.capitulo2?.desertor;
+          if (canonicalPadronTeam && isActiveC2OrMj) {
+            const rawTipo = String(p.tipo_persona || '').toLowerCase();
+            const rolLabel =
+              rawTipo === 'manager'
+                ? 'Manager'
+                : rawTipo === 'capitan'
+                ? 'Capitán'
+                : 'Participante';
+            nodusPadronList.push({
+              id: `nodus-${p.id || cleanDoc || cleanName}`,
+              equipo: canonicalPadronTeam,
+              cohorte: COHORTE_BY_TEAM[canonicalPadronTeam] || eqName,
+              nombre: p.nombreCompleto || p.nombre || '',
+              identificacion: cleanDoc,
+              telefono: p.telefono || '',
+              rol: rolLabel,
+              estado: p.capitulo2?.maestria ? 'Activo MJ (Nodus)' : 'Pagado C2 (Nodus)',
+              detalle: p.coordinador ? `Coordinador(a): ${p.coordinador}` : 'Padrón en vivo Nodus'
+            });
+          }
         }
       }
 
-      const built = { byDoc, byName, rosterList, syncedAt: new Date().toLocaleTimeString('es-PE') };
+      nodusPadronList.sort((a, b) => {
+        if (a.equipo !== b.equipo) return b.equipo.localeCompare(a.equipo);
+        return String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es');
+      });
+
+      const built = {
+        byDoc,
+        byName,
+        rosterList,
+        nodusPadronList,
+        syncedAt: new Date().toLocaleTimeString('es-PE')
+      };
       setNodusIndex(built);
       if (showToast) {
         toast.success(`Equipos de Lima sincronizados desde Nodus (${byDoc.size} fichas indexadas).`);
@@ -161216,17 +161261,27 @@ export default function MonitorAcreditacionFuegoLima() {
     }
   };
 
-  // Matching de firmas contra el padrón oficial de 111 integrantes
+  // Matching de firmas contra padrón real en vivo desde Nodus (con respaldo limpio sin placeholders)
   const enrichedPadron = useMemo(() => {
-    return padronLima111.map((person) => {
+    const sourceList =
+      Array.isArray(nodusIndex?.nodusPadronList) && nodusIndex.nodusPadronList.length > 0
+        ? nodusIndex.nodusPadronList
+        : padronLima111;
+
+    return sourceList.map((person) => {
+      const normPersonDoc = normalizeLimaDocNumber(person.identificacion || person.dni || '');
       const normPersonName = normalizeStr(person.nombre);
-      const personTokens = normPersonName.split(/\s+/).filter((t) => t.length > 2);
+      const personTokens = Array.from(new Set(normPersonName.split(/\s+/).filter((t) => t.length > 2)));
 
       const matchedRow = roster.find((c) => {
+        const sigDoc = normalizeLimaDocNumber(c.numeroDocumentoNorm || c.numeroDocumento || c.doc || '');
+        if (normPersonDoc && sigDoc && normPersonDoc === sigDoc) return true;
         const normSigName = normalizeStr(c.nombreDisplay || c.nombre || '');
-        if (normSigName === normPersonName) return true;
-        const matchTokens = personTokens.filter((t) => normSigName.includes(t));
-        return matchTokens.length >= 2;
+        if (normSigName && normPersonName && normSigName === normPersonName) return true;
+        const sigTokens = new Set(normSigName.split(/\s+/).filter((t) => t.length > 2));
+        const matchCount = personTokens.filter((t) => sigTokens.has(t)).length;
+        const minNeeded = personTokens.length <= 2 ? 2 : Math.min(3, personTokens.length);
+        return personTokens.length >= 2 && matchCount >= minNeeded;
       });
 
       return {
@@ -161235,7 +161290,15 @@ export default function MonitorAcreditacionFuegoLima() {
         signature: matchedRow || null
       };
     });
-  }, [roster]);
+  }, [roster, nodusIndex]);
+
+  const padronTeamCounts = useMemo(() => {
+    const counts = { 'Equipo 29': 0, 'Equipo 30': 0, 'Equipo 31': 0, 'Equipo 32': 0 };
+    for (const p of enrichedPadron) {
+      if (counts[p.equipo] !== undefined) counts[p.equipo] += 1;
+    }
+    return counts;
+  }, [enrichedPadron]);
 
   // Contadores por equipo para chips rápidos
   const teamChipCounts = useMemo(() => {
@@ -162952,11 +163015,11 @@ export default function MonitorAcreditacionFuegoLima() {
 
               <div style={{ display: 'flex', gap: '0.4rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
                 {[
-                  { id: 'TODOS', label: `Todos (${padronLima111.length})` },
-                  { id: 'Equipo 29', label: 'E29 · Phoenix (16)' },
-                  { id: 'Equipo 30', label: 'E30 · Tinkuy (34)' },
-                  { id: 'Equipo 31', label: 'E31 · Imperio (19)' },
-                  { id: 'Equipo 32', label: 'E32 · C2 Lima (42)' }
+                  { id: 'TODOS', label: `Todos (${enrichedPadron.length})` },
+                  { id: 'Equipo 29', label: `E29 · Phoenix (${padronTeamCounts['Equipo 29'] || 0})` },
+                  { id: 'Equipo 30', label: `E30 · Tinkuy (${padronTeamCounts['Equipo 30'] || 0})` },
+                  { id: 'Equipo 31', label: `E31 · Imperio (${padronTeamCounts['Equipo 31'] || 0})` },
+                  { id: 'Equipo 32', label: `E32 · C2 Lima (${padronTeamCounts['Equipo 32'] || 0})` }
                 ].map((t) => {
                   const active = padronTeamFilter === t.id;
                   return (
@@ -163089,6 +163152,10 @@ export default function MonitorAcreditacionFuegoLima() {
                 const waMessage = encodeURIComponent(
                   `Hola ${item.nombre}, te escribe el equipo de CREAR PSL Lima. Por favor completa y firma tu exoneración legal obligatoria para la Caminata sobre Fuego en Casona Blanca antes de ingresar aquí: ${contractUrl}`
                 );
+                const cleanPhone9 = normalizePhoneLast9(item.telefono || '');
+                const waUrl = cleanPhone9
+                  ? `https://wa.me/51${cleanPhone9}?text=${waMessage}`
+                  : `https://wa.me/?text=${waMessage}`;
 
                 return (
                   <div
@@ -163127,12 +163194,12 @@ export default function MonitorAcreditacionFuegoLima() {
                       </div>
                       <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#f1f5f9' }}>{item.nombre}</h3>
                       <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: '#94a3b8' }}>
-                        {item.detalle || 'Requiere firma digital antes del ingreso a la actividad'}
+                        {item.identificacion ? `DNI: ${item.identificacion} · ` : ''}{item.detalle || 'Requiere firma digital antes del ingreso a la actividad'}
                       </p>
                     </div>
 
                     <a
-                      href={`https://wa.me/?text=${waMessage}`}
+                      href={waUrl}
                       target="_blank"
                       rel="noreferrer"
                       style={{
