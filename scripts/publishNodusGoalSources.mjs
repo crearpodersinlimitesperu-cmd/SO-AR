@@ -3,13 +3,16 @@ import { loginNodusReadOnly, getNodusAdminDb, isNodusVerificationUrl } from './n
 import { canonicalSede, explicitGoalTeam, explicitTeamFromText, goalStageKey } from '../src/services/goalsTimeline.js';
 import { nodusDate, NODUS_GOAL_SOURCE } from '../src/services/nodusGoalSources.js';
 
-async function readPage(page, path) {
+async function readPage(page, path, expectedSelector = null) {
   const response = await page.goto(`${NODUS_GOAL_SOURCE}${path}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
   if (new URL(page.url()).origin !== NODUS_GOAL_SOURCE || /\/auth\/login|captcha/i.test(page.url()) ||
       isNodusVerificationUrl(page.url()) || !response || response.status() >= 400) {
     throw new Error(`Nodus no permitió leer ${path.split('?')[0]}; HTTP ${response?.status() ?? 'sin respuesta'}. Consulta detenida.`);
   }
-  await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 });
+  await page.waitForNetworkIdle({ idleTime: 500, timeout: 10000 }).catch(() => {});
+  if (expectedSelector && typeof page.waitForSelector === 'function') {
+    await page.waitForSelector(expectedSelector, { timeout: 15000 });
+  }
 }
 
 export function parseNodusTeamRows(rows) {
@@ -58,7 +61,7 @@ export function nodusAttendanceScopes(goals) {
 }
 
 export async function collectNodusGoalSources(page, desiredScopes, attendanceScopes = []) {
-  await readPage(page, '/equipos');
+  await readPage(page, '/equipos', '#tablaEquipos');
   const rows = await page.evaluate(() => {
     const table = document.querySelector('#tablaEquipos');
     if (!table) throw new Error('No existe la tabla de equipos esperada.');
@@ -81,7 +84,7 @@ export async function collectNodusGoalSources(page, desiredScopes, attendanceSco
     const matches = teams.filter(t => t.sede === canonicalSede(scope.sede) && t.team === scope.team && t.stage === 'C1');
     if (matches.length !== 1 || !matches[0].end || matches[0].end >= new Date().toISOString().slice(0, 10)) continue;
     const team = matches[0];
-    await readPage(page, `/reporte?id_equipo=${team.teamId}`);
+    await readPage(page, `/reporte?id_equipo=${team.teamId}`, 'select[name="id_equipo"]');
     const counts = await page.evaluate(({ teamId, stage }) => {
       if (document.querySelector('select[name="id_equipo"]')?.value !== teamId) {
         throw new Error('El filtro de asistencia no corresponde al equipo solicitado.');
@@ -113,7 +116,7 @@ export async function collectNodusGoalSources(page, desiredScopes, attendanceSco
     const matches = teams.filter(t => t.sede === canonicalSede(scope.sede) && t.team === scope.team && t.stage === scope.stage);
     if (matches.length !== 1) continue;
     const team = matches[0];
-    await readPage(page, `/aliados?id_equipo=${team.teamId}`);
+    await readPage(page, `/aliados?id_equipo=${team.teamId}`, 'select[name="id_equipo"]');
     const headings = await page.evaluate(teamId => {
       const select = document.querySelector('select[name="id_equipo"]');
       if (select?.value !== teamId) throw new Error('El filtro de aliados no corresponde al equipo solicitado.');

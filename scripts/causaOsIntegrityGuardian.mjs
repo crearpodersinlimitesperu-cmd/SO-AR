@@ -426,8 +426,7 @@ async function checkGitHubWorkflowsHealth() {
     }
 
     const failingCritical = [];
-    for (const wfName of criticalWorkflows) {
-      const info = latestCompletedByWorkflow.get(wfName);
+    for (const [wfName, info] of latestCompletedByWorkflow.entries()) {
       if (info && info.conclusion === 'failure') {
         failingCritical.push(`${wfName} (#${info.id} @ ${info.headSha})`);
       }
