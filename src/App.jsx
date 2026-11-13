@@ -194,9 +194,8 @@ function App() {
 
   const [showHelp, setShowHelp] = useState(false);
   const location = useLocation();
-  // /home ya tiene su propio selector "Tema:" inline (junto al selector de Vista) —
-  // no se duplica aquí para no repetir el mismo control dos veces en esa página.
-  const showFloatingThemeToggle = !location.pathname.startsWith('/home');
+  // Selector Día/Noche/Zen/Auto y botón Actualizar disponibles en todos los módulos sin excepción.
+  const showFloatingThemeToggle = true;
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

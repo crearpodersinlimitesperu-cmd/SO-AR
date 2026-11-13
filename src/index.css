@@ -314,6 +314,61 @@
   border-color: rgba(15, 23, 42, 0.1) !important;
 }
 
+/* Adaptar contenedores y tarjetas con fondos oscuros hardcodeados al Modo Claro (☀️) */
+[data-theme="light"] [style*="background: #050811" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background-color: #050811" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: #020617" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background-color: #020617" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: #091124" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background-color: #091124" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: #0b1325" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background-color: #0b1325" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: #111c38" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background-color: #111c38" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: #0f172a" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background-color: #0f172a" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: #1e293b" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background-color: #1e293b" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: rgba(5, 8, 17" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: rgba(9, 17, 36" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: rgba(11, 19, 37" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: rgba(15, 23, 42" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: rgba(17, 28, 56" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: rgba(30, 41, 59" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: linear-gradient" i][style*="#091124" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: linear-gradient" i][style*="#050811" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="background: linear-gradient" i][style*="#0f172a" i]:not(.maestria-contract-root *):not(.fuego-contract-root *) {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Contraste legible en Modo Claro para textos pastel/neón sobre tarjetas claras */
+[data-theme="light"] [style*="color: #94a3b8" i]:not(.maestria-contract-root *):not(.fuego-contract-root *) {
+  color: #475569 !important;
+}
+[data-theme="light"] [style*="color: #34d399" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="color: #6ee7b7" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="color: #a7f3d0" i]:not(.maestria-contract-root *):not(.fuego-contract-root *) {
+  color: #047857 !important;
+}
+[data-theme="light"] [style*="color: #38bdf8" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="color: #7dd3fc" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="color: #93c5fd" i]:not(.maestria-contract-root *):not(.fuego-contract-root *) {
+  color: #0369a1 !important;
+}
+[data-theme="light"] [style*="color: #fbbf24" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="color: #fde047" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="color: #fef08a" i]:not(.maestria-contract-root *):not(.fuego-contract-root *) {
+  color: #b45309 !important;
+}
+[data-theme="light"] [style*="color: #fb7185" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="color: #fda4af" i]:not(.maestria-contract-root *):not(.fuego-contract-root *),
+[data-theme="light"] [style*="color: #fecdd3" i]:not(.maestria-contract-root *):not(.fuego-contract-root *) {
+  color: #be123c !important;
+}
+
 /* Soporte y contraste impecable en modo claro para modales, tablas y dropzones */
 [data-theme="light"] .task-detail-modal-card {
   background: #ffffff !important;
