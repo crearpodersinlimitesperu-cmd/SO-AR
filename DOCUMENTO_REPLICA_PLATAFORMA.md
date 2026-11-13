@@ -129520,7 +129520,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
 ## Archivo: src/components/StaffMesaAdminPanel.jsx
 
 ```javascript
-import { useState, useEffect, useMemo } from 'react';
+import { Fragment, useState, useEffect, useMemo } from 'react';
 import { initializeApp, getApps } from 'firebase/app';
 import {
   getFirestore,
@@ -129581,6 +129581,18 @@ function getStaffMesaDb() {
   const existing = getApps().find((a) => a.name === appName);
   const app = existing || initializeApp(STAFF_MESA_FIREBASE_CONFIG, appName);
   return getFirestore(app);
+}
+
+function toMillis(tsOrIso) {
+  if (!tsOrIso) return 0;
+  try {
+    if (typeof tsOrIso?.toMillis === 'function') return tsOrIso.toMillis();
+    const d = tsOrIso?.toDate ? tsOrIso.toDate() : new Date(tsOrIso);
+    const ms = d.getTime();
+    return Number.isNaN(ms) ? 0 : ms;
+  } catch {
+    return 0;
+  }
 }
 
 function formatDateTime(tsOrIso) {
@@ -129644,6 +129656,9 @@ export default function StaffMesaAdminPanel({ currentUser }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
   const [sedeFilter, setSedeFilter] = useState('todas');
+  const [puestoFilter, setPuestoFilter] = useState('todos');
+  const [conexionFilter, setConexionFilter] = useState('todas');
+  const [sortBy, setSortBy] = useState('ultima_conexion');
   const [expandedEmail, setExpandedEmail] = useState(null);
   const [showHorarios, setShowHorarios] = useState(false);
 
@@ -129808,13 +129823,45 @@ export default function StaffMesaAdminPanel({ currentUser }) {
 
     return Array.from(map.values()).map((user) => {
       const email = user.email;
-      const userLogs = logs.filter(
-        (l) => l.userEmail?.toLowerCase().trim() === email || l.email?.toLowerCase().trim() === email
-      );
+      const userLogs = logs
+        .filter((l) => l.userEmail?.toLowerCase().trim() === email || l.email?.toLowerCase().trim() === email)
+        .map((l) => ({
+          ...l,
+          _ts: toMillis(l.timestamp || l.createdAt || l.loginAt || l.lastActiveAt || l.fecha)
+        }))
+        .sort((a, b) => b._ts - a._ts);
+
       const securityIncidents = userLogs.filter(
         (l) => l.eventType === 'SECURITY_SHIELD_TRIGGERED' || l.eventType === 'SECURITY_EVENT' || l.action === 'screenshot_blocked'
       );
+      const connectionEvents = userLogs.filter(
+        (l) => l.eventType !== 'SECURITY_SHIELD_TRIGGERED' && l.eventType !== 'SECURITY_EVENT' && l.action !== 'screenshot_blocked'
+      );
       const isOnline = isRecentlyActive(user.lastActive, 5);
+
+      const sessionMs = Math.max(
+        toMillis(user.lastActive),
+        toMillis(user.sesionData?.lastActiveAt),
+        toMillis(user.sesionData?.loginAt)
+      );
+      const latestLogMs = userLogs[0]?._ts || 0;
+      const lastConnectionMs = Math.max(sessionMs, latestLogMs);
+      const lastConnectionAt = lastConnectionMs > 0 ? new Date(lastConnectionMs).toISOString() : null;
+
+      const oldestCandidates = [
+        toMillis(user.sesionData?.createdAt),
+        toMillis(user.sesionData?.loginAt),
+        toMillis(user.encuestaData?.createdAt),
+        userLogs.length > 0 ? userLogs[userLogs.length - 1]._ts : 0
+      ].filter((ms) => ms > 0);
+      const firstConnectionMs = oldestCandidates.length > 0 ? Math.min(...oldestCandidates) : 0;
+      const firstConnectionAt = firstConnectionMs > 0 ? new Date(firstConnectionMs).toISOString() : null;
+
+      const explicitCount = Number(user.sesionData?.connectionCount || user.sesionData?.loginCount || user.sesionData?.totalConnections || 0);
+      const connectionsCount = Math.max(explicitCount, connectionEvents.length, lastConnectionMs > 0 ? 1 : 0);
+
+      const lastIp = user.sesionData?.ip || userLogs.find((l) => l.ip)?.ip || null;
+      const lastDevice = user.sesionData?.device || user.sesionData?.userAgent || userLogs.find((l) => l.device || l.userAgent)?.device || userLogs.find((l) => l.userAgent)?.userAgent || null;
 
       const validity = evaluateAccessValidity(user.encuestaData || {}, 'staff_mesa');
 
@@ -129822,6 +129869,12 @@ export default function StaffMesaAdminPanel({ currentUser }) {
         ...user,
         logs: userLogs,
         securityCount: securityIncidents.length,
+        connectionsCount,
+        lastConnectionMs,
+        lastConnectionAt,
+        firstConnectionAt,
+        lastIp,
+        lastDevice,
         isOnline,
         isExpired: validity.isExpired,
         expirationReason: validity.reason,
@@ -129830,9 +129883,17 @@ export default function StaffMesaAdminPanel({ currentUser }) {
     });
   }, [autorizados, encuestas, sesiones, records, logs]);
 
-  // Filtrado
+  const puestoOptions = useMemo(() => {
+    const set = new Set();
+    consolidatedStaff.forEach((u) => {
+      if (u.puestoMesa) set.add(u.puestoMesa);
+    });
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [consolidatedStaff]);
+
+  // Filtrado y Ordenamiento
   const filteredStaff = useMemo(() => {
-    return consolidatedStaff.filter((u) => {
+    const list = consolidatedStaff.filter((u) => {
       const q = searchTerm.toLowerCase().trim();
       const matchSearch =
         !q ||
@@ -129841,13 +129902,22 @@ export default function StaffMesaAdminPanel({ currentUser }) {
         u.sede?.toLowerCase().includes(q) ||
         u.whatsapp?.includes(q) ||
         u.puestoMesa?.toLowerCase().includes(q) ||
-        u.equipoGeneracion?.toLowerCase().includes(q);
+        u.equipoGeneracion?.toLowerCase().includes(q) ||
+        u.lastIp?.toLowerCase().includes(q);
 
       if (!matchSearch) return false;
 
       if (sedeFilter !== 'todas' && u.sede !== sedeFilter) {
         return false;
       }
+
+      if (puestoFilter !== 'todos' && u.puestoMesa !== puestoFilter) {
+        return false;
+      }
+
+      if (conexionFilter === 'con_conexiones' && u.connectionsCount <= 0) return false;
+      if (conexionFilter === 'sin_conexiones' && u.connectionsCount > 0) return false;
+      if (conexionFilter === 'frecuentes' && u.connectionsCount < 3) return false;
 
       if (statusFilter === 'activos') return u.isOnline;
       if (statusFilter === 'autorizados') return u.isAuthorized && !u.isExpired;
@@ -129856,7 +129926,14 @@ export default function StaffMesaAdminPanel({ currentUser }) {
       if (statusFilter === 'con_alertas') return u.securityCount > 0;
       return true;
     });
-  }, [consolidatedStaff, searchTerm, statusFilter, sedeFilter]);
+
+    return [...list].sort((a, b) => {
+      if (sortBy === 'ultima_conexion') return (b.lastConnectionMs || 0) - (a.lastConnectionMs || 0);
+      if (sortBy === 'mas_conexiones') return (b.connectionsCount || 0) - (a.connectionsCount || 0);
+      if (sortBy === 'alertas') return (b.securityCount || 0) - (a.securityCount || 0);
+      return (a.nombre || '').localeCompare(b.nombre || '');
+    });
+  }, [consolidatedStaff, searchTerm, statusFilter, sedeFilter, puestoFilter, conexionFilter, sortBy]);
 
   // KPIs
   const metrics = useMemo(() => {
@@ -129956,8 +130033,8 @@ export default function StaffMesaAdminPanel({ currentUser }) {
   };
 
   const handleExportCSV = () => {
-    const headers = ['Email', 'Nombre', 'Sede', 'Puesto Mesa', 'Equipo Generacion', 'WhatsApp', 'Autorizado', 'Expirado', 'En Vivo', 'Alertas Escudo', 'Fecha Registro'];
-    const rows = consolidatedStaff.map((u) => [
+    const headers = ['Email', 'Nombre', 'Sede', 'Puesto Mesa', 'Equipo Generacion', 'WhatsApp', 'Autorizado', 'Expirado', 'En Vivo', 'Conexiones Totales', 'Ultima Conexion', 'Primera Conexion', 'Alertas Escudo', 'Fecha Registro'];
+    const rows = filteredStaff.map((u) => [
       u.email,
       `"${u.nombre || ''}"`,
       u.sede || '',
@@ -129967,6 +130044,9 @@ export default function StaffMesaAdminPanel({ currentUser }) {
       u.isAuthorized ? 'SI' : 'NO',
       u.isExpired ? 'SI' : 'NO',
       u.isOnline ? 'SI' : 'NO',
+      u.connectionsCount || 0,
+      u.lastConnectionAt ? `"${formatDateTime(u.lastConnectionAt)}"` : 'Sin conexiones',
+      u.firstConnectionAt ? `"${formatDateTime(u.firstConnectionAt)}"` : '',
       u.securityCount || 0,
       u.encuestaData?.createdAt ? formatDateTime(u.encuestaData.createdAt) : '',
     ]);
@@ -130445,6 +130525,66 @@ export default function StaffMesaAdminPanel({ currentUser }) {
             <option value="revocados">🚫 Revocados</option>
             <option value="con_alertas">⚠️ Con Alertas de Escudo</option>
           </select>
+
+          {/* Filtro por Puesto */}
+          <select
+            value={puestoFilter}
+            onChange={(e) => setPuestoFilter(e.target.value)}
+            style={{
+              background: 'rgba(15, 23, 42, 0.9)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '8px',
+              padding: '0.55rem 0.85rem',
+              color: '#ffffff',
+              fontSize: '0.85rem',
+              outline: 'none',
+            }}
+          >
+            <option value="todos">Todos los Puestos</option>
+            {puestoOptions.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
+
+          {/* Filtro por Conexiones */}
+          <select
+            value={conexionFilter}
+            onChange={(e) => setConexionFilter(e.target.value)}
+            style={{
+              background: 'rgba(15, 23, 42, 0.9)',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              borderRadius: '8px',
+              padding: '0.55rem 0.85rem',
+              color: '#ffffff',
+              fontSize: '0.85rem',
+              outline: 'none',
+            }}
+          >
+            <option value="todas">Conexiones: Todas</option>
+            <option value="con_conexiones">📡 Con al menos 1 conexión</option>
+            <option value="frecuentes">🔥 Frecuentes (3+ conexiones)</option>
+            <option value="sin_conexiones">⚪ Sin conexiones registradas</option>
+          </select>
+
+          {/* Ordenar por */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{
+              background: 'rgba(15, 23, 42, 0.9)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              borderRadius: '8px',
+              padding: '0.55rem 0.85rem',
+              color: '#ffffff',
+              fontSize: '0.85rem',
+              outline: 'none',
+            }}
+          >
+            <option value="ultima_conexion">Ordenar: Última conexión</option>
+            <option value="mas_conexiones">Ordenar: Más conexiones</option>
+            <option value="alertas">Ordenar: Más alertas</option>
+            <option value="nombre">Ordenar: Nombre (A-Z)</option>
+          </select>
         </div>
       </div>
 
@@ -130465,6 +130605,7 @@ export default function StaffMesaAdminPanel({ currentUser }) {
                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Sede & Puesto</th>
                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Generación</th>
                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Estado de Acceso</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Conexiones & Última Vez</th>
                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Checklist Mesa</th>
                 <th style={{ padding: '0.9rem 1rem', fontWeight: 600 }}>Alertas Escudo</th>
                 <th style={{ padding: '0.9rem 1.25rem', fontWeight: 600, textAlign: 'right' }}>Acciones</th>
@@ -130473,14 +130614,14 @@ export default function StaffMesaAdminPanel({ currentUser }) {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
+                  <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
                     <Activity size={24} className="animate-spin" style={{ margin: '0 auto 0.5rem' }} />
                     Cargando bitácora y sesiones de Staff de Mesa...
                   </td>
                 </tr>
               ) : filteredStaff.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
+                  <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8' }}>
                     No se encontraron registros de Staff de Mesa con los filtros actuales.
                   </td>
                 </tr>
@@ -130493,10 +130634,10 @@ export default function StaffMesaAdminPanel({ currentUser }) {
                   const checklistPct = checklistTotal > 0 ? Math.min(100, Math.round((checkedCount / checklistTotal) * 100)) : 0;
 
                   return (
+                    <Fragment key={user.email}>
                     <tr
-                      key={user.email}
                       style={{
-                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                        borderBottom: isExpanded ? 'none' : '1px solid rgba(255, 255, 255, 0.05)',
                         background: isExpanded ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
                         transition: 'background 0.15s ease',
                       }}
@@ -130615,6 +130756,42 @@ export default function StaffMesaAdminPanel({ currentUser }) {
                         )}
                       </td>
 
+                      {/* Conexiones & Última Vez */}
+                      <td style={{ padding: '1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              width: 'fit-content',
+                              background: user.connectionsCount > 0 ? 'rgba(56, 189, 248, 0.14)' : 'rgba(148, 163, 184, 0.12)',
+                              color: user.connectionsCount > 0 ? '#38bdf8' : '#94a3b8',
+                              border: user.connectionsCount > 0 ? '1px solid rgba(56, 189, 248, 0.35)' : '1px solid rgba(148, 163, 184, 0.25)',
+                              padding: '0.18rem 0.55rem',
+                              borderRadius: '9999px',
+                              fontSize: '0.73rem',
+                              fontWeight: 800,
+                            }}
+                          >
+                            <Activity size={11} />
+                            {user.connectionsCount} {user.connectionsCount === 1 ? 'conexión' : 'conexiones'}
+                          </span>
+                          <div style={{ fontSize: '0.74rem', color: user.isOnline ? '#34d399' : '#cbd5e1', fontWeight: user.isOnline ? 700 : 500 }}>
+                            {user.isOnline
+                              ? '🟢 En vivo ahora'
+                              : user.lastConnectionAt
+                              ? `Última: ${formatDateTime(user.lastConnectionAt)}`
+                              : 'Sin conexiones registradas'}
+                          </div>
+                          {user.firstConnectionAt && user.connectionsCount > 1 && (
+                            <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                              1ra vez: {formatDateTime(user.firstConnectionAt)}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+
                       {/* Checklist Mesa */}
                       <td style={{ padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -130671,6 +130848,67 @@ export default function StaffMesaAdminPanel({ currentUser }) {
                         </button>
                       </td>
                     </tr>
+                    {isExpanded && (
+                      <tr style={{ background: 'rgba(15, 23, 42, 0.95)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                        <td colSpan={8} style={{ padding: '1rem 1.5rem' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '0.9rem' }}>
+                            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.07)' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Conexiones Totales</div>
+                              <div style={{ fontSize: '1.1rem', color: '#38bdf8', fontWeight: 800, marginTop: '0.15rem' }}>{user.connectionsCount}</div>
+                            </div>
+                            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.07)' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Última Conexión</div>
+                              <div style={{ fontSize: '0.82rem', color: '#f8fafc', fontWeight: 700, marginTop: '0.2rem' }}>{user.lastConnectionAt ? formatDateTime(user.lastConnectionAt) : 'Sin registro'}</div>
+                            </div>
+                            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.07)' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Primera Conexión / Alta</div>
+                              <div style={{ fontSize: '0.82rem', color: '#cbd5e1', fontWeight: 600, marginTop: '0.2rem' }}>{user.firstConnectionAt ? formatDateTime(user.firstConnectionAt) : 'Sin registro'}</div>
+                            </div>
+                            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.07)' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>IP / Dispositivo Reciente</div>
+                              <div style={{ fontSize: '0.78rem', color: '#fde047', fontWeight: 600, marginTop: '0.2rem', wordBreak: 'break-word' }}>
+                                {user.lastIp || 'IP no registrada'}{user.lastDevice ? ` · ${String(user.lastDevice).slice(0, 48)}` : ''}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#94a3b8', marginBottom: '0.4rem', textTransform: 'uppercase' }}>
+                            Bitácora Reciente de Conexiones y Seguridad ({user.logs?.length || 0} eventos)
+                          </div>
+                          {user.logs && user.logs.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', maxHeight: '180px', overflowY: 'auto' }}>
+                              {user.logs.slice(0, 10).map((lg, idx) => (
+                                <div
+                                  key={lg.id || idx}
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    flexWrap: 'wrap',
+                                    gap: '0.5rem',
+                                    fontSize: '0.74rem',
+                                    padding: '0.4rem 0.65rem',
+                                    background: 'rgba(0,0,0,0.28)',
+                                    borderRadius: '6px',
+                                    border: '1px solid rgba(255,255,255,0.05)'
+                                  }}
+                                >
+                                  <span style={{ color: '#e2e8f0', fontWeight: 600 }}>
+                                    {lg.eventType || lg.action || 'CONEXION'}
+                                  </span>
+                                  <span style={{ color: '#94a3b8' }}>
+                                    {lg.ip ? `IP: ${lg.ip} · ` : ''}
+                                    {formatDateTime(lg.timestamp || lg.createdAt || lg.loginAt || lg.lastActiveAt || lg.fecha)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div style={{ fontSize: '0.76rem', color: '#64748b' }}>No hay eventos individuales en la bitácora de conexiones todavía.</div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                    </Fragment>
                   );
                 })
               )}
