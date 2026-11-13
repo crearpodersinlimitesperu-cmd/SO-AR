@@ -173528,7 +173528,7 @@ export default function CfoDashboard() {
 
 ```javascript
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
@@ -174886,10 +174886,20 @@ function DiagnosticsView() {
 export default function SuperAdminPanel() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { tasks } = useChecklist();
   const { currentStage } = useCycles();
   const canAccessGlobal = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano') || isElizabethEscobar(currentUser);
-  const [activeView, setActiveView] = useState(canAccessGlobal ? 'global' : 'sede');
+  const canAccessAliadosStaff = currentUser?.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(currentUser?.appRole);
+  const initialTabParam = searchParams.get('tab') || searchParams.get('view');
+  const [activeView, setActiveView] = useState(initialTabParam || (canAccessGlobal ? 'global' : 'sede'));
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab') || searchParams.get('view');
+    if (tabParam) {
+      setActiveView(tabParam);
+    }
+  }, [searchParams]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [assignUser, setAssignUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
@@ -175305,13 +175315,13 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+            {canAccessAliadosStaff && (
               <button style={tabStyle('aliados_c1')} onClick={() => setActiveView('aliados_c1')}>📘 Aliados C1 (Guía & Accesos)</button>
             )}
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+            {canAccessAliadosStaff && (
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
             )}
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+            {canAccessAliadosStaff && (
               <button style={tabStyle('staff_mesa')} onClick={() => setActiveView('staff_mesa')}>📋 Staff de Mesa (Guía & Accesos)</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
@@ -189859,6 +189869,19 @@ export default function Home() {
             <ModuleHelpButton helpKey="mando" onClick={() => navigate('/superadmin')} className="home-module-card">
               🌐 Centro de Mando
             </ModuleHelpButton>
+          )}
+          {(currentUser?.isSuperAdmin || hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'superadmin'])) && (
+            <>
+              <ModuleHelpButton helpKey="aliadosC1" onClick={() => navigate('/superadmin?tab=aliados_c1')} className="home-module-card" style={{ borderColor: 'rgba(56, 189, 248, 0.45)', background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.14) 0%, rgba(15, 23, 42, 0.35) 100%)' }}>
+                📘 Aliados C1 (Guía & Accesos)
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="aliadosC2" onClick={() => navigate('/superadmin?tab=aliados_c2')} className="home-module-card" style={{ borderColor: 'rgba(239, 68, 68, 0.45)', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.14) 0%, rgba(15, 23, 42, 0.35) 100%)' }}>
+                🛡️ Aliados C2 (Guía & Accesos)
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="staffMesa" onClick={() => navigate('/superadmin?tab=staff_mesa')} className="home-module-card" style={{ borderColor: 'rgba(16, 185, 129, 0.55)', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(6, 78, 59, 0.28) 100%)' }}>
+                📋 Staff de Mesa (Guía & Accesos)
+              </ModuleHelpButton>
+            </>
           )}
           {hasRoleAccess(['cfo', 'ceo', 'superadmin', 'direccion']) && (
             <ModuleHelpButton helpKey="cfo" onClick={() => navigate('/cfo-dashboard')} className="home-module-card">

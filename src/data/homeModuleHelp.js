@@ -32,5 +32,8 @@ export const homeModuleHelp = {
   monitorMaestriaLima: 'Panel independiente de Maestría Lima: firmas legales, cruce en vivo con Nodus por FDS vigente (PFD/SFD/TFD) y verificación de asistencia para participantes y managers.',
   asignador: 'Asigna entrenadores a entrenamientos y fines de semana de Maestría.',
   rezagadosC1: 'Centro de Operaciones Rezagados C1: Guía Oficial de Llamadas C1, scripts de reencuadre, objeciones, protocolo legal Indecopi y reporte Nodus.',
-  baseNodusRezagados: 'Abre la Base Nodus de Rezagados C1 en vivo (imo.crearpslglobal.com/reporterezagados).'
+  baseNodusRezagados: 'Abre la Base Nodus de Rezagados C1 en vivo (imo.crearpslglobal.com/reporterezagados).',
+  aliadosC1: 'Acceso directo a la Guía, accesos, bitácora y control operativo de Aliados C1.',
+  aliadosC2: 'Acceso directo a la Guía, accesos, vigencia y control operativo de Aliados C2.',
+  staffMesa: 'Acceso directo a la Guía, accesos, conexiones y bitácora de Staff de Mesa.'
 };

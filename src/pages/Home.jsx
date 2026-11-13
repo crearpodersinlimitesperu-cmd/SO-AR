@@ -2586,6 +2586,19 @@ export default function Home() {
               🌐 Centro de Mando
             </ModuleHelpButton>
           )}
+          {(currentUser?.isSuperAdmin || hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'superadmin'])) && (
+            <>
+              <ModuleHelpButton helpKey="aliadosC1" onClick={() => navigate('/superadmin?tab=aliados_c1')} className="home-module-card" style={{ borderColor: 'rgba(56, 189, 248, 0.45)', background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.14) 0%, rgba(15, 23, 42, 0.35) 100%)' }}>
+                📘 Aliados C1 (Guía & Accesos)
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="aliadosC2" onClick={() => navigate('/superadmin?tab=aliados_c2')} className="home-module-card" style={{ borderColor: 'rgba(239, 68, 68, 0.45)', background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.14) 0%, rgba(15, 23, 42, 0.35) 100%)' }}>
+                🛡️ Aliados C2 (Guía & Accesos)
+              </ModuleHelpButton>
+              <ModuleHelpButton helpKey="staffMesa" onClick={() => navigate('/superadmin?tab=staff_mesa')} className="home-module-card" style={{ borderColor: 'rgba(16, 185, 129, 0.55)', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(6, 78, 59, 0.28) 100%)' }}>
+                📋 Staff de Mesa (Guía & Accesos)
+              </ModuleHelpButton>
+            </>
+          )}
           {hasRoleAccess(['cfo', 'ceo', 'superadmin', 'direccion']) && (
             <ModuleHelpButton helpKey="cfo" onClick={() => navigate('/cfo-dashboard')} className="home-module-card">
               🏦 Dir. Financiera

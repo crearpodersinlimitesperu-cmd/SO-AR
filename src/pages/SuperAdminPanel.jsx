@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
@@ -1357,10 +1357,20 @@ function DiagnosticsView() {
 export default function SuperAdminPanel() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { tasks } = useChecklist();
   const { currentStage } = useCycles();
   const canAccessGlobal = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano') || isElizabethEscobar(currentUser);
-  const [activeView, setActiveView] = useState(canAccessGlobal ? 'global' : 'sede');
+  const canAccessAliadosStaff = currentUser?.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(currentUser?.appRole);
+  const initialTabParam = searchParams.get('tab') || searchParams.get('view');
+  const [activeView, setActiveView] = useState(initialTabParam || (canAccessGlobal ? 'global' : 'sede'));
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab') || searchParams.get('view');
+    if (tabParam) {
+      setActiveView(tabParam);
+    }
+  }, [searchParams]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [assignUser, setAssignUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
@@ -1776,13 +1786,13 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+            {canAccessAliadosStaff && (
               <button style={tabStyle('aliados_c1')} onClick={() => setActiveView('aliados_c1')}>📘 Aliados C1 (Guía & Accesos)</button>
             )}
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+            {canAccessAliadosStaff && (
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
             )}
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+            {canAccessAliadosStaff && (
               <button style={tabStyle('staff_mesa')} onClick={() => setActiveView('staff_mesa')}>📋 Staff de Mesa (Guía & Accesos)</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
