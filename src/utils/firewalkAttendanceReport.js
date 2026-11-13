@@ -141,100 +141,264 @@ export function getFirewalkPersonKey(record = {}) {
   return cleanId ? `id_${cleanId}` : '';
 }
 
+export function normalizePhoneLast9(rawPhone) {
+  const digits = String(rawPhone || '').replace(/\D/g, '');
+  return digits.length >= 9 ? digits.slice(-9) : '';
+}
+
+function getUniqueTokens(str) {
+  return Array.from(
+    new Set(
+      normalizeLimaPersonName(str || '')
+        .split(/\s+/)
+        .filter((t) => t.length > 2)
+    )
+  );
+}
+
 /**
- * Cruza un registro firmado contra Nodus en vivo y el Padrón Lima 111.
- * Reglas de seguridad operativa:
- * - Para Participantes (`Px`), si coincide en Nodus o Padrón dentro de los equipos activos (`Equipo 28–33`),
- *   auto-asigna ese equipo (`AUTO_NODUS` / `AUTO_PADRON`).
- * - Para Managers / Capitanes (`MG`), solo auto-asigna si está explícitamente asignado a una cohorte activa
- *   en el Padrón Lima (`Equipo 29–32`). Si en Nodus aparece en un equipo antiguo de graduación (`Equipo 18`, `22`, etc.),
- *   NO lo asigna falsamente a ese equipo antiguo; deja `equipo: ''` y expone `graduadoRef` para que coordinación
- *   lo asigne con 1 clic al FDS/Equipo donde está sirviendo como MG.
+ * Cruza un registro firmado contra Nodus en vivo (por DNI exacto, ficha de etapas `/participante`
+ * y respaldo teléfono+nombre ante error de 1 dígito en DNI) + Capitanes Lima + Padrón Lima 111.
+ *
+ * Reglas forenses de prioridad (Cero invención / Cero falsos homónimos):
+ * 1. El DNI exacto en Nodus (`nodusIndex.byDoc` / `nodusIndex.profileByDoc`) SIEMPRE prevalece sobre
+ *    cualquier coincidencia aproximada de nombres en `padron_fuego_lima_111.json` (evita colisiones
+ *    de apellidos como "Ruth Mery Quispe Quispe" E29 vs "Ruth Sandra Quispe Quispe" E31 o
+ *    "Guisella Zoraida Medina López" E32 vs "Fernando López López" E30).
+ * 2. Si alguien dejó "Participante" por defecto en el formulario pero en Nodus `etapas` de `EQUIPO 29–33`
+ *    figura exclusivamente como `manager` o `capitan`, se corrige automáticamente `autoCategoria = 'MG'`.
+ *    Si en Nodus figura como `GRADUADOS` o graduado `< Equipo 28` sin etapa `px` activa, se reclasifica
+ *    como `MG` sin equipo asignado para no inflar `Px`.
+ * 3. Si el DNI digitado tiene 1 dígito errado y no existe en Nodus, se recupera únicamente cuando
+ *    coinciden simultáneamente los 9 dígitos exactos del celular + >= 2 tokens del nombre/firma.
+ * 4. Para Managers (`MG`), el Padrón estático nunca asigna una fila cuyo rol sea `"Participante"`.
  */
 export function resolveAutoTeamMatch(record, { padronList = [], capitanesList = [], nodusIndex = null } = {}) {
   const defaultCat = deriveDefaultCategoriaFromRol(record.rol || record.rolActividad);
   if (defaultCat === 'Aliados') {
-    return { autoEquipo: 'Aliados', source: 'AUTO_ROL', graduadoRef: '' };
+    return { autoEquipo: 'Aliados', autoCategoria: 'Aliados', source: 'AUTO_ROL', graduadoRef: '', forensicNote: '' };
   }
   if (defaultCat === 'Staff') {
-    return { autoEquipo: 'Staff', source: 'AUTO_ROL', graduadoRef: '' };
+    return { autoEquipo: 'Staff', autoCategoria: 'Staff', source: 'AUTO_ROL', graduadoRef: '', forensicNote: '' };
   }
 
   const normDoc = normalizeLimaDocNumber(
     record.numeroDocumentoNorm || record.numeroDocumento || record.doc || ''
   );
   const normName = normalizeLimaPersonName(record.nombre || record.nombreCompleto || '');
-  const nameTokens = normName.split(/\s+/).filter((t) => t.length > 2);
+  const normFirma = normalizeLimaPersonName(
+    record.firma && record.firma !== 'undefined' ? record.firma : ''
+  );
+  const combinedTokens = new Set([...getUniqueTokens(normName), ...getUniqueTokens(normFirma)]);
+  const cleanPhone = normalizePhoneLast9(record.telefono || record.tel || '');
 
-  // 1. Buscar en Padrón Oficial Lima 111 (cubre tanto Participantes como Managers/Capitanes asignados a E29-E32)
-  if (normName && Array.isArray(padronList)) {
-    const padronHit = padronList.find((p) => {
-      const pName = normalizeLimaPersonName(p.nombre || '');
-      if (!pName) return false;
-      if (pName === normName) return true;
-      const pTokens = pName.split(/\s+/).filter((t) => t.length > 2);
-      if (pTokens.length < 2 || nameTokens.length < 2) return false;
-      const matches = pTokens.filter((t) => nameTokens.includes(t));
-      return matches.length >= Math.min(3, pTokens.length);
-    });
-    if (padronHit && padronHit.equipo) {
-      return {
-        autoEquipo: canonicalizeEquipoName(padronHit.equipo),
-        source: 'AUTO_PADRON',
-        graduadoRef: padronHit.cohorte || ''
-      };
-    }
-  }
-
-  // 1b. Buscar en directorio oficial de Capitanes Lima activos (E29+)
-  if (normName && Array.isArray(capitanesList) && capitanesList.length > 0) {
-    const capHit = capitanesList.find((c) => {
-      if (String(c.sede || '').toLowerCase() !== 'lima' || Number(c.numEquipo) < 29) return false;
-      const cName = normalizeLimaPersonName(c.nombre || '');
-      if (!cName) return false;
-      if (cName === normName) return true;
-      const cTokens = cName.split(/\s+/).filter((t) => t.length > 2);
-      if (cTokens.length < 2 || nameTokens.length < 2) return false;
-      return nameTokens.every((t) => cTokens.includes(t)) || cTokens.filter((t) => nameTokens.includes(t)).length >= 2;
-    });
-    if (capHit && capHit.numEquipo) {
-      return {
-        autoEquipo: `Equipo ${capHit.numEquipo}`,
-        source: 'AUTO_PADRON',
-        graduadoRef: ''
-      };
-    }
-  }
-
-  // 2. Buscar en índice vivo de Nodus (por DNI exacto o nombre completo exacto)
+  // 1. Autoridad Primaria: Índice vivo de Nodus (DNI exacto -> Ficha Etapas -> Recuperación Teléfono+Nombre)
   if (nodusIndex) {
-    const nodusHit =
-      (normDoc && nodusIndex.byDoc?.get(normDoc)) ||
-      (normName && nodusIndex.byName?.get(normName)) ||
-      null;
+    let nodusHit = (normDoc && nodusIndex.byDoc?.get(normDoc)) || null;
+    let profile = (normDoc && nodusIndex.profileByDoc?.get(normDoc)) || null;
+    let typoRecoveredDoc = '';
 
+    // Si el DNI digitado no existe en Nodus (ej. error de tipeo de 1 dígito), validar Celular Exacto (9 dígitos) + >=2 tokens de nombre/firma
+    if (!nodusHit && !profile && cleanPhone && Array.isArray(nodusIndex.rosterList)) {
+      const phoneNameMatch = nodusIndex.rosterList.find((cand) => {
+        if (!cand.telefonoNorm || cand.telefonoNorm !== cleanPhone) return false;
+        const overlap = (cand.tokens || []).filter((t) => combinedTokens.has(t));
+        return overlap.length >= 2;
+      });
+      if (phoneNameMatch) {
+        nodusHit = phoneNameMatch;
+        typoRecoveredDoc = phoneNameMatch.docNorm || '';
+        if (typoRecoveredDoc && nodusIndex.profileByDoc?.has(typoRecoveredDoc)) {
+          profile = nodusIndex.profileByDoc.get(typoRecoveredDoc);
+        }
+      }
+    }
+
+    // Evaluar etapas reales en Nodus cuando existe ficha individual (`profile`)
+    if (profile) {
+      const etapas = Array.isArray(profile.etapas) ? profile.etapas : [];
+      const activeMgEtapa = etapas.find((e) => {
+        const eqCanon = canonicalizeEquipoName(e.equipo);
+        return ACTIVE_MG_COHORT_TEAMS.has(eqCanon) && (e.tipo === 'manager' || e.tipo === 'capitan');
+      });
+      const activePxEtapa = etapas.find((e) => {
+        const eqCanon = canonicalizeEquipoName(e.equipo);
+        return ACTIVE_STUDENT_TEAMS.has(eqCanon) && e.tipo === 'px';
+      });
+      const rawEqActual = String(profile.equipoActual || nodusHit?.equipo || '').trim();
+      const canonEqActual = canonicalizeEquipoName(rawEqActual);
+      const eqNumMatch = canonEqActual.match(/Equipo\s+(\d+)/i);
+      const eqNum = eqNumMatch ? Number(eqNumMatch[1]) : 0;
+
+      // Caso A: Firmó "Participante" por defecto pero Nodus confirma que es Manager/Capitán activo en E29–E33
+      if (defaultCat === 'Px' && activeMgEtapa && !activePxEtapa) {
+        const mgTeam = canonicalizeEquipoName(activeMgEtapa.equipo);
+        return {
+          autoEquipo: mgTeam,
+          autoCategoria: 'MG',
+          source: 'AUTO_NODUS_MG',
+          graduadoRef: '',
+          forensicNote: `Nodus confirma rol ${activeMgEtapa.tipo.toUpperCase()} en ${mgTeam}`
+        };
+      }
+
+      // Caso B: Firmó "Participante" pero en Nodus es GRADUADOS o graduado antiguo (< E28) sin etapa Px activa
+      if (
+        defaultCat === 'Px' &&
+        !activePxEtapa &&
+        (rawEqActual.toUpperCase() === 'GRADUADOS' || (eqNum > 0 && eqNum < 28))
+      ) {
+        return {
+          autoEquipo: '',
+          autoCategoria: 'MG',
+          source: 'UNASSIGNED',
+          graduadoRef: rawEqActual.toUpperCase() === 'GRADUADOS' ? 'GRADUADOS' : canonEqActual,
+          forensicNote: `Graduado histórico en Nodus (${rawEqActual || canonEqActual})`
+        };
+      }
+
+      // Caso C: Firmó Manager / Capitán y Nodus confirma cohorte activa E29–E33
+      if (defaultCat === 'MG') {
+        if (activeMgEtapa) {
+          return {
+            autoEquipo: canonicalizeEquipoName(activeMgEtapa.equipo),
+            autoCategoria: 'MG',
+            source: 'AUTO_NODUS',
+            graduadoRef: '',
+            forensicNote: ''
+          };
+        }
+        if (ACTIVE_MG_COHORT_TEAMS.has(canonEqActual)) {
+          return {
+            autoEquipo: canonEqActual,
+            autoCategoria: 'MG',
+            source: 'AUTO_NODUS',
+            graduadoRef: '',
+            forensicNote: ''
+          };
+        }
+      }
+
+      // Caso D: Participante Px confirmado en equipo activo E28–E33
+      if (defaultCat === 'Px' && ACTIVE_STUDENT_TEAMS.has(canonEqActual)) {
+        return {
+          autoEquipo: canonEqActual,
+          autoCategoria: 'Px',
+          source: typoRecoveredDoc ? 'AUTO_NODUS_TEL' : 'AUTO_NODUS',
+          graduadoRef: '',
+          forensicNote: typoRecoveredDoc ? `DNI Nodus validado por celular: ${typoRecoveredDoc}` : ''
+        };
+      }
+    }
+
+    // Si aún no cargó `profile` individual pero sí existe `nodusHit` en el padrón vivo de equipos Nodus
     if (nodusHit && nodusHit.equipo) {
       const canonicalEq = canonicalizeEquipoName(nodusHit.equipo);
+      // Revisar si el Padrón Oficial Lima ya reporta a esta persona exacta como Manager/Capitán (ej. Pilco Laura / Zuley Urteaga antes de terminar fetch individual)
+      if (defaultCat === 'Px' && Array.isArray(padronList)) {
+        const exactLeadershipHit = padronList.find((p) => {
+          const pCat = deriveDefaultCategoriaFromRol(p.rol);
+          if (pCat !== 'MG') return false;
+          const pName = normalizeLimaPersonName(p.nombre || '');
+          return pName && (pName === normName || (normFirma && pName === normFirma));
+        });
+        if (exactLeadershipHit) {
+          return {
+            autoEquipo: canonicalizeEquipoName(exactLeadershipHit.equipo || canonicalEq),
+            autoCategoria: 'MG',
+            source: 'AUTO_NODUS_MG',
+            graduadoRef: '',
+            forensicNote: 'Liderazgo confirmado en Padrón/Nodus'
+          };
+        }
+      }
+
       if (
         (defaultCat === 'Px' && ACTIVE_STUDENT_TEAMS.has(canonicalEq)) ||
         (defaultCat === 'MG' && ACTIVE_MG_COHORT_TEAMS.has(canonicalEq))
       ) {
         return {
           autoEquipo: canonicalEq,
-          source: 'AUTO_NODUS',
-          graduadoRef: ''
+          autoCategoria: defaultCat,
+          source: typoRecoveredDoc ? 'AUTO_NODUS_TEL' : 'AUTO_NODUS',
+          graduadoRef: '',
+          forensicNote: typoRecoveredDoc ? `DNI Nodus validado por celular: ${typoRecoveredDoc}` : ''
         };
       }
-      // Si es MG (o Px de un equipo antiguo graduado), mostrar referencia pero pedir asignación al FDS actual
+    }
+  }
+
+  // 2. Directorio oficial de Capitanes Lima activos (E29+) — solo para liderazgo (`MG`) y con tokens únicos deduplicados
+  if (defaultCat === 'MG' && combinedTokens.size >= 2 && Array.isArray(capitanesList) && capitanesList.length > 0) {
+    const capHit = capitanesList.find((c) => {
+      if (String(c.sede || '').toLowerCase() !== 'lima' || Number(c.numEquipo) < 29) return false;
+      const cName = normalizeLimaPersonName(c.nombre || '');
+      if (!cName) return false;
+      if (cName === normName || (normFirma && cName === normFirma)) return true;
+      const cTokens = getUniqueTokens(cName);
+      if (cTokens.length < 2) return false;
+      const nameTokArr = getUniqueTokens(normName);
+      return (
+        cTokens.every((t) => combinedTokens.has(t)) ||
+        (nameTokArr.length >= 2 && nameTokArr.every((t) => cTokens.includes(t)))
+      );
+    });
+    if (capHit && capHit.numEquipo) {
       return {
-        autoEquipo: '',
-        source: 'UNASSIGNED',
-        graduadoRef: canonicalEq
+        autoEquipo: `Equipo ${capHit.numEquipo}`,
+        autoCategoria: 'MG',
+        source: 'AUTO_PADRON',
+        graduadoRef: '',
+        forensicNote: `Capitanía oficial Lima E${capHit.numEquipo}`
       };
     }
   }
 
-  return { autoEquipo: '', source: 'UNASSIGNED', graduadoRef: '' };
+  // 3. Fallback estricto en Padrón Lima 111 (sin colisiones por apellidos repetidos ni cruce MG <-> Participante)
+  if (combinedTokens.size >= 2 && Array.isArray(padronList)) {
+    const padronHit = padronList.find((p) => {
+      const pName = normalizeLimaPersonName(p.nombre || '');
+      if (!pName || /^participante\s+(confirmado|pendiente)/i.test(pName) || /^manager\s+de\s+soporte/i.test(pName) || /^partner\s+de\s+soporte/i.test(pName)) {
+        return false;
+      }
+      const pCat = deriveDefaultCategoriaFromRol(p.rol);
+      // Nunca asignar un Manager graduado usando una fila marcada como "Participante" en el padrón estático
+      if (defaultCat === 'MG' && pCat !== 'MG') return false;
+
+      if (pName === normName || (normFirma && pName === normFirma)) return true;
+      const pTokens = getUniqueTokens(pName);
+      if (pTokens.length < 2) return false;
+      const nameTokArr = getUniqueTokens(normName);
+      return (
+        pTokens.every((t) => combinedTokens.has(t)) ||
+        (nameTokArr.length >= 2 && nameTokArr.every((t) => pTokens.includes(t)))
+      );
+    });
+    if (padronHit && padronHit.equipo) {
+      const pCat = deriveDefaultCategoriaFromRol(padronHit.rol);
+      return {
+        autoEquipo: canonicalizeEquipoName(padronHit.equipo),
+        autoCategoria: defaultCat === 'Px' && pCat === 'MG' ? 'MG' : defaultCat,
+        source: 'AUTO_PADRON',
+        graduadoRef: padronHit.cohorte || '',
+        forensicNote: ''
+      };
+    }
+  }
+
+  // 4. Si es MG/Graduado con referencia histórica en Nodus pero sin cohorte activa asignada, exponer referencia sin inventar equipo
+  const fallbackProfile = normDoc && nodusIndex?.profileByDoc?.get(normDoc);
+  const fallbackHit = normDoc && nodusIndex?.byDoc?.get(normDoc);
+  const rawGradEq = fallbackProfile?.equipoActual || fallbackHit?.equipo || '';
+  const gradRef = rawGradEq ? canonicalizeEquipoName(rawGradEq) : '';
+
+  return {
+    autoEquipo: '',
+    autoCategoria: defaultCat,
+    source: 'UNASSIGNED',
+    graduadoRef: gradRef,
+    forensicNote: ''
+  };
 }
 
 /**
@@ -262,7 +426,7 @@ export function buildEnrichedFirewalkRoster({
     const autoMatch = resolveAutoTeamMatch(contract, { padronList, capitanesList, nodusIndex });
 
     const defaultCat = deriveDefaultCategoriaFromRol(contract.rol || contract.rolActividad);
-    const categoriaReporte = saved?.categoriaReporte || defaultCat;
+    const categoriaReporte = saved?.categoriaReporte || autoMatch.autoCategoria || defaultCat;
 
     let equipoAsignado = '';
     let equipoSource = 'UNASSIGNED';
@@ -303,6 +467,7 @@ export function buildEnrichedFirewalkRoster({
       equipoAsignado,
       equipoSource,
       graduadoRef: autoMatch.graduadoRef || '',
+      forensicNote: autoMatch.forensicNote || '',
       bloqueReporte,
       asistio: Boolean(saved?.asistio),
       horaAsistencia: saved?.horaAsistencia || '',
@@ -502,7 +667,7 @@ export function computeFirewalkAttendanceSummary(
       if (r.asistio) teamBucket.mgAsist += 1;
     }
 
-    const blk = r.bloqueReporte;
+    const blk = resolveBloqueReporte(r.equipoAsignado, cat, mergedMap);
     if (!r.equipoAsignado || blk === 'Sin Asignar') {
       sinAsignarPxMgReg += 1;
       if (r.asistio) sinAsignarPxMgAsist += 1;

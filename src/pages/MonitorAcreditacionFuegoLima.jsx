@@ -48,7 +48,8 @@ import {
 } from '../utils/limaContractUniqueness';
 import {
   getLiveNodusEquipos,
-  getLiveNodusParticipantes
+  getLiveNodusParticipantes,
+  getLiveNodusParticipantePorCedula
 } from '../services/nodusLiveApiService';
 import {
   EQUIPO_OPTIONS,
@@ -60,12 +61,14 @@ import {
   computeFirewalkAttendanceSummary,
   formatWhatsAppFirewalkReport,
   buildFirewalkAttendanceCsv,
-  deriveDefaultCategoriaFromRol
+  deriveDefaultCategoriaFromRol,
+  normalizePhoneLast9
 } from '../utils/firewalkAttendanceReport';
 
 const ATTENDANCE_COLLECTION = 'control_asistencia_fuego_lima';
 const EVENT_CONFIG_DOC_ID = '_config_evento';
 const LOCAL_ATTENDANCE_CACHE_KEY = 'cq_firewalk_attendance_cache_v1';
+const LOCAL_NODUS_PROFILE_CACHE_KEY = 'cq_firewalk_nodus_profiles_v1';
 
 export default function MonitorAcreditacionFuegoLima() {
   const navigate = useNavigate();
@@ -82,6 +85,14 @@ export default function MonitorAcreditacionFuegoLima() {
     }
   });
   const [nodusIndex, setNodusIndex] = useState(null);
+  const [nodusProfileObj, setNodusProfileObj] = useState(() => {
+    try {
+      const raw = localStorage.getItem(LOCAL_NODUS_PROFILE_CACHE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
   const [syncingNodus, setSyncingNodus] = useState(false);
   const [savingBatch, setSavingBatch] = useState(false);
   const [savingRowKey, setSavingRowKey] = useState(null);
@@ -145,6 +156,7 @@ export default function MonitorAcreditacionFuegoLima() {
 
       const byDoc = new Map();
       const byName = new Map();
+      const rosterList = [];
       const partResults = await Promise.all(
         equipos.map((eq) => getLiveNodusParticipantes(eq.id).catch(() => ({ ok: false })))
       );
@@ -155,18 +167,24 @@ export default function MonitorAcreditacionFuegoLima() {
         for (const p of pRes.participantes) {
           const cleanDoc = normalizeLimaDocNumber(p.identificacion || p.dni || '');
           const cleanName = normalizeLimaPersonName(p.nombreCompleto || p.nombre || '');
+          const telefonoNorm = normalizePhoneLast9(p.telefono || '');
+          const tokens = Array.from(new Set(cleanName.split(/\s+/).filter((t) => t.length > 2)));
           const info = {
+            docNorm: cleanDoc,
             equipo: eqName,
             equipoId: pRes.equipo?.id || null,
             etapaVigente: pRes.equipo?.etapa_vigente || '',
-            tipo: p.tipo_persona || 'px'
+            tipo: p.tipo_persona || 'px',
+            telefonoNorm,
+            tokens
           };
           if (cleanDoc && !byDoc.has(cleanDoc)) byDoc.set(cleanDoc, info);
           if (cleanName && !byName.has(cleanName)) byName.set(cleanName, info);
+          rosterList.push(info);
         }
       }
 
-      const built = { byDoc, byName, syncedAt: new Date().toLocaleTimeString('es-PE') };
+      const built = { byDoc, byName, rosterList, syncedAt: new Date().toLocaleTimeString('es-PE') };
       setNodusIndex(built);
       if (showToast) {
         toast.success(`Equipos de Lima sincronizados desde Nodus (${byDoc.size} fichas indexadas).`);
@@ -184,6 +202,88 @@ export default function MonitorAcreditacionFuegoLima() {
   useEffect(() => {
     refreshNodusLimaTeams(false);
   }, []);
+
+  // Hidratación forense de fichas individuales `/participante?identificacion=` para detectar
+  // Managers activos que firmaron "Participante" por defecto y Graduados históricos sin cohorte activa
+  useEffect(() => {
+    if (!Array.isArray(signedContracts) || signedContracts.length === 0) return;
+    let cancelled = false;
+
+    const pendingDocs = [];
+    for (const c of signedContracts) {
+      const cat = deriveDefaultCategoriaFromRol(c.rol || c.rolActividad);
+      if (cat !== 'Px' && cat !== 'MG') continue;
+      const d = normalizeLimaDocNumber(c.numeroDocumentoNorm || c.numeroDocumento || c.doc || '');
+      if (d && d.length >= 6 && !(d in nodusProfileObj)) {
+        pendingDocs.push(d);
+      }
+    }
+    const uniquePending = Array.from(new Set(pendingDocs));
+    if (uniquePending.length === 0) return undefined;
+
+    (async () => {
+      const patch = {};
+      const batchSize = 8;
+      for (let i = 0; i < uniquePending.length; i += batchSize) {
+        if (cancelled) return;
+        const slice = uniquePending.slice(i, i + batchSize);
+        const results = await Promise.all(
+          slice.map((docNum) =>
+            getLiveNodusParticipantePorCedula(docNum).catch(() => ({ ok: false }))
+          )
+        );
+        slice.forEach((docNum, idx) => {
+          const r = results[idx];
+          if (r?.ok && r.data) {
+            const rawEq =
+              r.data.equipo_actual?.nombre ||
+              (typeof r.data.equipo_actual === 'string' ? r.data.equipo_actual : '') ||
+              '';
+            const etapas = Array.isArray(r.data.etapas)
+              ? r.data.etapas.map((e) => ({
+                  equipo: e.equipo || '',
+                  etapa: e.etapa || '',
+                  tipo: e.tipo || ''
+                }))
+              : [];
+            patch[docNum] = { equipoActual: rawEq, etapas };
+          } else {
+            patch[docNum] = null;
+          }
+        });
+      }
+      if (!cancelled && Object.keys(patch).length > 0) {
+        setNodusProfileObj((prev) => {
+          const merged = { ...prev, ...patch };
+          try {
+            localStorage.setItem(LOCAL_NODUS_PROFILE_CACHE_KEY, JSON.stringify(merged));
+          } catch {
+            // ignore quota
+          }
+          return merged;
+        });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [signedContracts, nodusProfileObj]);
+
+  const effectiveNodusIndex = useMemo(() => {
+    const profileByDoc = new Map();
+    for (const [k, v] of Object.entries(nodusProfileObj || {})) {
+      if (v) profileByDoc.set(k, v);
+    }
+    if (!nodusIndex && profileByDoc.size === 0) return null;
+    return {
+      byDoc: nodusIndex?.byDoc || new Map(),
+      byName: nodusIndex?.byName || new Map(),
+      rosterList: nodusIndex?.rosterList || [],
+      syncedAt: nodusIndex?.syncedAt || '',
+      profileByDoc
+    };
+  }, [nodusIndex, nodusProfileObj]);
 
   // Escuchar estado de correos enviados
   useEffect(() => {
@@ -383,10 +483,10 @@ export default function MonitorAcreditacionFuegoLima() {
       attendanceMap,
       padronList: padronLima111,
       capitanesList: capitanesData?.capitanes || [],
-      nodusIndex,
+      nodusIndex: effectiveNodusIndex,
       teamBlockMap
     });
-  }, [signedContracts, attendanceMap, nodusIndex, teamBlockMap]);
+  }, [signedContracts, attendanceMap, effectiveNodusIndex, teamBlockMap]);
 
   // Resumen matemático de asistencia y equipos
   const attendanceSummary = useMemo(() => {
@@ -422,7 +522,7 @@ export default function MonitorAcreditacionFuegoLima() {
 
   // Guardar todas las auto-asignaciones detectadas desde Nodus/Padrón en Firestore con 1 clic
   const handlePersistAutoAssignments = async () => {
-    let currentNodus = nodusIndex;
+    let currentNodus = effectiveNodusIndex;
     if (!currentNodus) {
       currentNodus = await refreshNodusLimaTeams(false);
     }
@@ -430,6 +530,7 @@ export default function MonitorAcreditacionFuegoLima() {
       signedContracts,
       attendanceMap,
       padronList: padronLima111,
+      capitanesList: capitanesData?.capitanes || [],
       nodusIndex: currentNodus,
       teamBlockMap
     }).filter((r) => r.equipoAsignado && r.equipoSource !== 'MANUAL');
@@ -1508,7 +1609,22 @@ export default function MonitorAcreditacionFuegoLima() {
                           </span>
                           {item.equipoSource && item.equipoSource !== 'UNASSIGNED' && (
                             <span style={{ fontSize: '0.63rem', color: '#94a3b8', fontWeight: 700 }}>
-                              [{item.equipoSource === 'MANUAL' ? 'Asignado' : item.equipoSource === 'AUTO_NODUS' ? 'Auto Nodus' : item.equipoSource === 'AUTO_PADRON' ? 'Auto Padrón' : 'Auto Rol'}]
+                              [{item.equipoSource === 'MANUAL'
+                                ? 'Asignado'
+                                : item.equipoSource === 'AUTO_NODUS_MG'
+                                ? 'Nodus: Rol MG'
+                                : item.equipoSource === 'AUTO_NODUS_TEL'
+                                ? 'Nodus: Validado Celular'
+                                : item.equipoSource === 'AUTO_NODUS'
+                                ? 'Auto Nodus'
+                                : item.equipoSource === 'AUTO_PADRON'
+                                ? 'Auto Padrón'
+                                : 'Auto Rol'}]
+                            </span>
+                          )}
+                          {item.forensicNote && (
+                            <span style={{ fontSize: '0.63rem', color: '#38bdf8', fontWeight: 700 }}>
+                              ({item.forensicNote})
                             </span>
                           )}
                           {isUnassigned && item.graduadoRef && (

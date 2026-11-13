@@ -119,3 +119,121 @@ test('Generates exact WhatsApp template format with exact arithmetic', () => {
   assert.ok(csv.includes('"Equipo 31"'));
   assert.ok(TEAM_MAPPING_PRESETS.length >= 3);
 });
+
+test('Forensic safeguards: Nodus DNI precedence over surname homonyms, MG auto-correction from etapas, 1-digit DNI typo recovery by exact phone+name, and zero false MG<-Participante padron cross-assignment', () => {
+  const padronList = [
+    { equipo: 'Equipo 31', nombre: 'Ruth Sandra Quispe Quispe', rol: 'Participante' },
+    { equipo: 'Equipo 32', nombre: 'Charo Aponte', rol: 'Participante' },
+    { equipo: 'Equipo 30', nombre: 'Ruth Yesly Pilco Laura', rol: 'Manager' }
+  ];
+  const capitanesList = [
+    { sede: 'Lima', numEquipo: 30, nombre: 'Fernando Lopez Lopez', rol: 'Capitán' },
+    { sede: 'Lima', numEquipo: 32, nombre: 'Anita Esperanza Flores Tipismana', rol: 'Capitán' }
+  ];
+
+  const nodusIndex = {
+    byDoc: new Map([
+      ['45141505', { docNorm: '45141505', equipo: 'EQUIPO 29', tipo: 'participante' }],
+      ['40864137', { docNorm: '40864137', equipo: 'EQUIPO 32', tipo: 'manager' }],
+      ['73132527', { docNorm: '73132527', equipo: 'EQUIPO 30', tipo: 'manager' }]
+    ]),
+    byName: new Map(),
+    rosterList: [
+      {
+        docNorm: '40900526',
+        equipo: 'EQUIPO 31',
+        tipo: 'manager',
+        telefonoNorm: '987165681',
+        tokens: ['edith', 'pillaca', 'huamani']
+      }
+    ],
+    profileByDoc: new Map([
+      [
+        '73132527',
+        {
+          equipoActual: 'EQUIPO 30',
+          etapas: [
+            { equipo: 'EQUIPO 23', etapa: 'PFD', tipo: 'px' },
+            { equipo: 'EQUIPO 30', etapa: 'PFD', tipo: 'manager' }
+          ]
+        }
+      ],
+      [
+        '10618858',
+        {
+          equipoActual: 'GRADUADOS',
+          etapas: []
+        }
+      ],
+      [
+        '45289012',
+        {
+          equipoActual: 'EQUIPO 22',
+          etapas: [
+            { equipo: 'EQUIPO 17', etapa: 'PFD', tipo: 'px' },
+            { equipo: 'EQUIPO 22', etapa: 'PFD', tipo: 'manager' }
+          ]
+        }
+      ]
+    ])
+  };
+
+  const contracts = [
+    // 1. Homónimo de apellidos: Ruth Mery Quispe Quispe (E29 en Nodus) no debe caer en E31 por Ruth Sandra Quispe Quispe
+    { id: '1', nombre: 'Ruth Mery Quispe Quispe', numeroDocumento: '45141505', rol: 'Participante' },
+    // 2. Apellido repetido en capitanes: Guisella Zoraida Medina López (E32 en Nodus) no debe caer en E30 por Fernando Lopez Lopez
+    { id: '2', nombre: 'Guisella Zoraida Medina López', numeroDocumento: '40864137', rol: 'Participante' },
+    // 3. Firmó Participante por defecto pero es Manager de E30 en Nodus etapas
+    { id: '3', nombre: 'Pilco Laura', firma: 'Ruth yesly pilco Laura', numeroDocumento: '73132527', rol: 'Participante' },
+    // 4. Graduado histórico que firmó Participante: no debe inflar Px
+    { id: '4', nombre: 'Manuel Francisco Vivanco Saavedra', numeroDocumento: '10618858', rol: 'Participante' },
+    // 5. Error de 1 dígito en DNI (40900527 vs 40900526), recuperado por celular exacto + nombre
+    { id: '5', nombre: 'Edith Ruth pillaca huamani', numeroDocumento: '40900527', telefono: '987165681', rol: 'Participante' },
+    // 6. Manager graduada E22 (Charo Aponte) no debe auto-asignarse a E32 por fila errónea "Participante" del padrón
+    { id: '6', nombre: 'Charo Yaneth Aponte Pérez', numeroDocumento: '45289012', rol: 'Manager' },
+    // 7. Capitana oficial Lima E32 (Anita Flores) sí se asigna por capitanía oficial
+    { id: '7', nombre: 'Anita Flores', numeroDocumento: '21866212', rol: 'Capitán' }
+  ];
+
+  const roster = buildEnrichedFirewalkRoster({
+    signedContracts: contracts,
+    attendanceMap: {},
+    padronList,
+    capitanesList,
+    nodusIndex
+  });
+
+  assert.equal(roster[0].equipoAsignado, 'Equipo 29');
+  assert.equal(roster[0].categoriaReporte, 'Px');
+
+  assert.equal(roster[1].equipoAsignado, 'Equipo 32');
+  assert.equal(roster[1].categoriaReporte, 'Px');
+
+  assert.equal(roster[2].equipoAsignado, 'Equipo 30');
+  assert.equal(roster[2].categoriaReporte, 'MG');
+  assert.equal(roster[2].equipoSource, 'AUTO_NODUS_MG');
+
+  assert.equal(roster[3].equipoAsignado, '');
+  assert.equal(roster[3].categoriaReporte, 'MG');
+  assert.equal(roster[3].graduadoRef, 'GRADUADOS');
+
+  assert.equal(roster[4].equipoAsignado, 'Equipo 31');
+  assert.equal(roster[4].categoriaReporte, 'Px');
+  assert.equal(roster[4].equipoSource, 'AUTO_NODUS_TEL');
+
+  assert.equal(roster[5].equipoAsignado, '');
+  assert.equal(roster[5].categoriaReporte, 'MG');
+  assert.equal(roster[5].graduadoRef, 'Equipo 22');
+
+  assert.equal(roster[6].equipoAsignado, 'Equipo 32');
+  assert.equal(roster[6].categoriaReporte, 'MG');
+
+  // Verificar que computeFirewalkAttendanceSummary recalcule bloques al cambiar teamBlockMap
+  const customSummary = computeFirewalkAttendanceSummary(roster, {
+    countMode: 'REGISTRADOS',
+    teamBlockMap: TEAM_MAPPING_PRESETS[2].map // Por Número de Equipo
+  });
+  const e32Block = customSummary.blocks.find((b) => b.bloque === 'Equipo 32');
+  assert.equal(e32Block.pxActive, 1);
+  assert.equal(e32Block.mgActive, 1);
+});
