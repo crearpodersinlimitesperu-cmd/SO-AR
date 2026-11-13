@@ -61,7 +61,7 @@ import {
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
   canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar, isGlobalObserver,
-  canAccessMonitorContratoLima, PORTFOLIO_FI_REVIEW_EMAILS
+  canAccessMonitorContratoLima, canAccessAliadosStaff, PORTFOLIO_FI_REVIEW_EMAILS
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -322,7 +322,8 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Guía, accesos, bitácora y control operativo de Aliados C1.',
     keywords: ['aliados', 'aliados c1', 'c1', 'guia', 'accesos', 'registro'],
     route: '/superadmin?tab=aliados_c1',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+    roles: null,
+    visible: canAccessAliadosStaff
   },
   {
     id: 'opt-aliados-c2',
@@ -333,7 +334,8 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Guía, accesos, vigencia y control operativo de Aliados C2.',
     keywords: ['aliados', 'aliados c2', 'c2', 'guia', 'accesos', 'vigencia'],
     route: '/superadmin?tab=aliados_c2',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+    roles: null,
+    visible: canAccessAliadosStaff
   },
   {
     id: 'opt-staff-mesa',
@@ -344,7 +346,8 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Guía, accesos, cantidad de conexiones, última conexión, checklist y alertas de Staff de Mesa.',
     keywords: ['staff', 'staff de mesa', 'mesa', 'conexiones', 'ultima conexion', 'guia', 'accesos', 'checklist', 'escudo'],
     route: '/superadmin?tab=staff_mesa',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+    roles: null,
+    visible: canAccessAliadosStaff
   },
   {
     id: 'opt-monitor-maestria-lima',
@@ -2641,7 +2644,7 @@ export default function Home() {
               🌐 Centro de Mando
             </ModuleHelpButton>
           )}
-          {(currentUser?.isSuperAdmin || hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'superadmin'])) && (
+          {canAccessAliadosStaff(currentUser) && (
             <>
               <ModuleHelpButton helpKey="aliadosC1" onClick={() => navigate('/superadmin?tab=aliados_c1')} className="home-module-card" style={{ borderColor: 'rgba(56, 189, 248, 0.45)', background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.14) 0%, rgba(15, 23, 42, 0.35) 100%)' }}>
                 📘 Aliados C1 (Guía & Accesos)

@@ -7,7 +7,7 @@ import { useUI } from '../context/UIContext';
 import { doc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
-import { canViewInactiveUsers, isElizabethEscobar } from '../config/permissions';
+import { canViewInactiveUsers, isElizabethEscobar, canAccessAliadosStaff } from '../config/permissions';
 import { isInactiveTrainer } from '../data/managersData';
 import { isUserInactive as isInactiveUserRecord } from '../utils/userNormalizer.js';
 import { getAllCompanyUsers } from '../services/userService';
@@ -1361,7 +1361,7 @@ export default function SuperAdminPanel() {
   const { tasks } = useChecklist();
   const { currentStage } = useCycles();
   const canAccessGlobal = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano') || isElizabethEscobar(currentUser);
-  const canAccessAliadosStaff = currentUser?.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(currentUser?.appRole);
+  const hasAliadosStaffAccess = canAccessAliadosStaff(currentUser);
   const initialTabParam = searchParams.get('tab') || searchParams.get('view');
   const [activeView, setActiveView] = useState(initialTabParam || (canAccessGlobal ? 'global' : 'sede'));
 
@@ -1786,13 +1786,13 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
-            {canAccessAliadosStaff && (
+            {hasAliadosStaffAccess && (
               <button style={tabStyle('aliados_c1')} onClick={() => setActiveView('aliados_c1')}>📘 Aliados C1 (Guía & Accesos)</button>
             )}
-            {canAccessAliadosStaff && (
+            {hasAliadosStaffAccess && (
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
             )}
-            {canAccessAliadosStaff && (
+            {hasAliadosStaffAccess && (
               <button style={tabStyle('staff_mesa')} onClick={() => setActiveView('staff_mesa')}>📋 Staff de Mesa (Guía & Accesos)</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
@@ -1844,13 +1844,13 @@ export default function SuperAdminPanel() {
           {activeView === 'sugerencias' && (
             <SuggestionsView />
           )}
-          {activeView === 'aliados_c1' && (
+          {activeView === 'aliados_c1' && hasAliadosStaffAccess && (
             <AliadosC1AdminPanel currentUser={currentUser} onToggleGuideView={() => navigate('/guia-aliados-c1')} />
           )}
-          {activeView === 'aliados_c2' && (
+          {activeView === 'aliados_c2' && hasAliadosStaffAccess && (
             <AliadosC2AdminPanel currentUser={currentUser} />
           )}
-          {activeView === 'staff_mesa' && (
+          {activeView === 'staff_mesa' && hasAliadosStaffAccess && (
             <StaffMesaAdminPanel currentUser={currentUser} />
           )}
           {activeView === 'contraste_nodus' && (

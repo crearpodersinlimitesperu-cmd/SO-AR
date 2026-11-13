@@ -1089,3 +1089,21 @@ export const canAccessMonitorContratoLima = (currentUser) => {
     'finanzas', 'facturacion', 'legal', 'juridico', 'oficina'
   ].includes(r));
 };
+
+export const canAccessAliadosStaff = (currentUser) => {
+  if (!currentUser || isUserInactive(currentUser)) return false;
+  if (!currentUser.isSimulated && (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email))) return true;
+  if (!currentUser.isSimulated && isGlobalObserver(currentUser)) return true;
+  const userRoles = collectUserRoles(currentUser);
+  if (userRoles.some(r => ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(r))) {
+    return true;
+  }
+  const sedeNorm = String(currentUser.sede || '').toLowerCase().trim();
+  const isLimaOrGlobal = !sedeNorm || sedeNorm.includes('lima') || sedeNorm === 'global';
+  if (!isLimaOrGlobal) return false;
+  return userRoles.some(r => [
+    'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj',
+    'coord_jr', 'coordinador', 'coordinacion', 'coordinadora', 'coordinador_general',
+    'director_maestria'
+  ].includes(r));
+};
