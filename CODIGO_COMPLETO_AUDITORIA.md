@@ -150981,7 +150981,20 @@ import {
 import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
 import { calendarSede } from '../../functions-imo/calendarModel.mjs';
 import { callTotal, currentReportTeams, reportStages, reportSourceStatus, validCallCounts } from '../services/nodusReportModel.js';
+import { syncNodusForReport } from '../services/nodusReportSync.js';
 import { sendReportToGoogleChat, getGoogleChatWebhookConfig, saveGoogleChatWebhookConfig } from '../services/googleChatService';
+
+const URL_REPORT_TYPE_MAP = {
+  'micro-pulso': 'MicroPulsoStaff',
+  'micropulso': 'MicroPulsoStaff',
+  'relampago': 'ReporteRelampagoFDS',
+  'llamadas': 'Llamadas',
+  'fds': 'FDS',
+  'c2': 'C2',
+  'mj': 'MJ',
+  'qt': 'QT_Contexto',
+  'qt-contexto': 'QT_Contexto'
+};
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
 const POOL_PREGUNTAS = {
@@ -151024,13 +151037,15 @@ export default function ReportesBoard() {
   useEffect(() => {
     const urlType = searchParams.get('type');
     if (urlType) {
-      setReportType(urlType);
+      const mapped = URL_REPORT_TYPE_MAP[urlType.toLowerCase()] || urlType;
+      setReportType(mapped);
     }
   }, [searchParams]);
 
   // Control estricto de visibilidad: Solo Directivos y Gerentes pueden ver el Dashboard de Evolución (08/09/2026 - Confirmado por José)
   const role = (currentUser?.activeRole || currentUser?.appRole || currentUser?.role || '').toLowerCase();
   const roles = (currentUser?.roles || []).map(r => String(r).toLowerCase());
+  const hasAnyRole = (...targets) => targets.includes(role) || roles.some(r => targets.includes(r));
   const isDireccion = currentUser?.isDireccion || role === 'direccion' || roles.includes('direccion');
   const isGerente = currentUser?.isGerente || role === 'gerente' || roles.includes('gerente');
 
@@ -151038,17 +151053,31 @@ export default function ReportesBoard() {
     currentUser?.isSuperAdmin ||
     isDireccion ||
     isGerente ||
-    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'coord_c1', 'coordinador_c1c2', 'coord_c2'].includes(role) ||
-    roles.some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'coord_c1', 'coordinador_c1c2', 'coord_c2'].includes(r))
+    hasAnyRole('gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'coord_c1', 'coordinador_c1c2', 'coord_c2')
   );
-  
+
+  const canViewFdsForm = Boolean(
+    canViewLlamadasForm || hasAnyRole('capitan', 'manager', 'aliado')
+  );
+
+  const canViewC2Form = Boolean(
+    canViewLlamadasForm || hasAnyRole('coord_c2', 'coordinador_c1c2', 'capitan', 'manager', 'aliado')
+  );
+
+  const canViewMjForm = Boolean(
+    currentUser?.isSuperAdmin || isDireccion || isGerente ||
+    hasAnyRole('coord_maestria', 'coordinador_mj', 'coord_maestria_global', 'director_maestria', 'manager')
+  );
+
+  const canViewQtForm = Boolean(
+    currentUser?.isSuperAdmin || isDireccion || isGerente || hasAnyRole('qt', 'capitan')
+  );
 
   const canViewEvolucionDashboard = Boolean(
     currentUser?.isSuperAdmin ||
     isDireccion ||
     isGerente ||
-    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'director_maestria'].includes(role) ||
-    roles.some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'director_maestria'].includes(r))
+    hasAnyRole('gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'director_maestria')
   );
 
   const canSwitchAnyCoord = Boolean(
@@ -151075,9 +151104,11 @@ export default function ReportesBoard() {
   const [nodusStatusMsg, setNodusStatusMsg] = useState('');
   const [nodusEquiposDisponibles, setNodusEquiposDisponibles] = useState([]);
   const [selectedNodusTeam, setSelectedNodusTeam] = useState('auto');
-  const [reportSede, setReportSede] = useState(calendarSede(currentUser?.sede));
+  const [reportSede, setReportSede] = useState(() => calendarSede(currentUser?.sede) || (currentUser?.isSuperAdmin || currentUser?.isDireccion ? 'Lima' : ''));
   const [reportStage, setReportStage] = useState(reportStages(currentUser)[0] || '');
   const [nodusSource, setNodusSource] = useState(null);
+  const [nodusLiveSummary, setNodusLiveSummary] = useState(null);
+  const [nodusLiveEquipos, setNodusLiveEquipos] = useState([]);
   const [reviewedCounts, setReviewedCounts] = useState(false);
   const nodusRequest = useRef(0);
   const allowedStages = reportStages(currentUser);
@@ -151163,27 +151194,67 @@ export default function ReportesBoard() {
     const requestId = ++nodusRequest.current;
     setLoadingNodus(true);
     setNodusStatusMsg('');
-    setNodusSource(null);
-    setFormData({});
-    setReviewedCounts(false);
+    if (reportType === 'Llamadas') {
+      setNodusSource(null);
+      setFormData({});
+      setReviewedCounts(false);
+    }
     try {
-      if (!allowedStages.includes(reportStage) || (!canSwitchAnyCoord && calendarSede(currentUser?.sede) !== reportSede)) throw new Error('Sede o etapa no autorizada.');
-      const targets = currentReportTeams(events || [], reportSede, reportStage);
-      const target = targets.find(t => t.team === teamOverride) || (targets.length === 1 ? targets[0] : null);
-      const docSnap = await getDoc(doc(db, 'nodus_report_sources', `${reportSede}_${reportStage}`));
+      const effectiveSede = reportSede || calendarSede(currentUser?.sede) || (canSwitchAnyCoord ? 'Lima' : '');
+      if (!effectiveSede) throw new Error('Selecciona una sede para conectar con Nodus.');
+      if (reportType === 'Llamadas' && (!allowedStages.includes(reportStage) || (!canSwitchAnyCoord && calendarSede(currentUser?.sede) !== effectiveSede))) {
+        throw new Error('Sede o etapa no autorizada.');
+      }
+
+      const syncRes = await syncNodusForReport({
+        sede: effectiveSede,
+        stage: reportStage || 'C1',
+        teamOverride: teamOverride || selectedNodusTeam,
+        events: events || [],
+        includeCallSources: reportType === 'Llamadas'
+      });
+
       if (requestId !== nodusRequest.current) return;
-      const source = docSnap.exists() ? docSnap.data() : null;
-      const result = reportSourceStatus(source, target);
-      setNodusSource(source);
-      setNodusEquiposDisponibles(targets);
-      setFormData(result.ready ? { ...result.counts, sede_id: reportSede } : {});
-      setNodusStatusMsg(result.message);
-      if (!isSilent) showToast(result.message, result.ready ? 'success' : 'warning');
+
+      setNodusSource(syncRes.source);
+      setNodusEquiposDisponibles(syncRes.targets);
+      setNodusLiveSummary(syncRes.liveSummary);
+      setNodusLiveEquipos(syncRes.liveEquiposSede || []);
+
+      if (reportType === 'Llamadas') {
+        const result = syncRes.sourceStatus;
+        setFormData(result.ready ? { ...result.counts, sede_id: effectiveSede } : {});
+        const liveTag = syncRes.liveSummary
+          ? ` | Nodus en vivo (${syncRes.liveSummary.equipoNombre}): ${syncRes.liveSummary.totalPx} PX (${syncRes.liveSummary.asistieronC1} asistieron C1, ${syncRes.liveSummary.pagadosC2} C2)`
+          : '';
+        const msg = `${result.message}${liveTag}`;
+        setNodusStatusMsg(msg);
+        if (!isSilent) showToast(result.ready ? 'Conteos de Nodus cargados.' : (syncRes.liveSummary ? 'Padrón en vivo conectado; completa los conteos de llamada.' : result.message), result.ready ? 'success' : 'info');
+      } else if (syncRes.liveSummary) {
+        const live = syncRes.liveSummary;
+        setFormData(prev => {
+          const next = { ...prev, sede_id: prev.sede_id || effectiveSede };
+          if (reportType === 'ReporteRelampagoFDS') {
+            if (next.sentados_inicio === undefined || next.sentados_inicio === '') {
+              next.sentados_inicio = live.asistieronC1 || live.totalPx;
+            }
+          } else if (reportType === 'C2') {
+            if (next.pagos_c2_mj === undefined || next.pagos_c2_mj === '') next.pagos_c2_mj = live.pagadosC2;
+            if (next.pagos_rotos === undefined || next.pagos_rotos === '') next.pagos_rotos = live.desertoresC1;
+          }
+          return next;
+        });
+        const msg = `Nodus en vivo (${live.sedeNormalizada} · ${live.equipoNombre}): ${live.totalPx} PX inscritos · ${live.asistieronC1} asistieron C1 · ${live.pagadosC2} pagados C2`;
+        setNodusStatusMsg(msg);
+        if (!isSilent) showToast('Datos en vivo extraídos de Nodus.', 'success');
+      } else {
+        setNodusStatusMsg(syncRes.liveError || 'Sin equipo activo en Nodus para esta sede.');
+      }
     } catch (e) {
       console.error("Error al extraer datos de Nodus:", e);
       if (requestId === nodusRequest.current) {
-        setNodusStatusMsg('No se pudo leer Nodus. No se usará ningún respaldo histórico.');
-        showToast('Error al extraer datos de Nodus.', 'error');
+        setNodusStatusMsg(e.message || 'No se pudo leer Nodus. No se usará ningún respaldo histórico.');
+        if (!isSilent) showToast('Error al extraer datos de Nodus.', 'error');
       }
     } finally {
       if (requestId === nodusRequest.current) setLoadingNodus(false);
@@ -151271,13 +151342,14 @@ export default function ReportesBoard() {
 
   // Al cambiar de usuario, simulación o tipo de reporte, sincronizar datos de su sede
   useEffect(() => {
-    setReportSede(calendarSede(currentUser?.sede));
+    setReportSede(calendarSede(currentUser?.sede) || ((currentUser?.isSuperAdmin || isDireccion) ? 'Lima' : ''));
     setReportStage(reportStages(currentUser)[0] || '');
     setFormData({});
     setNodusSource(null);
+    setNodusLiveSummary(null);
     setReviewedCounts(false);
     nodusRequest.current++;
-  }, [currentUser?.uid, currentUser?.sede, currentUser?.activeRole, currentUser?.appRole, currentUser?.role, currentUser?.isSimulated]);
+  }, [currentUser?.uid, currentUser?.sede, currentUser?.activeRole, currentUser?.appRole, currentUser?.role, currentUser?.isSimulated, isDireccion]);
 
   useEffect(() => {
     setSelectedNodusTeam('auto');
@@ -151287,25 +151359,31 @@ export default function ReportesBoard() {
     setLoadingUltimoReporte(false);
     setFormData({});
     setNodusSource(null);
+    setNodusLiveSummary(null);
     setReviewedCounts(false);
 
     let isCancelled = false;
-    const initLlamadas = async () => {
-      if (reportType === 'Llamadas' && !loadingEvents && reportSede && allowedStages.includes(reportStage)) {
-        if (!isCancelled) {
-          await handleExtraerDeNodus(null, null, true);
-          if (!isCancelled) await fetchUltimoReporteLlamadas();
-        }
-      } else {
-        setFormData({});
-        setUltimoReporteInfo(null);
-      }
+    const initReportSync = async () => {
       if (reportType === 'MicroPulsoStaff') {
         shufflePulso();
+        return;
+      }
+      if (!reportType) return;
+      if (reportType === 'Llamadas') {
+        if (!loadingEvents && reportSede && allowedStages.includes(reportStage)) {
+          if (!isCancelled) {
+            await handleExtraerDeNodus(null, null, true);
+            if (!isCancelled) await fetchUltimoReporteLlamadas();
+          }
+        }
+      } else if (reportSede) {
+        if (!isCancelled) {
+          await handleExtraerDeNodus(null, null, true);
+        }
       }
     };
 
-    initLlamadas();
+    initReportSync();
     return () => { isCancelled = true; nodusRequest.current++; };
   }, [reportType, reportSede, reportStage, events, loadingEvents, currentUser?.uid, currentUser?.email, currentUser?.sede, currentUser?.activeRole, currentUser?.isSimulated]);
 
@@ -151513,7 +151591,7 @@ export default function ReportesBoard() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
             <div>
               <label className="text-muted" style={{ fontSize: '0.82rem', display: 'block', marginBottom: '0.3rem' }}>Sede Operativa *</label>
-              <select name="sede_id" onChange={handleChange} className="form-input" required defaultValue={currentUser?.sede || ''}>
+              <select name="sede_id" onChange={handleChange} className="form-input" required value={formData.sede_id || reportSede || currentUser?.sede || ''}>
                 <option value="">-- Selecciona Sede --</option>
                 {OPERATIONAL_SEDES.map(s => (
                   <option key={s} value={s}>{s}</option>
@@ -151684,6 +151762,7 @@ export default function ReportesBoard() {
                   type="number"
                   name="sentados_inicio"
                   placeholder="Ej: 120"
+                  value={formData.sentados_inicio !== undefined ? formData.sentados_inicio : ''}
                   onChange={handleChange}
                   className="form-input"
                   required
@@ -151908,68 +151987,93 @@ export default function ReportesBoard() {
     if (reportType === 'Llamadas') {
       const metrics = ['OK', 'XC', 'NC', 'NI', 'SIG', 'OS', 'PENDIENTES'];
       return (
-        <div style={{ display: 'grid', gap: '2rem' }}>
-          {/* BANNER DE PRECARGA DE ÚLTIMO REPORTE */}
-          {loadingUltimoReporte && (
-            <div style={{
-              background: 'rgba(41, 171, 226, 0.1)',
-              border: '1px solid rgba(41, 171, 226, 0.3)',
-              borderRadius: '8px',
-              padding: '0.8rem 1.2rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.6rem',
-              color: 'var(--crear-cyan)',
-              fontSize: '0.88rem'
-            }}>
-              <RefreshCw size={16} className="spin" />
-              <span>Buscando referencia histórica; no se copiará al formulario.</span>
-            </div>
-          )}
-
-          {ultimoReporteInfo && !loadingUltimoReporte && (
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.05) 100%)',
-              border: '1px solid rgba(34, 197, 94, 0.35)',
-              borderRadius: '10px',
-              padding: '0.9rem 1.2rem',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '0.8rem'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.88rem', color: '#86efac' }}>
-                <CheckCircle2 size={18} color="#22c55e" />
-                <div>
-                  <div>
-                    <strong>Referencia histórica (no precargada):</strong> {ultimoReporteInfo.submitted_by} ({ultimoReporteInfo.sede})
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
-                    Registrado: {new Date(ultimoReporteInfo.fecha).toLocaleString()} • No representa al equipo en curso.
-                  </div>
-                </div>
+        <div style={{ display: 'grid', gap: '1.5rem' }}>
+          {/* BARRA SUPERIOR AUTOMÁTICA DE NODUS */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(41, 171, 226, 0.12) 0%, rgba(3, 105, 161, 0.08) 100%)',
+            border: '1px solid rgba(41, 171, 226, 0.35)',
+            borderRadius: '10px',
+            padding: '1rem 1.2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <Database size={18} color="var(--crear-cyan, #29abe2)" />
+                <span style={{ fontWeight: 800, color: '#fff', fontSize: '0.95rem' }}>
+                  Conexión Nodus en Vivo
+                </span>
+                {nodusLiveSummary && (
+                  <span style={{ fontSize: '0.76rem', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', padding: '2px 10px', borderRadius: '12px', fontWeight: 700 }}>
+                    {nodusLiveSummary.equipoNombre} · {nodusLiveSummary.totalPx} PX · {nodusLiveSummary.asistieronC1} Asistieron
+                  </span>
+                )}
               </div>
-              <button
-                type="button"
-                onClick={handleLimpiarFormulario}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  color: '#e2e8f0',
-                  borderRadius: '6px',
-                  padding: '0.35rem 0.8rem',
-                  fontSize: '0.78rem',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  transition: 'all 0.2s'
-                }}
-                title="Vaciar campos sin copiar la referencia histórica"
-              >
-                🔄 Vaciar formulario
-              </button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <select className="form-input" value={reportStage} onChange={e => setReportStage(e.target.value)} aria-label="Etapa del reporte" style={{ width: 'auto', padding: '0.45rem 0.75rem', fontSize: '0.85rem' }}>
+                  {!allowedStages.length && <option value="">Sin etapa</option>}
+                  {allowedStages.map(stage => <option key={stage} value={stage}>{stage}</option>)}
+                </select>
+
+                {nodusEquiposDisponibles.length > 1 && (
+                  <select
+                    value={selectedNodusTeam}
+                    onChange={(e) => {
+                      setSelectedNodusTeam(e.target.value);
+                      handleExtraerDeNodus(e.target.value);
+                    }}
+                    className="form-input"
+                    style={{ width: 'auto', minWidth: '170px', padding: '0.45rem 0.75rem', fontSize: '0.85rem' }}
+                  >
+                    <option value="auto">Selecciona equipo paralelo</option>
+                    {nodusEquiposDisponibles.map(eq => (
+                      <option key={eq.team} value={eq.team}>
+                        {eq.label} · FDS {eq.start}
+                      </option>
+                    ))}
+                  </select>
+                )}
+
+                {reportTarget && (
+                  <span style={{ fontSize: '0.8rem', color: '#e2e8f0', background: 'rgba(255,255,255,0.08)', padding: '0.4rem 0.75rem', borderRadius: '8px', fontWeight: 700 }}>
+                    {reportTarget.label}
+                  </span>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => handleExtraerDeNodus(selectedNodusTeam)}
+                  disabled={loadingNodus || loadingEvents || !reportSede || !reportStage}
+                  title="Sincronizar nuevamente con Nodus"
+                  style={{
+                    background: 'rgba(41, 171, 226, 0.18)',
+                    color: '#38bdf8',
+                    border: '1px solid rgba(56, 189, 248, 0.45)',
+                    borderRadius: '8px',
+                    padding: '0.45rem 0.85rem',
+                    fontWeight: 700,
+                    fontSize: '0.82rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <RefreshCw size={14} className={loadingNodus ? 'spin' : ''} />
+                  {loadingNodus ? 'Sincronizando...' : 'Actualizar'}
+                </button>
+              </div>
             </div>
-          )}
+
+            {nodusStatusMsg && (
+              <div style={{ background: 'rgba(0, 0, 0, 0.35)', padding: '0.55rem 0.85rem', borderRadius: '6px', fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {sourceStatus.ready ? <CheckCircle2 size={15} color="#34d399" /> : <AlertTriangle size={15} color="#fbbf24" />}
+                <span>{nodusStatusMsg}</span>
+              </div>
+            )}
+          </div>
 
           <div>
             <h4 className="text-blue" style={{ marginBottom: '1rem', borderBottom: '1px solid rgba(0,212,255,0.2)' }}>Nuevos</h4>
@@ -151986,7 +152090,7 @@ export default function ReportesBoard() {
                     value={formData[`nuevos_${m}`] !== undefined ? formData[`nuevos_${m}`] : ''} 
                     onChange={handleChange} 
                     className="form-input" 
-                    placeholder="Sin dato"
+                    placeholder="0"
                   />
                 </div>
               ))}
@@ -152011,7 +152115,7 @@ export default function ReportesBoard() {
                     value={formData[`rezagados_${m}`] !== undefined ? formData[`rezagados_${m}`] : ''} 
                     onChange={handleChange} 
                     className="form-input" 
-                    placeholder="Sin dato"
+                    placeholder="0"
                   />
                 </div>
               ))}
@@ -152022,134 +152126,9 @@ export default function ReportesBoard() {
             </div>
           </div>
 
-          <div style={{ background: 'rgba(52, 168, 83, 0.1)', border: '1px solid #34a853', padding: '1rem', borderRadius: '8px' }}>
-            <p style={{ margin: 0, color: '#34a853', fontSize: '0.9rem' }}>
-              Revisa y edita los conteos antes de enviar. Un reporte es una fotografía, no se suman sus OK nuevamente a las metas.
-            </p>
-          </div>
-
-          {/* BOTÓN Y PANEL DE EXTRACCIÓN AUTOMÁTICA DESDE NODUS */}
-          <div style={{
-            background: 'linear-gradient(135deg, rgba(41, 171, 226, 0.12) 0%, rgba(3, 105, 161, 0.08) 100%)',
-            border: '1px solid rgba(41, 171, 226, 0.35)',
-            borderRadius: '10px',
-            padding: '1.2rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.8rem'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                <div style={{ background: 'rgba(41, 171, 226, 0.2)', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Database size={20} color="var(--crear-cyan, #29abe2)" />
-                </div>
-                <div>
-                  <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    Sincronización Nodus
-                    <span style={{ fontSize: '0.7rem', background: 'rgba(41, 171, 226, 0.25)', color: 'var(--crear-cyan, #29abe2)', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
-                      Cero Pereza
-                    </span>
-                  </div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                    Precarga desde Nodus solo cuando existen conteos verificables. Envío con revisión + clic, no desatendido.
-                  </div>
-                  <div style={{ color: '#fbbf24', fontSize: '0.8rem' }}>
-                    Envío programado bloqueado: falta una política confirmada de destinatarios y frecuencia de reportes.
-                  </div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-                {/* Selector de Coordinador para perfiles SuperAdmin/Dirección; badge privado para coordinadores. */}
-                {canSwitchAnyCoord ? (
-                  <select
-                    value={reportSede}
-                    onChange={e => setReportSede(e.target.value)}
-                    className="form-input"
-                    style={{ width: 'auto', minWidth: '180px', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
-                    title="Seleccionar sede"
-                  >
-                    <option value="">Selecciona sede</option>
-                    {OPERATIONAL_SEDES.map(s => <option key={s} value={calendarSede(s)}>{s}</option>)}
-                  </select>
-                ) : (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    background: 'rgba(255, 255, 255, 0.06)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    padding: '0.45rem 0.9rem',
-                    borderRadius: '8px',
-                    fontSize: '0.85rem',
-                    color: '#fff',
-                    fontWeight: 600
-                  }}>
-                    <span style={{ color: 'var(--crear-cyan, #29abe2)' }}>📍 {reportSede || 'Sin sede autorizada'}</span>
-                    <span style={{ color: 'var(--text-muted)' }}>•</span>
-                    <span>{reportTarget?.label || 'Selecciona equipo'}</span>
-                  </div>
-                )}
-                <select className="form-input" value={reportStage} onChange={e => setReportStage(e.target.value)} aria-label="Etapa del reporte" style={{ width: 'auto' }}>
-                  {!allowedStages.length && <option value="">Sin etapa autorizada</option>}
-                  {allowedStages.map(stage => <option key={stage} value={stage}>{stage}</option>)}
-                </select>
-
-                {nodusEquiposDisponibles.length > 0 && (
-                  <select
-                    value={selectedNodusTeam}
-                    onChange={(e) => {
-                      setSelectedNodusTeam(e.target.value);
-                      handleExtraerDeNodus(e.target.value);
-                    }}
-                    className="form-input"
-                    style={{ width: 'auto', minWidth: '170px', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
-                  >
-                    <option value="auto">{nodusEquiposDisponibles.length === 1 ? 'Equipo del calendario' : 'Selecciona equipo paralelo'}</option>
-                    {nodusEquiposDisponibles.map(eq => (
-                      <option key={eq.team} value={eq.team}>
-                        {eq.label} · FDS {eq.start}
-                      </option>
-                    ))}
-                  </select>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => handleExtraerDeNodus(selectedNodusTeam)}
-                  disabled={loadingNodus || loadingEvents || !reportSede || !reportStage}
-                  style={{
-                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-                    color: '#fff',
-                    border: '1px solid #38bdf8',
-                    borderRadius: '8px',
-                    padding: '0.65rem 1.4rem',
-                    fontWeight: 800,
-                    fontSize: '0.92rem',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {loadingNodus ? <RefreshCw size={16} className="spin" /> : <Download size={16} />}
-                  {loadingNodus ? 'Extrayendo de Nodus...' : 'Extraer de Nodus'}
-                </button>
-              </div>
-            </div>
-
-            {nodusStatusMsg && (
-              <div style={{ background: 'rgba(0, 0, 0, 0.35)', padding: '0.6rem 0.9rem', borderRadius: '6px', fontSize: '0.82rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                {sourceStatus.ready ? <CheckCircle2 size={16} color="#34d399" /> : <AlertTriangle size={16} color="#fbbf24" />}
-                <span>{nodusStatusMsg}</span>
-              </div>
-            )}
-          </div>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', background: 'rgba(52, 168, 83, 0.08)', border: '1px solid rgba(52, 168, 83, 0.35)', padding: '0.85rem 1rem', borderRadius: '8px', cursor: 'pointer', fontSize: '0.88rem' }}>
             <input type="checkbox" checked={reviewedCounts} onChange={e => setReviewedCounts(e.target.checked)} disabled={!reportTarget || !validCallCounts(formData) || loadingNodus} />
-            Revisé sede, etapa, equipo y los conteos de Nuevos y Rezagados{!sourceStatus.ready ? ' (carga manual; Nodus no aporta conteos verificables)' : ''}.
+            Confirmo que revisé sede, etapa, equipo y los conteos de Nuevos y Rezagados{!sourceStatus.ready ? ' (carga manual verificada)' : ' (extraídos de Nodus)'}.
           </label>
         </div>
       );
@@ -152179,8 +152158,8 @@ export default function ReportesBoard() {
                 <option value="PAYPHONE">PAYPHONE</option>
                 <option value="PAYPAL">PAYPAL</option>
              </select>
-             <input type="number" name="pagos_c2_mj" placeholder="Monto Total Procesado" onChange={handleChange} className="form-input" />
-             <input type="number" name="pagos_rotos" placeholder="Pagos Rotos / Desertores" onChange={handleChange} className="form-input" />
+             <input type="number" name="pagos_c2_mj" placeholder="Pagos C2 / Monto Procesado" value={formData.pagos_c2_mj !== undefined ? formData.pagos_c2_mj : ''} onChange={handleChange} className="form-input" />
+             <input type="number" name="pagos_rotos" placeholder="Pagos Rotos / Desertores" value={formData.pagos_rotos !== undefined ? formData.pagos_rotos : ''} onChange={handleChange} className="form-input" />
           </div>
         </div>
       );
@@ -152261,472 +152240,549 @@ export default function ReportesBoard() {
       `}</style>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
-          <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
-            <ArrowLeft size={18} /> Volver al Inicio
-          </button>
-          {canViewEvolucionDashboard && (
-            <button
-              onClick={() => setShowChatWebhookModal(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                padding: '0.5rem 1rem',
-                background: chatWebhookUrl ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255, 255, 255, 0.06)',
-                border: chatWebhookUrl ? '1px solid var(--crear-cyan)' : '1px solid rgba(255,255,255,0.2)',
-                color: chatWebhookUrl ? 'var(--crear-cyan)' : 'var(--text-muted)',
-                borderRadius: '8px',
-                fontWeight: 700,
-                fontSize: '0.82rem',
-                cursor: 'pointer'
-              }}
-              title="Configurar webhook para enviar reportes a un espacio de Google Chat"
-            >
-              <MessageSquare size={16} />
-              {chatWebhookUrl ? 'Google Chat Conectado' : 'Conectar Google Chat'}
-            </button>
-          )}
-        </div>
+        <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
+          <ArrowLeft size={18} /> Volver
+        </button>
 
-        {/* CONMUTADOR DE VISTAS (Solo Directivos y Gerentes) */}
+        {/* CONMUTADOR DE VISTAS LIMPIO */}
         {canViewEvolucionDashboard ? (
-          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '8px' }}>
+          <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '8px', flexWrap: 'wrap' }}>
             <button
               onClick={() => setActiveTab('formulario')}
               style={{
-                padding: '0.5rem 1.2rem',
+                padding: '0.45rem 1rem',
                 borderRadius: '6px',
                 border: 'none',
                 background: activeTab === 'formulario' ? 'var(--crear-cyan, #29abe2)' : 'transparent',
                 color: activeTab === 'formulario' ? '#000' : 'var(--text-muted)',
                 fontWeight: 800,
-                fontSize: '0.85rem',
+                fontSize: '0.84rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.4rem'
               }}
             >
-              <FileText size={16} /> Enviar Reportes
+              <FileText size={15} /> Enviar Reporte
+            </button>
+            <button
+              onClick={() => setActiveTab('monitor_vivo')}
+              style={{
+                padding: '0.45rem 1rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: activeTab === 'monitor_vivo' ? '#22c55e' : 'transparent',
+                color: activeTab === 'monitor_vivo' ? '#000' : 'var(--text-muted)',
+                fontWeight: 800,
+                fontSize: '0.84rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <Eye size={15} /> Monitor en Vivo ({dailyReports.length})
             </button>
             <button
               onClick={() => setActiveTab('dashboard_evolucion')}
               style={{
-                padding: '0.5rem 1.2rem',
+                padding: '0.45rem 1rem',
                 borderRadius: '6px',
                 border: 'none',
                 background: activeTab === 'dashboard_evolucion' ? 'var(--crear-gold, #ffb703)' : 'transparent',
                 color: activeTab === 'dashboard_evolucion' ? '#000' : 'var(--text-muted)',
                 fontWeight: 800,
-                fontSize: '0.85rem',
+                fontSize: '0.84rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.4rem'
               }}
             >
-              <BarChart3 size={16} /> Dashboard Evolución (Causa OS)
+              <BarChart3 size={15} /> Evolución
             </button>
           </div>
         ) : (
           <div style={{ fontWeight: 800, color: 'var(--crear-cyan)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <FileText size={16} /> Módulo Oficial de Reportes
+            <FileText size={16} /> Centro de Reportes
           </div>
         )}
       </div>
 
-      {/* VISTA 1: FORMULARIO DE REPORTES */}
+      {/* VISTA 1: FORMULARIO DE REPORTES (CERO CUELLOS DE BOTELLA) */}
       {activeTab === 'formulario' && (
-        <div className="glass-panel" style={{ padding: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-            <FileText size={32} className="text-gold" />
-            <div>
-              <h1 className="text-gold uppercase" style={{ margin: 0, fontSize: '1.6rem' }}>Centro de Reportes Operativos</h1>
-              <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
-                Sistema Nodus & Causa OS • Formatos de Baja Fricción («Cero Pereza») y Alta Impecabilidad
-              </p>
-            </div>
-          </div>
-
-          {/* ACCESOS DIRECTOS DESTACADOS */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-            {/* CARD 1: REPORTE RELAMPAGO GERENTE (Solo Directivos y Gerentes) */}
-            {canViewEvolucionDashboard && (
-              <div 
-                onClick={() => {
-                  setReportType('ReporteRelampagoFDS');
-                  setTimeout(() => {
-                    document.getElementById('formulario-reporte-activo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }, 60);
-                }}
-                style={{
-                  background: reportType === 'ReporteRelampagoFDS' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)',
-                  border: reportType === 'ReporteRelampagoFDS' ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '12px',
-                  padding: '1.2rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                  <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <Zap size={15} /> GERENTES DE SEDE
-                  </span>
-                  <span style={{ background: 'rgba(245,158,11,0.2)', color: '#fbbf24', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
-                    &lt; 3 minutos
-                  </span>
-                </div>
-                <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>⚡ Reporte Relámpago Post-FDS</h3>
-                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                  Evaluación 5 Puntos (Entrenador, Logística, Staff, Retención TRO y Quiebres). Habilitado Domingo 21:00 a Lunes 12:00 PM.
+        <div className="glass-panel" style={{ padding: '1.75rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+              <FileText size={30} className="text-gold" />
+              <div>
+                <h1 className="text-gold uppercase" style={{ margin: 0, fontSize: '1.45rem' }}>Enviar Reporte</h1>
+                <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
+                  Conectado automáticamente con Nodus • Elige tu formato y envía en 1 paso
                 </p>
               </div>
-            )}
-
-            {/* CARD 2: MICRO-PULSO STAFF */}
-            <div 
-              onClick={() => {
-                setReportType('MicroPulsoStaff');
-                setTimeout(() => {
-                  document.getElementById('formulario-reporte-activo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 60);
-              }}
-              style={{
-                background: reportType === 'MicroPulsoStaff' ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.03)',
-                border: reportType === 'MicroPulsoStaff' ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
-                padding: '1.2rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#38bdf8', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <Sparkles size={15} /> STAFF & VOLUNTARIOS
-                </span>
-                <span style={{ background: 'rgba(56,189,248,0.2)', color: '#38bdf8', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
-                  &lt; 30 segundos
-                </span>
-              </div>
-              <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>🎧 Micro-Pulso Aleatorio</h3>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                3 preguntas dinámicas (Seguridad psicológica, liderazgo y freno a la fricción Stop). Lunes 11:00 AM a Martes 18:00 PM.
-              </p>
             </div>
 
-            {/* CARD 3: REPORTE DIARIO DE LLAMADAS (COORDINADORES C1 & C2) */}
-            {canViewLlamadasForm && (
-            <div 
-              onClick={() => {
-                setReportType('Llamadas');
-                setTimeout(() => {
-                  document.getElementById('formulario-reporte-activo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 60);
-              }}
-              style={{
-                background: reportType === 'Llamadas' ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.03)',
-                border: reportType === 'Llamadas' ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
-                padding: '1.2rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#22c55e', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <PhoneCall size={15} /> COORDINACIÓN C1 & C2
-                </span>
-                <span style={{ background: 'rgba(34,197,94,0.2)', color: '#22c55e', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
-                  Diario 12:00 M
-                </span>
+            {canSwitchAnyCoord ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Building2 size={16} color="var(--crear-cyan)" />
+                <select
+                  value={reportSede}
+                  onChange={e => setReportSede(e.target.value)}
+                  className="form-input"
+                  style={{ width: 'auto', minWidth: '165px', padding: '0.45rem 0.8rem', fontSize: '0.85rem' }}
+                  aria-label="Seleccionar sede para Nodus"
+                >
+                  {OPERATIONAL_SEDES.map(s => <option key={s} value={calendarSede(s)}>{s}</option>)}
+                </select>
               </div>
-              <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>📞 Reporte Diario de Llamadas</h3>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                Revisión diaria a las 12:00 M (Nuevos y Rezagados). Equipo del calendario y conteos verificables desde Nodus; sin copiar reportes anteriores.
-              </p>
-            </div>
+            ) : (
+              <div style={{ background: 'rgba(41, 171, 226, 0.12)', border: '1px solid rgba(41, 171, 226, 0.35)', padding: '0.45rem 0.9rem', borderRadius: '8px', fontSize: '0.85rem', color: '#fff', fontWeight: 700 }}>
+                📍 {reportSede || calendarSede(currentUser?.sede) || 'Sede asignada'}
+              </div>
             )}
           </div>
 
-          {/* BANDEJA DE REPORTES DIARIOS (DIRECTIVOS Y GERENTES) */}
-          {canViewEvolucionDashboard && (
-            <div style={{ marginBottom: '2.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.2rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
-                  <div style={{ background: 'rgba(41, 171, 226, 0.15)', padding: '10px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <FileText size={22} color="var(--crear-cyan, #29abe2)" />
-                  </div>
-                  <div>
-                    <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      Reportes Diarios de Coordinadores
-                      <span style={{ fontSize: '0.72rem', background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
-                        En Vivo
-                      </span>
-                    </h2>
-                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                      Monitoreo en tiempo real de llamadas, avances y confirmados reportados por los coordinadores de sede.
-                    </p>
-                  </div>
-                </div>
-
-                {/* FILTRO POR SEDE */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>Filtrar Sede:</span>
-                  <select
-                    value={filterSedeFeed}
-                    onChange={e => setFilterSedeFeed(e.target.value)}
-                    className="form-input"
-                    style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
-                  >
-                    <option value="Todas">🌐 Todas las Sedes</option>
-                    <option value="Lima">Lima</option>
-                    <option value="Quito">Quito</option>
-                    <option value="Guayaquil">Guayaquil</option>
-                    <option value="Cuenca">Cuenca</option>
-                    <option value="Bogota">Bogotá</option>
-                    <option value="Medellin">Medellín</option>
-                    <option value="Mexico">México</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* LISTA DE REPORTES */}
-              {loadingDailyReports ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                  <RefreshCw size={24} className="spin" style={{ margin: '0 auto 0.5rem' }} />
-                  <p style={{ margin: 0, fontSize: '0.85rem' }}>Cargando reportes diarios de coordinadores...</p>
-                </div>
-              ) : filteredDailyReports.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2.5rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
-                  <CheckCircle2 size={32} color="#64748b" style={{ margin: '0 auto 0.5rem' }} />
-                  <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>
-                    No hay reportes recientes registrados para <strong>{filterSedeFeed}</strong>.
-                  </p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
-                  {filteredDailyReports.map(rep => {
-                    const isExpanded = expandedReportId === rep.id;
-                    const d = rep.data || {};
-                    const totalOk = (Number(d.nuevos_OK) || 0) + (Number(d.rezagados_OK) || 0);
-                    const totalXc = (Number(d.nuevos_XC) || 0) + (Number(d.rezagados_XC) || 0);
-                    const totalNc = (Number(d.nuevos_NC) || 0) + (Number(d.rezagados_NC) || 0);
-                    const totalPend = (Number(d.nuevos_PENDIENTES) || 0) + (Number(d.rezagados_PENDIENTES) || 0);
-
-                    return (
-                      <div
-                        key={rep.id}
-                        style={{
-                          background: 'rgba(255,255,255,0.03)',
-                          border: '1px solid rgba(255,255,255,0.07)',
-                          borderRadius: '12px',
-                          padding: '1.1rem 1.3rem',
-                          transition: 'all 0.2s'
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '0.8rem' }}>
-                          <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                              <span style={{ fontWeight: 800, color: '#fff', fontSize: '1.02rem' }}>
-                                {rep.submitted_by || 'Coordinador(a)'}
-                              </span>
-                              <span style={{ fontSize: '0.72rem', background: 'rgba(255, 193, 7, 0.18)', color: 'var(--crear-gold)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                                📍 {rep.sede || 'Global'}
-                              </span>
-                              {rep.cycle_id && (
-                                <span style={{ fontSize: '0.72rem', background: 'rgba(41, 171, 226, 0.18)', color: 'var(--crear-cyan)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                                  {rep.cycle_id}
-                                </span>
-                              )}
-                              {rep.stage && (
-                                <span style={{ fontSize: '0.72rem', background: 'rgba(168, 85, 247, 0.18)', color: '#c084fc', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                                  {rep.stage}
-                                </span>
-                              )}
-                            </div>
-                            <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                              <Clock size={13} /> {formatReportDate(rep.created_at)}
-                              <span>•</span>
-                              <span style={{ color: '#94a3b8' }}>Tipo: <strong>{rep.type === 'Llamadas' ? 'Reporte Diario de Llamadas' : rep.type}</strong></span>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                            {rep.reviewedBy ? (
-                              <span style={{ fontSize: '0.75rem', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 10px', borderRadius: '8px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                <Check size={14} /> Auditado por {rep.reviewedBy}
-                              </span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => handleMarkReviewed(rep.id)}
-                                style={{
-                                  background: 'rgba(16, 185, 129, 0.15)',
-                                  border: '1px solid #10b981',
-                                  color: '#10b981',
-                                  borderRadius: '8px',
-                                  padding: '0.4rem 0.8rem',
-                                  fontSize: '0.75rem',
-                                  fontWeight: 800,
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                ✓ Marcar como Visto
-                              </button>
-                            )}
-
-                            <button
-                              type="button"
-                              onClick={() => setExpandedReportId(isExpanded ? null : rep.id)}
-                              style={{
-                                background: 'transparent',
-                                border: '1px solid rgba(255,255,255,0.15)',
-                                color: 'var(--text-muted)',
-                                borderRadius: '8px',
-                                padding: '0.4rem 0.7rem',
-                                fontSize: '0.75rem',
-                                fontWeight: 700,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.3rem'
-                              }}
-                            >
-                              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                              {isExpanded ? 'Ocultar' : 'Detalle'}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* PÍLDORAS DE MÉTRICAS */}
-                        {rep.type === 'Llamadas' && (
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
-                            <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                              <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>CONFIRMADOS (OK)</div>
-                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>{totalOk}</div>
-                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_OK || 0} nuevos · {d.rezagados_OK || 0} rez.</div>
-                            </div>
-                            <div style={{ background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                              <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 700 }}>POR CONFIRMAR (XC)</div>
-                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#f59e0b' }}>{totalXc}</div>
-                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_XC || 0} nuevos · {d.rezagados_XC || 0} rez.</div>
-                            </div>
-                            <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                              <div style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: 700 }}>NO CONTESTA (NC)</div>
-                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#ef4444' }}>{totalNc}</div>
-                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_NC || 0} nuevos · {d.rezagados_NC || 0} rez.</div>
-                            </div>
-                            <div style={{ background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                              <div style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 700 }}>PENDIENTES</div>
-                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#38bdf8' }}>{totalPend}</div>
-                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_PENDIENTES || 0} nuevos · {d.rezagados_PENDIENTES || 0} rez.</div>
-                            </div>
-                          </div>
-                        )}
-
-                        {rep.type === 'ReporteRelampagoFDS' && (
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
-                            <div style={{ background: 'rgba(167, 139, 250, 0.12)', border: '1px solid rgba(167, 139, 250, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                              <div style={{ fontSize: '0.7rem', color: '#a78bfa', fontWeight: 700 }}>RETENCIÓN (TRO)</div>
-                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#a78bfa' }}>{d.tasa_retencion_automatica || 0}%</div>
-                            </div>
-                            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>SENTADOS / GRADUADOS</div>
-                              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{d.sentados_inicio || 0} / {d.graduados_cierre || 0}</div>
-                            </div>
-                            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>QUIEBRE</div>
-                              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: d.tipo_quiebre === 'Ninguno' ? '#10b981' : '#ef4444' }}>{d.tipo_quiebre || 'Ninguno'}</div>
-                            </div>
-                          </div>
-                        )}
-
-                        {rep.type === 'ReporteSentadosSala' && (
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
-                            <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                              <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>SENTADOS EN SALA</div>
-                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>{d.sentados || 0}</div>
-                            </div>
-                            {d.managers && (
-                              <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
-                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>MANAGERS</div>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{d.managers}</div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-
-                        {/* DETALLE EXPANDIBLE */}
-                        {isExpanded && (
-                          <div style={{ marginTop: '0.9rem', paddingTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.82rem' }}>
-                            <div style={{ color: 'var(--crear-cyan)', fontWeight: 700, marginBottom: '0.4rem' }}>
-                              Desglose Operativo de Gestión:
-                            </div>
-                            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.78rem', color: '#cbd5e1', whiteSpace: 'pre-wrap' }}>
-                              {JSON.stringify(d, null, 2)}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {isDireccion && (
-            <div style={{ padding: '0.9rem 1.2rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(218,165,32,0.08)', borderRadius: '12px', border: '1px solid rgba(218,165,32,0.3)', flexWrap: 'wrap', gap: '0.8rem' }}>
-              <p style={{ margin: 0, fontSize: '0.88rem', color: '#e2e8f0' }}>
-                👑 <strong>Modo Dirección / SuperAdmin:</strong> Tienes acceso global para llenar, auditar y emitir cualquier formato de reporte.
-              </p>
-              <button 
-                type="button" 
-                onClick={() => setActiveTab('dashboard_evolucion')}
-                className="btn-secondary" 
-                style={{ fontSize: '0.8rem', padding: '4px 10px', borderColor: 'var(--crear-gold)', color: 'var(--crear-gold)' }}
+          {/* SELECTOR ÚNICO DE FORMATOS AUTORIZADOS POR ROL */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.85rem', marginBottom: '1.75rem' }}>
+            {canViewLlamadasForm && (
+              <button
+                type="button"
+                onClick={() => setReportType('Llamadas')}
+                style={{
+                  textAlign: 'left',
+                  background: reportType === 'Llamadas' ? 'rgba(34,197,94,0.18)' : 'rgba(255,255,255,0.03)',
+                  border: reportType === 'Llamadas' ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  color: '#fff'
+                }}
               >
-                Ver Dashboard Evolución →
+                <div style={{ color: '#22c55e', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.25rem' }}>📞 DIARIO 12:00 M</div>
+                <div style={{ fontWeight: 800, fontSize: '1rem' }}>Llamadas (C1 / C2)</div>
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Nuevos y Rezagados desde Nodus</div>
+              </button>
+            )}
+
+            {canViewEvolucionDashboard && (
+              <button
+                type="button"
+                onClick={() => setReportType('ReporteRelampagoFDS')}
+                style={{
+                  textAlign: 'left',
+                  background: reportType === 'ReporteRelampagoFDS' ? 'rgba(245,158,11,0.18)' : 'rgba(255,255,255,0.03)',
+                  border: reportType === 'ReporteRelampagoFDS' ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  color: '#fff'
+                }}
+              >
+                <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.25rem' }}>⚡ GERENCIA &lt;3 MIN</div>
+                <div style={{ fontWeight: 800, fontSize: '1rem' }}>Relámpago Post-FDS</div>
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Entrenador, TRO y quiebres</div>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setReportType('MicroPulsoStaff')}
+              style={{
+                textAlign: 'left',
+                background: reportType === 'MicroPulsoStaff' ? 'rgba(56,189,248,0.18)' : 'rgba(255,255,255,0.03)',
+                border: reportType === 'MicroPulsoStaff' ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '12px',
+                padding: '1rem',
+                cursor: 'pointer',
+                color: '#fff'
+              }}
+            >
+              <div style={{ color: '#38bdf8', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.25rem' }}>🎧 STAFF &lt;30 SEG</div>
+              <div style={{ fontWeight: 800, fontSize: '1rem' }}>Micro-Pulso Aleatorio</div>
+              <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>3 preguntas rápidas de sala</div>
+            </button>
+
+            {canViewFdsForm && (
+              <button
+                type="button"
+                onClick={() => setReportType('FDS')}
+                style={{
+                  textAlign: 'left',
+                  background: reportType === 'FDS' ? 'rgba(168,85,247,0.18)' : 'rgba(255,255,255,0.03)',
+                  border: reportType === 'FDS' ? '2px solid #a855f7' : '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  color: '#fff'
+                }}
+              >
+                <div style={{ color: '#c084fc', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.25rem' }}>🏛️ SALA C1</div>
+                <div style={{ fontWeight: 800, fontSize: '1rem' }}>Reporte FDS</div>
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Sentados, aliados y enrolamiento</div>
+              </button>
+            )}
+
+            {canViewC2Form && (
+              <button
+                type="button"
+                onClick={() => setReportType('C2')}
+                style={{
+                  textAlign: 'left',
+                  background: reportType === 'C2' ? 'rgba(249,115,22,0.18)' : 'rgba(255,255,255,0.03)',
+                  border: reportType === 'C2' ? '2px solid #f97316' : '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  color: '#fff'
+                }}
+              >
+                <div style={{ color: '#fb923c', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.25rem' }}>🔥 CAPÍTULO 2</div>
+                <div style={{ fontWeight: 800, fontSize: '1rem' }}>Reporte C2</div>
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Pagos C2/MJ, aliados y desertores</div>
+              </button>
+            )}
+
+            {canViewMjForm && (
+              <button
+                type="button"
+                onClick={() => setReportType('MJ')}
+                style={{
+                  textAlign: 'left',
+                  background: reportType === 'MJ' ? 'rgba(234,179,8,0.18)' : 'rgba(255,255,255,0.03)',
+                  border: reportType === 'MJ' ? '2px solid #eab308' : '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  color: '#fff'
+                }}
+              >
+                <div style={{ color: '#facc15', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.25rem' }}>👑 MAESTRÍA</div>
+                <div style={{ fontWeight: 800, fontSize: '1rem' }}>Maestría del Juego</div>
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Asistencia, declaración y enrolamiento</div>
+              </button>
+            )}
+
+            {canViewQtForm && (
+              <button
+                type="button"
+                onClick={() => setReportType('QT_Contexto')}
+                style={{
+                  textAlign: 'left',
+                  background: reportType === 'QT_Contexto' ? 'rgba(20,184,166,0.18)' : 'rgba(255,255,255,0.03)',
+                  border: reportType === 'QT_Contexto' ? '2px solid #14b8a6' : '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '12px',
+                  padding: '1rem',
+                  cursor: 'pointer',
+                  color: '#fff'
+                }}
+              >
+                <div style={{ color: '#2dd4bf', fontWeight: 800, fontSize: '0.78rem', marginBottom: '0.25rem' }}>⚡ QUANTUM TEAM</div>
+                <div style={{ fontWeight: 800, fontSize: '1rem' }}>Contexto QT</div>
+                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>Lectura rápida de sala y contexto</div>
+              </button>
+            )}
+          </div>
+
+          {/* RESUMEN AUTOMÁTICO DE NODUS EN VIVO PARA FORMATOS OPERATIVOS (EXCEPTO MICRO-PULSO Y LLAMADAS QUE TIENE SU PROPIA BARRA) */}
+          {reportType && reportType !== 'MicroPulsoStaff' && reportType !== 'Llamadas' && (
+            <div style={{
+              marginBottom: '1.25rem',
+              padding: '0.85rem 1.1rem',
+              borderRadius: '10px',
+              background: 'rgba(41, 171, 226, 0.1)',
+              border: '1px solid rgba(41, 171, 226, 0.3)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '0.75rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.84rem', color: '#e2e8f0', flexWrap: 'wrap' }}>
+                <Database size={16} color="var(--crear-cyan)" />
+                {loadingNodus ? (
+                  <span>Conectando con Nodus ({reportSede})...</span>
+                ) : nodusLiveSummary ? (
+                  <>
+                    <strong style={{ color: '#38bdf8' }}>Nodus en Vivo ({nodusLiveSummary.equipoNombre}):</strong>
+                    <span>{nodusLiveSummary.totalPx} PX</span>
+                    <span>• {nodusLiveSummary.asistieronC1} Asistieron C1</span>
+                    <span>• {nodusLiveSummary.pagadosC1} Pagados C1</span>
+                    <span>• {nodusLiveSummary.pagadosC2} Pagados C2</span>
+                    {nodusLiveSummary.maestriaC2 > 0 && <span>• {nodusLiveSummary.maestriaC2} MJ</span>}
+                  </>
+                ) : (
+                  <span style={{ color: 'var(--text-muted)' }}>{nodusStatusMsg || `Sin datos activos en Nodus para ${reportSede}`}</span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => handleExtraerDeNodus(selectedNodusTeam)}
+                disabled={loadingNodus}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  color: '#38bdf8',
+                  borderRadius: '6px',
+                  padding: '0.3rem 0.7rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
+                }}
+              >
+                <RefreshCw size={13} className={loadingNodus ? 'spin' : ''} /> Sincronizar
               </button>
             </div>
           )}
 
           <form id="formulario-reporte-activo" onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label className="text-white" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700 }}>
-                {reportType ? 'Formato Operativo Seleccionado:' : 'O selecciona un formato operativo:'}
-              </label>
-              <select 
-                value={reportType} 
-                onChange={e => setReportType(e.target.value)} 
-                className="form-input"
-              >
-                <option value="">-- Selecciona Formato Oficial Autorizado --</option>
-                {canViewEvolucionDashboard && (
-                  <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
-                )}
-                <option value="MicroPulsoStaff">🎧 Micro-Pulso de Staff (Escucha Activa 3 Preguntas &lt;30 seg)</option>
-                {canViewLlamadasForm && <option value="Llamadas">1. Reporte de Llamadas (C1)</option>}
-                {canViewLlamadasForm && <option value="FDS">2. Reporte FDS (Sede C1 tradicional)</option>}
-                {(canViewLlamadasForm || roles.includes("coord_c2") || role === "coord_c2") && <option value="C2">3. Reporte Capítulo Dos</option>}
-                {(isGerente || isDireccion || roles.includes("coord_maestria") || roles.includes("director_maestria") || role === "coord_maestria" || role === "director_maestria" || currentUser?.isSuperAdmin) && <option value="MJ">4. Reporte Maestría del Juego</option>}
-                {(isGerente || isDireccion || roles.includes("qt") || role === "qt" || currentUser?.isSuperAdmin) && <option value="QT_Contexto">5. Reporte de Contexto (QT)</option>}
-              </select>
-            </div>
+            {reportType ? (
+              <>
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', marginBottom: '1.5rem' }}>
+                  {renderFormFields()}
+                </div>
 
-            {reportType && (
-              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', marginBottom: '2rem' }}>
-                {renderFormFields()}
+                <button type="submit" disabled={loading || (reportType === 'Llamadas' && (loadingNodus || loadingEvents || !reportTarget || !reviewedCounts || !validCallCounts(formData)))} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem' }}>
+                  <Send size={18} /> {loading ? 'Enviando...' : 'Enviar Reporte'}
+                </button>
+              </>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                Selecciona una tarjeta arriba para abrir el formato correspondiente.
               </div>
             )}
-
-            {reportType && (
-              <button type="submit" disabled={loading || (reportType === 'Llamadas' && (loadingNodus || loadingEvents || !reportTarget || !reviewedCounts || !validCallCounts(formData)))} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem' }}>
-                <Send size={18} /> {loading ? 'Enviando...' : 'Enviar Reporte y Registrar en Causa OS'}
-              </button>
-            )}
           </form>
+        </div>
+      )}
+
+      {/* VISTA 2: MONITOR EN VIVO DE REPORTES (SOLO GERENTES Y DIRECCIÓN) */}
+      {activeTab === 'monitor_vivo' && canViewEvolucionDashboard && (
+        <div className="glass-panel" style={{ padding: '1.75rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+              <div style={{ background: 'rgba(41, 171, 226, 0.15)', padding: '10px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <FileText size={22} color="var(--crear-cyan, #29abe2)" />
+              </div>
+              <div>
+                <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  Monitor en Vivo por Sede
+                  <span style={{ fontSize: '0.72rem', background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
+                    Tiempo Real
+                  </span>
+                </h2>
+                <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                  Reportes recibidos de coordinadores, capitanes, managers, aliados y QT.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+              {(isDireccion || currentUser?.isSuperAdmin) && (
+                <button
+                  type="button"
+                  onClick={() => setShowChatWebhookModal(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    padding: '0.45rem 0.85rem',
+                    background: chatWebhookUrl ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+                    border: chatWebhookUrl ? '1px solid var(--crear-cyan)' : '1px solid rgba(255,255,255,0.2)',
+                    color: chatWebhookUrl ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    fontSize: '0.8rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <MessageSquare size={14} />
+                  {chatWebhookUrl ? 'Google Chat' : 'Conectar Chat'}
+                </button>
+              )}
+              <select
+                value={filterSedeFeed}
+                onChange={e => setFilterSedeFeed(e.target.value)}
+                className="form-input"
+                style={{ width: 'auto', padding: '0.45rem 0.8rem', fontSize: '0.85rem' }}
+              >
+                <option value="Todas">🌐 Todas las Sedes</option>
+                <option value="Lima">Lima</option>
+                <option value="Quito">Quito</option>
+                <option value="Guayaquil">Guayaquil</option>
+                <option value="Cuenca">Cuenca</option>
+                <option value="Medellin">Medellín</option>
+                <option value="Mexico">México</option>
+              </select>
+            </div>
+          </div>
+
+          {loadingDailyReports ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+              <RefreshCw size={24} className="spin" style={{ margin: '0 auto 0.5rem' }} />
+              <p style={{ margin: 0, fontSize: '0.85rem' }}>Cargando reportes...</p>
+            </div>
+          ) : filteredDailyReports.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2.5rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+              <CheckCircle2 size={32} color="#64748b" style={{ margin: '0 auto 0.5rem' }} />
+              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>
+                No hay reportes recientes registrados para <strong>{filterSedeFeed}</strong>.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+              {filteredDailyReports.map(rep => {
+                const isExpanded = expandedReportId === rep.id;
+                const d = rep.data || {};
+                const totalOk = (Number(d.nuevos_OK) || 0) + (Number(d.rezagados_OK) || 0);
+                const totalXc = (Number(d.nuevos_XC) || 0) + (Number(d.rezagados_XC) || 0);
+                const totalNc = (Number(d.nuevos_NC) || 0) + (Number(d.rezagados_NC) || 0);
+                const totalPend = (Number(d.nuevos_PENDIENTES) || 0) + (Number(d.rezagados_PENDIENTES) || 0);
+
+                return (
+                  <div
+                    key={rep.id}
+                    style={{
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      borderRadius: '12px',
+                      padding: '1.1rem 1.3rem',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 800, color: '#fff', fontSize: '1.02rem' }}>
+                            {rep.submitted_by || 'Staff'}
+                          </span>
+                          <span style={{ fontSize: '0.72rem', background: 'rgba(255, 193, 7, 0.18)', color: 'var(--crear-gold)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                            📍 {rep.sede || 'Global'}
+                          </span>
+                          {rep.cycle_id && (
+                            <span style={{ fontSize: '0.72rem', background: 'rgba(41, 171, 226, 0.18)', color: 'var(--crear-cyan)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                              {rep.cycle_id}
+                            </span>
+                          )}
+                          {rep.stage && (
+                            <span style={{ fontSize: '0.72rem', background: 'rgba(168, 85, 247, 0.18)', color: '#c084fc', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                              {rep.stage}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                          <Clock size={13} /> {formatReportDate(rep.created_at)}
+                          <span>•</span>
+                          <span style={{ color: '#94a3b8' }}>Tipo: <strong>{rep.type === 'Llamadas' ? 'Reporte Diario de Llamadas' : rep.type}</strong></span>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                        {rep.reviewedBy ? (
+                          <span style={{ fontSize: '0.75rem', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 10px', borderRadius: '8px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <Check size={14} /> Auditado por {rep.reviewedBy}
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleMarkReviewed(rep.id)}
+                            style={{
+                              background: 'rgba(16, 185, 129, 0.15)',
+                              border: '1px solid #10b981',
+                              color: '#10b981',
+                              borderRadius: '8px',
+                              padding: '0.4rem 0.8rem',
+                              fontSize: '0.75rem',
+                              fontWeight: 800,
+                              cursor: 'pointer'
+                            }}
+                          >
+                            ✓ Marcar como Visto
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => setExpandedReportId(isExpanded ? null : rep.id)}
+                          style={{
+                            background: 'transparent',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                            color: 'var(--text-muted)',
+                            borderRadius: '8px',
+                            padding: '0.4rem 0.7rem',
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem'
+                          }}
+                        >
+                          {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          {isExpanded ? 'Ocultar' : 'Detalle'}
+                        </button>
+                      </div>
+                    </div>
+
+                    {rep.type === 'Llamadas' && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
+                        <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>CONFIRMADOS (OK)</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>{totalOk}</div>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_OK || 0} nuevos · {d.rezagados_OK || 0} rez.</div>
+                        </div>
+                        <div style={{ background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 700 }}>POR CONFIRMAR (XC)</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#f59e0b' }}>{totalXc}</div>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_XC || 0} nuevos · {d.rezagados_XC || 0} rez.</div>
+                        </div>
+                        <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: 700 }}>NO CONTESTA (NC)</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#ef4444' }}>{totalNc}</div>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_NC || 0} nuevos · {d.rezagados_NC || 0} rez.</div>
+                        </div>
+                        <div style={{ background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 700 }}>PENDIENTES</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#38bdf8' }}>{totalPend}</div>
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_PENDIENTES || 0} nuevos · {d.rezagados_PENDIENTES || 0} rez.</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {rep.type === 'ReporteRelampagoFDS' && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
+                        <div style={{ background: 'rgba(167, 139, 250, 0.12)', border: '1px solid rgba(167, 139, 250, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#a78bfa', fontWeight: 700 }}>RETENCIÓN (TRO)</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#a78bfa' }}>{d.tasa_retencion_automatica || 0}%</div>
+                        </div>
+                        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>SENTADOS / GRADUADOS</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{d.sentados_inicio || 0} / {d.graduados_cierre || 0}</div>
+                        </div>
+                        <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>QUIEBRE</div>
+                          <div style={{ fontSize: '0.9rem', fontWeight: 800, color: d.tipo_quiebre === 'Ninguno' ? '#10b981' : '#ef4444' }}>{d.tipo_quiebre || 'Ninguno'}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {isExpanded && (
+                      <div style={{ marginTop: '0.9rem', paddingTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.82rem' }}>
+                        <div style={{ color: 'var(--crear-cyan)', fontWeight: 700, marginBottom: '0.4rem' }}>
+                          Desglose Operativo de Gestión:
+                        </div>
+                        <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.78rem', color: '#cbd5e1', whiteSpace: 'pre-wrap' }}>
+                          {JSON.stringify(d, null, 2)}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -201924,6 +201980,256 @@ export async function enforceUserRolesAgent(firebaseUser, currentRoles) {
     console.error("🛡️ [RoleIntegrityAgent] Error validando integridad de roles:", error);
     throw error;
   }
+}
+
+```
+
+---
+
+## Archivo: src/services/nodusReportSync.js
+
+```js
+/**
+ * src/services/nodusReportSync.js
+ * =========================================================================
+ * Sincronización Automática Multi-Sede con Nodus para el Centro de Reportes
+ * =========================================================================
+ * Conecta todas las sedes (Lima, Quito, Cuenca, Guayaquil, Medellín, México)
+ * con:
+ *   1. API Oficial en Vivo de Nodus (https://imo.crearpslglobal.com/api)
+ *   2. Fuentes sincronizadas en Firestore (nodus_report_sources / nodus_coordinadores_c1c2)
+ * Sin inventar ni estimar conteos: si Nodus no aporta etiquetas de llamada,
+ * muestra el resumen real en vivo del equipo para verificación humana.
+ */
+
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase.js';
+import { calendarSede } from '../../functions-imo/calendarModel.mjs';
+import { getLiveNodusEquipos, getLiveNodusParticipantes } from './nodusLiveApiService.js';
+import {
+  buildReportSources,
+  currentReportTeams,
+  reportSourceStatus
+} from './nodusReportModel.js';
+import { explicitTeamFromText } from './goalsTimeline.js';
+
+/**
+ * Normaliza cualquier nombre de sede de Nodus (ej. "CUENCA CICLO 1", "MÉXICO CICLO 1", "UIO C1")
+ * al nombre canónico de Causa OS ("Cuenca", "México", "Quito", etc.).
+ */
+export function normalizeNodusSede(value = '') {
+  const raw = String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase()
+    .trim();
+  if (!raw) return '';
+  if (raw.includes('LIMA') || /\bLIM\b/.test(raw)) return 'Lima';
+  if (raw.includes('QUITO') || /\bUIO\b/.test(raw)) return 'Quito';
+  if (raw.includes('CUENCA') || /\bCUE\b/.test(raw)) return 'Cuenca';
+  if (raw.includes('GUAYAQUIL') || /\bGYE\b/.test(raw)) return 'Guayaquil';
+  if (raw.includes('MEDELLIN') || /\bMED\b/.test(raw)) return 'Medellín';
+  if (raw.includes('MEXICO') || raw.includes('CDMX') || /\bMEX\b/.test(raw)) return 'México';
+  if (raw.includes('BOGOTA') || /\bBOG\b/.test(raw)) return 'Bogotá';
+  return calendarSede(value);
+}
+
+/**
+ * Normaliza el nombre de equipo de Nodus (ej. "EQUIPO 32" -> "32")
+ */
+export function extractTeamNumber(teamName = '') {
+  const raw = String(teamName || '').trim();
+  if (/^\d+$/.test(raw)) return String(Number(raw));
+  return explicitTeamFromText(raw) || '';
+}
+
+/**
+ * Resume de forma exacta y determinista los participantes reales de un equipo Nodus.
+ */
+export function summarizeNodusParticipants(equipo = {}, participantes = []) {
+  const list = Array.isArray(participantes) ? participantes : [];
+  let pagadosC1 = 0;
+  let asistieronC1 = 0;
+  let desertoresC1 = 0;
+  let pagadosC2 = 0;
+  let maestriaC2 = 0;
+  const coordMap = new Map();
+
+  for (const p of list) {
+    const c1 = p.capitulo1 || {};
+    const c2 = p.capitulo2 || {};
+    const pagado1 = Boolean(p.pagadoC1 ?? c1.pagado);
+    const asistio1 = Boolean(p.asistioC1 ?? c1.asistio);
+    const desertor1 = Boolean(p.desertorC1 ?? c1.desertor);
+    const pagado2 = Boolean(p.pagadoC2 ?? c2.pagado);
+    const maestria = Boolean(c2.maestria);
+
+    if (pagado1) pagadosC1++;
+    if (asistio1) asistieronC1++;
+    if (desertor1) desertoresC1++;
+    if (pagado2) pagadosC2++;
+    if (maestria) maestriaC2++;
+
+    const coord = String(p.coordinador || '').trim();
+    if (coord) {
+      coordMap.set(coord, (coordMap.get(coord) || 0) + 1);
+    }
+  }
+
+  const coordinadores = [...coordMap.entries()]
+    .map(([nombre, total]) => ({ nombre, total }))
+    .sort((a, b) => b.total - a.total);
+
+  return {
+    equipoId: equipo.id || null,
+    equipoNombre: equipo.nombre || '',
+    teamNumber: extractTeamNumber(equipo.nombre || ''),
+    sedeNodus: equipo.sede || '',
+    sedeNormalizada: normalizeNodusSede(equipo.sede || ''),
+    etapaVigente: equipo.etapa_vigente || 'PFD',
+    fechaInicio: equipo.fecha_inicio || '',
+    fechaFin: equipo.fecha_fin || '',
+    totalPx: list.length,
+    pagadosC1,
+    sinPagarC1: Math.max(0, list.length - pagadosC1),
+    asistieronC1,
+    desertoresC1,
+    pagadosC2,
+    maestriaC2,
+    coordinadores
+  };
+}
+
+/**
+ * Selecciona el mejor equipo activo de Nodus para una sede y número de equipo opcional.
+ */
+export function selectNodusEquipoForSede(equipos = [], sede = '', preferredTeam = '') {
+  const targetSede = normalizeNodusSede(sede);
+  if (!targetSede) return null;
+
+  const matching = (Array.isArray(equipos) ? equipos : []).filter(
+    eq => normalizeNodusSede(eq.sede || '') === targetSede
+  );
+  if (matching.length === 0) return null;
+
+  if (preferredTeam && preferredTeam !== 'auto') {
+    const exact = matching.find(eq => extractTeamNumber(eq.nombre) === String(preferredTeam));
+    if (exact) return exact;
+  }
+
+  // Priorizar equipos con participantes > 0 y fecha_inicio más reciente
+  const sorted = [...matching].sort((a, b) => {
+    const aHasPx = (a.participantes || 0) > 0 ? 1 : 0;
+    const bHasPx = (b.participantes || 0) > 0 ? 1 : 0;
+    if (aHasPx !== bHasPx) return bHasPx - aHasPx;
+    return String(b.fecha_inicio || '').localeCompare(String(a.fecha_inicio || ''));
+  });
+
+  return sorted[0];
+}
+
+/**
+ * Extrae automáticamente datos de Nodus para cualquier sede:
+ * - Conteos de llamadas verificables (desde nodus_report_sources o nodus_coordinadores_c1c2)
+ * - Padrón y métricas en vivo (desde la API oficial de Nodus /equipos + /participantes/:id)
+ */
+export async function syncNodusForReport({
+  sede = '',
+  stage = 'C1',
+  teamOverride = null,
+  events = [],
+  includeCallSources = true
+} = {}) {
+  const normalizedSede = normalizeNodusSede(sede);
+  const targets = normalizedSede && stage ? currentReportTeams(events || [], normalizedSede, stage) : [];
+  const target = targets.find(t => t.team === teamOverride) || (targets.length === 1 ? targets[0] : null);
+
+  let source = null;
+  let sourceStatus = target ? reportSourceStatus(null, target) : { ready: false, message: '' };
+
+  if (includeCallSources && normalizedSede && stage) {
+    try {
+      const docSnap = await getDoc(doc(db, 'nodus_report_sources', `${normalizedSede}_${stage}`));
+      if (docSnap.exists()) {
+        source = docSnap.data();
+        sourceStatus = reportSourceStatus(source, target);
+      }
+
+      if (!sourceStatus.ready) {
+        const coordSnap = await getDoc(doc(db, 'nodus_coordinadores_c1c2', 'latest'));
+        if (coordSnap.exists()) {
+          const derived = buildReportSources(coordSnap.data());
+          const matchedSource = derived.find(s => s.sede === normalizedSede && s.stage === stage);
+          if (matchedSource) {
+            const derivedStatus = reportSourceStatus(matchedSource, target);
+            if (derivedStatus.ready || !source) {
+              source = matchedSource;
+              sourceStatus = derivedStatus;
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('No se pudo consultar fuentes de llamadas en Firestore:', err?.message || err);
+    }
+  }
+
+  let liveSummary = null;
+  let liveEquiposSede = [];
+  let liveError = null;
+
+  if (normalizedSede) {
+    try {
+      const eqRes = await getLiveNodusEquipos({ enActividad: true });
+      if (eqRes.ok && Array.isArray(eqRes.data)) {
+        liveEquiposSede = eqRes.data
+          .filter(eq => normalizeNodusSede(eq.sede || '') === normalizedSede)
+          .map(eq => ({
+            id: eq.id,
+            nombre: eq.nombre,
+            teamNumber: extractTeamNumber(eq.nombre),
+            sede: eq.sede,
+            etapaVigente: eq.etapa_vigente,
+            fechaInicio: eq.fecha_inicio,
+            fechaFin: eq.fecha_fin,
+            participantes: eq.participantes || 0
+          }));
+
+        const preferredTeam = (teamOverride && teamOverride !== 'auto')
+          ? teamOverride
+          : target?.team || '';
+
+        const chosen = selectNodusEquipoForSede(eqRes.data, normalizedSede, preferredTeam);
+        if (chosen?.id) {
+          const pRes = await getLiveNodusParticipantes(chosen.id);
+          if (pRes.ok) {
+            liveSummary = {
+              ...summarizeNodusParticipants(chosen, pRes.participantes),
+              apiSource: pRes.source || 'LIVE_API',
+              syncedAt: new Date().toISOString()
+            };
+          } else {
+            liveError = pRes.error || 'No se pudo leer participantes de Nodus';
+          }
+        }
+      } else {
+        liveError = eqRes.error || 'No se pudo conectar con la API de Nodus';
+      }
+    } catch (err) {
+      liveError = err?.message || 'Error de red con Nodus';
+    }
+  }
+
+  return {
+    normalizedSede,
+    targets,
+    target,
+    source,
+    sourceStatus,
+    liveSummary,
+    liveEquiposSede,
+    liveError
+  };
 }
 
 ```
