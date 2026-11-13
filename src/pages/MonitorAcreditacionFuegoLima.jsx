@@ -38,6 +38,7 @@ import toast from 'react-hot-toast';
 import { db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 import padronLima111 from '../data/padron_fuego_lima_111.json';
+import capitanesData from '../data/capitanesSedesEquipos.json';
 import { generateFirewalkPassCanvas, sendFirewalkConfirmationEmail } from '../utils/maestriaPass';
 import { downloadFirewalkContractPdf } from '../utils/contractPdfGenerator';
 import {
@@ -381,6 +382,7 @@ export default function MonitorAcreditacionFuegoLima() {
       signedContracts,
       attendanceMap,
       padronList: padronLima111,
+      capitanesList: capitanesData?.capitanes || [],
       nodusIndex,
       teamBlockMap
     });

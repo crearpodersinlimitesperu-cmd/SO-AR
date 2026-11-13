@@ -93,6 +93,14 @@ export const ACTIVE_STUDENT_TEAMS = new Set([
   'Equipo 28'
 ]);
 
+export const ACTIVE_MG_COHORT_TEAMS = new Set([
+  'Equipo 33',
+  'Equipo 32',
+  'Equipo 31',
+  'Equipo 30',
+  'Equipo 29'
+]);
+
 export function canonicalizeEquipoName(rawEquipo) {
   const s = String(rawEquipo || '').trim();
   if (!s) return '';
@@ -143,7 +151,7 @@ export function getFirewalkPersonKey(record = {}) {
  *   NO lo asigna falsamente a ese equipo antiguo; deja `equipo: ''` y expone `graduadoRef` para que coordinación
  *   lo asigne con 1 clic al FDS/Equipo donde está sirviendo como MG.
  */
-export function resolveAutoTeamMatch(record, { padronList = [], nodusIndex = null } = {}) {
+export function resolveAutoTeamMatch(record, { padronList = [], capitanesList = [], nodusIndex = null } = {}) {
   const defaultCat = deriveDefaultCategoriaFromRol(record.rol || record.rolActividad);
   if (defaultCat === 'Aliados') {
     return { autoEquipo: 'Aliados', source: 'AUTO_ROL', graduadoRef: '' };
@@ -178,6 +186,26 @@ export function resolveAutoTeamMatch(record, { padronList = [], nodusIndex = nul
     }
   }
 
+  // 1b. Buscar en directorio oficial de Capitanes Lima activos (E29+)
+  if (normName && Array.isArray(capitanesList) && capitanesList.length > 0) {
+    const capHit = capitanesList.find((c) => {
+      if (String(c.sede || '').toLowerCase() !== 'lima' || Number(c.numEquipo) < 29) return false;
+      const cName = normalizeLimaPersonName(c.nombre || '');
+      if (!cName) return false;
+      if (cName === normName) return true;
+      const cTokens = cName.split(/\s+/).filter((t) => t.length > 2);
+      if (cTokens.length < 2 || nameTokens.length < 2) return false;
+      return nameTokens.every((t) => cTokens.includes(t)) || cTokens.filter((t) => nameTokens.includes(t)).length >= 2;
+    });
+    if (capHit && capHit.numEquipo) {
+      return {
+        autoEquipo: `Equipo ${capHit.numEquipo}`,
+        source: 'AUTO_PADRON',
+        graduadoRef: ''
+      };
+    }
+  }
+
   // 2. Buscar en índice vivo de Nodus (por DNI exacto o nombre completo exacto)
   if (nodusIndex) {
     const nodusHit =
@@ -187,7 +215,10 @@ export function resolveAutoTeamMatch(record, { padronList = [], nodusIndex = nul
 
     if (nodusHit && nodusHit.equipo) {
       const canonicalEq = canonicalizeEquipoName(nodusHit.equipo);
-      if (defaultCat === 'Px' && ACTIVE_STUDENT_TEAMS.has(canonicalEq)) {
+      if (
+        (defaultCat === 'Px' && ACTIVE_STUDENT_TEAMS.has(canonicalEq)) ||
+        (defaultCat === 'MG' && ACTIVE_MG_COHORT_TEAMS.has(canonicalEq))
+      ) {
         return {
           autoEquipo: canonicalEq,
           source: 'AUTO_NODUS',
@@ -214,6 +245,7 @@ export function buildEnrichedFirewalkRoster({
   signedContracts = [],
   attendanceMap = {},
   padronList = [],
+  capitanesList = [],
   nodusIndex = null,
   teamBlockMap = DEFAULT_TEAM_BLOCK_MAP
 } = {}) {
@@ -227,7 +259,7 @@ export function buildEnrichedFirewalkRoster({
     seenKeys.add(personKey);
 
     const saved = attendanceMap[personKey] || null;
-    const autoMatch = resolveAutoTeamMatch(contract, { padronList, nodusIndex });
+    const autoMatch = resolveAutoTeamMatch(contract, { padronList, capitanesList, nodusIndex });
 
     const defaultCat = deriveDefaultCategoriaFromRol(contract.rol || contract.rolActividad);
     const categoriaReporte = saved?.categoriaReporte || defaultCat;
