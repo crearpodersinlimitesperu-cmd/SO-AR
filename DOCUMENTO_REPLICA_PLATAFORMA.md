@@ -123351,29 +123351,40 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [],
 ```javascript
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { usersData, normalizeRole, getRoleDisplayName } from '../data/usersData';
+import { usersData, normalizeRole, getRoleDisplayName, normalizeSede } from '../data/usersData';
 import { Users, CheckCircle2, Shield, UserCheck, Calculator, X, Sparkles } from 'lucide-react';
 
 export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignment, currentUser }) {
   // Determinar si el usuario es gerente (no superAdmin ni dirección)
   const isGerente = currentUser?.appRole === 'gerente' && !currentUser?.isSuperAdmin && !currentUser?.isDireccion;
-  const userSede = currentUser?.sede || 'Lima';
+  const userSede = normalizeSede(currentUser?.sede || 'Lima');
+  const goalSede = goal?.sede ? normalizeSede(goal.sede) : '';
 
-  const [selectedSede, setSelectedSede] = useState(isGerente ? userSede : 'Lima');
+  const [selectedSede, setSelectedSede] = useState(isGerente ? userSede : (goalSede || userSede || 'Lima'));
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('ALL'); // 'ALL' | 'CC1Y2' | 'CMJ' | 'CUSTOM'
   const [assignedCoordinators, setAssignedCoordinators] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
 
   // Lista única de sedes disponibles
-  const sedesList = [...new Set(usersData.map(u => u.sede?.trim()).filter(Boolean))];
+  const sedesList = [...new Set(usersData.map(u => normalizeSede(u.sede || '')).filter(s => s && s !== 'Sede Global' && s !== 'Global'))];
 
-  // Obtener coordinadores disponibles
+  // Obtener coordinadores disponibles estrictamente de la sede seleccionada
   const availableCoordinators = usersData.filter(u => {
     const roleNorm = normalizeRole(u.role);
-    const isCoord = roleNorm === 'coord_c1' || roleNorm === 'coord_maestria';
-    const matchSede = selectedSede === 'GLOBAL' || (u.sede && u.sede.toLowerCase() === selectedSede.toLowerCase());
+    const isCoord = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coordinador'].includes(roleNorm);
+    const matchSede = Boolean(u.sede) && normalizeSede(u.sede) === normalizeSede(selectedSede);
     return isCoord && matchSede;
   });
+
+  // Sincronizar sede con la meta al abrir el modal (nunca cruzar sedes)
+  useEffect(() => {
+    if (!goal) return;
+    if (isGerente) {
+      setSelectedSede(userSede);
+    } else if (goal.sede && normalizeSede(goal.sede) !== 'Global' && normalizeSede(goal.sede) !== 'Sede Global') {
+      setSelectedSede(normalizeSede(goal.sede));
+    }
+  }, [goal?.id, goal?.sede, isGerente, userSede]);
 
   // Inicializar o sincronizar selección cuando cambia la meta o filtro
   useEffect(() => {
@@ -145880,6 +145891,7 @@ export default function GoalsBoard() {
     }
     return 'Todas';
   });
+  const [goalViewMode, setGoalViewMode] = useState(() => (canManageGoals ? 'all' : 'mine'));
 
   // Mantener sincronizado el filtro de sede cuando carga el perfil del usuario (ej. Josue Vera -> Guayaquil)
   useEffect(() => {
@@ -146046,20 +146058,39 @@ export default function GoalsBoard() {
     let unsubGoalSources = () => {};
     try {
       unsubMJ = onSnapshot(collection(db, 'mj_calendars'), (snap) => {
-        setMjCalendars(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        const allCalendars = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const scopedCalendars = (!isSuperUser && userSedeNorm)
+          ? allCalendars.filter(c => normalizeSede(c.sede || '') === userSedeNorm)
+          : allCalendars;
+        setMjCalendars(scopedCalendars);
         sourceReady('calendario');
       }, (err) => sourceError('calendario', err));
 
       const qRep = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50));
       unsubRep = onSnapshot(qRep, (snap) => {
-        setCoordinatorReports(snap.metadata.fromCache ? [] : snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        if (snap.metadata.fromCache) {
+          setCoordinatorReports([]);
+        } else {
+          const allReps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          const scopedReps = (!isSuperUser && userSedeNorm)
+            ? allReps.filter(r => normalizeSede(r.sede || r.data?.sede_id || '') === userSedeNorm)
+            : allReps;
+          setCoordinatorReports(scopedReps);
+        }
         sourceReady('reportes');
       }, (err) => { setCoordinatorReports([]); sourceError('reportes', err); });
-      // Listener en tiempo real a Nodus Coordinadores C1/C2
+      // Listener en tiempo real a Nodus Coordinadores C1/C2 (estrictamente aislado por sede para no-globales)
       const nodusDocRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
       unsubNodus = onSnapshot(nodusDocRef, (snap) => {
         const d = snap.exists() && !snap.metadata.fromCache ? snap.data() : null;
-        setNodusData(d && Array.isArray(d.coordinadores) ? d : null);
+        if (d && Array.isArray(d.coordinadores)) {
+          const scopedCoords = (!isSuperUser && userSedeNorm)
+            ? d.coordinadores.filter(c => normalizeSede(c.sede || '') === userSedeNorm)
+            : d.coordinadores;
+          setNodusData({ ...d, coordinadores: scopedCoords });
+        } else {
+          setNodusData(null);
+        }
         sourceReady('Nodus');
       }, (err) => {
         setNodusData(null);
@@ -147111,8 +147142,14 @@ export default function GoalsBoard() {
     }
   };
 
-  // ACTUALIZAR EL AVANCE INDIVIDUAL DE UNA COORDINADORA
+  // ACTUALIZAR EL AVANCE INDIVIDUAL DE UNA COORDINADORA (con aislamiento estricto de usuario)
   const handleUpdateCoordinatorProgress = async (goal, coordEmail, currentQuota, targetQuota, coordName) => {
+    const myEmail = (currentUser?.email || '').toLowerCase().trim();
+    const targetEmail = (coordEmail || '').toLowerCase().trim();
+    if (!canManageGoals && (!myEmail || myEmail !== targetEmail)) {
+      showToast('Solo puedes registrar tu propio avance asignado.', 'error');
+      return;
+    }
     const newVal = await showPrompt(
       `📊 Reportar Avance de ${coordName}:\nCuota Asignada: ${targetQuota}\nIngresa el nuevo total alcanzado:`,
       currentQuota || 0
@@ -147127,7 +147164,7 @@ export default function GoalsBoard() {
       try {
         const numericVal = Number(newVal);
         const updatedCoordinators = (goal.assignedCoordinators || []).map(c => {
-          if (c.email === coordEmail) {
+          if ((c.email || '').toLowerCase().trim() === targetEmail) {
             return { ...c, currentQuota: numericVal };
           }
           return c;
@@ -147887,13 +147924,14 @@ export default function GoalsBoard() {
               {goal.assignedCoordinators.map(coord => {
                 const quota = goalProgress(coord.currentQuota, coord.targetQuota);
                 const { current, target, percent: pct } = quota;
+                const isOwnCard = Boolean(currentUser?.email) && (coord.email || '').toLowerCase().trim() === currentUser.email.toLowerCase().trim();
 
                 return (
                   <div
                     key={coord.email}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      background: isOwnCard ? 'rgba(41, 171, 226, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                      border: isOwnCard ? '1px solid rgba(41, 171, 226, 0.45)' : '1px solid rgba(255, 255, 255, 0.08)',
                       borderRadius: '8px',
                       padding: '0.75rem',
                       display: 'flex',
@@ -147903,31 +147941,38 @@ export default function GoalsBoard() {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
-                        <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: 'var(--text-heading)' }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '0.85rem', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                           {coord.name}
+                          {isOwnCard && (
+                            <span style={{ fontSize: '0.66rem', background: 'rgba(41, 171, 226, 0.25)', color: '#38bdf8', padding: '1px 6px', borderRadius: '8px', fontWeight: 800 }}>
+                              Tú
+                            </span>
+                          )}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
                           {coord.role ? getRoleDisplayName(coord.role) : 'Rol no registrado'} · {coord.sede || 'Sede no registrada'}
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => handleUpdateCoordinatorProgress(goal, coord.email, current, target, coord.name)}
-                        className="btn-secondary"
-                        style={{
-                          fontSize: '0.75rem',
-                          padding: '0.25rem 0.6rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '3px',
-                          background: 'rgba(0, 210, 255, 0.1)',
-                          borderColor: 'var(--crear-blue)',
-                          color: 'var(--crear-blue)'
-                        }}
-                      >
-                        <Edit3 size={11} /> Registrar avance
-                      </button>
+                      {(canManageGoals || isOwnCard) && (
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateCoordinatorProgress(goal, coord.email, current, target, coord.name)}
+                          className="btn-secondary"
+                          style={{
+                            fontSize: '0.75rem',
+                            padding: '0.25rem 0.6rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            background: 'rgba(0, 210, 255, 0.1)',
+                            borderColor: 'var(--crear-blue)',
+                            color: 'var(--crear-blue)'
+                          }}
+                        >
+                          <Edit3 size={11} /> Registrar avance
+                        </button>
+                      )}
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginTop: '0.2rem' }}>
@@ -148080,42 +148125,79 @@ export default function GoalsBoard() {
         </div>
       </div>
 
-        {(currentUser?.isSuperAdmin || currentUser?.isDireccion) ? (
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Filtro de Sede (Vista Global):</label>
-            <select 
-              className="form-select" 
-              value={selectedSedeFilter} 
-              onChange={e => setSelectedSedeFilter(e.target.value)} 
-              style={{ width: '100%', maxWidth: '300px', padding: '0.5rem', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', color: 'white', border: '1px solid var(--border-subtle)' }}
-            >
-              <option value="Todas">Todas las Sedes</option>
-              <option value="Lima">Lima</option>
-              <option value="Quito">Quito</option>
-              <option value="Medellín">Medellín</option>
-              <option value="Guayaquil">Guayaquil</option>
-              <option value="Cuenca">Cuenca</option>
-              <option value="México">México</option>
-            </select>
-          </div>
-        ) : (
-          currentUser?.sede && (
-            <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Sede Operativa:</span>
-              <span style={{ 
-                background: 'rgba(56, 189, 248, 0.15)', 
-                color: '#38bdf8', 
-                padding: '0.3rem 0.8rem', 
-                borderRadius: '6px', 
-                fontWeight: 700, 
-                fontSize: '0.85rem',
-                border: '1px solid rgba(56, 189, 248, 0.3)'
-              }}>
-                📍 {normalizeSede(currentUser.sede)}
-              </span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+          {(currentUser?.isSuperAdmin || currentUser?.isDireccion) ? (
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Filtro de Sede (Vista Global):</label>
+              <select 
+                className="form-select" 
+                value={selectedSedeFilter} 
+                onChange={e => setSelectedSedeFilter(e.target.value)} 
+                style={{ width: '100%', minWidth: '220px', maxWidth: '300px', padding: '0.5rem', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', color: 'white', border: '1px solid var(--border-subtle)' }}
+              >
+                <option value="Todas">Todas las Sedes</option>
+                <option value="Lima">Lima</option>
+                <option value="Quito">Quito</option>
+                <option value="Medellín">Medellín</option>
+                <option value="Guayaquil">Guayaquil</option>
+                <option value="Cuenca">Cuenca</option>
+                <option value="México">México</option>
+              </select>
             </div>
-          )
-        )}
+          ) : (
+            currentUser?.sede && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Sede Operativa:</span>
+                <span style={{ 
+                  background: 'rgba(56, 189, 248, 0.15)', 
+                  color: '#38bdf8', 
+                  padding: '0.3rem 0.8rem', 
+                  borderRadius: '6px', 
+                  fontWeight: 700, 
+                  fontSize: '0.85rem',
+                  border: '1px solid rgba(56, 189, 248, 0.3)'
+                }}>
+                  📍 {normalizeSede(currentUser.sede)}
+                </span>
+              </div>
+            )
+          )}
+
+          <div style={{ display: 'flex', gap: '0.4rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '8px' }}>
+            <button
+              type="button"
+              onClick={() => setGoalViewMode('mine')}
+              style={{
+                padding: '0.45rem 1rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: goalViewMode === 'mine' ? 'var(--crear-blue)' : 'transparent',
+                color: goalViewMode === 'mine' ? '#000' : 'var(--text-muted)',
+                fontWeight: 800,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+            >
+              🎯 Mis Metas
+            </button>
+            <button
+              type="button"
+              onClick={() => setGoalViewMode('all')}
+              style={{
+                padding: '0.45rem 1rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: goalViewMode === 'all' ? 'var(--crear-gold)' : 'transparent',
+                color: goalViewMode === 'all' ? '#000' : 'var(--text-muted)',
+                fontWeight: 800,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+            >
+              🏛️ Equipo / Sede
+            </button>
+          </div>
+        </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
         {goalsStatus !== 'loaded' && (
@@ -148189,6 +148271,103 @@ export default function GoalsBoard() {
               </div>
             );
           }
+
+          if (goalViewMode === 'mine') {
+            const myEmail = (currentUser?.email || '').toLowerCase().trim();
+            const myName = (currentUser?.displayName || currentUser?.name || '').toLowerCase().trim();
+            const myPersonalGoals = filteredGoals.flatMap(g => {
+              const myEntry = (g.assignedCoordinators || []).find(
+                c => myEmail && (c.email || '').toLowerCase().trim() === myEmail
+              );
+              return myEntry ? [{ goal: g, myEntry }] : [];
+            });
+
+            const myNodusCoord = (nodusData?.coordinadores || []).find(c => {
+              const sameSede = !userSedeNorm || userSedeNorm === 'Sede Global' || userSedeNorm === 'Global' || normalizeSede(c.sede || '') === userSedeNorm;
+              if (!sameSede) return false;
+              const cEmail = (c.email || '').toLowerCase().trim();
+              const cName = (c.nombre || c.name || '').toLowerCase().trim();
+              return (myEmail && cEmail && cEmail === myEmail) || (myName && cName && (cName.includes(myName) || myName.includes(cName)));
+            });
+
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                {myNodusCoord && (
+                  <div className="glass-panel" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #10b981', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                    <div>
+                      <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 800, textTransform: 'uppercase' }}>
+                        Tu Seguimiento Real en Nodus · {normalizeSede(myNodusCoord.sede || currentUser?.sede)}
+                      </div>
+                      <div style={{ fontWeight: 800, color: '#fff', fontSize: '1rem', marginTop: '0.15rem' }}>
+                        {myNodusCoord.nombre || currentUser?.displayName || currentUser?.email}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', fontSize: '0.85rem' }}>
+                      <span>📞 Equipos: <strong>{(myNodusCoord.equipos || []).length}</strong></span>
+                      <span>✅ Confirmados: <strong style={{ color: '#10b981' }}>{myNodusCoord.totalConfirmados ?? 0}</strong></span>
+                      <span>⏳ Por confirmar: <strong style={{ color: '#fbbf24' }}>{myNodusCoord.totalPorConfirmar ?? 0}</strong></span>
+                    </div>
+                  </div>
+                )}
+
+                {myPersonalGoals.length === 0 ? (
+                  <div className="glass-panel" style={{ padding: '2rem', textAlign: 'center' }}>
+                    <p className="text-muted" style={{ margin: '0 0 1rem 0' }}>
+                      Aún no tienes cuotas individuales asignadas a <strong>{currentUser?.email}</strong> en esta sede.
+                    </p>
+                    <button type="button" className="btn-secondary" onClick={() => setGoalViewMode('all')}>
+                      Ver Metas de Equipo / Sede
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                    {myPersonalGoals.map(({ goal, myEntry }) => {
+                      const parentGoal = goals.find(p => p.id === goal.parentId);
+                      const teamNum = explicitGoalTeam(goal, parentGoal);
+                      const stage = goalStageKey(goal) || goal.stage || 'General';
+                      const quota = goalProgress(myEntry.currentQuota, myEntry.targetQuota);
+                      return (
+                        <div key={goal.id} className="glass-panel" style={{ padding: '1.25rem', borderTop: '3px solid var(--crear-blue)', display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 800, padding: '2px 8px', borderRadius: '6px', background: 'rgba(41,171,226,0.18)', color: '#38bdf8' }}>
+                              {teamNum ? `Equipo ${teamNum}` : 'Equipo'} · {stage}
+                            </span>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 700 }}>
+                              📍 {goal.sede || normalizeSede(currentUser?.sede)}
+                            </span>
+                          </div>
+
+                          <div style={{ fontWeight: 800, fontSize: '1.02rem', color: '#fff' }}>{goal.title}</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>KPI: {goal.kpi}</div>
+
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: '0.25rem' }}>
+                            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>Mi avance:</span>
+                            <span style={{ fontSize: '1.05rem', fontWeight: 900, color: quota.percent >= 100 ? '#22c55e' : '#fff' }}>
+                              {quota.current ?? 0} / {quota.target ?? 0} {quota.percent !== null && `(${quota.percent}%)`}
+                            </span>
+                          </div>
+
+                          <div style={{ height: '8px', background: 'rgba(255,255,255,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${quota.barPercent}%`, background: quota.percent >= 100 ? '#22c55e' : 'var(--crear-blue)', transition: 'width 0.3s ease' }} />
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateCoordinatorProgress(goal, myEntry.email, quota.current, quota.target, myEntry.name)}
+                            className="btn-primary"
+                            style={{ marginTop: '0.4rem', padding: '0.55rem 0.9rem', fontSize: '0.84rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                          >
+                            <Edit3 size={14} /> Registrar mi avance
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           return organizeGoalsByTeam(filteredGoals, { events, today: localDateKey() }).map(renderTeamGroup);
         })()}
       </div>
@@ -204129,7 +204308,7 @@ export function goalsAccess(user) {
   const role = String(user?.activeRole || user?.appRole || user?.role || '').toLowerCase();
   const roles = (user?.roles || []).map(r => String(r).toLowerCase());
   const managers = ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado'];
-  const viewers = [...managers, 'coord_c1', 'coordinador_c1c2', 'coord_c2', 'coord_maestria', 'coordinador_mj'];
+  const viewers = [...managers, 'coord_c1', 'coordinador_c1c2', 'coord_c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coord_maestria_global', 'coordinador'];
   return {
     canView: Boolean(user?.isSuperAdmin || user?.isDireccion || user?.isGerente ||
       viewers.includes(role) || roles.some(r => viewers.includes(r))),

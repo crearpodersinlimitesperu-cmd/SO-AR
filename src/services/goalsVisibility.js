@@ -5,7 +5,7 @@ export function goalsAccess(user) {
   const role = String(user?.activeRole || user?.appRole || user?.role || '').toLowerCase();
   const roles = (user?.roles || []).map(r => String(r).toLowerCase());
   const managers = ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado'];
-  const viewers = [...managers, 'coord_c1', 'coordinador_c1c2', 'coord_c2', 'coord_maestria', 'coordinador_mj'];
+  const viewers = [...managers, 'coord_c1', 'coordinador_c1c2', 'coord_c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coord_maestria_global', 'coordinador'];
   return {
     canView: Boolean(user?.isSuperAdmin || user?.isDireccion || user?.isGerente ||
       viewers.includes(role) || roles.some(r => viewers.includes(r))),

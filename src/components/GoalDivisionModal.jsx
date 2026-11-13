@@ -1,28 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { usersData, normalizeRole, getRoleDisplayName } from '../data/usersData';
+import { usersData, normalizeRole, getRoleDisplayName, normalizeSede } from '../data/usersData';
 import { Users, CheckCircle2, Shield, UserCheck, Calculator, X, Sparkles } from 'lucide-react';
 
 export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignment, currentUser }) {
   // Determinar si el usuario es gerente (no superAdmin ni dirección)
   const isGerente = currentUser?.appRole === 'gerente' && !currentUser?.isSuperAdmin && !currentUser?.isDireccion;
-  const userSede = currentUser?.sede || 'Lima';
+  const userSede = normalizeSede(currentUser?.sede || 'Lima');
+  const goalSede = goal?.sede ? normalizeSede(goal.sede) : '';
 
-  const [selectedSede, setSelectedSede] = useState(isGerente ? userSede : 'Lima');
+  const [selectedSede, setSelectedSede] = useState(isGerente ? userSede : (goalSede || userSede || 'Lima'));
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('ALL'); // 'ALL' | 'CC1Y2' | 'CMJ' | 'CUSTOM'
   const [assignedCoordinators, setAssignedCoordinators] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
 
   // Lista única de sedes disponibles
-  const sedesList = [...new Set(usersData.map(u => u.sede?.trim()).filter(Boolean))];
+  const sedesList = [...new Set(usersData.map(u => normalizeSede(u.sede || '')).filter(s => s && s !== 'Sede Global' && s !== 'Global'))];
 
-  // Obtener coordinadores disponibles
+  // Obtener coordinadores disponibles estrictamente de la sede seleccionada
   const availableCoordinators = usersData.filter(u => {
     const roleNorm = normalizeRole(u.role);
-    const isCoord = roleNorm === 'coord_c1' || roleNorm === 'coord_maestria';
-    const matchSede = selectedSede === 'GLOBAL' || (u.sede && u.sede.toLowerCase() === selectedSede.toLowerCase());
+    const isCoord = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_jr', 'coord_maestria', 'coordinador_mj', 'coordinador'].includes(roleNorm);
+    const matchSede = Boolean(u.sede) && normalizeSede(u.sede) === normalizeSede(selectedSede);
     return isCoord && matchSede;
   });
+
+  // Sincronizar sede con la meta al abrir el modal (nunca cruzar sedes)
+  useEffect(() => {
+    if (!goal) return;
+    if (isGerente) {
+      setSelectedSede(userSede);
+    } else if (goal.sede && normalizeSede(goal.sede) !== 'Global' && normalizeSede(goal.sede) !== 'Sede Global') {
+      setSelectedSede(normalizeSede(goal.sede));
+    }
+  }, [goal?.id, goal?.sede, isGerente, userSede]);
 
   // Inicializar o sincronizar selección cuando cambia la meta o filtro
   useEffect(() => {
