@@ -151,7 +151,9 @@ export const MAESTRIA_COORDINATOR_EMAILS = [
   'erika.gavilanez@crearpsl.net',
   'liliana.cubillo@crearpsl.net',
   'lili.cubillo@crearpsl.net',
-  'andres.gomez@crearpsl.net'
+  'andres.gomez@crearpsl.net',
+  'mauricio.ramirez@crearpsl.net',
+  'mauricio.ramirez@crearpsl.com'
 ];
 
 export const isMaestriaCoordinator = (currentUser) => {
@@ -366,6 +368,7 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
   'daniela.monroy@crearpsl.net',      // Entrenadora de llamadas
   'erika.gavilanez@crearpsl.net',     // Coordinadora MJ + Entrenadora de llamadas
   'mauricio.ramirez@crearpsl.net',    // Entrenador de llamadas
+  'mauricio.ramirez@crearpsl.com',    // Entrenador de llamadas (alterno)
   'emalejodiaz@gmail.com',            // Entrenador de llamadas
   'anamonroyt@gmail.com',             // Entrenadora de llamadas
   'dibrafi@gmail.com',                // Entrenador de llamadas

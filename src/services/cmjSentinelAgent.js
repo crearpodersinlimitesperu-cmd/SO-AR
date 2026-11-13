@@ -20,6 +20,7 @@
 import { db } from './firebase.js';
 import { collection, query, where, getDocs, doc, setDoc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { omniAuditor } from './omniAuditorOrquestador.js';
+import { canonicalSede } from '../utils/sede.js';
 
 export const CMJ_DIRECTORY = [
   {
@@ -44,7 +45,7 @@ export const CMJ_DIRECTORY = [
     activeTeams: [7, 8]
   },
   {
-    sede: 'Medellin',
+    sede: 'Medellín',
     name: 'Mauricio Ramírez',
     email: 'mauricio.ramirez@crearpsl.net',
     role: 'coord_maestria',
@@ -106,32 +107,56 @@ export class CMJSentinelAgent {
       const userRef = doc(db, 'users', currentUser.uid);
       const userSnap = await getDoc(userRef);
 
-      const payload = {
-        email: email,
-        name: currentUser.displayName || cmjEntry.name,
-        role: 'coord_maestria',
-        roles: ['coord_maestria'],
-        sede: cmjEntry.sede,
-        isCMJ: true,
-        canManageTrainers: true,
-        updatedAt: new Date().toISOString(),
-        sentinelChecked: true
-      };
+      const targetSede = canonicalSede(cmjEntry.sede);
 
       if (!userSnap.exists()) {
+        const payload = {
+          email: email,
+          name: currentUser.displayName || cmjEntry.name,
+          role: 'coord_maestria',
+          activeRole: 'coord_maestria',
+          activeRoleOverride: 'coord_maestria',
+          roles: ['coord_maestria'],
+          sede: targetSede,
+          roleSedes: { coord_maestria: targetSede },
+          isCMJ: true,
+          canManageTrainers: true,
+          updatedAt: new Date().toISOString(),
+          sentinelChecked: true
+        };
         await setDoc(userRef, payload, { merge: true });
-        console.log(`[CMJ Sentinel] Perfil inicializado para ${cmjEntry.name} (${cmjEntry.sede})`);
+        console.log(`[CMJ Sentinel] Perfil inicializado para ${cmjEntry.name} (${targetSede})`);
         return { status: 'REPAIRED_CREATED', entry: cmjEntry };
       } else {
         const data = userSnap.data();
-        const needsUpdate = data.role !== 'coord_maestria' || 
-                            !Array.isArray(data.roles) || 
-                            !data.roles.includes('coord_maestria') ||
-                            data.sede !== cmjEntry.sede;
+        const existingRoles = Array.isArray(data.roles) ? data.roles : (data.role ? [data.role] : []);
+        const hasCoordMaestria = existingRoles.includes('coord_maestria');
+        const roleMatches = data.role === 'coord_maestria';
+        const sedeMatches = canonicalSede(data.sede) === targetSede;
+
+        const needsUpdate = !roleMatches || !hasCoordMaestria || !sedeMatches;
 
         if (needsUpdate) {
-          await updateDoc(userRef, payload);
-          console.log(`[CMJ Sentinel] Rol auto-reparado a coord_maestria para ${cmjEntry.name}`);
+          const mergedRoles = Array.from(new Set(['coord_maestria', ...existingRoles]));
+          const mergedRoleSedes = {
+            ...(data.roleSedes || {}),
+            coord_maestria: targetSede
+          };
+          const updatePayload = {
+            email: email,
+            name: currentUser.displayName || data.name || cmjEntry.name,
+            role: 'coord_maestria',
+            activeRole: data.activeRole || 'coord_maestria',
+            roles: mergedRoles,
+            sede: targetSede,
+            roleSedes: mergedRoleSedes,
+            isCMJ: true,
+            canManageTrainers: true,
+            updatedAt: new Date().toISOString(),
+            sentinelChecked: true
+          };
+          await updateDoc(userRef, updatePayload);
+          console.log(`[CMJ Sentinel] Rol auto-reparado a coord_maestria para ${cmjEntry.name} conservando roles asignados`);
           return { status: 'REPAIRED_UPDATED', entry: cmjEntry };
         }
       }

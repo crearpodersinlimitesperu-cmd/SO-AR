@@ -457,15 +457,19 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "staff_mauricioramirezsilva",
-    "name": "Mauricio Ramirez",
+    "name": "Mauricio Ramirez Silva",
     "role": "coord_maestria",
     "roles": [
-      "coord_maestria"
+      "coord_maestria",
+      "entrenador_llamadas",
+      "entrenador",
+      "operativo",
+      "consolidado"
     ],
-    "sede": "Medellin",
+    "sede": "Medellín",
     "emails": [
       "mauricio.ramirez@crearpsl.net",
-      "mauricio.ramirez@crearpsl.net"
+      "mauricio.ramirez@crearpsl.com"
     ],
     "email": "mauricio.ramirez@crearpsl.net"
   },

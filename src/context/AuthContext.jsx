@@ -413,6 +413,25 @@ export function AuthProvider({ children }) {
       }
     }
 
+    // Mauricio Ramírez Silva: Coordinador de Maestría del Juego (Medellín) y Entrenador de Llamadas
+    const isMauricioRamirez = ['mauricio.ramirez@crearpsl.net', 'mauricio.ramirez@crearpsl.com'].includes(normalizedEmail) || ['mauricio.ramirez@crearpsl.net', 'mauricio.ramirez@crearpsl.com'].includes(rawEmail);
+    if (isMauricioRamirez) {
+      if (!assignedRoles.includes('coord_maestria')) assignedRoles.push('coord_maestria');
+      if (!assignedRoles.includes('entrenador_llamadas')) assignedRoles.push('entrenador_llamadas');
+      if (!assignedRoles.includes('entrenador')) assignedRoles.push('entrenador');
+      if (!assignedRoles.includes('operativo')) assignedRoles.push('operativo');
+      if (!canonicalRole || canonicalRole === 'operativo' || canonicalRole === 'colaborador' || canonicalRole === 'miembro') {
+        canonicalRole = 'coord_maestria';
+      }
+      if (!foundUser.sede || foundUser.sede === 'Global' || foundUser.sede === 'Sede Global' || foundUser.sede === 'Medellin') {
+        foundUser.sede = 'Medellín';
+      }
+      if (!foundUser.roleSedes) foundUser.roleSedes = {};
+      foundUser.roleSedes.coord_maestria = 'Medellín';
+      foundUser.roleSedes.entrenador = foundUser.roleSedes.entrenador || 'Medellín';
+      foundUser.roleSedes.entrenador_llamadas = foundUser.roleSedes.entrenador_llamadas || 'Sede Global';
+    }
+
     // Gina Cárdenas López: Coordinadora Junior (Rezagados C1 + Quantum Team Lima)
     const isGinaCardenas = ['cardenasgina29@gmail.com', 'cardenaslopezgina@gmail.com'].includes(normalizedEmail) || ['cardenasgina29@gmail.com', 'cardenaslopezgina@gmail.com'].includes(rawEmail);
     if (isGinaCardenas) {
