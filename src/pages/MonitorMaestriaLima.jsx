@@ -156,23 +156,26 @@ export default function MonitorMaestriaLima() {
   }, []);
 
   // Sincronización exhaustiva en vivo con Nodus vía Cloudflare Worker (Equipos + Rosters + Búsqueda por DNI)
-  const syncNodusLive = async ({ manual = false, contractsList = signedContracts } = {}) => {
+  const syncNodusLive = async ({ manual = false, contractsList = signedContracts, extraDnis = [] } = {}) => {
     const user = auth?.currentUser;
     if (!user) return;
     setNodusLoading(true);
     setNodusError(null);
     try {
       const idToken = await user.getIdToken();
-      const dnis = [...new Set(
-        (Array.isArray(contractsList) ? contractsList : [])
-          .map((c) =>
-            String(c.numeroDocumento || c.doc || '')
-              .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
-              .replace(/[^a-zA-Z0-9]/g, '')
-              .trim()
-          )
-          .filter((d) => d.length >= 5)
-      )];
+      const contractDnis = (Array.isArray(contractsList) ? contractsList : []).map((c) =>
+        String(c.numeroDocumento || c.doc || '')
+          .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .trim()
+      );
+      const extraClean = (Array.isArray(extraDnis) ? extraDnis : []).map((d) =>
+        String(d || '')
+          .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .trim()
+      );
+      const dnis = [...new Set([...contractDnis, ...extraClean].filter((d) => d.length >= 5))];
       dnis.forEach((d) => fetchedDnisRef.current.add(d));
 
       const resp = await fetch(`${NODUS_WORKER_BASE}/nodus-json/maestria-lima`, {
@@ -281,6 +284,23 @@ export default function MonitorMaestriaLima() {
       }),
     [signedContracts, nodusEquipos, nodusRosterByTeam, nodusByDni]
   );
+
+  // Si un contrato empató por Nombre/Teléfono/Email con un DNI distinto en Nodus (ej. error de tipeo en DNI),
+  // consultar también ese DNI real en Nodus para traer sus `etapas` exactas del FDS vigente.
+  useEffect(() => {
+    if (!auth?.currentUser || nodusLoading) return;
+    const missingMatchedDnis = nodusCrossResult.enrichedContracts
+      .map((c) =>
+        String(c.nodusCross?.nodusDoc || '')
+          .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .trim()
+      )
+      .filter((d) => d.length >= 5 && !fetchedDnisRef.current.has(d));
+    if (missingMatchedDnis.length > 0) {
+      syncNodusLive({ contractsList: signedContracts, extraDnis: missingMatchedDnis });
+    }
+  }, [nodusCrossResult.enrichedContracts, nodusLoading]);
 
   // Indicadores Ejecutivos para Oficina Lima
   const stats = useMemo(() => {
@@ -1405,6 +1425,9 @@ export default function MonitorMaestriaLima() {
                               {item.nodusCross.nodusTeamName} · {item.nodusCross.nodusRole}
                               {item.nodusCross.coordinador ? ` (${item.nodusCross.coordinador})` : ''} ·{' '}
                               {item.nodusCross.maestriaNodus ? 'Asistencia Maestría ✅' : 'Sin Check-in Nodus ⚠️'}
+                              {item.nodusCross.dniMismatch && item.nodusCross.nodusDoc ? (
+                                <span style={{ color: '#fbbf24' }}>{` · DNI Nodus: ${item.nodusCross.nodusDoc}`}</span>
+                              ) : null}
                             </span>
                           ) : (
                             <span style={{ color: '#94a3b8' }}>Sin coincidencia en equipos activos de Lima</span>

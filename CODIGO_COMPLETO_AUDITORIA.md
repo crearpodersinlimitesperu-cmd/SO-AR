@@ -91147,6 +91147,13 @@ export function normalizeNodusEmail(str) {
   return String(str).trim().toLowerCase();
 }
 
+export function normalizeNodusPhone(str) {
+  if (!str) return '';
+  const digits = String(str).replace(/\D/g, '');
+  if (digits.length < 8) return '';
+  return digits.slice(-9);
+}
+
 export function extractTeamNumber(teamLabel) {
   const m = String(teamLabel || '').match(/\b(\d{2,3})\b/);
   return m ? m[1] : null;
@@ -91175,6 +91182,7 @@ function formatRoleLabel(tipoPersona) {
 function findContractForNodusPerson(person, signedContracts) {
   const personDoc = normalizeNodusDoc(person.identificacion);
   const personEmail = normalizeNodusEmail(person.email);
+  const personPhone = normalizeNodusPhone(person.telefono);
   const personFull = normalizeNodusText(`${person.nombres || ''} ${person.apellidos || ''}`);
   const personPref = normalizeNodusText(person.nombre_preferido || '');
   const personTokens = personFull.split(' ').filter((t) => t.length > 2);
@@ -91187,6 +91195,11 @@ function findContractForNodusPerson(person, signedContracts) {
   if (personEmail.includes('@')) {
     const byEmail = signedContracts.find((c) => normalizeNodusEmail(c.email) === personEmail);
     if (byEmail) return { contract: byEmail, matchBy: 'EMAIL' };
+  }
+
+  if (personPhone) {
+    const byPhone = signedContracts.find((c) => normalizeNodusPhone(c.telefono || c.celular) === personPhone);
+    if (byPhone) return { contract: byPhone, matchBy: 'TELEFONO' };
   }
 
   const byName = signedContracts.find((c) => {
@@ -91216,6 +91229,7 @@ export function buildMaestriaNodusCross({
   const allNodusEntries = [];
   const byDoc = new Map();
   const byEmail = new Map();
+  const byPhone = new Map();
   const byName = new Map();
 
   for (const eq of activeTeams) {
@@ -91262,6 +91276,8 @@ export function buildMaestriaNodusCross({
       allNodusEntries.push(entry);
       if (docNorm.length >= 5 && !byDoc.has(docNorm)) byDoc.set(docNorm, entry);
       if (emailNorm.includes('@') && !byEmail.has(emailNorm)) byEmail.set(emailNorm, entry);
+      const phoneNorm = normalizeNodusPhone(p.telefono);
+      if (phoneNorm && !byPhone.has(phoneNorm)) byPhone.set(phoneNorm, entry);
       if (nameNorm && !byName.has(nameNorm)) byName.set(nameNorm, entry);
     }
   }
@@ -91347,6 +91363,8 @@ export function buildMaestriaNodusCross({
     allNodusEntries.push(entry);
     byDoc.set(docNorm, entry);
     if (emailNorm.includes('@') && !byEmail.has(emailNorm)) byEmail.set(emailNorm, entry);
+    const phoneNorm = normalizeNodusPhone(p.telefono);
+    if (phoneNorm && !byPhone.has(phoneNorm)) byPhone.set(phoneNorm, entry);
     if (nameNorm && !byName.has(nameNorm)) byName.set(nameNorm, entry);
   }
 
@@ -91354,6 +91372,7 @@ export function buildMaestriaNodusCross({
   const enrichedContracts = signedContracts.map((contract) => {
     const docNorm = normalizeNodusDoc(contract.numeroDocumento || contract.doc);
     const emailNorm = normalizeNodusEmail(contract.email);
+    const phoneNorm = normalizeNodusPhone(contract.telefono || contract.celular);
     const nameNorm = normalizeNodusText(contract.nombre || contract.nombreCompleto || '');
 
     let matched = null;
@@ -91365,6 +91384,9 @@ export function buildMaestriaNodusCross({
     } else if (emailNorm.includes('@') && byEmail.has(emailNorm)) {
       matched = byEmail.get(emailNorm);
       matchBy = 'EMAIL';
+    } else if (phoneNorm && byPhone.has(phoneNorm)) {
+      matched = byPhone.get(phoneNorm);
+      matchBy = 'TELEFONO';
     } else if (nameNorm && byName.has(nameNorm)) {
       matched = byName.get(nameNorm);
       matchBy = 'NOMBRE';
@@ -91398,6 +91420,8 @@ export function buildMaestriaNodusCross({
         matched: Boolean(matched),
         matchBy,
         nodusId: matched?.nodusId || null,
+        nodusDoc: matched?.identificacion || null,
+        dniMismatch: Boolean(matched && docNorm.length >= 5 && matched.docNorm.length >= 5 && docNorm !== matched.docNorm),
         nodusTeamId: matched?.equipoId || null,
         nodusTeamName: matched?.equipoNombre || null,
         fdsVigente: matched?.fdsVigente || null,
@@ -141650,23 +141674,26 @@ export default function MonitorMaestriaLima() {
   }, []);
 
   // Sincronización exhaustiva en vivo con Nodus vía Cloudflare Worker (Equipos + Rosters + Búsqueda por DNI)
-  const syncNodusLive = async ({ manual = false, contractsList = signedContracts } = {}) => {
+  const syncNodusLive = async ({ manual = false, contractsList = signedContracts, extraDnis = [] } = {}) => {
     const user = auth?.currentUser;
     if (!user) return;
     setNodusLoading(true);
     setNodusError(null);
     try {
       const idToken = await user.getIdToken();
-      const dnis = [...new Set(
-        (Array.isArray(contractsList) ? contractsList : [])
-          .map((c) =>
-            String(c.numeroDocumento || c.doc || '')
-              .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
-              .replace(/[^a-zA-Z0-9]/g, '')
-              .trim()
-          )
-          .filter((d) => d.length >= 5)
-      )];
+      const contractDnis = (Array.isArray(contractsList) ? contractsList : []).map((c) =>
+        String(c.numeroDocumento || c.doc || '')
+          .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .trim()
+      );
+      const extraClean = (Array.isArray(extraDnis) ? extraDnis : []).map((d) =>
+        String(d || '')
+          .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .trim()
+      );
+      const dnis = [...new Set([...contractDnis, ...extraClean].filter((d) => d.length >= 5))];
       dnis.forEach((d) => fetchedDnisRef.current.add(d));
 
       const resp = await fetch(`${NODUS_WORKER_BASE}/nodus-json/maestria-lima`, {
@@ -141775,6 +141802,23 @@ export default function MonitorMaestriaLima() {
       }),
     [signedContracts, nodusEquipos, nodusRosterByTeam, nodusByDni]
   );
+
+  // Si un contrato empató por Nombre/Teléfono/Email con un DNI distinto en Nodus (ej. error de tipeo en DNI),
+  // consultar también ese DNI real en Nodus para traer sus `etapas` exactas del FDS vigente.
+  useEffect(() => {
+    if (!auth?.currentUser || nodusLoading) return;
+    const missingMatchedDnis = nodusCrossResult.enrichedContracts
+      .map((c) =>
+        String(c.nodusCross?.nodusDoc || '')
+          .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .trim()
+      )
+      .filter((d) => d.length >= 5 && !fetchedDnisRef.current.has(d));
+    if (missingMatchedDnis.length > 0) {
+      syncNodusLive({ contractsList: signedContracts, extraDnis: missingMatchedDnis });
+    }
+  }, [nodusCrossResult.enrichedContracts, nodusLoading]);
 
   // Indicadores Ejecutivos para Oficina Lima
   const stats = useMemo(() => {
@@ -142899,6 +142943,9 @@ export default function MonitorMaestriaLima() {
                               {item.nodusCross.nodusTeamName} · {item.nodusCross.nodusRole}
                               {item.nodusCross.coordinador ? ` (${item.nodusCross.coordinador})` : ''} ·{' '}
                               {item.nodusCross.maestriaNodus ? 'Asistencia Maestría ✅' : 'Sin Check-in Nodus ⚠️'}
+                              {item.nodusCross.dniMismatch && item.nodusCross.nodusDoc ? (
+                                <span style={{ color: '#fbbf24' }}>{` · DNI Nodus: ${item.nodusCross.nodusDoc}`}</span>
+                              ) : null}
                             </span>
                           ) : (
                             <span style={{ color: '#94a3b8' }}>Sin coincidencia en equipos activos de Lima</span>

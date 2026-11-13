@@ -225,3 +225,64 @@ test('buildMaestriaNodusCross exige asistencia en el FDS vigente exacto cuando h
   assert.equal(result.enrichedContracts[0].nodusCross.maestriaNodus, false);
   assert.equal(result.enrichedContracts[0].nodusCross.estadoCruce, 'FALTA_CHECKIN_NODUS');
 });
+
+test('buildMaestriaNodusCross cruza por teléfono/nombre cuando hay error de tipeo en DNI y usa etapas de SFD', () => {
+  const result = buildMaestriaNodusCross({
+    signedContracts: [
+      {
+        id: 'c-edith',
+        nombre: 'Edith ruth pillaca huamani',
+        numeroDocumento: '40900626',
+        email: 'edith ruth pillacae22@gmail.com',
+        telefono: '987165681',
+        rol: 'Participante',
+        equipo: 'Equipo 31 — Imperio del Éxito'
+      }
+    ],
+    nodusEquipos: MOCK_EQUIPOS,
+    nodusRosterByTeam: {
+      134: [],
+      141: [
+        {
+          id: 901619,
+          identificacion: '40900526',
+          nombres: 'EDITH',
+          apellidos: 'PILLACA HUAMANI',
+          email: 'edithpillcahuamani@hormail.com',
+          telefono: '987165681',
+          tipo_persona: 'manager',
+          coordinador: 'DIANA',
+          capitulo1: { asistio: true, desertor: false },
+          capitulo2: { pagado: true, maestria: false }
+        }
+      ],
+      149: []
+    },
+    nodusByDni: {
+      '40900526': {
+        id: 901619,
+        identificacion: '40900526',
+        nombres: 'EDITH',
+        apellidos: 'PILLACA HUAMANI',
+        email: 'edithpillcahuamani@hormail.com',
+        telefono: '987165681',
+        tipo_persona: 'manager',
+        sede: { id: 7, nombre: 'LIMA CICLO 1' },
+        equipo_actual: { id: 141, nombre: 'EQUIPO 31' },
+        maestria: false,
+        etapas: [
+          { equipo: 'EQUIPO 31', etapa: 'PFD', tipo: 'px', asistio: true, desertor: false, fecha_registro: '2026-10-09' },
+          { equipo: 'EQUIPO 31', etapa: 'SFD', tipo: 'px', asistio: true, desertor: false, fecha_registro: '2026-11-13' }
+        ]
+      }
+    }
+  });
+
+  const c = result.enrichedContracts[0];
+  assert.equal(c.nodusCross.matched, true);
+  assert.equal(c.nodusCross.matchBy, 'TELEFONO');
+  assert.equal(c.nodusCross.nodusDoc, '40900526');
+  assert.equal(c.nodusCross.dniMismatch, true);
+  assert.equal(c.nodusCross.maestriaNodus, true);
+  assert.equal(c.nodusCross.estadoCruce, 'COMPLETO');
+});

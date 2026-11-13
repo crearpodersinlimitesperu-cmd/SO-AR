@@ -26,6 +26,13 @@ export function normalizeNodusEmail(str) {
   return String(str).trim().toLowerCase();
 }
 
+export function normalizeNodusPhone(str) {
+  if (!str) return '';
+  const digits = String(str).replace(/\D/g, '');
+  if (digits.length < 8) return '';
+  return digits.slice(-9);
+}
+
 export function extractTeamNumber(teamLabel) {
   const m = String(teamLabel || '').match(/\b(\d{2,3})\b/);
   return m ? m[1] : null;
@@ -54,6 +61,7 @@ function formatRoleLabel(tipoPersona) {
 function findContractForNodusPerson(person, signedContracts) {
   const personDoc = normalizeNodusDoc(person.identificacion);
   const personEmail = normalizeNodusEmail(person.email);
+  const personPhone = normalizeNodusPhone(person.telefono);
   const personFull = normalizeNodusText(`${person.nombres || ''} ${person.apellidos || ''}`);
   const personPref = normalizeNodusText(person.nombre_preferido || '');
   const personTokens = personFull.split(' ').filter((t) => t.length > 2);
@@ -66,6 +74,11 @@ function findContractForNodusPerson(person, signedContracts) {
   if (personEmail.includes('@')) {
     const byEmail = signedContracts.find((c) => normalizeNodusEmail(c.email) === personEmail);
     if (byEmail) return { contract: byEmail, matchBy: 'EMAIL' };
+  }
+
+  if (personPhone) {
+    const byPhone = signedContracts.find((c) => normalizeNodusPhone(c.telefono || c.celular) === personPhone);
+    if (byPhone) return { contract: byPhone, matchBy: 'TELEFONO' };
   }
 
   const byName = signedContracts.find((c) => {
@@ -95,6 +108,7 @@ export function buildMaestriaNodusCross({
   const allNodusEntries = [];
   const byDoc = new Map();
   const byEmail = new Map();
+  const byPhone = new Map();
   const byName = new Map();
 
   for (const eq of activeTeams) {
@@ -141,6 +155,8 @@ export function buildMaestriaNodusCross({
       allNodusEntries.push(entry);
       if (docNorm.length >= 5 && !byDoc.has(docNorm)) byDoc.set(docNorm, entry);
       if (emailNorm.includes('@') && !byEmail.has(emailNorm)) byEmail.set(emailNorm, entry);
+      const phoneNorm = normalizeNodusPhone(p.telefono);
+      if (phoneNorm && !byPhone.has(phoneNorm)) byPhone.set(phoneNorm, entry);
       if (nameNorm && !byName.has(nameNorm)) byName.set(nameNorm, entry);
     }
   }
@@ -226,6 +242,8 @@ export function buildMaestriaNodusCross({
     allNodusEntries.push(entry);
     byDoc.set(docNorm, entry);
     if (emailNorm.includes('@') && !byEmail.has(emailNorm)) byEmail.set(emailNorm, entry);
+    const phoneNorm = normalizeNodusPhone(p.telefono);
+    if (phoneNorm && !byPhone.has(phoneNorm)) byPhone.set(phoneNorm, entry);
     if (nameNorm && !byName.has(nameNorm)) byName.set(nameNorm, entry);
   }
 
@@ -233,6 +251,7 @@ export function buildMaestriaNodusCross({
   const enrichedContracts = signedContracts.map((contract) => {
     const docNorm = normalizeNodusDoc(contract.numeroDocumento || contract.doc);
     const emailNorm = normalizeNodusEmail(contract.email);
+    const phoneNorm = normalizeNodusPhone(contract.telefono || contract.celular);
     const nameNorm = normalizeNodusText(contract.nombre || contract.nombreCompleto || '');
 
     let matched = null;
@@ -244,6 +263,9 @@ export function buildMaestriaNodusCross({
     } else if (emailNorm.includes('@') && byEmail.has(emailNorm)) {
       matched = byEmail.get(emailNorm);
       matchBy = 'EMAIL';
+    } else if (phoneNorm && byPhone.has(phoneNorm)) {
+      matched = byPhone.get(phoneNorm);
+      matchBy = 'TELEFONO';
     } else if (nameNorm && byName.has(nameNorm)) {
       matched = byName.get(nameNorm);
       matchBy = 'NOMBRE';
@@ -277,6 +299,8 @@ export function buildMaestriaNodusCross({
         matched: Boolean(matched),
         matchBy,
         nodusId: matched?.nodusId || null,
+        nodusDoc: matched?.identificacion || null,
+        dniMismatch: Boolean(matched && docNorm.length >= 5 && matched.docNorm.length >= 5 && docNorm !== matched.docNorm),
         nodusTeamId: matched?.equipoId || null,
         nodusTeamName: matched?.equipoNombre || null,
         fdsVigente: matched?.fdsVigente || null,
