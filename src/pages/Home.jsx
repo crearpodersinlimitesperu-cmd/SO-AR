@@ -912,7 +912,8 @@ export default function Home() {
 
     const isGerenteRole = role === 'gerente' || Boolean(currentUser?.isGerente);
     const isCoordRole = role.startsWith('coord') || role.startsWith('coordinador');
-    if (!isGerenteRole && !isCoordRole) return '';
+    const isQtRole = role === 'qt' || (currentUser?.roles || []).includes('qt');
+    if (!isGerenteRole && !isCoordRole && !isQtRole) return '';
 
     const sedeNorm = normalizeSede(currentUser?.sede);
     return ['Lima', 'Quito', 'Guayaquil', 'Cuenca', 'Medellín', 'México'].includes(sedeNorm) ? sedeNorm : '';
@@ -3315,39 +3316,30 @@ export default function Home() {
                       return timeFilter === 'pasados' ? dateB - dateA : dateA - dateB; // Past events descending, future ascending
                     });
 
-                    // --- QT Filter Logic: solo de su sede, solo C1 y C2 actual y próximo, SIN entrenador asignado ---
-                    // La Matriz Oficial define este alcance como "SEDE_C1C2_PROXIMOS_SIN_TRAINER"
-                    // (ver OFFICIAL_PERMISSION_MATRIX.eventos_entrenamientos.qt en permissions.js).
-                    // Antes (hasta 08/09/2026) el filtro cubría sede + C1/C2 + actual/próximo, pero
-                    // NO excluía eventos que ya tienen entrenador asignado — corregido aquí.
+                    // --- QT Filter Logic: solo de su sede, solo Capítulo 1 y Capítulo 2 de los próximos 3 meses ---
                     if (isQT) {
-                      const qtNow = new Date().getTime();
-                      const userSede = currentUser?.sede || '';
-                      let c1Count = 0;
-                      let c2Count = 0;
+                      const qtToday = new Date();
+                      qtToday.setHours(0, 0, 0, 0);
+                      const qtStartMs = qtToday.getTime();
+                      const qtThreeMonths = new Date(qtToday);
+                      qtThreeMonths.setMonth(qtThreeMonths.getMonth() + 3);
+                      qtThreeMonths.setHours(23, 59, 59, 999);
+                      const qtMaxMs = qtThreeMonths.getTime();
+                      const userSedeNorm = normalizeSede(currentUser?.sede);
                       displayEvents = displayEvents.filter(ev => {
-                        if (userSede && !userSede.toLowerCase().includes('global')) {
-                          const evSede = ev.sede || ev.sedeTag || '';
-                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                        if (userSedeNorm && userSedeNorm !== 'Sede Global') {
+                          const evSedeRaw = ev.sede || ev.sedeTag || '';
+                          if (!evSedeRaw || normalizeSede(evSedeRaw) !== userSedeNorm) {
                             return false;
                           }
                         }
                         const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
-                        if (dateMs < qtNow) return false;
-                        // "SIN TRAINER": si el evento ya tiene un entrenador asignado, QT ya no
-                        // necesita verlo en su lista de pendientes.
-                        const trainerAsignado = (ev.trainer || ev.entrenador || '').trim();
-                        if (trainerAsignado) return false;
+                        if (Number.isNaN(dateMs) || dateMs < qtStartMs || dateMs > qtMaxMs) return false;
                         const name = (ev.nombre || ev.name || '').toUpperCase();
-                        if (name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO')) {
-                          c1Count++;
-                          return c1Count <= 2;
-                        }
-                        if (name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS')) {
-                          c2Count++;
-                          return c2Count <= 2;
-                        }
-                        return false; // QTs SOLO ven C1 y C2 de su sede (actual y próximo, sin entrenador)
+                        return (
+                          name.includes('CAPITULO UNO') || name.includes('CAPÍTULO UNO') || /\bC1\b/.test(name) ||
+                          name.includes('CAPITULO DOS') || name.includes('CAPÍTULO DOS') || /\bC2\b/.test(name)
+                        );
                       });
                     }
 
