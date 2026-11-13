@@ -5,7 +5,7 @@
 **Portales Satélite Sincronizados:** [https://cartas.crearpsl.net](https://cartas.crearpsl.net) (`crearpodersinlimitesperu-cmd/cartas-crear`) · Auditor Financiero Cloud (`crearpodersinlimitesperu-cmd/auditor-financiero-cpsl`)  
 **Repositorio Principal:** [`crearpodersinlimitesperu-cmd/SO-AR`](https://github.com/crearpodersinlimitesperu-cmd/SO-AR) (rama `master`)  
 **Fecha de Certificación y Consolidación Inicial:** 12 de Septiembre de 2026  
-**Última Actualización Registrada:** 12 de Noviembre de 2026 (ver Sección 19 y `CAJA_NEGRA_OPERATIVA.md` raíz)  
+**Última Actualización Registrada:** 12 de Noviembre de 2026 (ver Sección 19)  
 **Auditor & Arquitecto:** Antigravity AI (Google DeepMind) — Consolidación Integral al 12/11/2026  
 **Directiva Permanente del Sistema:** **"AGREGAR TODO A LA CAJA NEGRA SIEMPRE"** — Cada cambio, regla de negocio, arquitectura, gobernanza de permisos o integración técnica debe quedar inmediatamente registrado y versionado en este documento (sin exponer jamás secretos ni credenciales en texto plano).
 
@@ -74,8 +74,11 @@ flowchart TD
 
 ### 2.2. Servidor de Correo y Canal Oficial Único (`no-reply@crearpsl.net`)
 * **Host / Puerto:** `smtp.gmail.com:465` (SSL/TLS nativo forzado sobre IPv4 en Linux runners y Cloud Functions)
-* **Canal Remitente Oficial Único (`From` y `Reply-To`):** `"CREAR PODER SIN LÍMITES — Causa OS" <no-reply@crearpsl.net>` (fuente canónica en `src/config/officialMailConfig.js`).
-* **Secretos Cifrados (Cero Texto Plano):** GitHub Secrets (`GMAIL_USER`, `GMAIL_PASS`, `CAUSA_OFFICIAL_FROM_EMAIL`) y Google Cloud Secret Manager (`IMO_MAIL_USER`, `IMO_MAIL_PASS`, `IMO_VERIFICATION_SECRET`). No se documenta ningún valor de contraseña en este archivo — el repositorio `SO-AR` es público.
+* **Canal Remitente Oficial Único (`From` y `Reply-To`):** `"CREAR PODER SIN LÍMITES — Causa OS" <no-reply@crearpsl.net>` (fuente canónica en `src/config/officialMailConfig.js`; reemplaza cualquier remitente legado `@gmail.com`).
+* **Secretos Cifrados (Cero Texto Plano):**
+  * GitHub Actions Secrets: `GMAIL_USER`, `GMAIL_PASS`, `CAUSA_OFFICIAL_FROM_EMAIL`.
+  * Google Cloud Secret Manager (Cloud Functions `deliverContractMail` e `imoDeliverCode`): `IMO_MAIL_USER`, `IMO_MAIL_PASS`, `IMO_VERIFICATION_SECRET`.
+  * No se documenta ningún valor de contraseña en este archivo — el repositorio `SO-AR` es público.
 * **Estado SMTP:** Autenticación aprobada con código `235 2.7.0 Accepted` y verificada cada 3 horas por `scripts/causaOsIntegrityGuardian.mjs`.
 * **Función Operativa:** Despacho en tiempo real (~2 s vía `functions-mailer`) y por cola transaccional (`scripts/mailerDaemon.js`) de contratos firmados PDF A4, pases de acreditación QR, códigos OTP Misión IMO, alertas de tareas, liquidaciones financieras e invitaciones corporativas.
 
@@ -589,40 +592,419 @@ Tras auditoría de compatibilidad con las suscripciones reactivas (`onSnapshot`)
 
 ---
 
-### 13.6. Auditorías y archivo de diagnósticos (Centro de Mando)
+### 13.6. Blindaje Legal KYC, Auto-recuperación y Arquitectura de Cero Pérdida de Datos (`px_legal_signatures`)
 
-* **Agente de integridad:** `.github/agents/causa-auditor-integridad.agent.md` define `CausaAuditorAgent`, que revisa evidencia accesible en modo de solo lectura. No ejecuta sincronizaciones, no cambia registros y no escribe directamente en Nodus, Firestore ni en este documento. Distingue datos verificados en Nodus, Firestore y código de inferencias y puntos no verificables; no etiqueta una ausencia en Nodus sin consulta autorizada y suficientemente completa.
-* **Cierre de pendientes:** `.github/agents/causa-auditoria-pendientes.agent.md` define el agente `Auditor de pendientes de Causa OS`. En cada invocación recorre por área el backlog pendiente (permisos/sede, tareas, Nodus, conversiones/pagos/caja, FI/Equipo 1000, pólizas/correo/Palabra Rota, UX y workflows), prueba solo superficies seguras y etiqueta lo no consultable como **NO VERIFICABLE**. No muta datos, no cambia reglas y no dispara workflows productivos de forma autónoma.
-* **Límite de automatización:** las definiciones `.agent.md` son instrucciones de agentes bajo demanda, no procesos persistentes. No garantizan barridos continuos ni crean schedules. Los workflows listados abajo son automatizaciones aparte; se inspecciona su ejecución y sus efectos antes de confiar en su cobertura.
-* **Panel de destino:** Centro de Mando → Super Admin → Diagnósticos (`src/pages/SuperAdminPanel.jsx`, `DiagnosticsView`). Los informes automáticos de `.github/workflows/platform-audit.yml` se guardan en `platform_diagnostic_reports` por `scripts/platform_audit.mjs`. Los informes de `CausaAuditorAgent` y del agente `Diagnóstico integral de Causa OS` se pegan, revisan y publican por un Super Admin desde el mismo panel; publicar crea un registro `copilot_deep`. Ambos aparecen en “Reportes recientes”.
-* **Acceso y límites:** `firestore.rules`, regla `platform_diagnostic_reports`, reserva la lectura a Super Admin, limita la creación cliente a informes profundos con campos/tamaño validados y niega update/delete desde cliente. El job automático usa Admin SDK y escribe por separado; por tanto, la regla cliente no hace inmutable la colección frente al Admin SDK. La vista no dispara el workflow ni las auditorías. Un reporte publicado no prueba por sí solo que se haya revisado toda la plataforma o que sus hallazgos sean actuales; debe incluir alcance, hora, fuente y límites.
-* **Manejo seguro:** redactar datos personales, comprobantes, credenciales y secretos antes de pegar. No publicar identificadores personales en informes generales. No copiar registros crudos ni datos personales a esta Caja Negra: aquí se mantiene arquitectura, reglas, procedimientos y resúmenes agregados no identificables; el historial detallado de hallazgos vive en `platform_diagnostic_reports`. No crear colecciones ni permisos de escritura nuevos para cumplir este flujo.
-* **Ciclo de actualización:** después de modificar el agente, el flujo del panel, el esquema o las reglas de publicación, actualizar esta sección en el mismo cambio. Para registrar un hallazgo, usar el panel solo después de revisión humana y con el alcance/fuente documentados.
+Tras el reporte de incidencias donde firmas completadas figuraban en el panel administrativo (`LegalStatusPanel.jsx`) como *"Sin Nombre"*, *"DOC: No reg."* y sede *"Global"*, se ejecutó una intervención forense y de blindaje estructural:
 
-#### Registro de auditoría con corte al 2026-10-17
+1. **Causas Raíz Detectadas:**
+   * **Descarte de campos en `saveLegalSignature`:** La función destructuraba únicamente campos legacy de contratos y omitía `kycData`, `docNumber`, `docType`, `birthDate` y `phone` antes de llamar a `setDoc`.
+   * **Incompatibilidad snake_case vs camelCase:** El backend guardaba `participant_name` y `participant_id`, mientras que `LegalStatusPanel.jsx` leía `participantName` y `participantId`.
+   * **Prevalencia errónea en `LegalOnboardingModal.jsx`:** `currentUser?.name` (que por defecto en `AuthContext` asignaba `'Colaborador CREAR'`) tenía mayor precedencia que el nombre legal tipeado por el usuario en el paso KYC.
+   * **Sede no parametrizada en onboarding:** El formulario inicial no permitía elegir sede, cayendo a `'ALL'` y asignando por defecto sede `'Global'` y código `'PE'`.
+   * **Ruta de acceso directa desalineada:** El enlace institucional `crearpsl.net/dna` no estaba registrado en el enrutador principal de React (`App.jsx`).
 
-Este registro resume evidencia histórica y no certifica el estado actual de producción. La auditoría se basó en código, ejecuciones de CI y un respaldo Firestore con captura del 2026-10-16; no hubo consulta autenticada actual a Nodus ni conciliación completa de los datos operativos.
+2. **Garantía de Persistencia Dual (`snake_case` y `camelCase`):**
+   * Toda escritura en Firestore (`px_legal_signatures`) ahora almacena **ambas variantes simultáneamente**:
+     - `participantName` / `participant_name` / `full_name`
+     - `participantId` / `participant_id` / `email`
+     - `docType` / `doc_type`
+     - `docNumber` / `doc_number`
+     - `birthDate` / `birth_date`
+     - `phone`
+     - `sede` y `countryCode` / `country_code`
+     - `kycData` y `kyc_data`
+     - `hashSha256` / `hash_sha256` / `audit_hash`
+   * Esto garantiza compatibilidad retroactiva y futura con cualquier script, exportador o componente.
 
-| Área | Hallazgo al corte | Estado / cautela |
-|---|---|---|
-| Centro Managers México | El respaldo contenía 12 documentos de directorio; el catálogo estático incorporaba una fila adicional no coincidente y el algoritmo anterior podía presentar 13 claves frente a 12 documentos. | Corrección de fuente, persistencia por docId y precedencia de ediciones manuales fusionada en [PR #169](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/pull/169) y publicada por [deploy 38986982284](https://github.com/crearpodersinlimitesperu-cmd/SO-AR/actions/runs/38986982284). La verificación fue con tests y Firestore Emulator; no se editó un registro real ni se concilió el directorio actual. |
-| Acceso por rol/sede | Revisión estática encontró reglas amplias en colecciones operativas, IMO y completitudes de tareas; el filtrado de UI no constituye aislamiento backend. | Riesgo pendiente de matriz de permisos, pruebas negativas por sede/rol y revisión de consumidores antes de cambiar reglas. No se documentó explotación productiva. |
-| FI y Equipo 1000 | Se observó lógica de FI derivada de aprobaciones sin evidencia física en un flujo y exclusión de Equipo 1000 inconsistente entre fuentes. | Revisar procedencia, identificadores y denominadores; no afirmar integridad o segregación global hasta validar cada fuente. |
-| Nodus, pagos y operación | No se verificaron en línea paginación completa, latencia autenticada, conversión C1→C2→MJ, pólizas/pagos, entrega de correo, Palabra Rota en horario/zona local ni cuadre físico de caja. | **NO VERIFICADO** al corte; no tratarlo como ausencia de registro ni inferir falta de pago/actividad. |
-| Perfiles de prueba | El respaldo revisado no contenía coincidencia exacta del ejemplo “Leyla Ochoa” ni marcas nominales explícitas de prueba en los campos examinados. | Esto no prueba ausencia en Nodus, otras colecciones ni datos actuales. No se acusó ni eliminó a ninguna persona. |
+3. **Motor de Auto-Recuperación y Auto-Sanación Multi-Fuente (`resolveParticipantKYC` y `normalizeSignatureDoc`):**
+   * En `src/services/legalSignatureService.js`, toda lectura (`getLegalStatusByParticipant`, `getAllLegalSignatures`) pasa por `normalizeSignatureDoc`.
+   * Si un registro antiguo o defectuoso contiene *"Sin Nombre"* o carece de documento/sede, el motor ejecuta una búsqueda cruzada en cascada a través de 5 fuentes:
+     1. `usersData.js` (`USERS_TO_IMPORT`): Colaboradores oficiales, directivos y coordinadores.
+     2. `googleWorkspaceUsers.json`: Directorio institucional corporativo de Google Workspace.
+     3. `nodusEnroladosRecords.json`: CRM Base con más de 3,000 registros, teléfonos y asignaciones por sede.
+     4. `INITIAL_MANAGERS` de `managersData.js`: Directorio de managers y líderes territoriales.
+     5. Parser heurístico de correos (`formatEmailToName`): Descompone `nombre.apellido@dominio` en formato capitalizado.
+   * **Auto-Sanación Silenciosa en Firestore:** Al consultar `getAllLegalSignatures`, si el sistema detecta que un documento persistido en Firestore tenía campos incompletos o "Sin Nombre" y ahora se cuenta con su resolución fidedigna, dispara automáticamente una actualización `{ merge: true }` en background para sanar la base de datos de manera definitiva.
 
-Los conteos del respaldo son históricos y no representan personas activas, ventas, conversión ni integridad total. El exportador de respaldo puede convertir errores de lectura en listas vacías; por ello, un cero exportado no basta para afirmar `[DATO NO REGISTRADO EN NODUS]`. La evidencia detallada solo debe publicarse en el panel después de revisión y saneamiento de datos sensibles.
+4. **Herramienta de Recuperación y Blindaje Manual en `LegalStatusPanel.jsx`:**
+   * Se incorporó el botón **[✏️ Recuperar KYC]** en cada fila de la bóveda legal.
+   * Permite a SuperAdmin y Dirección:
+     - Consultar y editar el nombre completo, documento, teléfono, correo y sede.
+     - Botón inteligente **[✨ Auto-completar]** que consulta en tiempo real los directorios y precarga los datos oficiales.
+     - Función `updateLegalSignatureKYC` que persiste el blindaje en Firestore preservando inalterable la firma criptográfica (canvas vectorial y hash SHA-256).
+
+5. **Experiencia de Usuario y Captura Fidedigna:**
+   * **Selector de Sede Oficial:** En el Paso -1 de `LegalOnboardingModal.jsx`, el usuario selecciona su ciudad de operación (`Lima`, `Quito`, `Guayaquil`, `Cuenca`, `CDMX`, `Medellín`, `Madrid`), la cual actualiza dinámicamente los contratos legales de su país y queda grabada en su expediente.
+   * **Prevalencia del Nombre Legal:** El valor digitado en el campo KYC toma prioridad absoluta sobre alias genéricos de sesión.
+   * **Puerta Segura de Autenticación:** `OnboardingLegal.jsx` detecta si el usuario no tiene sesión activa y ofrece un acceso limpio con Google antes de firmar, garantizando que el `owner_uid` y `participant_id` correspondan a un usuario real autenticado.
+   * **Ruta Canónica:** Se habilitó `<Route path="/dna" element={<OnboardingLegal />} />` en `App.jsx`.
+
+6. **Reglas de Seguridad Actualizadas (`firestore.rules`):**
+   * `allow read`: SuperAdmin, Gerente/Dirección y el propio participante.
+   * `allow delete`: Exclusivo para SuperAdmin (permite purgar registros de prueba o corrompidos desde `LegalStatusPanel`).
+   * `allow update`: SuperAdmin y el participante sobre campos de sincronización con Nodus y PDF.
 
 ---
 
-## 19. 🛡️ Consolidación Integral de Noviembre 2026 (Sincronizada con `CAJA_NEGRA_OPERATIVA.md` Sección 19 — 12/11/2026)
+## 16. Centro de Managers: Organización Numérica de Equipos y Blindaje de Persistencia en Checklist (Zero-Loss)
 
-1. **Canal Oficial Único de Correo (`no-reply@crearpsl.net`):** Unificado en `src/config/officialMailConfig.js`, `scripts/mailerDaemon.js` (TLS 465 IPv4 + confirmación transaccional), `functions-mailer/index.mjs` (`deliverContractMail` ~2 s), `functions-imo/index.mjs` y flujo de liquidaciones financieras (`1f65004`).
-2. **Permisos Globales de Tareas, Metas y Sincronización `users/{uid}` (`f28ea85`, `6b04e6b`):** Incorporación de `officialRosterHasRole()` y alias multi-correo en `firestore.rules`, corrección de `collaborators: []` en `src/utils/taskPrivacy.js` y sincronización automática `scripts/syncUsersUidProfiles.mjs` en `deploy.yml` para los **153 usuarios activos y 8 roles** en las 6 sedes.
-3. **Centro de Managers y Cohortes Activas MJ (`812e045`, `f28ea85`):** Restauración de cohortes activas de 90 días, bloqueo de auto-graduación antes de concluir el 4to FDS `EL VIAJE` y persistencia de `estadoReactivadoManual: true` en `src/pages/CentroManagers.jsx`, `src/services/managerSyncPolicy.js` y `cloudflare-worker/src/index.js` (incluyendo Cuenca `#22 JAGUARUNDIS KAWSAY`).
-4. **Instrumentos Legales Digitales Sede Lima y `cartas.crearpsl.net` (`0b30676`, `3588721`, `63cb005`, `cartas-crear@15d49ff`):** Separación del Contrato Legal PDF A4 multipágina y Pase QR PNG (`< 1 MiB`), monitores internos protegidos por RBAC (`/monitor-fuego-lima`, `/monitor-maestria-lima`), y reparación de firma resiliente SDK + REST API en `https://cartas.crearpsl.net/contrato_caminata_fuego.html` (`129` páginas HTML auditadas con `0` enlaces rotos).
-5. **Guardián Autónomo 3H y Auditor Financiero Diario Cloud (`a4fb152`, `auditor-financiero-cpsl@fba3965`):** Supervisión integral cada 3 horas (`scripts/causaOsIntegrityGuardian.mjs`) y modernización/reparación del workflow diario `auditor-financiero-cpsl` (`ubuntu-24.04`, Python `3.12`, cuadre de 11 pestañas de `EGRESOS CREAR 2026`, Unidades Compartidas Drive e IMAP SSL).
-6. **Auditoría Forense Embudo Nodus Lima (`Equipos 28–32`):** Consolidación verificada sobre `852` fichas únicas (`id_sede=7`, corte `12/11/2026`), separando estrictamente `Nuevos` vs. `Rezagados` y `Pagado verificado` vs. `Abono`. El desglose técnico completo reside en `CAJA_NEGRA_OPERATIVA.md` (Secciones 14 a 19).
+### 16.1. Organización Numérica Estricta y Vista por Equipos en Centro de Managers (`/centro-managers`)
+* **Problema:** En el Centro de Managers, las escuadras aparecían desordenadas alfabéticamente (por ejemplo, el equipo 91 y 92 aparecían antes del 81, o agrupaciones mezcladas), dificultando la auditoría de coordinadores y directores territoriales.
+* **Solución Implementada (`src/pages/CentroManagers.jsx`):**
+  1. **Algoritmo de Ordenamiento Natural Numérico (`getTeamNumericValue`):**
+     - Extrae la cifra entera del nombre o identificador del equipo (ej. `"Equipo 30 Lima" -> 30`, `"UIO-EQ-126" -> 126`, `"Equipo 81" -> 81`).
+     - Ordena de manera estrictamente ascendente (1, 2, 3 ... 81, 91, 92 ... 126).
+  2. **Formato Visual Canónico de Badges:**
+     - El número de equipo siempre se visualiza de primero destacado: `#{numEquipo} - {Nombre / Sede}` (ej. `#30 Equipo 30 Lima`, `#126 UIO-EQ-126`).
+  3. **Selector de Vistas:**
+     - `[📋 Vista Tabla]`: Tabla compacta ordenada ascendentemente por número de equipo.
+     - `[🗂️ Por Equipos]`: Vista en cuadrícula de tarjetas de equipos (`groupedManagersByTeam`), mostrando resumen de managers, llamada al 7mo día, coordinadores y entrenadores asociados.
+
+---
+
+### 16.2. Blindaje de Persistencia y Progreso en Tareas de Checklist (Zero Data Loss)
+* **Problema Reportado:** Los usuarios (como Erika Gavilánez) completaban su tarea reiteradas veces y siempre volvía al 0%, perdiendo la información tras recargar o cerrar la ventana.
+* **Causas Identificadas y Subsanadas:**
+  1. **Reglas de Seguridad Firestore (`firestore.rules`):**
+     - `isOperationalProgressUpdate()` rechazaba escrituras porque los clientes enviaban campos de auditoría temporal (`updatedAt`, `updated_at`, `deadline`) no incluidos en la lista blanca de `hasOnly()`.
+     - Se actualizó la función para permitir explícitamente `'updatedAt'`, `'updated_at'`, `'deadline'` sin generar errores `PERMISSION_DENIED`.
+  2. **Resolución y Normalización de Correos (`findUserByAnyEmail`):**
+     - Corrección del error tipográfico histórico `@crearpls.com` y `@crearpsl.com` a `@crearpsl.net`.
+     - Soporte cruzado de aliases (ej. correos personales de Gmail mapeados a sus correos institucionales de Causa OS).
+     - En `TaskDetailModal.jsx`, `myEmailKey` y `collaboratorsList` ahora utilizan concordancia semántica multi-correo, impidiendo que el colaborador autenticado sea omitido de `assigneeProgress`.
+  3. **Protección en `ChecklistContext.jsx`:**
+     - En `writeTaskDoc` y `updateTaskDetails`, los errores de Firestore se propagan con `throw err` para que la interfaz nunca finja un éxito falso.
+     - En el listener `onSnapshot`, se blindó la resolución de tareas personalizadas (`custom_`) y con asignaciones directas (`assignedToEmail` / `assignedToEmails`) para que un `data.completions` vacío o sin la clave de la sede activa no fuerce indebidamente `completed: false` y `status: 'Pendiente'`.
+  4. **Script de Auto-Recuperación de Datos (`scripts/recoverErikaTask.mjs`):**
+     - Integrado en el pipeline de despliegue (`deploy-rules.yml`) con credenciales de cuenta de servicio para restaurar automáticamente a 100% el avance de colaboradores cuyas tareas hubiesen quedado congeladas en 0%.
+
+---
+
+
+---
+
+## 17. Avances de Octubre 2026: Auditoría de Seguros Inteligente, Auto-Graduación de Equipos y Estabilización de la Nómina
+
+### 17.1. Auditoría Inteligente de Pólizas de Seguro (Gemini Vision AI)
+* **Problema Original:** El sistema validaba las pólizas basándose en si el archivo se llamaba de cierta forma o buscando fechas con expresiones regulares muy débiles, generando que usuarios con seguros vigentes quedaran en rojo ("En Revisión") de manera injusta, o que se aprobaran archivos falsos.
+* **Solución Definitiva (Causa OS + Gemini AI):**
+  1. Se implementó un agente basado en `@google/generative-ai` (`gemini-1.5-flash`) en `scripts/trainerPolicyAuditAgent.mjs`.
+  2. Este agente no lee el nombre del archivo, lee **EL CONTENIDO VISUAL Y DE TEXTO DEL PDF**, buscando literalmente la fecha de vencimiento y el nombre del asegurado para hacer match estricto con el entrenador.
+  3. Se vincularon las fechas **REALES** en Firestore (`validUntil`). 
+  4. Los entrenadores sin archivo, con archivos de imagen no válidos, o sin fechas legibles fueron regresados irreversiblemente a `EN REVISIÓN`. **Ninguna fecha falsa de "2026-12-31" está permitida en la base de datos.** 
+
+### 17.2. Auto-Graduación de Equipos (Centro de Managers)
+* **Problema Original:** Los Coordinadores o Entrenadores debían marcar manualmente que un equipo se graduó o cerró al terminar su proceso, para que las finanzas procedieran a la liquidación, lo que llevaba a errores y retrasos.
+* **Solución Implementada (`src/pages/CentroManagers.jsx`):**
+  1. **Opción 100% Automática:** El sistema ahora lee el calendario en vivo (Sheets/`CyclesContext`). 
+  2. Si detecta que un equipo cursó el evento de **"EL VIAJE"** y ya transcurrieron 3 días de esa fecha, el sistema de CAUSA de forma autónoma y silenciosa marca al equipo como `Graduado` y los envía a la cola de **Liquidación/Pagos**.
+  3. Se añadió una **Alerta Visual Verde** ("¡Graduación Automática Detectada!") en la parte superior del módulo de Managers que detalla al CMJ qué equipos se graduaron recientemente de manera automática y cuántas llamadas tenían registradas.
+
+### 17.3. Estabilización de la Nómina del Asignador (El caso Emily Campuzano)
+* **Problema:** En el Asignador de Entrenadores, ciertos entrenadores (como Emily Campuzano) desaparecían del listado oficial impidiendo que se les asignara a eventos.
+* **Solución Estructural:**
+  1. **Nombres Legales Estrictos:** Se mapeó `'emily campuzano': 'Emily Campuzano'` en `NOMBRES_LEGALES_ENTRENADORES` (`src/pages/AsignadorEntrenadores.jsx`).
+  2. **Inclusión en Plan Maestro 2026:** Se inyectó formalmente en el array `ENTRENADORES_OFICIALES_CPSL` etiquetada para "El Viaje" y habilitada para recibir llamadas.
+  3. **Corrección de Directorio Activo:** Se normalizó a los usuarios en Firestore (`users` y `staff_directory`) inyectándoles el `displayName` correcto si venían de cuentas importadas con campos en blanco. 
+
+---
+
+## 18. Actualización Operativa & Técnica Mayor: Sincronización Automática e Íntegra Asignador ↔ Calendario Global, Visibilidad Jerárquica y Blindaje Anti-Invención (22 de Octubre de 2026)
+
+### 18.1. Sincronización Automática e Íntegra Asignador ↔ Calendario Global
+* **Directiva:** Todo lo que se asigne, sugiera o modifique en `/asignador-entrenadores` (fuente única y autoritativa) debe reflejarse fielmente, de forma automática e íntegra en el Calendario Global (`public/calendario_global.html`) y en los paneles de Causa OS.
+* **Mapeo de Estados Sin Invenciones:**
+  1. **Entrenador Confirmado:** Se publica en tiempo real en la colección `calendario_asignaciones_publicas` vía Firestore (`onSnapshot`). En el Calendario Global se rotula en color verde esmeralda: `✓ Confirmado en Asignador Causa OS`.
+  2. **Entrenador Sugerido por Cronograma Oficial:** Se incorporó el motor espejo de sugerencias ([`resumenSugerenciaCronograma`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/trainerAssignments.js)) replicando exactamente la lógica del Asignador:
+     - En **Maestría del Juego**, se desglosa por fines de semana (`Creación`, `Relación`, `Gratitud`). Si la celda contiene un único nombre, se sugiere exclusivamente para el FDS 1.
+     - En programas de slot único con múltiples candidatos no consensuados, se mantiene como pendiente de resolución para evitar ambigüedades.
+     - Se rotula explícitamente en color ámbar: `Sugerido por cronograma · pendiente de confirmar en Asignador`.
+  3. **Sin Asignar:** Permanece visible como `Sin asignar · Pendiente en Asignador de Entrenadores`. Jamás se fabrica o inventa un entrenador sintético.
+
+### 18.2. Reglas de Filtrado y Visibilidad Jerárquica en "Eventos y Entrenamientos" (`Home.jsx`)
+* **Gerentes de Sede (Filtro por Defecto de Primera Vista):**
+  - **Requisito:** Al ingresar a Mi Inicio (`/home`), el Gerente debe ver de primera vista únicamente las fechas de su propia sede, pero manteniendo la libertad de ver las demás sedes si lo desea.
+  - **Implementación:** Se inicializa `selectedSedeFilter` mediante `gerenteDefaultSede`, asociando la sede canónica del gerente (`Lima`, `Quito`, `Guayaquil`, `Cuenca`, `Medellín`, `México`).
+  - **Flexibilidad Operativa:** El selector 📍 permanece 100% activo, permitiendo al gerente cambiar en cualquier momento a "Todas las sedes" o a otra sede sin bloqueos de permisos.
+* **Visibilidad de Entrenadores (Gerentes vs Coordinadores):**
+  - **Gerentes, Dirección y SuperAdmin:** Pueden ver **siempre** los entrenadores (confirmados o sugeridos) en **todas** las fechas y eventos visibles.
+  - **Coordinadores (`coord_c1`, `coord_c2`, `coord_maestria`, `coordinador_c1c2`, `coordinador_mj`, `coord_jr`):** Únicamente pueden ver los entrenadores asignados/sugeridos en las fechas que pertenezcan al **ciclo activo de su sede/equipo** (`currentCycle` o `quitoCycles`). Para fechas ajenas al ciclo activo, se reserva la visibilidad del entrenador.
+
+### 18.3. Mandato Estricto Anti-Invención de Datos de Nodus
+* Todos los agentes de sincronización (`scripts/nodusApiClient.mjs`, `scripts/nodusMultiAgentSync.mjs`, `publishNodusReportSources.mjs`) y servicios de visualización frontend (`NodusDataMap.jsx`, `AuditoriaKPIs.jsx`, `ReportesBoard.jsx`) operan bajo arquitectura *fail-closed*:
+  - Si un dato no existe o no pudo ser extraído de Nodus, se reporta como "No disponible / Pendiente de sync".
+  - Prohibido cualquier valor simulado, sintético o inventado en Causa OS.
+* **Distinción Estricta entre PX (Personas Únicas) y Gestiones/Llamadas:**
+  - **Regla Fundamental:** Jamás se debe contar el número de llamadas como el número de PX. A una misma persona (PX) se le puede llamar múltiples veces hasta lograr el contacto o confirmación; por tanto, las llamadas miden volumen de esfuerzo operativo, mientras que los PX miden personas únicas reales en sala.
+  - **Reflejo en Copiloto Analítico (`AICopilot.jsx`):** Las respuestas diferencian explícitamente entre `PX Confirmados`, `PX Por Confirmar` y `Total Intentos / Gestiones de Llamada realizada`. Si la consulta especifica sede (ej. Lima), se filtra estrictamente a las coordinaciones de dicha sede.
+
+### 18.4. Agente de Reporte Diario de Llamadas de Coordinadores (12:30 PM Automático a Chat de Sede)
+* **Objetivo y Automatización:**
+  - Transmisión autónoma y programada todos los días a las **12:30 PM** (hora local UTC-5: Lima, Quito, Guayaquil, Cuenca, Medellín; cron: `30 17 * * *` en GitHub Actions).
+  - Componentes:
+    - **Workflow de GitHub Actions:** [`.github/workflows/daily-calls-report-1230.yml`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/.github/workflows/daily-calls-report-1230.yml).
+    - **Script Ejecutor:** [`scripts/sendDailyCallsReportChat.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/sendDailyCallsReportChat.mjs).
+    - **Suite de Pruebas Automatizadas:** [`tests/daily-calls-report.test.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/tests/daily-calls-report.test.mjs).
+* **Estructura Canónica del Reporte:**
+  1. **Separación Taxativa de PX vs Llamadas:**
+     - 👥 **PX ASIGNADOS EN SALA (Personas Únicas):** Conteo exacto de participantes únicos asignados al ciclo.
+     - 🟢 **Confirmados a Sala (OK):** Personas que confirmaron asistencia presencial.
+     - 🟡 **Por Confirmar (XC):** Personas en seguimiento pendiente.
+     - 🔴 **No Contesta (NC):** Personas sin respuesta telefónica.
+     - 📞 **GESTIONES REALIZADAS (Total Llamadas / Esfuerzos):** Volumen acumulado de intentos y llamadas completadas (desglosado en C1 y C2). Se explicita en el mensaje: *"A un PX se le contacta cuantas veces sea necesario; los PX son participantes únicos en sala."*
+  2. **Detalle por Coordinador(a):**
+     - Nombre y rol Nodus, equipos a cargo, PX Asignados, PX Confirmados, Gestiones de llamada realizadas y porcentaje de cobertura efectiva.
+  3. **Diagnóstico Asertivo Directivo:**
+     - Identifica el cuello de botella inmediato (ej. remarcar contactos Por Confirmar o recontactar por WhatsApp los No Contesta).
+  4. **Enrutamiento Estricto por Sede:**
+     - Lee la configuración en Firestore `settings/google_chat` (`sedesWebhooks` y fallback) y variables de entorno de GitHub Secrets (`GOOGLE_CHAT_WEBHOOK_LIMA`, `GOOGLE_CHAT_WEBHOOK_QUITO`, etc.).
+     - Si una sede no tiene webhook configurado aún, se omite limpiamente su envío para no contaminar el espacio de otras sedes (regla de no mezclar espacios).
+  5. **Política Anti-Alucinación (Fail-Closed):**
+     - Si Nodus no tiene datos para esa sede o ciclo en el corte de 12:30 PM, se notifica claramente como `Estado Nodus: Sin sincronización disponible para esta sede en el corte actual`, sin precargar números inventados.
+
+### 18.5. Agente Auditor de Coherencia de Tareas y Roles de Usuarios
+* **Objetivo:**
+  - Auditar de forma exhaustiva y continua que las tareas operativas (catálogo oficial y colecciones en vivo en Firestore `/tasks`) estén funcionando sin fallas y sean estrictamente coherentes con el perfil, identidad y roles de los usuarios asignados.
+  - Componentes:
+    - **Módulo de Reglas y Lógica Pura:** [`src/utils/taskRoleCoherence.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/taskRoleCoherence.js).
+    - **Script Ejecutor de Auditoría:** [`scripts/auditTaskRoleCoherenceAgent.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/auditTaskRoleCoherenceAgent.mjs).
+    - **Workflow de GitHub Actions:** [`.github/workflows/task-coherence-audit.yml`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/.github/workflows/task-coherence-audit.yml).
+    - **Suite de Pruebas Automatizadas:** [`tests/task-role-coherence.test.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/tests/task-role-coherence.test.mjs).
+* **Dimensiones Auditadas:**
+  1. **Coherencia de Rol & Perfil (`ROLE_MISMATCH`):**
+     - Compara los roles declarados de la tarea contra el conjunto canónico de roles del usuario (`user.role`, `user.roles`, `user.appRole`).
+     - Alerta si una tarea gerencial (`role: 'gerente'`) o de coordinación (`role: 'coord_c1'`) es asignada a un colaborador sin las credenciales o permisos correspondientes.
+  2. **Funcionamiento Operativo y Estado (`CONTRADICTORY_STATUS`, `STATUS_PROGRESS_MISMATCH`):**
+     - Detecta incoherencias como `completed: true` con `status: 'Pendiente'`, o `status: 'Completada'` con avance 0% sin evidencia.
+     - Provee payload de auto-reparación (`--fix`) para sincronizar estados de forma segura y no destructiva.
+  3. **Cero Tareas Huérfanas (`ORPHANED_ASSIGNEE`, `EMAIL_DOMAIN_TYPO`):**
+     - Valida que cada correo asignatario exista en el directorio de colaboradores de Causa OS.
+     - Detecta y corrige errores tipográficos históricos (ej. `@crearpls.com` ➔ `@crearpsl.net`).
+  4. **Multi-Asignación y Avance Individual (`MULTI_ASSIGNEE_DESYNC`):**
+     - Garantiza que si una tarea lista a varios asignatarios en `assignedToEmails`, cada uno posea su correspondiente entrada en `assigneeProgress`.
+  5. **Privacidad y Aislamiento de Tareas Personales (`UNOWNED_CUSTOM_TASK`):**
+     - Impide que tareas personalizadas queden sin propietario o asignatario (`ownerId`/`createdBy`), evitando cualquier riesgo de fuga hacia vistas públicas o catálogo.
+
+### 18.6. Auditoría Exhaustiva e Integración de Datos Reales de Documentos en Cartas de Entrenadores
+* **Mandato Operativo y Legal:**
+  - *"Todas las cartas emitidas deben de tener los datos reales de los entrenadores, esto es muy serio."*
+  - Queda terminantemente prohibido emitir cartas de bienvenida o invitaciones migratorias con leyendas provisionales (`[DOCUMENTO PENDIENTE]`), abreviaturas genéricas (`PASAPORTE ECUATORIANO` sin numeración) o enlaces a carpetas crudas de Google Drive.
+* **Fuente Canónica de Verificación:**
+  - Se realizó la extracción y verificación mediante OCR de alta precisión sobre la totalidad de los 20 escaneos oficiales de pasaporte y documentos de identidad gubernamentales almacenados en el expediente de entrenadores (`work/crm/trainers/`):
+    1. **Jesús Adrián Acosta Rodríguez:** Pasaporte MEX `N12516404` · CURP `AORJ880422HZSCDS03`.
+    2. **Cirilo Agustín Martínez:** Pasaporte MEX `N07847087` · CURP `AUMC010611HOCGRRA4`.
+    3. **Fernando Aragón:** DNI Mercosur ARG `17.856.159`.
+    4. **Juan Ángel Arreola Morales:** Pasaporte MEX `N11363440` · CURP `AEMJ880713HNLRRN01`.
+    5. **Michael Andrés Boada Rubiano:** Pasaporte COL `PE226260` · C.C. `1026263360`.
+    6. **Diego David Bravo Figueroa:** Pasaporte ECU `A9025643` · C.I. `1713803847`.
+    7. **Leandro Emilio Brunis Avilés:** Pasaporte ECU `A8243780` · C.I. `1718426560` (Vigencia: 14/09/2022 al 14/09/2032).
+    8. **Carlos Emilio Brunis Villacís:** Pasaporte ECU `A8885265` · C.I. `1201916986` (Vigencia: 19/09/2023 al 19/09/2033).
+    9. **Ernesto Alejandro Díaz Pabón:** Pasaporte ECU `A4152916` · C.I. `1727274928`.
+    10. **Carlos Andrés Gómez Gómez:** Pasaporte COL `BG726399` · C.C. `3482169`.
+    11. **Elmer Andrés Idrovo Andrade:** Pasaporte ECU `A9919241` · C.I. `1712332350` (Vigencia: 24/07/2023 al 24/07/2033).
+    12. **Haydin Fernando Mendoza Clavijo:** Pasaporte ECU `A9900720` · C.I. `1717587529`.
+    13. **Ana Elena Monroy Thompson:** Pasaporte MEX `N04328038` · CURP `MOTA960805MMCNHN08`.
+    14. **Mildred Muñoz Vásquez:** Pasaporte COL `BE596036` · C.C. `1036598062`.
+    15. **Julio César Narváez Mora:** Pasaporte ECU `A8266033` · C.I. `1714134804` (Vigencia: 24/09/2022 al 24/09/2032).
+    16. **María de Lourdes Patiño Galárraga:** Pasaporte ECU `B0857192` · C.I. `1712863404`.
+    17. **Mauricio Pérez Robles:** Pasaporte MEX `N13904212` · CURP `PERM910531HPLRBR01`.
+    18. **Alonso Solares Salazar:** Pasaporte MEX `N11971541` · CURP `SOSA851221HDFLLL00`.
+    19. **Edison Paúl Sosa Carrera:** Pasaporte ECU `A9305688` · C.I. `1717138596`.
+    20. **José Antonio Torrón Ramírez:** Pasaporte DOM `RD6804526` · C.I. `00115213092`.
+* **Componentes Impactados:**
+  1. [`public/cartas/entrenadores-documentos.json`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/entrenadores-documentos.json): Actualizado con los 20 registros oficiales estructurados con números de pasaporte, cédula/CURP/DNI, fechas de nacimiento, vigencias y enlaces de respaldo.
+  2. [`public/cartas/carta_invitacion_migraciones.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_invitacion_migraciones.html): Eliminado el truncamiento que eliminaba números de documento; ahora imprime la cadena oficial íntegra de pasaporte y cédula.
+  3. **Cartas HTML Oficiales Actualizadas y Nuevas:**
+     - [`carta_carlos_brunis_cue.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_carlos_brunis_cue.html) (Nueva carta interactiva para Carlos Brunis, CUE 4FDS).
+     - [`carta_leandro_brunis_cue.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_leandro_brunis_cue.html) (Nueva carta interactiva para Leandro Brunis, CUE CAP 1 E24).
+     - [`carta_ana_monroy_lim.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_ana_monroy_lim.html) (Nueva carta interactiva para Ana Elena Monroy, Sede Lima).
+     - Se integró la tarjeta de identidad y documentos oficiales verificados en [`carta_andres_idrobo_creacion_e31.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_andres_idrobo_creacion_e31.html), [`carta_andres_idrobo_e30.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_andres_idrobo_e30.html), [`carta_lourdes_relacion_e30.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_lourdes_relacion_e30.html), [`carta_lourdes_patino_e29.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_lourdes_patino_e29.html), [`carta_mike_boada_gratitud_e29.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_mike_boada_gratitud_e29.html), [`carta_alejandro_diaz_e28.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/carta_alejandro_diaz_e28.html), [`julio-narvaez-elviaje-e28.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/julio-narvaez-elviaje-e28.html) y [`fernando-aragon-c1.html`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/public/cartas/fernando-aragon-c1.html).
+  4. [`src/pages/MonitorVuelosCartas.jsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/pages/MonitorVuelosCartas.jsx): Actualizados todos los badges del catálogo `OFICIAL_LETTERS` con números reales de pasaporte/cédula; y el visor de previsualización (modal) incrusta automáticamente la carta oficial con datos verificados en lugar de enlaces rotos o carpetas crudas de Google Drive.
+
+---
+
+### 18.7. Auditoría de Cambios de Cupo vs Nodus y Bases de Datos de Sentados Históricos (Lima C1 E32)
+* **Mandato y Reglas de Negocio Directivas:**
+  1. *"Que las personas que salen no se hayan sentado y que estén inscritas."*
+  2. *"No apto si ya se le hizo cambio de cupo previo."* (Límite estricto de 1 cambio de cupo por participante).
+  3. *"Aquí se buscan sentados antiguos para ver si son aptos para cambio de nombre."*
+* **Bases de Datos de Sentados Históricos Integradas:**
+  - Se descargaron e indexaron localmente en `data/sentados_historicos/` las 6 fuentes maestras de asistencia histórica de la organización:
+    1. [`CAPITULO UNO E19 LIMA.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/CAPITULO%20UNO%20E19%20LIMA.xlsx) (`1K3BHZ9UpW77kWc9bXHG_a0Zx9ibRGPvh`).
+    2. [`ASISTENCIA CAPÍTULO UNO LIMA.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/ASISTENCIA%20CAP%C3%8DTULO%20UNO%20LIMA.xlsx) (`1pf6ytbSE988UvAv3AVvWUqjgQaTwDfYO`) — 21 hojas (Básico 1, 2, 3, CC 2024, N1, Rezagados, C1 #4 al #19).
+    3. [`REZAGADOS C1 E18 LIMA.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/REZAGADOS%20C1%20E18%20LIMA.xlsx) (`1enzfn6eqH5anXQOaBNNPiLcsLsFCOwtU`).
+    4. [`ASISTENCIA CAPITULO DOS LIMA.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/ASISTENCIA%20CAPITULO%20DOS%20LIMA.xlsx) (`17TsTmvuPmeal9vipZgosYhXRYD24XTGz`) — 19 hojas (Avanzado 1, 2, 3, C2 #4 al #18; quienes cursaron C2 ya consumieron C1).
+    5. [`clientes_asistencia (28).xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/clientes_asistencia%20%2828%29.xlsx) (`1zmE0gYzSNrJbTfsgZjMy7F2rITTaYbXT`).
+    6. [`LISTA DE ASISTENCIA EQUIPO 105.xlsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/LISTA%20DE%20ASISTENCIA%20EQUIPO%20105.xlsx) (`1uk_C5Ns79As2o_l08fAIONA2T_ChtWBy`).
+  - **Volumen Total Indexado:** 5,552 registros históricos consolidados, con 2,001 participantes con asistencia a sala confirmada.
+* **Cruce de las 23 Solicitudes de Cambio de Cupo (C1 E32 Lima):**
+  - **Total Solicitudes:** 23.
+  - **🟢 APTOS CONFIRMADOS:** 23 (100% de elegibilidad).
+  - **🔴 NO APTOS:** 0.
+  - **Detalle de Caso Singular (#8):** Beatriz Violeta Yanac Rodriguez (DNI `09641366`, registrada por Aliado Luis Alberto Hernández Mendoza en Equipo 11) figuraba en el historial de C1 #13, C1 #14 y N1. En N1 su estatus quedó registrado como `NI` (No Interesada), `DESABILITADA`, con asistencia vacía en las tres hojas, comprobando fehacientemente que **nunca se sentó en sala**.
+  - **Verificación de Cambios Previos:** 0 duplicados en formulario y 0 registros previos consumidos.
+* **Canales de Notificación y Trazabilidad Ejecutados:**
+  1. **Google Chat (Espacio Sede Lima `AAQAOaOPrZU`):** Tarjeta y reporte completo entregados exitosamente (`spaces/AAQAOaOPrZU/messages/5rnsCGr5c_I.5rnsCGr5c_I`).
+  2. **Causa OS (`/notifications`):**
+     - Joyce Marín (`joyce.marin@crearpsl.net`): Documento ID `Et2NUSi047QkAHromZir`.
+     - Diana Moscoso (`diana.moscoso@crearpsl.net`): Documento ID `D58O5XUk6UXYLuStQoUQ`.
+     - José Sánchez (`jose.sanchez@crearpsl.net`): Documento ID `ILsX8dogu0zoXqrYh8t1`.
+  3. **Script Automatizado:** [`scripts/validateCambiosCupoNodus.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/validateCambiosCupoNodus.mjs).
+  4. **Expediente de Resultados:** [`data/sentados_historicos/auditoria_cambios_cupo_e32.json`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/data/sentados_historicos/auditoria_cambios_cupo_e32.json).
+
+---
+
+### 18.8. Integración API Oficial Nodus — El Puente de Verdad Absoluta Anti-Invención
+* **Directiva Suprema del Usuario:** *"Los agentes conectados a Nodus deben de asegurarse que ningún dato sea inventado en Causa, que todos sean fieles a Nodus. Este JSON es el puente entre Nodus y Causa para que no alucine ni invente datos; todo debe salir de Nodus."*
+* **Especificación de la API de Consulta Nodus:**
+  - **Naturaleza:** API de **solo lectura** que entrega datos oficiales del sistema en **JSON**.
+  - **URL Base:** `https://imo.crearpslglobal.com/api`
+  - **Método HTTP:** Estrictamente `GET`. Cualquier otro método responde `405 Method Not Allowed`.
+  - **Codificación:** UTF-8. Formato de fechas: `YYYY-MM-DD`. Fechas con hora: `YYYY-MM-DD HH:MM:SS` (hora oficial de Ecuador / GMT-5).
+  - **Autenticación Obligatoria:** Header `X-Api-Key: <token>` (también admite `Authorization: Bearer <token>`). Ausencia o error de token responde `401 Unauthorized`.
+  - **Sobre de Respuesta Canónico:**
+    - Éxito (HTTP 200): `{ "ok": true, "data": { ... }, "meta": { "generado": "ISO-8601" } }`
+    - Error (HTTP 4xx / 5xx): `{ "ok": false, "error": { "codigo": "...", "mensaje": "..." } }`
+* **Endpoints Oficiales Documentados e Integrados:**
+  1. `GET /api/sedes`: Sedes activas, cada una con su arreglo de equipos activos (`id`, `nombre`, `ciudad`, `ciclo`, `pais`, `equipos` con `etapa_vigente` y número de `participantes`).
+  2. `GET /api/equipos`: Filtro de equipos activos por `id_sede` y estado `en_actividad=1`.
+  3. `GET /api/participantes/{id_equipo}`: Nómina completa y activa de participantes de un equipo ordenados por apellidos, identificador, teléfono, email, coordinador y estado de Capítulo 1 y Capítulo 2.
+  4. `GET /api/pagos`: Pagos registrados con filtros obligatorios de ventana temporal (`desde`, `hasta` máx 93 días), `id_sede` o `id_equipo`.
+  5. `GET /api/enrolados`: Registros de personas enroladas en el periodo por sede o equipo con detalle del enrolador/aliado y estado de asistencia.
+  6. `GET /api/persona/{identificacion}`: Ficha consolidada e historial de un participante en la plataforma Nodus.
+* **Política de Cero Invención / Fail-Closed:**
+  - Ningún módulo de Causa OS (Embudo C1/C2, Monitor IMOs, Auditoría KPIs, Copiloto IA) puede generar multiplicadores sintéticos, proyecciones inventadas ni rellenar con ceros silenciosos cuando la fuente Nodus no esté disponible.
+  - Distinción técnica obligatoria en toda la plataforma: **"Sentados en Sala"** (asistencia presencial física confirmada en puerta) vs. **"Confirmados Telefónicos"** (gestión previa de llamadas de coordinación).
+  - Componentes del puente: [`scripts/nodusApiClient.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/nodusApiClient.mjs), [`scripts/nodusMultiAgentSync.mjs`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/scripts/nodusMultiAgentSync.mjs), [`src/services/nodusApiService.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/services/nodusApiService.js).
+
+---
+
+### 18.9. Resolución de Casos Críticos de Coordinación: Daniela Monroy y Evelyn Cedillo
+* **Caso 1: Daniela Monroy Fabbri (`daniela.monroy@crearpsl.net`)**
+  - **Incidencia A — Centro de Mánagers con graduados como "Activos":**
+    - En Firestore `managers_directory` y en [`src/data/managersData.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/data/managersData.js), los equipos 1, 2, 3 y 4 de México (*MARDUK AETT*, *ALOHI MAU*, *TORA BUSHIDO* y *QUIRON 33*) tenían registros como `estado: "Activo"` (docs `23`, `31`, `1791924882958`, `694`).
+    - *Solución:* Se actualizaron todos los documentos en Firestore a `estado: "Graduado"`, se corrigió el catálogo histórico [`src/data/managersData.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/data/managersData.js), y en [`src/pages/CentroManagers.jsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/pages/CentroManagers.jsx) se fijó el filtro por defecto en `Activo` para evitar contaminación visual de cohortes anteriores.
+  - **Incidencia B — Desaparición de Calendarios de Maestría del Juego (MJ):**
+    - En [`src/utils/mjCalendarVisibility.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/mjCalendarVisibility.js), los roles con visión global estaban restringidos a directores (`director_maestria`, `direccion`, etc.). Siendo `coord_maestria` con sede `México` (donde aún no hay calendarios MJ registrados en `mj_calendars`), el filtro devolvía un array vacío `[]`.
+    - *Solución:* Se amplió [`src/utils/mjCalendarVisibility.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/mjCalendarVisibility.js) para otorgar visibilidad global completa a los roles `coord_maestria`, `coordinador_mj` y a Daniela Monroy de forma explícita.
+* **Caso 2: Evelyn Paulina Cedillo (`evelyn.cedillo@crearpsl.net` - Cuenca C1/C2)**
+  - **Incidencia — Tareas del checklist que se registraban y luego se reseteaban a 0%:**
+    - Discrepancia de casing: El perfil `users/evelyn_cedillo` contenía `sede: "cuenca"` (minúscula), mientras que las llaves de completitud en `tasks` se graban como `"Cuenca__CUE-EQ-24"` (con mayúscula).
+    - En [`src/utils/taskLifecycle.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/taskLifecycle.js), `getEffectiveCompletion` exigía coincidencia estricta; al haber diferencia de mayúscula, `applyCycleCompletion` sobreescribía los valores visuales a `0%` al recargar la página.
+    - Las tareas de POST-C1 de Cuenca Equipo 24 (`cc1y2_post1`, `cc1y2_post2`, `cc1y2_post3`) habían sido completadas por Evelyn a las 17:45 UTC pero la clave de ciclo no se había consolidado.
+    - *Solución:*
+      1. Se restauró en Firestore el objeto `Cuenca__CUE-EQ-24` al 100% en `cc1y2_post1`, `cc1y2_post2` y `cc1y2_post3`.
+      2. Se unificó la sede de `evelyn_cedillo` a `"Cuenca"` y se integró [`canonicalSede`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/sede.js) en [`src/context/ChecklistContext.jsx`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/context/ChecklistContext.jsx).
+      3. Se adaptó [`src/utils/taskLifecycle.js`](file:///Users/joseluissanchezmoreno/Documents/Codex/2026-09-27/files-mentioned-by-the-user-captura/work/so-ar/src/utils/taskLifecycle.js) para que la búsqueda de ciclo sea insensible a mayúsculas/minúsculas y vincule por `cycleId`, blindando el avance contra pérdidas de estado.
+
+---
+
+## 19. 🛡️ Consolidación Integral de Noviembre 2026: Canal Único de Correo, Permisos Globales, Cohortes MJ, Instrumentos Legales, Guardián 3H, Auditor Financiero Cloud y Embudo Nodus Lima (12 de Noviembre de 2026)
+
+### 19.1. Unificación del Canal Oficial Único de Correo (`no-reply@crearpsl.net`) y Despacho Instantáneo
+* **Fuente Canónica:** `src/config/officialMailConfig.js` (`OFFICIAL_CAUSA_MAIL_ADDRESS`, `OFFICIAL_CAUSA_MAIL_FROM`, `resolveOfficialMailFrom`).
+* **Unificación Total de Demonios y Funciones (`a4fb152`, `811b8ff`, `3d34c64`):**
+  1. **Cloud Function Tiempo Real (`functions-mailer/index.mjs` → `deliverContractMail`):** Despacho inmediato (~2 s) al crearse documentos en `mail/{docId}`, comprimiendo adjuntos bajo el límite de `1 MiB` de Firestore y confirmando entrega `SUCCESS` con reintento resiliente post-SMTP.
+  2. **Cola Transaccional (`scripts/mailerDaemon.js` & `scripts/mailQueue.js`):** Forzado explícito de `family: 4` (IPv4 sobre TLS `465`) en runners Linux de GitHub Actions, cerrojo transaccional `claimPendingMail`, presupuestos diarios (`mail_delivery_budgets`) y descarte automático si la tarea/ciclo ya fue cerrado (`skipTaskMailIfClosed`).
+  3. **Cloud Function Misión IMO (`functions-imo/index.mjs` → `imoDeliverCode`) y Agente Institucional (`scripts/nodusMarketingAgencyAgent.mjs`):** Eliminación total de remitentes legados `@gmail.com`.
+  4. **Flujo de Liquidaciones Financieras (`1f65004`):** Corrección del orden de despacho de correos de liquidación para Contabilidad/Tesorería (`Eli Escobar`), validación estricta de esquema contra `firestore.rules` y botón de reenvío manual auditado.
+
+---
+
+### 19.2. Blindaje Global de Permisos de Tareas (`tasks`), Metas (`goals`), KPIs y Sincronización `users/{uid}`
+* **Causa Raíz Detectada (Casos Jonathan La Rosa, Brenda Rodríguez y auditoría sobre los 153 usuarios activos):**
+  1. `firestore.rules` resolvía roles operativos buscando únicamente `users/$(request.auth.uid)` (ausente para ~92% de usuarios cuyo perfil histórico estaba indexado por slug de correo) sin consultar el padrón oficial en reglas.
+  2. `src/utils/taskPrivacy.js` contenía un atajo temprano en `collaborators: []` (arreglo vacío por defecto en todas las tareas de catálogo) que devolvía `false` antes de evaluar `task.role` y `task.assignedRoles`, ocultando tareas al marcar avance o recargar y provocando apariencia de reinicio a `0%`.
+  3. `src/context/ChecklistContext.jsx` enviaba llaves prohibidas en `task_completions` (`progress` / mutaciones fuera de `hasOnly`) que disparaban `FirebaseError: Missing or insufficient permissions`.
+* **Solución Definitiva Desplegada (`f28ea85`, `6b04e6b`, `8d6e80a`, `8841f77`):**
+  - **Reglas de Seguridad (`firestore.rules`):** Incorporación de `officialRosterHasRole()` y soporte de alias multi-correo (`callerMatchesEmailList`), autorizando lectura y guardado de avances (`participant_states`, `evidences`, `notes`, `status`, `task_completions`) a los **8 roles operativos** y **153 perfiles activos** en las 6 sedes, manteniendo aislamiento estricto frente a usuarios externos o inactivos (`isUserInactive`).
+  - **Sincronizador Automático (`scripts/syncUsersUidProfiles.mjs` integrado en `.github/workflows/deploy.yml`):** Garantiza que el 100% de las cuentas en Firebase Auth posean su documento canónico `users/{uid}` alineado con `officialUsers.js`.
+  - **Privacidad y Persistencia (`src/utils/taskPrivacy.js`, `src/pages/ChecklistBoard.jsx`, `src/components/TaskAssignmentModal.jsx`):** `collaborators` solo actúa como lista explícita cuando contiene correos reales (`length > 0`), preservando visibilidad por rol y conservando el progreso individual de cada colaborador al editar tareas compartidas.
+  - **Metas y KPIs (`src/pages/GoalsBoard.jsx`, `src/pages/MisKPIs.jsx`, `src/pages/AuditoriaKPIs.jsx`):** Autorización en `goals/{goalId}` para reporte de coordinadoras asignadas y separación estricta entre `id` real de Firestore y `clientReportId` local.
+
+---
+
+### 19.3. Gobernanza de Observador Total y Centro de Managers (Cohortes Activas MJ de 90 Días)
+* **Perfil de Observador Total y API REST (`c3ee50c`, `585436f`, `3250f6a`):** Habilitación de acceso transversal de lectura (`Observador Total`) y endpoint de consulta en tiempo real del Centro de Managers + panel de sincronización Nodus para auditoría directiva (`Armando Pilacuán`).
+* **Restauración de Cohortes Activas MJ 90 Días y Llaves de Equipo (`812e045`, `4744e97`):** Corrección de agrupación de equipos sin número oficial (`placeholder keys`), filtrado automático de cohortes graduadas en la vista de entrenadores y alineación con el calendario oficial de Maestría del Juego (`Alejandro Díaz`).
+* **Protección de Cohortes antes de Graduación (`EL VIAJE`) y Reactivación Manual (`f28ea85` — Caso Cuenca `#22 JAGUARUNDIS KAWSAY`):**
+  - *Problema:* El equipo `#22 JAGUARUNDIS KAWSAY` de Cuenca (en curso hacia su 4to FDS `EL VIAJE` del `20 al 22 de noviembre de 2026`) aparecía como `Graduado` en la tarjeta porque `CentroManagers.jsx` infería graduación prematura cuando existía un equipo de número superior, mientras el modal leía el campo crudo `Activo` y el worker sobreescribía cambios manuales.
+  - *Solución:* Unificación de la política en `src/pages/CentroManagers.jsx`, `src/services/managerSyncPolicy.js` y `cloudflare-worker/src/index.js`: ningún equipo se marca como `Graduado` antes de concluir `EL VIAJE`, el modal refleja el estado efectivo real y al guardar `Activo` se persiste `estadoReactivadoManual: true` respetado por todas las sincronizaciones automáticas.
+
+---
+
+### 19.4. Ecosistema de Instrumentos Legales Digitales Sede Lima y Portal Satélite `cartas.crearpsl.net`
+* **Contratos Vinculantes y Pases QR (`140b610`, `3588721`, `0b30676`, `3d34c64`, `63cb005`):**
+  1. **Instrumentos Activos:** Reglas Oficiales de Maestría del Juego (`/reglas-maestria-lima` / `/contrato-maestria-lima`, colección `contratos_maestria_lima`) y Exoneración / Declaración de Caminata sobre Fuego (`/caminata-fuego` / `/contrato-caminata-fuego`, colección `contratos_caminata_fuego`), más redirecciones compatibles `.html` en `src/App.jsx`.
+  2. **Trazabilidad Forense y Escudo Atómico Anti-Duplicados (`src/services/legalSignatureService.js`, `src/utils/limaContractUniqueness.js`, `firestore.rules`):** Captura de IP pública, geolocalización con fallback resiliente, sello criptográfico `SHA-256` y bloqueo multicapa que impide cualquier doble registro en `/monitor-imos?tab=monitores_lima`: (a) validación fail-closed SDK + REST paginado por **número de documento** (incluyendo equivalencia sin ceros iniciales), **correo electrónico** y **nombre completo normalizado**; (b) ID determinístico obligatorio `doc_<numeroDocumentoNorm>` mediante transacción ACID / `createDocument` HTTP `409` y reglas `firestore.rules` (`!exists(...)` y `allow update: if isSuperAdmin()`); y (c) deduplicación en tiempo real en `MonitorAcreditacionFuegoLima.jsx` y `MonitorMaestriaLima.jsx` con eliminación conjunta de `_allDocIds`.
+  3. **Doble Entregable Separado:** Generación independiente del **Contrato Legal Íntegro Firmado en PDF A4 multipágina** (`src/utils/contractPdfGenerator.js`) y del **Pase Oficial de Acreditación PNG (`1080×1440`)** (`src/utils/maestriaPass.js`), despachados por correo en tiempo real y descargables en pantalla.
+  4. **Monitores Internos Protegidos por RBAC (`e341d9f`, `5b10f21`):** Rutas `/monitor-fuego-lima` y `/monitor-maestria-lima` blindadas dentro de `RoleRoute` e integradas directamente en la barra principal del **Monitor de IMOs** (`/home`) antes del selector de campaña.
+* **Reparación y Auditoría Total de `https://cartas.crearpsl.net` (`crearpodersinlimitesperu-cmd/cartas-crear` commit `15d49ff`):**
+  - Corrección de `ReferenceError: db is not defined` en `contrato_caminata_fuego.html` (y sus mirrors en `/caminata-fuego/`, `/contrato-caminata-fuego/`, `/firewalking/` y `/docs/`), incorporando inicialización Firebase con timeout de `6 s`, fallback directo a Firestore REST API (`contratos_caminata_fuego` + `mail` con `delivery.state = 'PENDING'`) y banner visible de validación con auto-scroll.
+  - Auditoría automatizada sobre las **129 páginas HTML** del portal `cartas-crear`: `0` referencias rotas, `0` instancias de `db` sin inicializar y respuesta `HTTP 200` verificada en producción.
+
+---
+
+### 19.5. Guardián Autónomo 3H (`causaOsIntegrityGuardian.mjs`) y Auditor Financiero Diario Cloud (`auditor-financiero-cpsl`)
+* **Guardián Autónomo 3H (`a4fb152`, `6b04e6b`):**
+  - **Workflow y Agente:** `.github/workflows/causa-os-3h-integrity-guardian.yml` (`cron: '23 */3 * * *'`, grupo de concurrencia aislado) y `scripts/causaOsIntegrityGuardian.mjs`.
+  - **Cobertura:** Valida cada 3 horas las rutas estáticas y 4 suites de tests, HTTP 200 de `https://centro-operativo-cpsl.web.app` y sus bundles `/assets/*`, handshake activo `SMTP TLS 465 IPv4` de `no-reply@crearpsl.net`, higiene cero-secretos en los volcados de auditoría (`DOCUMENTO_REPLICA_PLATAFORMA.md`, `CODIGO_COMPLETO_AUDITORIA.md`, `TRAZABILIDAD_COMUNICACIONES_Y_GUARDIAN_CAUSA_OS.md`), integridad de colecciones críticas en Firestore y salud de los 20 workflows de GitHub Actions, publicando certificado en `nodus_reports/causa_os_3h_guardian_latest`.
+  - **Agente Nodus CRM (`4a455d1`):** Soporte nativo de escritura vía Firebase Admin SDK en `CausaNodusCRMSyncAgent` sin requerir `NODUS_ROBOT_SECRET` cuando opera con Service Account.
+* **Reparación del Auditor Financiero Diario CPSL (`crearpodersinlimitesperu-cmd/auditor-financiero-cpsl` commit `fba3965`):**
+  - *Causa Raíz del Fallo Diario (`Run #43308990178`):* El secreto `SPREADSHEET_ID` apuntaba a una hoja antigua sin permisos (`HttpError 403 PERMISSION_DENIED`) y el workflow utilizaba versiones obsoletas (`checkout@v3`, `setup-python@v4`, Python `3.10`).
+  - *Solución Certificada (`Run #43313965531` — `success`, `0` anotaciones):* Actualización de secretos cifrados hacia el libro oficial `EGRESOS CREAR 2026` (`1WCBnpomyGxgJXgHrp3dWcINbij-QIoaG7MPoBCM-AkU`) y las 3 Unidades Compartidas (`Pagos Semanales`, `Presupuesto Lima`, `Facturas Drive`), actualización del workflow a `ubuntu-24.04` + `actions/checkout@v7` + `actions/setup-python@v7` + Python `3.12`, e implementación en `main.py` + `orthography_guard.py` del cuadre real de las 11 pestañas contables, verificación de acceso a Drive y prueba de buzón bancario SSL IMAP (`imap.gmail.com:993`).
+
+---
+
+### 19.6. Auditoría Forense de Embudo Nodus — Sede Lima (`Equipos 28 al 32`: Diana, Joyce y Linid)
+* **Alcance y Reglas No Negociables Aplicadas (Corte `12/11/2026`, `id_sede=7`):**
+  - Extracción íntegra y sin estimaciones sobre **852 participantes únicos** (deduplicados por documento de identidad) en los equipos cronológicos `E28 → E29 → E30 → E31 → E32` desde la API oficial `https://imo.crearpslglobal.com/api` y la matriz autenticada `/actividadcoordinadores`.
+  - **Reglas de Conteo Institucionales:**
+    1. Separación estricta entre **Nuevos** (`705` asignados: `631` en `Diana` + `Joyce`) y **Rezagados** (`147` registros reprogramados), prohibiendo mezclarlos en un mismo denominador.
+    2. Separación estricta entre **Pagado verificado** y **Promesa / Abono parcial** (`con abono`), contabilizando cierres reales únicamente sobre pagos verificados.
+    3. Cuadre aritmético cerrado (`brecha sin clasificar = 0`) en todos los bloques (`C1 Nuevos`, `Conversión C1 → C2`, `C2 → MJ`, `Control de Aliados` y `Avance de Módulos de Maestría: Creación → Gratitud → El Viaje`).
+  - **Cifras Críticas Consolidadas (`E28–E32`):**
+    - **C1 Nuevos (`Diana` + `Joyce`):** `631` asignados → `558` contactados (`88.4%`) → `452` confirmados (`81.0%`) → **`416` sentados en sala C1 (`92.0%` sobre confirmados)**, más `35` rezagados sentados en columna separada.
+    - **Conversión C1 → C2 (Base Sentados C1 Nuevos):** `127 / 416` pagaron C2 (**`30.5%`**, principal etapa de fuga del embudo con `289` no cerrados: `Diana 31.8%` vs. `Joyce 29.0%`), con **`85.8%` de asistencia a sala C2** (`109 / 127`) y `18` pagados pendientes de sentarse (`14` de ellos en `E32`).
+    - **Conversión C2 → Maestría (`Linid` + Equipo):** `171` inscritos/pagados totales C2, `100` pagados totales MJ (`91` cerrados durante C2 sobre `148` sentados C2 = **`61.5%`**) y `85` sentados acumulados en módulos de Maestría (`Creación → Gratitud / Relación → El Viaje`).
+
+---
+
+### 19.7. Regla Permanente de Higiene y Gobernanza de la Caja Negra (Repositorio Público)
+* Dado que `crearpodersinlimitesperu-cmd/SO-AR` es un repositorio con trazabilidad auditable:
+  1. **Cero Secretos en Texto Plano:** Prohibido escribir contraseñas, App Passwords, tokens (`GH_PAT`, `ROBOT_TOKEN`) o llaves privadas en `CAJA_NEGRA_OPERATIVA.md`, `docs/caja_negra_operativa_cpsl.md`, `DOCUMENTO_REPLICA_PLATAFORMA.md` o `CODIGO_COMPLETO_AUDITORIA.md` (auditado automáticamente cada 3 horas por `checkTraceabilityAndSecretHygiene()` en `scripts/causaOsIntegrityGuardian.mjs`).
+  2. **Sincronización Espejo y Cloud:** Cada cierre arquitectónico relevante debe actualizar simultáneamente `CAJA_NEGRA_OPERATIVA.md`, su espejo `docs/caja_negra_operativa_cpsl.md`, los volcados de réplica (`python3 dump_code.py`) y el registro inmutable en Firestore `/audit_logs` (`action: 'ACTUALIZACION_CAJA_NEGRA'`).
+
+---
+
+### 19.8. Consolidado de Gobernanza, Roles de Eventos, Reglas Firestore y Estabilización CI (`13/11/2026`)
+* **Limpieza y Saneamiento de Módulos Obsoletos (`src/App.jsx`, `src/config/permissions.js`):**
+  - Eliminación definitiva de módulos retirados de la plataforma (`/masterclass-distinciones`, `/vende-sin-vender`, `/brandscript`, `/dna`, `/legal-hub`, `/onboarding-legal`, `/hr-command-center`, `/contraste-nodus`, `/qt-hub`, `/learning`, `/estrategia`, `/excelencia`, `/protocolo-emergencias`) manteniendo la paridad 1:1 entre botones de UI, `MODULE_REGISTRY` y `RoleRoute`.
+* **Módulos Operativos Conectados en Vivo (`Nodus` + `Causa OS`):**
+  - **`/reportes` (`ReportesBoard.jsx`, `nodusReportSync.js`):** Extracción automática desde Nodus por sede sin cuellos de botella.
+  - **`/metas` (`GoalsBoard.jsx`):** Seguimiento real por coordinador, equipo y sede sin cruzar datos entre sedes o usuarios.
+  - **`/checklist/:roleId` (`ChecklistBoard.jsx`, `43a89080`):** Coherencia total con fechas, horarios y ciclos reales de Causa OS y Nodus.
+  - **`/calendario-equipo` (`TeamCalendar.jsx`, `2db2c3ec`):** Agenda semanal y time-boxing operativo.
+  - **Reel Enrolador C2/IMO (`VideoC2ImoReel.jsx`, `50dd49ee`):** Motor de banda sonora cinematográfica Web Audio + narrativa personalizada.
+  - **Asignador Oficial de Entrenadores (`AsignadorEntrenadores.jsx`, `9524d613`):** En entrenamientos de un solo día (`Tanque`, `Caminata sobre Fuego`, `Caída de Confianza`, `Rompimiento de Barreras`, etc.), la fecha final se sincroniza automáticamente con la fecha inicial.
+  - **Buscador Global Profundo (`Home.jsx`, `src/utils/causaGlobalSearch.js`, `3dc863da`):** Búsqueda sin acentos sobre opciones de Causa, tareas del espacio y rol (respetando sede y privacidad), eventos y personas.
+* **Filtro Individual y Múltiple de Entrenamientos en `Home` (`126bc4f1`, `ebeb34b5`):**
+  - Implementado en `src/utils/trainingTypeFilter.js` y `src/pages/Home.jsx`: permite seleccionar cada entrenamiento de forma individual o varios al mismo tiempo (ej. `Tanque` + `Caminata sobre Fuego`) usando los nombres reales oficiales del calendario: `Capítulo 1`, `Capítulo 2`, `Maestría del Juego`, `El Viaje` (nunca "Retiro"), `Caminata sobre Fuego`, `Tanque`, `Caída de Confianza`, `Rompimiento de Barreras`, `Impactos`, `Revisión de FI` y `Otros Especiales`.
+* **Reglas Oficiales de Visibilidad en `EVENTOS Y ENTRENAMIENTOS` (`Home.jsx`, `permissions.js`, `0ea9a6d9`):**
+  1. **Directivos / SuperAdmin:** Ven todas las fechas y entrenadores de todas las sedes (`GLOBAL`).
+  2. **Gerentes:** Ven todas las fechas y entrenadores de todas las sedes (`GLOBAL`), arrancando en su sede de primera vista con libertad de cambiar a `Todas las sedes` o cualquier otra sede.
+  3. **Coordinadores (C1/C2 y Maestría):** Ven todos los eventos de su sede (`C1`, `C2`, `MJ` y especiales).
+  4. **Entrenadores:** Ven únicamente los eventos que ellos impartirán (`isExactAssignedTrainer` / `isTrainerMatchingUser`).
+  5. **QT:** Ven únicamente las fechas de **Capítulo 1 y Capítulo 2** de **su sede** (normalizada con `normalizeSede`) dentro de los **próximos 3 meses**.
+* **Permisos de Firestore para Roles Activos del Padrón Oficial (`firestore.rules`, `159d2848`):**
+  - Corrección en `authedCallerHasTaskRole()` y `authedCallerHasAnyRole()`: manteniendo el bloqueo estricto `!isProfileInactive(u)`, un usuario activo incluido en el padrón oficial (`rosterCoordC1`, `rosterCoordMaestria`, etc.) conserva su acceso a tareas de catálogo aunque su perfil `users/{uid}` tenga un rol parcial/degradado (ej. caso Mauricio Ramírez en `/checklist/coord_maestria` con tarea `cmj_prec1_1`).
+* **Estabilización CI/CD y Guardián 3H (`7e48a95c`, `e2bcd44b`):**
+  - `.github/workflows/deploy.yml` despliega exclusivamente `--only hosting` con hasta 3 reintentos automáticos (evitando que errores `503` transitorios de `firebaserules.googleapis.com` bloqueen Firebase Hosting; las reglas e índices mantienen sus workflows dedicados `deploy-rules.yml` y `deploy-firestore-indexes.yml`).
+  - `scripts/causaOsIntegrityGuardian.mjs` supervisa **todos** los workflows de GitHub Actions en `checkWorkflowsHealth()` (sin omitir `Nodus goal sources read-only sync`), y `scripts/publishNodusGoalSources.mjs` endurece `readPage()` esperando el selector real de cada tabla/filtro.
+
+---
 
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
+
+

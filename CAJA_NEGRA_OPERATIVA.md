@@ -977,6 +977,33 @@ Tras el reporte de incidencias donde firmas completadas figuraban en el panel ad
 
 ---
 
+### 19.8. Consolidado de Gobernanza, Roles de Eventos, Reglas Firestore y Estabilización CI (`13/11/2026`)
+* **Limpieza y Saneamiento de Módulos Obsoletos (`src/App.jsx`, `src/config/permissions.js`):**
+  - Eliminación definitiva de módulos retirados de la plataforma (`/masterclass-distinciones`, `/vende-sin-vender`, `/brandscript`, `/dna`, `/legal-hub`, `/onboarding-legal`, `/hr-command-center`, `/contraste-nodus`, `/qt-hub`, `/learning`, `/estrategia`, `/excelencia`, `/protocolo-emergencias`) manteniendo la paridad 1:1 entre botones de UI, `MODULE_REGISTRY` y `RoleRoute`.
+* **Módulos Operativos Conectados en Vivo (`Nodus` + `Causa OS`):**
+  - **`/reportes` (`ReportesBoard.jsx`, `nodusReportSync.js`):** Extracción automática desde Nodus por sede sin cuellos de botella.
+  - **`/metas` (`GoalsBoard.jsx`):** Seguimiento real por coordinador, equipo y sede sin cruzar datos entre sedes o usuarios.
+  - **`/checklist/:roleId` (`ChecklistBoard.jsx`, `43a89080`):** Coherencia total con fechas, horarios y ciclos reales de Causa OS y Nodus.
+  - **`/calendario-equipo` (`TeamCalendar.jsx`, `2db2c3ec`):** Agenda semanal y time-boxing operativo.
+  - **Reel Enrolador C2/IMO (`VideoC2ImoReel.jsx`, `50dd49ee`):** Motor de banda sonora cinematográfica Web Audio + narrativa personalizada.
+  - **Asignador Oficial de Entrenadores (`AsignadorEntrenadores.jsx`, `9524d613`):** En entrenamientos de un solo día (`Tanque`, `Caminata sobre Fuego`, `Caída de Confianza`, `Rompimiento de Barreras`, etc.), la fecha final se sincroniza automáticamente con la fecha inicial.
+  - **Buscador Global Profundo (`Home.jsx`, `src/utils/causaGlobalSearch.js`, `3dc863da`):** Búsqueda sin acentos sobre opciones de Causa, tareas del espacio y rol (respetando sede y privacidad), eventos y personas.
+* **Filtro Individual y Múltiple de Entrenamientos en `Home` (`126bc4f1`, `ebeb34b5`):**
+  - Implementado en `src/utils/trainingTypeFilter.js` y `src/pages/Home.jsx`: permite seleccionar cada entrenamiento de forma individual o varios al mismo tiempo (ej. `Tanque` + `Caminata sobre Fuego`) usando los nombres reales oficiales del calendario: `Capítulo 1`, `Capítulo 2`, `Maestría del Juego`, `El Viaje` (nunca "Retiro"), `Caminata sobre Fuego`, `Tanque`, `Caída de Confianza`, `Rompimiento de Barreras`, `Impactos`, `Revisión de FI` y `Otros Especiales`.
+* **Reglas Oficiales de Visibilidad en `EVENTOS Y ENTRENAMIENTOS` (`Home.jsx`, `permissions.js`, `0ea9a6d9`):**
+  1. **Directivos / SuperAdmin:** Ven todas las fechas y entrenadores de todas las sedes (`GLOBAL`).
+  2. **Gerentes:** Ven todas las fechas y entrenadores de todas las sedes (`GLOBAL`), arrancando en su sede de primera vista con libertad de cambiar a `Todas las sedes` o cualquier otra sede.
+  3. **Coordinadores (C1/C2 y Maestría):** Ven todos los eventos de su sede (`C1`, `C2`, `MJ` y especiales).
+  4. **Entrenadores:** Ven únicamente los eventos que ellos impartirán (`isExactAssignedTrainer` / `isTrainerMatchingUser`).
+  5. **QT:** Ven únicamente las fechas de **Capítulo 1 y Capítulo 2** de **su sede** (normalizada con `normalizeSede`) dentro de los **próximos 3 meses**.
+* **Permisos de Firestore para Roles Activos del Padrón Oficial (`firestore.rules`, `159d2848`):**
+  - Corrección en `authedCallerHasTaskRole()` y `authedCallerHasAnyRole()`: manteniendo el bloqueo estricto `!isProfileInactive(u)`, un usuario activo incluido en el padrón oficial (`rosterCoordC1`, `rosterCoordMaestria`, etc.) conserva su acceso a tareas de catálogo aunque su perfil `users/{uid}` tenga un rol parcial/degradado (ej. caso Mauricio Ramírez en `/checklist/coord_maestria` con tarea `cmj_prec1_1`).
+* **Estabilización CI/CD y Guardián 3H (`7e48a95c`, `e2bcd44b`):**
+  - `.github/workflows/deploy.yml` despliega exclusivamente `--only hosting` con hasta 3 reintentos automáticos (evitando que errores `503` transitorios de `firebaserules.googleapis.com` bloqueen Firebase Hosting; las reglas e índices mantienen sus workflows dedicados `deploy-rules.yml` y `deploy-firestore-indexes.yml`).
+  - `scripts/causaOsIntegrityGuardian.mjs` supervisa **todos** los workflows de GitHub Actions en `checkWorkflowsHealth()` (sin omitir `Nodus goal sources read-only sync`), y `scripts/publishNodusGoalSources.mjs` endurece `readPage()` esperando el selector real de cada tabla/filtro.
+
+---
+
 > 📜 **Mandato de la Caja Negra:**
 > Esta Caja Negra es la fuente viva de verdad de CPSL y Causa OS. Debe consultarse antes de cualquier cambio de arquitectura y actualizarse de inmediato tras cada nueva funcionalidad, regla o descubrimiento operativo.
 
