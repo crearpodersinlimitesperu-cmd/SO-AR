@@ -93432,6 +93432,88 @@ export async function dispatchLiquidacionNotifications({
 
 ---
 
+## Archivo: src/utils/trainingTypeFilter.js
+
+```js
+/**
+ * trainingTypeFilter.js
+ * Filtro individual y múltiple de tipos de entrenamiento para Home.jsx
+ */
+
+export const TRAINING_FILTER_TYPES = [
+  { id: 'C1', label: 'Capítulo 1' },
+  { id: 'C2', label: 'Capítulo 2' },
+  { id: 'MJ', label: 'Maestría del Juego' },
+  { id: 'CAMINATA', label: 'Caminata sobre Fuego' },
+  { id: 'TANQUE', label: 'Tanque' },
+  { id: 'CONFIANZA', label: 'Noche de Confianza' },
+  { id: 'VIAJE', label: 'Viajes / Retiros' },
+  { id: 'OTROS', label: 'Otros Especiales' }
+];
+
+const normalizeUpper = (str) => String(str || '')
+  .toUpperCase()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '');
+
+export function matchesTrainingType(eventName, typeId) {
+  const name = normalizeUpper(eventName);
+  switch (typeId) {
+    case 'C1':
+      return name.includes('CAPITULO UNO') || /\bCAPITULO\s*1\b/.test(name) || /\bC1\b/.test(name);
+    case 'C2':
+      return name.includes('CAPITULO DOS') || /\bCAPITULO\s*2\b/.test(name) || /\bC2\b/.test(name);
+    case 'MJ':
+      return name.includes('MAESTRIA') || /\bMJ\b/.test(name);
+    case 'CAMINATA':
+      return name.includes('CAMINATA') || name.includes('FIREWALK') || name.includes('FUEGO');
+    case 'TANQUE':
+      return name.includes('TANQUE');
+    case 'CONFIANZA':
+      return name.includes('CONFIANZA');
+    case 'VIAJE':
+      return name.includes('VIAJE') || name.includes('RETIRO');
+    case 'OTROS':
+      return !name.includes('CAPITULO') &&
+        !/\bC[12]\b/.test(name) &&
+        !name.includes('MAESTRIA') &&
+        !/\bMJ\b/.test(name) &&
+        !name.includes('VIAJE') &&
+        !name.includes('RETIRO') &&
+        !name.includes('CAMINATA') &&
+        !name.includes('FIREWALK') &&
+        !name.includes('FUEGO') &&
+        !name.includes('TANQUE') &&
+        !name.includes('CONFIANZA');
+    default:
+      return true;
+  }
+}
+
+/**
+ * Filtra un evento por una lista de tipos seleccionados ([] = todos).
+ * Soporta uno o varios tipos al mismo tiempo (ej. ['TANQUE', 'CAMINATA']).
+ */
+export function matchesSelectedTrainingTypes(eventName, selectedTypes) {
+  if (!Array.isArray(selectedTypes) || selectedTypes.length === 0) return true;
+  return selectedTypes.some(typeId => matchesTrainingType(eventName, typeId));
+}
+
+export function formatSelectedTrainingLabel(selectedTypes) {
+  if (!Array.isArray(selectedTypes) || selectedTypes.length === 0) {
+    return 'Todos los tipos';
+  }
+  const labels = selectedTypes
+    .map(id => TRAINING_FILTER_TYPES.find(t => t.id === id)?.label || id);
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]} + ${labels[1]}`;
+  return `${labels[0]} +${labels.length - 1} más`;
+}
+
+```
+
+---
+
 ## Archivo: src/utils/liquidacionPayment.js
 
 ```js
@@ -186203,6 +186285,11 @@ import {
   searchUserTasks,
   searchUserEvents
 } from '../utils/causaGlobalSearch';
+import {
+  TRAINING_FILTER_TYPES,
+  matchesSelectedTrainingTypes,
+  formatSelectedTrainingLabel
+} from '../utils/trainingTypeFilter';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -187080,7 +187167,19 @@ export default function Home() {
   useEffect(() => {
     setSelectedSedeFilter(userDefaultSede || 'todas');
   }, [currentUser?.email, userDefaultSede]);
-  const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
+  const [selectedTrainingTypes, setSelectedTrainingTypes] = useState([]);
+  const [showTrainingFilterMenu, setShowTrainingFilterMenu] = useState(false);
+  const trainingFilterMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideTrainingMenu = (event) => {
+      if (trainingFilterMenuRef.current && !trainingFilterMenuRef.current.contains(event.target)) {
+        setShowTrainingFilterMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideTrainingMenu);
+    return () => document.removeEventListener('mousedown', handleOutsideTrainingMenu);
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [publicTrainerAssignments, setPublicTrainerAssignments] = useState({});
   const [publicCalendarChanges, setPublicCalendarChanges] = useState({});
@@ -189195,20 +189294,102 @@ export default function Home() {
                   </select>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <div ref={trainingFilterMenuRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                   <Filter size={13} style={{ color: 'var(--crear-gold)' }} />
-                  <select 
-                    value={selectedTrainingFilter}
-                    onChange={(e) => setSelectedTrainingFilter(e.target.value)}
-                    style={{ background: 'rgba(255,255,255,0.07)', color: 'white', border: '1px solid rgba(255,255,255,0.15)', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.78rem', cursor: 'pointer' }}
+                  <button
+                    type="button"
+                    onClick={() => setShowTrainingFilterMenu(prev => !prev)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      background: selectedTrainingTypes.length > 0 ? 'rgba(245, 158, 11, 0.16)' : 'rgba(255,255,255,0.07)',
+                      color: selectedTrainingTypes.length > 0 ? 'var(--crear-gold)' : 'white',
+                      border: `1px solid ${selectedTrainingTypes.length > 0 ? 'rgba(245, 158, 11, 0.45)' : 'rgba(255,255,255,0.15)'}`,
+                      padding: '0.25rem 0.55rem',
+                      borderRadius: '6px',
+                      fontSize: '0.78rem',
+                      fontWeight: selectedTrainingTypes.length > 0 ? 700 : 500,
+                      cursor: 'pointer'
+                    }}
                   >
-                    <option value="todos" style={{ background: '#0d152d' }}>Todos los tipos</option>
-                    <option value="C1" style={{ background: '#0d152d' }}>Capítulo 1</option>
-                    <option value="C2" style={{ background: '#0d152d' }}>Capítulo 2</option>
-                    <option value="MJ" style={{ background: '#0d152d' }}>Maestría del Juego</option>
-                    <option value="VIAJE" style={{ background: '#0d152d' }}>Viajes</option>
-                    <option value="OTROS" style={{ background: '#0d152d' }}>Confianza / Tanque</option>
-                  </select>
+                    <span>{formatSelectedTrainingLabel(selectedTrainingTypes)}</span>
+                    <ChevronDown size={13} />
+                  </button>
+
+                  {showTrainingFilterMenu && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '115%',
+                        left: 0,
+                        zIndex: 999,
+                        minWidth: '220px',
+                        background: '#0d152d',
+                        border: '1px solid rgba(245, 158, 11, 0.4)',
+                        borderRadius: '10px',
+                        padding: '0.45rem',
+                        boxShadow: '0 14px 35px rgba(0,0,0,0.85)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.2rem'
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedTrainingTypes([]);
+                          setShowTrainingFilterMenu(false);
+                        }}
+                        style={{
+                          textAlign: 'left',
+                          padding: '0.35rem 0.5rem',
+                          borderRadius: '6px',
+                          border: 'none',
+                          background: selectedTrainingTypes.length === 0 ? 'rgba(41, 171, 226, 0.2)' : 'transparent',
+                          color: selectedTrainingTypes.length === 0 ? 'var(--crear-cyan)' : '#e2e8f0',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {selectedTrainingTypes.length === 0 ? '✓ ' : ''}Todos los tipos
+                      </button>
+                      <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '2px 0' }} />
+                      {TRAINING_FILTER_TYPES.map(t => {
+                        const checked = selectedTrainingTypes.includes(t.id);
+                        return (
+                          <label
+                            key={t.id}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.45rem',
+                              padding: '0.32rem 0.5rem',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              background: checked ? 'rgba(245, 158, 11, 0.14)' : 'transparent',
+                              color: checked ? 'var(--crear-gold)' : '#e2e8f0',
+                              fontSize: '0.78rem',
+                              fontWeight: checked ? 700 : 500
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={checked}
+                              onChange={() => {
+                                setSelectedTrainingTypes(prev =>
+                                  prev.includes(t.id) ? prev.filter(id => id !== t.id) : [...prev, t.id]
+                                );
+                              }}
+                              style={{ accentColor: '#f59e0b', cursor: 'pointer' }}
+                            />
+                            <span>{t.label}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flex: 1, minWidth: '150px' }}>
@@ -189368,16 +189549,10 @@ export default function Home() {
                       });
                     }
 
-                    if (selectedTrainingFilter !== 'todos') {
-                      displayEvents = displayEvents.filter(ev => {
-                        const name = (ev.nombre || ev.name || '').toUpperCase();
-                        if (selectedTrainingFilter === 'C1') return name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO');
-                        if (selectedTrainingFilter === 'C2') return name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS');
-                        if (selectedTrainingFilter === 'MJ') return name.includes('MAESTRIA') || name.includes('MJ') || name.includes('MAESTRÍA');
-                        if (selectedTrainingFilter === 'VIAJE') return name.includes('VIAJE') || name.includes('RETIRO');
-                        if (selectedTrainingFilter === 'OTROS') return !name.includes('CAPITULO') && !name.includes('MAESTRIA') && !name.includes('VIAJE') && !name.includes('CAPÍTULO') && !name.includes('MAESTRÍA');
-                        return true;
-                      });
+                    if (selectedTrainingTypes.length > 0) {
+                      displayEvents = displayEvents.filter(ev =>
+                        matchesSelectedTrainingTypes(ev.nombre || ev.name || '', selectedTrainingTypes)
+                      );
                     }
 
                     // Sort events by date ascending so closest events show first
