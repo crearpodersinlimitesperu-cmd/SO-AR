@@ -901,7 +901,10 @@ export default function MonitorMaestriaLima() {
                 {nodusLoading ? '...' : stats.totalNodusMaestria}
               </div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                {stats.totalNodusParticipantes} Part. · {stats.totalNodusManagers} Mgr.
+                {stats.totalNodusParticipantes} Part. · {stats.totalNodusManagers} Mgr. · E30·31·32
+              </div>
+              <div style={{ fontSize: '0.66rem', color: '#38bdf8', marginTop: '0.1rem' }}>
+                {stats.totalCompletos} c/firma + {stats.totalFaltaFirmaContrato} s/firma
               </div>
             </div>
             <div
