@@ -104,8 +104,21 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/centro-operativo-cpsl-65ad52160f45.json
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --yes firebase-tools@latest deploy --only hosting,firestore:rules,firestore:indexes --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
-          DEPLOY_EXIT=${PIPESTATUS[0]}
+          # Desplegar solo hosting aquí (firestore:rules e indexes ya tienen sus propios workflows en deploy-rules.yml y deploy-firestore-indexes.yml).
+          # Así un 503 transitorio en firebaserules.googleapis.com nunca bloquea la publicación de la web.
+          DEPLOY_EXIT=1
+          for ATTEMPT in 1 2 3; do
+            echo "🚀 Intento $ATTEMPT/3 de despliegue a Firebase Hosting..."
+            npx --yes firebase-tools@latest deploy --only hosting --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
+            DEPLOY_EXIT=${PIPESTATUS[0]}
+            if [ "$DEPLOY_EXIT" -eq 0 ]; then
+              break
+            fi
+            if [ "$ATTEMPT" -lt 3 ]; then
+              echo "⚠️ Intento $ATTEMPT falló (código $DEPLOY_EXIT). Reintentando en 15s..."
+              sleep 15
+            fi
+          done
 
           # (04/09/2026) FIX — antes este paso terminaba SIEMPRE con "exit 0",
           # sin importar si el deploy real había fallado, así que GitHub
