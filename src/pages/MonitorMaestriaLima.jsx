@@ -165,7 +165,12 @@ export default function MonitorMaestriaLima() {
       const idToken = await user.getIdToken();
       const dnis = [...new Set(
         (Array.isArray(contractsList) ? contractsList : [])
-          .map((c) => String(c.numeroDocumento || c.doc || '').trim())
+          .map((c) =>
+            String(c.numeroDocumento || c.doc || '')
+              .replace(/^(dni|ce|pasaporte|doc)[:\s-]*/i, '')
+              .replace(/[^a-zA-Z0-9]/g, '')
+              .trim()
+          )
           .filter((d) => d.length >= 5)
       )];
       dnis.forEach((d) => fetchedDnisRef.current.add(d));

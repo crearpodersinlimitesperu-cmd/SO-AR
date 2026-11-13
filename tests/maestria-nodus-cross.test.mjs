@@ -171,3 +171,57 @@ test('buildMaestriaNodusCross resuelve rezagados vía nodusByDni exhaustivo y et
   assert.equal(result.summary.totalCompletos, 1);
   assert.equal(result.summary.totalNoEncontradoNodus, 0);
 });
+
+test('buildMaestriaNodusCross exige asistencia en el FDS vigente exacto cuando hay etapas', () => {
+  const result = buildMaestriaNodusCross({
+    signedContracts: [
+      {
+        id: 'c-prev-fds',
+        nombre: 'LUIS TORRES',
+        numeroDocumento: '77778888',
+        email: 'luis@test.com',
+        rol: 'Participante',
+        equipo: 'Equipo 30 — Tinkuy Ruray'
+      }
+    ],
+    nodusEquipos: MOCK_EQUIPOS,
+    nodusRosterByTeam: {
+      134: [
+        {
+          id: 901,
+          identificacion: '77778888',
+          nombres: 'LUIS',
+          apellidos: 'TORRES',
+          email: 'luis@test.com',
+          tipo_persona: 'participante',
+          capitulo1: { asistio: true, desertor: false },
+          capitulo2: { pagado: true, maestria: true }
+        }
+      ],
+      141: [],
+      149: []
+    },
+    nodusByDni: {
+      '77778888': {
+        id: 901,
+        identificacion: '77778888',
+        nombres: 'LUIS',
+        apellidos: 'TORRES',
+        email: 'luis@test.com',
+        tipo_persona: 'participante',
+        sede: { id: 7, nombre: 'LIMA CICLO 1' },
+        equipo_actual: { id: 134, nombre: 'EQUIPO 30' },
+        maestria: true,
+        etapas: [
+          { equipo: 'EQUIPO 30', etapa: 'PFD', tipo: 'px', asistio: true, desertor: false, fecha_registro: '2026-09-05' },
+          { equipo: 'EQUIPO 30', etapa: 'SFD', tipo: 'px', asistio: true, desertor: false, fecha_registro: '2026-10-10' }
+        ]
+      }
+    }
+  });
+
+  // Equipo 30 está en TFD y Luis solo tiene PFD y SFD en etapas -> falta check-in de TFD
+  assert.equal(result.enrichedContracts[0].nodusCross.fdsVigente, 'TFD');
+  assert.equal(result.enrichedContracts[0].nodusCross.maestriaNodus, false);
+  assert.equal(result.enrichedContracts[0].nodusCross.estadoCruce, 'FALTA_CHECKIN_NODUS');
+});

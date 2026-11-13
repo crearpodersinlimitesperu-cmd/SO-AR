@@ -177,13 +177,16 @@ export function buildMaestriaNodusCross({
     const anyMaestriaAsistio = etapas.some(
       (e) => ACTIVE_MAESTRIA_FDS.has(String(e?.etapa || '').toUpperCase().trim()) && Boolean(e?.asistio) && !e?.desertor
     );
-    const maestriaFlag = Boolean(p.maestria || p.capitulo2?.maestria || activeFdsEtapa?.asistio || anyMaestriaAsistio);
+    const hasExactEtapasForActiveTeam = Boolean(matchedActiveTeam && etapas.length > 0);
+    const maestriaFlag = hasExactEtapasForActiveTeam
+      ? Boolean(activeFdsEtapa && activeFdsEtapa.asistio && !activeFdsEtapa.desertor)
+      : Boolean(p.maestria || p.capitulo2?.maestria || anyMaestriaAsistio);
 
     const existing = byDoc.get(docNorm);
     if (existing) {
       existing.etapas = etapas.length > 0 ? etapas : existing.etapas;
       existing.exhaustiveLookup = true;
-      existing.maestriaNodus = existing.maestriaNodus || maestriaFlag;
+      existing.maestriaNodus = hasExactEtapasForActiveTeam ? maestriaFlag : (existing.maestriaNodus || maestriaFlag);
       continue;
     }
 
