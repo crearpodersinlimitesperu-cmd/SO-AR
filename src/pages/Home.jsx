@@ -31,6 +31,13 @@ import {
 import { getFlagForSede } from '../utils/flags';
 import { getTaskProgressRoles } from '../utils/taskProgressRoles';
 import { isTaskVisibleForUser } from '../utils/taskPrivacy';
+import {
+  normalizeSearchText,
+  tokenizeSearchQuery,
+  matchesAllTokens as matchesQueryTokens,
+  searchUserTasks,
+  searchUserEvents
+} from '../utils/causaGlobalSearch';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -1302,25 +1309,11 @@ export default function Home() {
     canViewAllManagers(currentUser)
   );
   const currentUserSedeNorm = normalizeSede(currentUser?.sede);
-  const normalizeSearchText = (str) =>
-    (str || '')
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
-
   const globalSearchQ = globalSearchTerm.trim().toLowerCase();
-  const globalSearchActive = globalSearchQ.length >= 2;
+  const searchTokens = tokenizeSearchQuery(globalSearchTerm);
+  const globalSearchActive = searchTokens.length > 0;
 
-  const searchTokens = !globalSearchActive
-    ? []
-    : normalizeSearchText(globalSearchTerm).split(/\s+/).filter(Boolean);
-
-  const matchesAllTokens = (searchableText) => {
-    if (searchTokens.length === 0) return false;
-    const target = normalizeSearchText(searchableText);
-    return searchTokens.every(t => target.includes(t));
-  };
+  const matchesAllTokens = (searchableText) => matchesQueryTokens(searchableText, searchTokens);
 
   const globalSearchOptionResults = !globalSearchActive ? [] : CAUSA_OPTIONS_REGISTRY
     .filter(opt => {
@@ -1335,6 +1328,21 @@ export default function Home() {
     })
     .slice(0, 8);
 
+  const globalSearchTaskResults = !globalSearchActive ? [] : searchUserTasks({
+    allTasks,
+    currentUser,
+    tokens: searchTokens,
+    limit: 6
+  });
+
+  const globalSearchEventResults = !globalSearchActive ? [] : searchUserEvents({
+    events,
+    currentUser,
+    canSeeGlobalDirectory,
+    tokens: searchTokens,
+    limit: 5
+  });
+
   const globalSearchPeopleResults = !globalSearchActive ? [] : (realUsersData || [])
     .filter(u => {
       if (canSeeGlobalDirectory) return true;
@@ -1342,41 +1350,52 @@ export default function Home() {
       return uSede === currentUserSedeNorm || uSede === 'Sede Global' || isGlobalQTCoordinator({ email: u.email });
     })
     .filter(u => {
-      const name = (u.name || u.displayName || '').toLowerCase();
-      const email = (u.email || '').toLowerCase();
-      const role = (ROLE_DISPLAY_NAMES[u.role] || u.role || '').toLowerCase();
-      const sede = (u.sede || '').toLowerCase();
-      return name.includes(globalSearchQ) || email.includes(globalSearchQ) || role.includes(globalSearchQ) || sede.includes(globalSearchQ);
+      const text = [
+        u.name,
+        u.displayName,
+        u.email,
+        ROLE_DISPLAY_NAMES[u.role] || u.role,
+        u.sede
+      ].filter(Boolean).join(' ');
+      return matchesAllTokens(text);
     })
     .slice(0, 8);
 
   const globalSearchModuleResults = !globalSearchActive ? [] : MODULE_REGISTRY
     .filter(mod => mod.route ? allowedModules.some(allowed => allowed.id === mod.id) : isModuleVisible(mod, currentUser))
-    .filter(mod => mod.label.toLowerCase().includes(globalSearchQ))
+    .filter(mod => matchesAllTokens(`${mod.label || ''} ${mod.id || ''} ${typeof mod.route === 'string' ? mod.route : ''} ${mod.desc || ''}`))
     .slice(0, 8);
 
   const globalSearchTeamResults = (() => {
     if (!globalSearchActive) return [];
     const seenTeams = new Map();
-    const capitanHits = [];
+    const staffHits = [];
     INITIAL_MANAGERS.forEach(m => {
       const mSede = normalizeSede(m.sede);
       if (!canSeeGlobalDirectory && mSede !== currentUserSedeNorm && mSede !== 'Sede Global') return;
 
       if (m.equipo) {
         const key = `${mSede}_${m.equipo}`;
-        const teamStr = `${m.equipo} ${m.numEquipo || ''} ${mSede} ${m.entrenador || ''}`.toLowerCase();
-        if (!seenTeams.has(key) && teamStr.includes(globalSearchQ)) {
+        const teamStr = `${m.equipo} ${m.numEquipo || ''} ${mSede} ${m.entrenador || ''}`;
+        if (!seenTeams.has(key) && matchesAllTokens(teamStr)) {
           seenTeams.set(key, { type: 'equipo', key, equipo: m.equipo, sede: mSede });
         }
       }
 
       const rol = (m.rol || '').toLowerCase();
-      if (rol.includes('capitan') && (m.nombre || '').toLowerCase().includes(globalSearchQ)) {
-        capitanHits.push({ type: 'capitan', key: `cap_${m.id}`, id: m.id, nombre: m.nombre, equipo: m.equipo, sede: mSede });
+      if (matchesAllTokens(`${m.nombre || ''} ${m.rol || ''} ${m.equipo || ''} ${mSede}`)) {
+        staffHits.push({
+          type: rol.includes('capitan') ? 'capitan' : 'manager',
+          key: `staff_${m.id}`,
+          id: m.id,
+          nombre: m.nombre,
+          rolLabel: m.rol || 'Staff',
+          equipo: m.equipo,
+          sede: mSede
+        });
       }
     });
-    return [...Array.from(seenTeams.values()).slice(0, 5), ...capitanHits.slice(0, 5)];
+    return [...Array.from(seenTeams.values()).slice(0, 5), ...staffHits.slice(0, 5)];
   })();
 
   const handleSelectSearchOption = (opt) => {
@@ -1485,6 +1504,19 @@ export default function Home() {
     } else {
       navigate(`/centro-managers?tab=directorio&q=${encodeURIComponent(item.nombre)}&sede=${encodeURIComponent(item.sede)}`);
     }
+  };
+
+  const handleSelectSearchTask = (task) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    const targetRole = normalizeRole(task?.role || currentUser?.appRole || currentUser?.role || 'gerente');
+    navigate(`/checklist/${targetRole}`);
+  };
+
+  const handleSelectSearchEvent = () => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    navigate('/calendario-equipo');
   };
 
   // ==========================================================================
@@ -1782,8 +1814,56 @@ export default function Home() {
                   <div className="text-muted" style={{ fontSize: '0.78rem', padding: '0.4rem' }}>Cargando personas...</div>
                 )}
 
-                {!usersLoading && globalSearchOptionResults.length === 0 && globalSearchPeopleResults.length === 0 && globalSearchModuleResults.length === 0 && globalSearchTeamResults.length === 0 && (
+                {!usersLoading && globalSearchOptionResults.length === 0 && globalSearchTaskResults.length === 0 && globalSearchEventResults.length === 0 && globalSearchPeopleResults.length === 0 && globalSearchModuleResults.length === 0 && globalSearchTeamResults.length === 0 && (
                   <div className="text-muted" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Sin resultados para "{globalSearchTerm}"</div>
+                )}
+
+                {/* ✅ SECCIÓN: TAREAS DE MI ESPACIO Y ROL */}
+                {globalSearchTaskResults.length > 0 && (
+                  <div style={{ marginBottom: '0.55rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.4rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#4ade80', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>
+                      ✅ Tareas de Mi Espacio y Rol
+                    </div>
+                    {globalSearchTaskResults.map((t, i) => (
+                      <button
+                        key={t.uiKey || t.id || i}
+                        onClick={() => handleSelectSearchTask(t)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(34,197,94,0.12)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '0.83rem', fontWeight: 600 }}>
+                          {t.completed ? '✓ ' : '⏳ '}{t.task || t.title}
+                        </span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                          {t.cyclePhase || 'Operativo'} • {ROLE_DISPLAY_NAMES[normalizeRole(t.role)] || t.role}{(t.assignedSede || t.sede) ? ` • ${t.assignedSede || t.sede}` : ''}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* 📅 SECCIÓN: ENTRENAMIENTOS Y FECHAS DE MI SEDE */}
+                {globalSearchEventResults.length > 0 && (
+                  <div style={{ marginBottom: '0.55rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.4rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-gold)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>
+                      📅 Entrenamientos y Fechas
+                    </div>
+                    {globalSearchEventResults.map((ev, i) => (
+                      <button
+                        key={ev.id || i}
+                        onClick={handleSelectSearchEvent}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(245,158,11,0.12)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '0.83rem', fontWeight: 600 }}>✨ {ev.nombre || ev.name}</span>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                          {ev.sede || 'Global'}{ev.equipo ? ` • Eq. ${ev.equipo}` : ''}{ev.fecha_inicio || ev.start ? ` • ${String(ev.fecha_inicio || ev.start).slice(0, 10)}` : ''}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 )}
 
                 {/* ⚡ SECCIÓN DESTACADA: OPCIONES Y ACCIONES DE CAUSA */}
@@ -1867,7 +1947,7 @@ export default function Home() {
                         {item.type === 'equipo' ? (
                           <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👥 Equipo {item.equipo}</span>
                         ) : (
-                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>🎖️ {item.nombre} (Capitán)</span>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>🎖️ {item.nombre} ({item.rolLabel || (item.type === 'capitan' ? 'Capitán' : 'Manager')})</span>
                         )}
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.sede}</span>
                       </button>
