@@ -1682,6 +1682,16 @@ service cloud.firestore {
       allow update: if isSuperAdmin();
       allow delete: if isAuthenticated();
     }
+
+    // ============================================================================
+    // CONTROL ASISTENCIA CAMINATA SOBRE FUEGO LIMA: Operación interna Causa OS
+    // Asignación Equipo/FDS, asistencia en vivo (asistio), contingencias y _config_evento
+    // ============================================================================
+    match /control_asistencia_fuego_lima/{docId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && request.resource.data.keys().size() <= 50;
+      allow delete: if isAuthenticated();
+    }
   }
 }
 
