@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Calendar as CalendarIcon, Clock, Users, ChevronLeft, ChevronRight, 
   Plus, ArrowLeft, Filter, CheckCircle2, Sparkles, Shirt, X, 
   Layers, MapPin, Tag, AlertCircle, Info, Briefcase, Building, 
-  UserCheck, Shield, FileText, CheckSquare, Award, ShieldAlert, Lock
+  UserCheck, Shield, FileText, CheckSquare, Award, ShieldAlert, Lock,
+  Trash2, AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
@@ -12,6 +13,15 @@ import { calendarEventsForLocalDay } from '../services/trainerCalendarProjection
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
 import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
+import {
+  formatLocalDateKey,
+  sortBlocksChronologically,
+  getBlockLiveStatus,
+  filterCalendarEventsBySede,
+  summarizeDayTimeBoxing,
+  mergeCustomAndMasterBlocks,
+  getWeekDaysMondayToSunday
+} from '../utils/teamCalendarModel.js';
 
 const MONTH_NAMES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -583,29 +593,71 @@ const MASTER_TEAM_SCHEDULES = [
 
 export default function TeamCalendar() {
   const { currentUser } = useAuth();
-  const { events, calendarStatus, refreshCalendar } = useCycles();
+  const { events, currentCycle, currentStage, calendarStatus, refreshCalendar } = useCycles();
   const { showToast } = useUI();
   const navigate = useNavigate();
 
   // Filtro de Rol: 'todos', 'oficina', 'gerente', 'coordinador'
   const [selectedRole, setSelectedRole] = useState('todos');
   const [activeTab, setActiveTab] = useState('calendario'); // 'calendario' | 'turnos_rol' | 'horarios_sala'
+  const [calendarViewMode, setCalendarViewMode] = useState('mensual'); // 'mensual' | 'semanal'
   const [selectedType, setSelectedType] = useState('todos');
   const [selectedSede, setSelectedSede] = useState(() => normalizeSede(currentUser?.sede) || 'Todas');
   
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
   const today = useMemo(() => new Date(), []);
   const [viewDate, setViewDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState(() => new Date());
 
-  // Bloques personalizados guardados localmente combinados con la matriz maestra
+  // Bloques personalizados guardados localmente combinados con la matriz maestra actualizada
+  const masterBlockIds = useMemo(() => new Set(MASTER_TEAM_SCHEDULES.map(b => b.id)), []);
   const [customBlocks, setCustomBlocks] = useState(() => {
     try {
       const saved = localStorage.getItem('cpsl_timeboxing_blocks_v2');
-      return saved ? JSON.parse(saved) : MASTER_TEAM_SCHEDULES;
+      const parsed = saved ? JSON.parse(saved) : [];
+      return mergeCustomAndMasterBlocks(MASTER_TEAM_SCHEDULES, parsed);
     } catch (e) {
       return MASTER_TEAM_SCHEDULES;
     }
   });
+
+  // Estado de bloques completados por fecha (persistido localmente)
+  const [completedBlockKeys, setCompletedBlockKeys] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cpsl_timeboxing_done_v1');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const handleToggleBlockDone = (blockId, dateObj = selectedDate) => {
+    const key = `${formatLocalDateKey(dateObj)}__${blockId}`;
+    setCompletedBlockKeys(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      if (!next[key]) delete next[key];
+      try {
+        localStorage.setItem('cpsl_timeboxing_done_v1', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const handleDeleteCustomBlock = (blockId) => {
+    if (masterBlockIds.has(blockId)) return;
+    const updated = customBlocks.filter(b => b.id !== blockId);
+    setCustomBlocks(updated);
+    try {
+      const customOnly = updated.filter(b => !masterBlockIds.has(b.id));
+      localStorage.setItem('cpsl_timeboxing_blocks_v2', JSON.stringify(customOnly));
+    } catch {}
+    showToast?.('Bloque personalizado eliminado.', 'info');
+  };
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [newBlock, setNewBlock] = useState({
@@ -627,13 +679,15 @@ export default function TeamCalendar() {
     const block = {
       ...newBlock,
       id: `sch-${Date.now()}`,
+      isCustom: true,
       dayOfWeek: selectedDate.getDay(),
-      specificDate: selectedDate.toISOString().slice(0, 10)
+      specificDate: formatLocalDateKey(selectedDate)
     };
     const updated = [block, ...customBlocks];
     setCustomBlocks(updated);
     try {
-      localStorage.setItem('cpsl_timeboxing_blocks_v2', JSON.stringify(updated));
+      const customOnly = updated.filter(b => !masterBlockIds.has(b.id));
+      localStorage.setItem('cpsl_timeboxing_blocks_v2', JSON.stringify(customOnly));
     } catch (err) {}
     setShowAddModal(false);
     setNewBlock({
@@ -713,37 +767,53 @@ export default function TeamCalendar() {
     return cells;
   }, [viewDate, today]);
 
-  // Eventos de Cycles en el día seleccionado
-  const selectedDayEvents = useMemo(() => {
-    if (!events || events.length === 0) return [];
-    return calendarEventsForLocalDay(events, selectedDate);
-  }, [events, selectedDate]);
+  // Helper reutilizable para obtener eventos oficiales filtrados por sede para cualquier día
+  const getEventsForDate = useMemo(() => {
+    return (dateObj) => {
+      if (!events || events.length === 0) return [];
+      const dayEvents = calendarEventsForLocalDay(events, dateObj);
+      return filterCalendarEventsBySede(dayEvents, selectedSede);
+    };
+  }, [events, selectedSede]);
 
-  // Bloques del día seleccionado filtrados por ROL, SEDE y TIPO
-  const selectedDayBlocks = useMemo(() => {
-    const dayOfWeek = selectedDate.getDay();
-    const dateStr = selectedDate.toISOString().slice(0, 10);
+  // Helper reutilizable para obtener bloques ordenados cronológicamente para cualquier día
+  const getBlocksForDate = useMemo(() => {
+    return (dateObj) => {
+      const dayOfWeek = dateObj.getDay();
+      const dateStr = formatLocalDateKey(dateObj);
+      const targetSedeNorm = selectedSede !== 'Todas' ? normalizeSede(selectedSede) : 'Todas';
 
-    return customBlocks.filter(b => {
-      // Filtro por Rol
-      if (selectedRole !== 'todos' && b.roleCategory && b.roleCategory !== selectedRole) {
-        return false;
-      }
-      // Filtro por Sede
-      if (selectedSede !== 'Todas' && b.sede !== 'Todas' && b.sede !== selectedSede) {
-        return false;
-      }
-      // Filtro por Tipo de Bloque
-      if (selectedType !== 'todos' && b.type !== selectedType) {
-        return false;
-      }
-      // Fecha específica o día recurrente
-      if (b.specificDate) {
-        return b.specificDate === dateStr;
-      }
-      return b.dayOfWeek === dayOfWeek;
-    });
-  }, [customBlocks, selectedDate, selectedRole, selectedType, selectedSede]);
+      const filtered = customBlocks.filter(b => {
+        if (selectedRole !== 'todos' && b.roleCategory && b.roleCategory !== selectedRole) {
+          return false;
+        }
+        if (targetSedeNorm !== 'Todas' && b.sede && b.sede !== 'Todas' && normalizeSede(b.sede) !== targetSedeNorm) {
+          return false;
+        }
+        if (selectedType !== 'todos' && b.type !== selectedType) {
+          return false;
+        }
+        if (b.specificDate) {
+          return b.specificDate === dateStr;
+        }
+        return b.dayOfWeek === dayOfWeek;
+      });
+
+      return sortBlocksChronologically(filtered);
+    };
+  }, [customBlocks, selectedRole, selectedType, selectedSede]);
+
+  // Eventos de Cycles en el día seleccionado (filtrados por sede)
+  const selectedDayEvents = useMemo(() => getEventsForDate(selectedDate), [getEventsForDate, selectedDate]);
+
+  // Bloques del día seleccionado ordenados cronológicamente
+  const selectedDayBlocks = useMemo(() => getBlocksForDate(selectedDate), [getBlocksForDate, selectedDate]);
+
+  // Métricas logísticas y detección de cruces horarios del día
+  const dayTimeBoxingSummary = useMemo(() => summarizeDayTimeBoxing(selectedDayBlocks), [selectedDayBlocks]);
+
+  // Días de la semana activa (Lun - Dom) para la Vista Semanal
+  const weekDays = useMemo(() => getWeekDaysMondayToSunday(selectedDate), [selectedDate]);
 
   return (
     <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '1.5rem 2rem 5rem', color: 'var(--text-main)' }}>
@@ -786,7 +856,14 @@ export default function TeamCalendar() {
           <p style={{ margin: '0.4rem 0 0', fontSize: '0.92rem', color: 'var(--text-muted)' }}>
             <strong>CREAR PODER SIN LÍMITES</strong> • Jornadas, turnos y deadlines para <strong>Equipo de Oficina, Gerentes de Sede y Coordinadores</strong>.
           </p>
-          <CalendarFreshness status={calendarStatus} onRefresh={refreshCalendar} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginTop: '0.45rem' }}>
+            <CalendarFreshness status={calendarStatus} onRefresh={refreshCalendar} />
+            {currentCycle?.name && (
+              <span style={{ fontSize: '0.74rem', padding: '2px 8px', borderRadius: '999px', background: 'rgba(245, 158, 11, 0.14)', color: 'var(--crear-gold)', border: '1px solid rgba(245, 158, 11, 0.35)', fontWeight: 700 }}>
+                📅 {currentCycle.name}{currentStage && currentStage !== 'CARGANDO...' ? ` • ${currentStage}` : ''}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* ACCIONES SUPERIORES */}
@@ -974,6 +1051,148 @@ export default function TeamCalendar() {
 
       {/* TAB 1: CALENDARIO INTERACTIVO & TIMELINE */}
       {activeTab === 'calendario' && (
+        <div>
+          {/* SUB-SWITCHER: MENSUAL + DÍA VS VISTA SEMANAL (LUN-DOM) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+            <div style={{ display: 'inline-flex', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <button
+                type="button"
+                onClick={() => setCalendarViewMode('mensual')}
+                style={{
+                  padding: '0.4rem 0.9rem',
+                  borderRadius: '7px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: calendarViewMode === 'mensual' ? 'var(--crear-cyan)' : 'transparent',
+                  color: calendarViewMode === 'mensual' ? '#041222' : 'var(--text-muted)'
+                }}
+              >
+                📅 Mensual + Agenda Diaria
+              </button>
+              <button
+                type="button"
+                onClick={() => setCalendarViewMode('semanal')}
+                style={{
+                  padding: '0.4rem 0.9rem',
+                  borderRadius: '7px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: 'none',
+                  background: calendarViewMode === 'semanal' ? 'var(--crear-cyan)' : 'transparent',
+                  color: calendarViewMode === 'semanal' ? '#041222' : 'var(--text-muted)'
+                }}
+              >
+                🗓️ Vista Semanal (Lun–Dom)
+              </button>
+            </div>
+
+            {calendarViewMode === 'semanal' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDate(prev => new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() - 7))}
+                  className="btn-secondary"
+                  style={{ padding: '0.35rem 0.7rem', fontSize: '0.78rem', borderRadius: '6px' }}
+                >
+                  ← Semana Ant.
+                </button>
+                <button
+                  type="button"
+                  onClick={handleGoToday}
+                  className="btn-secondary"
+                  style={{ padding: '0.35rem 0.7rem', fontSize: '0.78rem', borderRadius: '6px', fontWeight: 700 }}
+                >
+                  Esta Semana
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDate(prev => new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + 7))}
+                  className="btn-secondary"
+                  style={{ padding: '0.35rem 0.7rem', fontSize: '0.78rem', borderRadius: '6px' }}
+                >
+                  Semana Sig. →
+                </button>
+              </div>
+            )}
+          </div>
+
+          {calendarViewMode === 'semanal' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '0.9rem', marginBottom: '2rem' }}>
+              {weekDays.map((dayDate, idx) => {
+                const dayKey = formatLocalDateKey(dayDate);
+                const isTodayCell = dayKey === formatLocalDateKey(now);
+                const isSelectedCell = dayKey === formatLocalDateKey(selectedDate);
+                const dayEvs = getEventsForDate(dayDate);
+                const dayBlks = getBlocksForDate(dayDate);
+                const daySum = summarizeDayTimeBoxing(dayBlks);
+                return (
+                  <div
+                    key={dayKey}
+                    className="glass-panel"
+                    onClick={() => setSelectedDate(dayDate)}
+                    style={{
+                      padding: '0.95rem',
+                      borderRadius: '12px',
+                      cursor: 'pointer',
+                      border: isSelectedCell
+                        ? '1px solid var(--crear-cyan)'
+                        : (isTodayCell ? '1px dashed var(--crear-gold)' : '1px solid rgba(255,255,255,0.08)'),
+                      background: isSelectedCell ? 'rgba(41, 171, 226, 0.08)' : 'rgba(255,255,255,0.02)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.55rem'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.07)', paddingBottom: '0.45rem' }}>
+                      <div>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 800, color: isTodayCell ? 'var(--crear-gold)' : 'var(--crear-cyan)', textTransform: 'uppercase' }}>
+                          {WEEKDAYS[idx]} {dayDate.getDate()}/{dayDate.getMonth() + 1}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          {daySum.totalBlocks} bloques • {daySum.hoursLabel}
+                        </div>
+                      </div>
+                      {daySum.conflictCount > 0 && (
+                        <span title="Cruce horario detectado" style={{ fontSize: '0.68rem', color: '#f87171', fontWeight: 800 }}>
+                          ⚠️ Cruce
+                        </span>
+                      )}
+                    </div>
+
+                    {dayEvs.map((ev, eIdx) => (
+                      <div key={eIdx} style={{ fontSize: '0.72rem', padding: '0.3rem 0.45rem', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.14)', color: 'var(--crear-gold)', fontWeight: 700, border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+                        ✨ {ev.nombre || ev.name}
+                      </div>
+                    ))}
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      {dayBlks.slice(0, 5).map(b => {
+                        const typeCfg = BLOCK_TYPES[b.type] || BLOCK_TYPES.Foco;
+                        const isDone = Boolean(completedBlockKeys[`${dayKey}__${b.id}`]);
+                        return (
+                          <div key={b.id} style={{ fontSize: '0.73rem', padding: '0.35rem 0.5rem', borderRadius: '6px', borderLeft: `3px solid ${typeCfg.color}`, background: 'rgba(255,255,255,0.03)', opacity: isDone ? 0.55 : 1 }}>
+                            <div style={{ fontWeight: 700, color: 'var(--crear-cyan)', fontSize: '0.68rem' }}>{b.time}</div>
+                            <div style={{ color: 'var(--text-heading)', fontWeight: 600, textDecoration: isDone ? 'line-through' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {b.title}
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {dayBlks.length > 5 && (
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+                          +{dayBlks.length - 5} bloques más (clic para ver)
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 460px) 1fr', gap: '2rem', alignItems: 'start' }}>
           
           {/* COLUMNA IZQUIERDA: CALENDARIO MENSUAL */}
@@ -1028,8 +1247,11 @@ export default function TeamCalendar() {
             {/* GRILLA DE DÍAS (7 COLUMNAS) */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', textAlign: 'center' }}>
               {calendarCells.map((cell, idx) => {
-                const isSelected = cell.date.toDateString() === selectedDate.toDateString();
+                const cellKey = formatLocalDateKey(cell.date);
+                const isSelected = cellKey === formatLocalDateKey(selectedDate);
                 const isEventDay = cell.date.getDay() >= 4 || cell.date.getDay() === 0; // Jueves a Domingo
+                const hasOfficialEvent = cell.isCurrentMonth && getEventsForDate(cell.date).length > 0;
+                const hasCustomForDay = cell.isCurrentMonth && customBlocks.some(b => b.specificDate === cellKey);
 
                 return (
                   <button
@@ -1060,8 +1282,12 @@ export default function TeamCalendar() {
                     }}
                   >
                     <span>{cell.dayNum}</span>
-                    {cell.isToday && (
-                      <span style={{ position: 'absolute', bottom: '3px', width: '4px', height: '4px', borderRadius: '50%', background: 'var(--crear-gold)' }}></span>
+                    {(cell.isToday || hasOfficialEvent || hasCustomForDay) && (
+                      <span style={{ position: 'absolute', bottom: '4px', display: 'flex', gap: '3px', alignItems: 'center' }}>
+                        {hasOfficialEvent && <span title="Entrenamiento Oficial Causa OS" style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--crear-gold)' }} />}
+                        {hasCustomForDay && <span title="Bloque personalizado" style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--crear-cyan)' }} />}
+                        {cell.isToday && !hasOfficialEvent && <span title="Hoy" style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#22c55e' }} />}
+                      </span>
                     )}
                   </button>
                 );
@@ -1160,6 +1386,34 @@ export default function TeamCalendar() {
               </button>
             </div>
 
+            {/* RESUMEN LOGÍSTICO DE TIME-BOXING DEL DÍA */}
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '0.6rem',
+              padding: '0.7rem 0.9rem',
+              borderRadius: '10px',
+              background: 'rgba(15, 23, 42, 0.55)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              marginBottom: '1.25rem',
+              fontSize: '0.78rem',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.9rem', alignItems: 'center' }}>
+                <span>⏱️ <strong>{dayTimeBoxingSummary.hoursLabel}</strong> en bloques ({dayTimeBoxingSummary.totalBlocks})</span>
+                <span style={{ color: '#ef4444', fontWeight: 700 }}>🚨 {dayTimeBoxingSummary.deadlines} Deadlines</span>
+                <span style={{ color: '#4ade80', fontWeight: 700 }}>
+                  ✓ {selectedDayBlocks.filter(b => completedBlockKeys[`${formatLocalDateKey(selectedDate)}__${b.id}`]).length}/{selectedDayBlocks.length} ejecutados
+                </span>
+              </div>
+              {dayTimeBoxingSummary.conflictCount > 0 && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.18)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.4)', fontWeight: 700 }}>
+                  <AlertTriangle size={13} /> {dayTimeBoxingSummary.conflictCount} bloques con cruce horario
+                </span>
+              )}
+            </div>
+
             {/* EVENTOS OFICIALES DE SALA */}
             {selectedDayEvents.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
@@ -1220,6 +1474,11 @@ export default function TeamCalendar() {
                   {selectedDayBlocks.map((block) => {
                     const typeCfg = BLOCK_TYPES[block.type] || BLOCK_TYPES.Foco;
                     const roleCfg = OPERATIONAL_ROLES[block.roleCategory] || OPERATIONAL_ROLES.oficina;
+                    const doneKey = `${formatLocalDateKey(selectedDate)}__${block.id}`;
+                    const isDone = Boolean(completedBlockKeys[doneKey]);
+                    const liveStatus = getBlockLiveStatus(block, selectedDate, now);
+                    const hasConflict = dayTimeBoxingSummary.conflictIds.has(block.id);
+                    const isCustom = !masterBlockIds.has(block.id);
 
                     return (
                       <div 
@@ -1228,51 +1487,84 @@ export default function TeamCalendar() {
                         style={{
                           padding: '1.1rem 1.3rem',
                           borderRadius: '12px',
-                          borderLeft: `5px solid ${typeCfg.color}`,
-                          background: 'rgba(255,255,255,0.02)',
+                          borderLeft: `5px solid ${liveStatus === 'active' ? '#22c55e' : typeCfg.color}`,
+                          background: liveStatus === 'active' ? 'rgba(34, 197, 94, 0.06)' : 'rgba(255,255,255,0.02)',
+                          opacity: isDone ? 0.62 : 1,
                           display: 'flex',
                           flexDirection: 'column',
                           gap: '0.5rem',
-                          transition: 'transform 0.15s ease'
+                          transition: 'all 0.15s ease'
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                          <div>
-                            <span 
-                              style={{ 
-                                display: 'inline-block',
-                                fontSize: '0.68rem', 
-                                padding: '1px 7px', 
-                                borderRadius: '10px', 
-                                background: `${roleCfg.color}25`, 
-                                color: roleCfg.color,
-                                border: `1px solid ${roleCfg.color}50`,
-                                fontWeight: 800,
-                                textTransform: 'uppercase',
-                                marginBottom: '0.3rem'
-                              }}
-                            >
-                              {roleCfg.label}
-                            </span>
-                            <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-heading)' }}>
-                              {block.title}
-                            </h4>
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+                            <input
+                              type="checkbox"
+                              checked={isDone}
+                              onChange={() => handleToggleBlockDone(block.id, selectedDate)}
+                              title="Marcar bloque como ejecutado hoy"
+                              style={{ width: '17px', height: '17px', marginTop: '4px', cursor: 'pointer', accentColor: '#22c55e' }}
+                            />
+                            <div>
+                              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '0.3rem' }}>
+                                <span 
+                                  style={{ 
+                                    display: 'inline-block',
+                                    fontSize: '0.68rem', 
+                                    padding: '1px 7px', 
+                                    borderRadius: '10px', 
+                                    background: `${roleCfg.color}25`, 
+                                    color: roleCfg.color,
+                                    border: `1px solid ${roleCfg.color}50`,
+                                    fontWeight: 800,
+                                    textTransform: 'uppercase'
+                                  }}
+                                >
+                                  {roleCfg.label}
+                                </span>
+                                {liveStatus === 'active' && !isDone && (
+                                  <span style={{ fontSize: '0.68rem', padding: '1px 7px', borderRadius: '10px', background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', border: '1px solid rgba(34, 197, 94, 0.45)', fontWeight: 800 }}>
+                                    🟢 En curso ahora
+                                  </span>
+                                )}
+                                {hasConflict && (
+                                  <span style={{ fontSize: '0.68rem', padding: '1px 7px', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.18)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.4)', fontWeight: 800 }}>
+                                    ⚠️ Cruce horario
+                                  </span>
+                                )}
+                              </div>
+                              <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-heading)', textDecoration: isDone ? 'line-through' : 'none' }}>
+                                {block.title}
+                              </h4>
+                            </div>
                           </div>
 
-                          <span 
-                            style={{ 
-                              fontSize: '0.72rem', 
-                              padding: '2px 8px', 
-                              borderRadius: '12px', 
-                              background: typeCfg.bg, 
-                              color: typeCfg.color, 
-                              border: `1px solid ${typeCfg.border}`,
-                              fontWeight: 700,
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {typeCfg.label}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                            <span 
+                              style={{ 
+                                fontSize: '0.72rem', 
+                                padding: '2px 8px', 
+                                borderRadius: '12px', 
+                                background: typeCfg.bg, 
+                                color: typeCfg.color, 
+                                border: `1px solid ${typeCfg.border}`,
+                                fontWeight: 700,
+                                whiteSpace: 'nowrap'
+                              }}
+                            >
+                              {typeCfg.label}
+                            </span>
+                            {isCustom && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteCustomBlock(block.id)}
+                                title="Eliminar bloque personalizado"
+                                style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.35)', color: '#f87171', borderRadius: '6px', padding: '3px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            )}
+                          </div>
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', fontSize: '0.82rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
@@ -1301,6 +1593,7 @@ export default function TeamCalendar() {
 
           </div>
 
+        </div>
         </div>
       )}
 
