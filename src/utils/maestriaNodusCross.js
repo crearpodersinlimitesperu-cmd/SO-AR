@@ -338,7 +338,7 @@ export function buildMaestriaNodusCross({
     const checkinInfo = getLimaMaestriaCheckinInfo(eq.nombre);
     const teamNodus = nodusPadronCross.filter((p) => p.equipoId === eq.id);
     const teamSigned = enrichedContracts.filter((c) => {
-      if (c.nodusCross.nodusTeamId === eq.id) return true;
+      if (c.nodusCross.nodusTeamId != null) return c.nodusCross.nodusTeamId === eq.id;
       return teamNum && extractTeamNumber(c.equipo || c.cohorte || c.equipoCohorte) === teamNum;
     });
 

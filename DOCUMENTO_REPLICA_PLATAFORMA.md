@@ -91459,7 +91459,7 @@ export function buildMaestriaNodusCross({
     const checkinInfo = getLimaMaestriaCheckinInfo(eq.nombre);
     const teamNodus = nodusPadronCross.filter((p) => p.equipoId === eq.id);
     const teamSigned = enrichedContracts.filter((c) => {
-      if (c.nodusCross.nodusTeamId === eq.id) return true;
+      if (c.nodusCross.nodusTeamId != null) return c.nodusCross.nodusTeamId === eq.id;
       return teamNum && extractTeamNumber(c.equipo || c.cohorte || c.equipoCohorte) === teamNum;
     });
 
@@ -141786,6 +141786,8 @@ export default function MonitorMaestriaLima() {
     const totalRegistradosFirestore = signedContracts.length;
     const totalParticipantes = signedContracts.filter((c) => (c.rol || c.rolActividad || '').toLowerCase().includes('participante')).length;
     const totalManagers = signedContracts.filter((c) => (c.rol || c.rolActividad || '').toLowerCase().includes('manager')).length;
+    const totalOtrosRoles = Math.max(0, totalRegistradosFirestore - totalParticipantes - totalManagers);
+    const totalNodusParticipantes = Math.max(0, (summary.totalNodusMaestria || 0) - (summary.totalNodusManagers || 0));
 
     return {
       totalPadron,
@@ -141795,6 +141797,8 @@ export default function MonitorMaestriaLima() {
       totalRegistradosFirestore,
       totalParticipantes,
       totalManagers,
+      totalOtrosRoles,
+      totalNodusParticipantes,
       ...summary
     };
   }, [nodusCrossResult, signedContracts]);
@@ -142281,7 +142285,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#34d399', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✓ Contratos Firmados</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#34d399', marginTop: '0.15rem' }}>{stats.totalRegistradosFirestore}</div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                {stats.totalParticipantes} Part. · {stats.totalManagers} Mgr.
+                {stats.totalParticipantes} Part. · {stats.totalManagers} Mgr.{stats.totalOtrosRoles > 0 ? ` · ${stats.totalOtrosRoles} Otros` : ''}
               </div>
             </div>
             <div style={{ background: '#0b1325', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.35)' }}>
@@ -142290,24 +142294,47 @@ export default function MonitorMaestriaLima() {
                 {nodusLoading ? '...' : stats.totalNodusMaestria}
               </div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                Incluye {stats.totalNodusManagers} Managers en vivo
+                {stats.totalNodusParticipantes} Part. · {stats.totalNodusManagers} Mgr.
               </div>
             </div>
-            <div style={{ background: 'rgba(16, 185, 129, 0.14)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+            <div
+              onClick={() => { setActiveTab('REGISTROS'); setRegNodusFilter('COMPLETO'); }}
+              title="Clic para filtrar los contratos completos"
+              style={{ background: 'rgba(16, 185, 129, 0.14)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.4)', cursor: 'pointer' }}
+            >
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✅ Completo (Firma + Nodus)</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#6ee7b7', marginTop: '0.15rem' }}>{stats.totalCompletos}</div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
                 Contrato + Check-in ok
               </div>
             </div>
-            <div style={{ background: 'rgba(245, 158, 11, 0.16)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.45)' }}>
+            <div
+              onClick={() => { setActiveTab('REGISTROS'); setRegNodusFilter('FALTA_CHECKIN_NODUS'); }}
+              title="Clic para ver quién firmó y falta check-in en Nodus"
+              style={{ background: 'rgba(245, 158, 11, 0.16)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(245, 158, 11, 0.45)', cursor: 'pointer' }}
+            >
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Falta Check-in Nodus</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>{stats.totalFaltaCheckinNodus}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
                 Ya firmaron · sin marca Nodus
               </div>
             </div>
-            <div style={{ background: 'rgba(136, 19, 55, 0.28)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(244, 63, 94, 0.4)' }}>
+            <div
+              onClick={() => { setActiveTab('REGISTROS'); setRegNodusFilter('NO_ENCONTRADO_NODUS'); }}
+              title="Clic para revisar los contratos sin cruce en Nodus"
+              style={{ background: 'rgba(148, 163, 184, 0.12)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(148, 163, 184, 0.35)', cursor: 'pointer' }}
+            >
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.05em' }}>❓ Sin Cruce Nodus</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#f8fafc', marginTop: '0.15rem' }}>{stats.totalNoEncontradoNodus}</div>
+              <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
+                Firmaron · no hallados en Nodus
+              </div>
+            </div>
+            <div
+              onClick={() => { setActiveTab('PADRON'); setPadronStatusFilter('FALTA_FIRMA_CONTRATO'); }}
+              title="Clic para ver quién está en Nodus sin firmar reglas"
+              style={{ background: 'rgba(136, 19, 55, 0.28)', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid rgba(244, 63, 94, 0.4)', cursor: 'pointer' }}
+            >
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fb7185', textTransform: 'uppercase', letterSpacing: '0.05em' }}>🚨 En Nodus · Falta Firma</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.totalFaltaFirmaContrato}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
