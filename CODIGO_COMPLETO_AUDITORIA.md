@@ -187090,7 +187090,7 @@ import { getVenueForTraining } from '../data/venuesData';
 import LegalOnboardingModal from '../components/LegalOnboardingModal';
 import { getLegalStatusByParticipant } from '../services/legalSignatureService';
 
-import { ROLE_DISPLAY_NAMES, normalizeSede, findUserByAnyEmail } from '../data/usersData';
+import { ROLE_DISPLAY_NAMES, normalizeRole, normalizeSede, findUserByAnyEmail } from '../data/usersData';
 import {
   canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
   canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
