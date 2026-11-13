@@ -36,6 +36,7 @@ import {
 } from '../src/config/officialMailConfig.js';
 import { runTaskRoleCoherenceAgent } from './auditTaskRoleCoherenceAgent.mjs';
 import { syncUsersUidProfilesAndCatalogTasks } from './syncUsersUidProfiles.mjs';
+import { runProfileRoleIntegrityAgent } from './profileRoleIntegrityAgent.mjs';
 
 dotenv.config();
 
@@ -336,11 +337,18 @@ async function checkFirestoreIntegrity(db) {
   // 5.4 Coherencia de tareas vs roles y sincronización de perfiles users/{uid}
   let coherenceCritical = 0;
   let syncedUidProfiles = 0;
+  let profileIntegrityRepaired = 0;
   try {
     const syncRes = await syncUsersUidProfilesAndCatalogTasks({ dryRun: false });
     syncedUidProfiles = syncRes?.updatedUsersCount || 0;
   } catch (err) {
     console.warn(`⚠️ [Guardián 3H] Aviso en syncUsersUidProfiles: ${err.message}`);
+  }
+  try {
+    const profileRes = await runProfileRoleIntegrityAgent({ db, dryRun: false });
+    profileIntegrityRepaired = profileRes?.repairedCount || 0;
+  } catch (err) {
+    console.warn(`⚠️ [Guardián 3H] Aviso en runProfileRoleIntegrityAgent: ${err.message}`);
   }
   try {
     const coherenceReport = await runTaskRoleCoherenceAgent({ autoFix: false, jsonOutput: true });
@@ -367,9 +375,11 @@ async function checkFirestoreIntegrity(db) {
       duplicateMaestriaDocs: mjDupes.length,
       duplicateFuegoDocs: fwDupes.length,
       recentAuditLogs: auditSnap.size || 0,
-      coherenceCritical
+      coherenceCritical,
+      syncedUidProfiles,
+      profileIntegrityRepaired
     },
-    detail: `Tareas=${tasksSnap.size} (avances=${tasksWithParticipantStates}, evidencias=${tasksWithEvidences}) | Mail SUCCESS=${mailSuccess}, estancados=${mailPendingStuck}, leasesVencidos=${mailExpiredSending} | Contratos MJ=${mjSnap.size}, Fuego=${fwSnap.size}`
+    detail: `Tareas=${tasksSnap.size} (avances=${tasksWithParticipantStates}, evidencias=${tasksWithEvidences}) | Perfiles saneados=${profileIntegrityRepaired} | Mail SUCCESS=${mailSuccess}, estancados=${mailPendingStuck}, leasesVencidos=${mailExpiredSending} | Contratos MJ=${mjSnap.size}, Fuego=${fwSnap.size}`
   };
 }
 
