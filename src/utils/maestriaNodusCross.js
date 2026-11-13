@@ -333,11 +333,7 @@ export function buildMaestriaNodusCross({
     );
 
     const isSigned = Boolean(matchInfo?.contract);
-    const isRelevant =
-      entry.maestriaNodus ||
-      entry.pagadoC2 ||
-      entry.tipoPersona === 'manager' ||
-      isSigned;
+    const isRelevant = entry.maestriaNodus || isSigned;
 
     if (!isRelevant) continue;
 
