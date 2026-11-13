@@ -10,8 +10,10 @@ import {
   Search,
   MapPin,
   Check,
-  Award
+  Award,
+  ExternalLink
 } from 'lucide-react';
+import { getLimaMaestriaCheckinInfo } from '../utils/maestriaLimaCheckin';
 import { collection, getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getClientGeoLocation } from '../utils/geoLocator';
@@ -949,6 +951,75 @@ export default function ContratoMaestriaLima() {
                     <Printer size={18} /> Imprimir Constancia
                   </button>
                 </div>
+
+                {(() => {
+                  const checkinInfo = getLimaMaestriaCheckinInfo(
+                    signedSuccess.equipo || signedSuccess.equipoCohorte
+                  );
+                  if (!checkinInfo) return null;
+                  return (
+                    <div
+                      style={{
+                        marginTop: '1.5rem',
+                        padding: '1.25rem',
+                        borderRadius: '14px',
+                        background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.18) 0%, rgba(16, 185, 129, 0.16) 100%)',
+                        border: '2px solid #38bdf8',
+                        textAlign: 'center',
+                        boxShadow: '0 10px 30px rgba(14, 165, 233, 0.22)'
+                      }}
+                    >
+                      <div style={{
+                        fontSize: '0.78rem',
+                        fontWeight: 900,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                        color: '#7dd3fc',
+                        marginBottom: '0.35rem'
+                      }}>
+                        PASO OBLIGATORIO — REGISTRO DE ASISTENCIA ({checkinInfo.label})
+                      </div>
+                      <p style={{
+                        margin: '0 0 0.9rem',
+                        fontSize: '0.92rem',
+                        color: '#f8fafc',
+                        lineHeight: 1.5
+                      }}>
+                        Ahora que firmaste tus acuerdos legales, ingresa obligatoriamente al siguiente enlace oficial para registrar tu asistencia del <strong>Equipo {checkinInfo.teamNumber} (Lima)</strong>:
+                      </p>
+                      <a
+                        href={checkinInfo.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.55rem',
+                          padding: '0.95rem 1.8rem',
+                          borderRadius: '10px',
+                          background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                          color: '#ffffff',
+                          fontWeight: 900,
+                          fontSize: '0.96rem',
+                          textDecoration: 'none',
+                          boxShadow: '0 8px 22px rgba(14, 165, 233, 0.4)'
+                        }}
+                      >
+                        <ExternalLink size={18} /> Registrar Asistencia Equipo {checkinInfo.teamNumber} en Nodus
+                      </a>
+                      <div style={{
+                        marginTop: '0.65rem',
+                        fontSize: '0.76rem',
+                        color: '#bae6fd',
+                        wordBreak: 'break-all',
+                        fontFamily: 'monospace'
+                      }}>
+                        {checkinInfo.url}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </div>
