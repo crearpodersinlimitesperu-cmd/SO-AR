@@ -94987,6 +94987,93 @@ test('CAMINATA_FUEGO initializes official presets for all sedes with venue and d
 
 ---
 
+## Archivo: src/utils/trainingDateEditor.js
+
+```js
+/**
+ * trainingDateEditor.js
+ * Reglas de coherencia de fechas para entrenamientos de 1 día o varios días
+ * en AsignadorEntrenadores.
+ */
+
+const SINGLE_DAY_KEYWORDS = [
+  'CAMINATA SOBRE FUEGO',
+  'FIREWALK',
+  'GROUNDING',
+  'GRADUACION',
+  'GRADUACIÓN',
+  'CENA DE GALA',
+  'INDUCCION',
+  'INDUCCIÓN'
+];
+
+export function isSingleDayTrainingName(nombre) {
+  const upper = String(nombre || '').trim().toUpperCase();
+  if (!upper) return false;
+  return SINGLE_DAY_KEYWORDS.some(k => upper.includes(k));
+}
+
+function addDaysIso(dateStr, days) {
+  const match = String(dateStr || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return dateStr;
+  const d = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+function diffDaysIso(startStr, endStr) {
+  const sMatch = String(startStr || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const eMatch = String(endStr || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!sMatch || !eMatch) return 0;
+  const s = Date.UTC(Number(sMatch[1]), Number(sMatch[2]) - 1, Number(sMatch[3]));
+  const e = Date.UTC(Number(eMatch[1]), Number(eMatch[2]) - 1, Number(eMatch[3]));
+  return Math.round((e - s) / 86400000);
+}
+
+/**
+ * Actualiza el borrador del modal cuando cambia la fecha de inicio:
+ * - Si `soloUnDia` está activo, `fechaFin` se sincroniza automáticamente a `nextStart`.
+ * - Si es multi-día y `fechaFin` queda anterior a `nextStart`, preserva la duración previa (o usa `nextStart`).
+ */
+export function updateDraftStartDate(prev, nextStart) {
+  const cleanStart = String(nextStart || '').slice(0, 10);
+  if (prev?.soloUnDia) {
+    return { ...prev, fechaInicio: cleanStart, fechaFin: cleanStart };
+  }
+  if (!cleanStart) {
+    return { ...prev, fechaInicio: '' };
+  }
+  const prevSpan = (prev?.fechaInicio && prev?.fechaFin) ? diffDaysIso(prev.fechaInicio, prev.fechaFin) : 0;
+  if (!prev?.fechaFin || prev.fechaFin < cleanStart) {
+    const autoEnd = prevSpan > 0 ? addDaysIso(cleanStart, prevSpan) : cleanStart;
+    return { ...prev, fechaInicio: cleanStart, fechaFin: autoEnd };
+  }
+  return { ...prev, fechaInicio: cleanStart };
+}
+
+/**
+ * Cambia el modo de 1 solo día y sincroniza `fechaFin` automáticamente cuando se activa.
+ */
+export function toggleSingleDayMode(prev, soloUnDia) {
+  const enabled = Boolean(soloUnDia);
+  if (enabled) {
+    return {
+      ...prev,
+      soloUnDia: true,
+      fechaFin: prev?.fechaInicio || prev?.fechaFin || ''
+    };
+  }
+  return {
+    ...prev,
+    soloUnDia: false,
+    fechaFin: prev?.fechaFin || prev?.fechaInicio || ''
+  };
+}
+
+```
+
+---
+
 ## Archivo: src/utils/mjCalendarVisibility.test.js
 
 ```js
@@ -168009,6 +168096,11 @@ import { listTrainerPolicyFiles, TRAINER_POLICIES_FOLDER_ID } from '../services/
 import { isInactiveTrainer } from '../data/managersData';
 import { isUserInactive } from '../utils/userNormalizer.js';
 import {
+  isSingleDayTrainingName,
+  updateDraftStartDate,
+  toggleSingleDayMode
+} from '../utils/trainingDateEditor.js';
+import {
   campoAsignacionSlot,
   extraerPreasignaciones,
   normalizarIdentidadEntrenador,
@@ -168926,12 +169018,24 @@ export default function AsignadorEntrenadores() {
   const abrirEditorCalendario = (fila = null) => {
     const onlyDate = value => String(value || '').slice(0, 10);
     setCalendarEditor(fila ? { mode: 'editar', fila } : { mode: 'nuevo', fila: null });
-    setCalendarDraft(fila ? {
-      nombre: fila.nombre || '', sede: fila.sede || '', equipo: fila.equipo || '', lugar: fila.lugar || '',
-      fechaInicio: onlyDate(fila.fechaInicio), fechaFin: onlyDate(fila.fechaFin) || onlyDate(fila.fechaInicio),
-    } : {
-      nombre: '', sede: 'Lima', equipo: '', lugar: '', fechaInicio: '', fechaFin: '',
-    });
+    if (fila) {
+      const fInicio = onlyDate(fila.fechaInicio);
+      const fFin = onlyDate(fila.fechaFin) || fInicio;
+      const soloUnDia = Boolean((fInicio && fFin && fInicio === fFin) || isSingleDayTrainingName(fila.nombre));
+      setCalendarDraft({
+        nombre: fila.nombre || '',
+        sede: fila.sede || '',
+        equipo: fila.equipo || '',
+        lugar: fila.lugar || '',
+        fechaInicio: fInicio,
+        fechaFin: soloUnDia ? fInicio : fFin,
+        soloUnDia
+      });
+    } else {
+      setCalendarDraft({
+        nombre: '', sede: 'Lima', equipo: '', lugar: '', fechaInicio: '', fechaFin: '', soloUnDia: false,
+      });
+    }
   };
 
   const guardarCalendarioOperativo = async () => {
@@ -168939,7 +169043,7 @@ export default function AsignadorEntrenadores() {
     if (!draft.nombre?.trim() || !draft.sede || !draft.fechaInicio) {
       showToast('Indica entrenamiento, sede y fecha de inicio.', 'error'); return;
     }
-    const fechaFin = draft.fechaFin || draft.fechaInicio;
+    const fechaFin = draft.soloUnDia ? draft.fechaInicio : (draft.fechaFin || draft.fechaInicio);
     if (fechaFin < draft.fechaInicio) {
       showToast('La fecha final no puede ser anterior al inicio.', 'error'); return;
     }
@@ -169256,16 +169360,59 @@ export default function AsignadorEntrenadores() {
             <button onClick={() => setCalendarEditor(null)} style={{ background: 'none', border: 0, color: 'var(--text-muted)', cursor: 'pointer' }}><X size={18} /></button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '.65rem' }}>
-            <input aria-label="Nombre del entrenamiento" style={selectStyle} value={calendarDraft.nombre || ''} placeholder="Entrenamiento" onChange={e => setCalendarDraft(prev => ({ ...prev, nombre: e.target.value }))} />
+            <input
+              aria-label="Nombre del entrenamiento"
+              style={selectStyle}
+              value={calendarDraft.nombre || ''}
+              placeholder="Entrenamiento"
+              onChange={e => {
+                const nextNombre = e.target.value;
+                setCalendarDraft(prev => {
+                  const autoSingle = isSingleDayTrainingName(nextNombre);
+                  const next = { ...prev, nombre: nextNombre };
+                  return autoSingle ? toggleSingleDayMode(next, true) : next;
+                });
+              }}
+            />
             <select aria-label="Sede" style={selectStyle} value={calendarDraft.sede || ''} onChange={e => setCalendarDraft(prev => ({ ...prev, sede: e.target.value }))}>{OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}</select>
             <input aria-label="Equipo" style={selectStyle} value={calendarDraft.equipo || ''} placeholder="Equipo" onChange={e => setCalendarDraft(prev => ({ ...prev, equipo: e.target.value }))} />
             <input aria-label="Lugar o salón" style={selectStyle} value={calendarDraft.lugar || ''} placeholder="Lugar / salón" onChange={e => setCalendarDraft(prev => ({ ...prev, lugar: e.target.value }))} />
-            <input aria-label="Fecha de inicio" type="date" style={selectStyle} value={calendarDraft.fechaInicio || ''} onChange={e => setCalendarDraft(prev => ({ ...prev, fechaInicio: e.target.value }))} />
-            <input aria-label="Fecha final" type="date" style={selectStyle} value={calendarDraft.fechaFin || ''} onChange={e => setCalendarDraft(prev => ({ ...prev, fechaFin: e.target.value }))} />
+            <input
+              aria-label={calendarDraft.soloUnDia ? 'Fecha del entrenamiento' : 'Fecha de inicio'}
+              type="date"
+              style={selectStyle}
+              value={calendarDraft.fechaInicio || ''}
+              onChange={e => setCalendarDraft(prev => updateDraftStartDate(prev, e.target.value))}
+            />
+            {calendarDraft.soloUnDia ? (
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 .7rem', borderRadius: 8, background: 'rgba(34, 197, 94, 0.12)', border: '1px solid rgba(34, 197, 94, 0.35)', color: '#4ade80', fontSize: '.76rem', fontWeight: 700 }}>
+                ✓ Fecha final automática (mismo día)
+              </div>
+            ) : (
+              <input
+                aria-label="Fecha final"
+                type="date"
+                style={selectStyle}
+                min={calendarDraft.fechaInicio || undefined}
+                value={calendarDraft.fechaFin || ''}
+                onChange={e => setCalendarDraft(prev => ({ ...prev, fechaFin: e.target.value }))}
+              />
+            )}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem', marginTop: '.8rem' }}>
-            <button onClick={() => setCalendarEditor(null)} style={{ ...selectStyle, width: 'auto', cursor: 'pointer' }}>Cancelar</button>
-            <button onClick={guardarCalendarioOperativo} disabled={calendarSaving} style={{ border: 0, borderRadius: 8, padding: '.5rem .75rem', background: 'var(--crear-gold)', color: '#111827', fontWeight: 800, cursor: calendarSaving ? 'wait' : 'pointer' }}>{calendarSaving ? 'Guardando…' : 'Guardar en Causa OS'}</button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '.6rem', marginTop: '.8rem' }}>
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '.45rem', fontSize: '.78rem', color: 'var(--text-muted)', cursor: 'pointer', fontWeight: 600 }}>
+              <input
+                type="checkbox"
+                aria-label="Evento de 1 solo día"
+                checked={Boolean(calendarDraft.soloUnDia)}
+                onChange={e => setCalendarDraft(prev => toggleSingleDayMode(prev, e.target.checked))}
+              />
+              Evento de 1 solo día (fecha final automática)
+            </label>
+            <div style={{ display: 'flex', gap: '.5rem' }}>
+              <button onClick={() => setCalendarEditor(null)} style={{ ...selectStyle, width: 'auto', cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={guardarCalendarioOperativo} disabled={calendarSaving} style={{ border: 0, borderRadius: 8, padding: '.5rem .75rem', background: 'var(--crear-gold)', color: '#111827', fontWeight: 800, cursor: calendarSaving ? 'wait' : 'pointer' }}>{calendarSaving ? 'Guardando…' : 'Guardar en Causa OS'}</button>
+            </div>
           </div>
         </div>
         </div>
