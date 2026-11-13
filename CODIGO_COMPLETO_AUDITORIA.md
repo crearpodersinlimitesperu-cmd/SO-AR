@@ -94350,6 +94350,346 @@ export function synchronizeFlyerRows(events, type, today = localCalendarDay()) {
 
 ---
 
+## Archivo: src/utils/reelSoundtrackEngine.js
+
+```js
+/**
+ * reelSoundtrackEngine.js
+ * Motor de audio cinemático en tiempo real (Web Audio API) + Locución personalizada
+ * para los Reels de Enrolamiento de CREAR Poder Sin Límites.
+ */
+
+const SCENE_NOTES = {
+  // Progresión emocional Cmaj9 -> Am9 -> Fmaj7 -> G6 -> Cmaj9
+  1: [130.81, 196.0, 246.94, 293.66], // C3, G3, B3, D4
+  2: [110.0, 164.81, 220.0, 261.63, 329.63], // Am9
+  3: [87.31, 174.61, 220.0, 261.63, 329.63], // Fmaj7
+  4: [98.0, 196.0, 246.94, 293.66, 392.0], // G6 épico
+  5: [130.81, 196.0, 261.63, 329.63, 392.0, 523.25] // Cmaj clímax
+};
+
+export function getSceneForTime(t) {
+  if (t < 4.5) return 1;
+  if (t < 9.0) return 2;
+  if (t < 14.0) return 3;
+  if (t < 18.5) return 4;
+  return 5;
+}
+
+export class ReelSoundtrackEngine {
+  constructor() {
+    this.ctx = null;
+    this.masterGain = null;
+    this.musicGain = null;
+    this.analyser = null;
+    this.mediaDest = null;
+    this.delayNode = null;
+    this.isMuted = false;
+    this.isPlaying = false;
+    this.lastStepIndex = -1;
+    this.lastScene = -1;
+    this.dataArray = null;
+  }
+
+  ensureContext() {
+    if (this.ctx) return true;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return false;
+
+    this.ctx = new AudioCtx();
+    const compressor = this.ctx.createDynamicsCompressor();
+    compressor.threshold.value = -14;
+    compressor.knee.value = 18;
+    compressor.ratio.value = 4;
+
+    this.masterGain = this.ctx.createGain();
+    this.masterGain.gain.value = this.isMuted ? 0 : 0.85;
+
+    this.musicGain = this.ctx.createGain();
+    this.musicGain.gain.value = 0.72;
+
+    this.analyser = this.ctx.createAnalyser();
+    this.analyser.fftSize = 64;
+    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+
+    // Delay estéreo sutil tipo sala épica
+    this.delayNode = this.ctx.createDelay(1.0);
+    this.delayNode.delayTime.value = 0.28;
+    const delayFeedback = this.ctx.createGain();
+    delayFeedback.gain.value = 0.32;
+    const delayFilter = this.ctx.createBiquadFilter();
+    delayFilter.type = 'lowpass';
+    delayFilter.frequency.value = 2200;
+
+    this.delayNode.connect(delayFilter);
+    delayFilter.connect(delayFeedback);
+    delayFeedback.connect(this.delayNode);
+    delayFilter.connect(this.musicGain);
+
+    this.musicGain.connect(compressor);
+    compressor.connect(this.analyser);
+    this.analyser.connect(this.masterGain);
+    this.masterGain.connect(this.ctx.destination);
+
+    if (typeof this.ctx.createMediaStreamDestination === 'function') {
+      this.mediaDest = this.ctx.createMediaStreamDestination();
+      this.analyser.connect(this.mediaDest);
+    }
+
+    return true;
+  }
+
+  async resume() {
+    if (!this.ensureContext()) return false;
+    if (this.ctx.state === 'suspended') {
+      try {
+        await this.ctx.resume();
+      } catch {
+        return false;
+      }
+    }
+    return this.ctx.state === 'running';
+  }
+
+  setMuted(muted) {
+    this.isMuted = Boolean(muted);
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setTargetAtTime(this.isMuted ? 0 : 0.85, this.ctx.currentTime, 0.05);
+    }
+  }
+
+  setDucking(duck) {
+    if (this.musicGain && this.ctx) {
+      this.musicGain.gain.setTargetAtTime(duck ? 0.34 : 0.72, this.ctx.currentTime, 0.15);
+    }
+  }
+
+  setPlaying(playing) {
+    this.isPlaying = Boolean(playing);
+    if (!playing) {
+      this.lastStepIndex = -1;
+      this.lastScene = -1;
+    }
+  }
+
+  getAudioStreamTrack() {
+    if (!this.mediaDest) return null;
+    const tracks = this.mediaDest.stream.getAudioTracks();
+    return tracks[0] || null;
+  }
+
+  getEnergy() {
+    if (!this.analyser || !this.dataArray || this.isMuted || !this.isPlaying) return 0;
+    this.analyser.getByteFrequencyData(this.dataArray);
+    let sum = 0;
+    for (let i = 0; i < this.dataArray.length; i += 1) {
+      sum += this.dataArray[i];
+    }
+    return Math.min(1, sum / (this.dataArray.length * 140));
+  }
+
+  getSpectrumBars(count = 16) {
+    if (!this.analyser || !this.dataArray || this.isMuted || !this.isPlaying) {
+      return new Array(count).fill(0.08);
+    }
+    this.analyser.getByteFrequencyData(this.dataArray);
+    const bars = [];
+    const step = Math.max(1, Math.floor(this.dataArray.length / count));
+    for (let i = 0; i < count; i += 1) {
+      const val = this.dataArray[Math.min(this.dataArray.length - 1, i * step)] || 0;
+      bars.push(Math.max(0.08, Math.min(1, val / 210)));
+    }
+    return bars;
+  }
+
+  // Dispara pulso musical sincronizado con el tiempo `t` (0..23s)
+  tick(t, style = 'epico') {
+    if (!this.isPlaying || !this.ctx || this.ctx.state !== 'running') return;
+
+    const scene = getSceneForTime(t);
+    const stepDuration = style === 'emotivo' ? 0.5 : 0.375; // 120 vs 160 corcheas/min
+    const stepIndex = Math.floor(t / stepDuration);
+
+    if (scene !== this.lastScene) {
+      this.lastScene = scene;
+      this.triggerScenePad(scene, style);
+      if (scene === 4 || scene === 5) {
+        this.triggerImpactBoom(scene === 5 ? 0.48 : 0.35);
+      }
+    }
+
+    if (stepIndex !== this.lastStepIndex) {
+      this.lastStepIndex = stepIndex;
+      const chord = SCENE_NOTES[scene] || SCENE_NOTES[1];
+      const noteFreq = chord[stepIndex % chord.length];
+      this.triggerArpNote(noteFreq * 2, scene >= 4 ? 0.14 : 0.10, style);
+
+      if (scene >= 3 && stepIndex % 2 === 0) {
+        this.triggerPulseKick(scene === 5 ? 0.34 : 0.22);
+      }
+    }
+  }
+
+  triggerScenePad(scene, style) {
+    if (!this.ctx || !this.musicGain) return;
+    const now = this.ctx.currentTime;
+    const chord = SCENE_NOTES[scene] || SCENE_NOTES[1];
+    const duration = scene === 3 ? 4.8 : 4.3;
+
+    chord.slice(0, 4).forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+
+      osc.type = idx === 0 ? 'triangle' : (style === 'epico' && scene >= 4 ? 'sawtooth' : 'sine');
+      osc.frequency.setValueAtTime(freq, now);
+      osc.detune.value = idx % 2 === 0 ? -5 : 5;
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(style === 'emotivo' ? 900 : 1200, now);
+      filter.frequency.exponentialRampToValueAtTime(scene >= 4 ? 2400 : 1500, now + duration * 0.6);
+
+      const peak = idx === 0 ? 0.15 : 0.065;
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(peak, now + 0.65);
+      gain.gain.setValueAtTime(peak * 0.85, now + duration - 0.8);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.musicGain);
+      gain.connect(this.delayNode);
+
+      osc.start(now);
+      osc.stop(now + duration + 0.05);
+    });
+  }
+
+  triggerArpNote(freq, volume = 0.1, style = 'epico') {
+    if (!this.ctx || !this.musicGain) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = style === 'emotivo' ? 'sine' : 'triangle';
+    osc.frequency.setValueAtTime(freq, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(volume, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+
+    osc.connect(gain);
+    gain.connect(this.musicGain);
+    gain.connect(this.delayNode);
+
+    osc.start(now);
+    osc.stop(now + 0.6);
+  }
+
+  triggerPulseKick(volume = 0.25) {
+    if (!this.ctx || !this.musicGain) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(115, now);
+    osc.frequency.exponentialRampToValueAtTime(42, now + 0.18);
+
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
+
+    osc.connect(gain);
+    gain.connect(this.musicGain);
+
+    osc.start(now);
+    osc.stop(now + 0.28);
+  }
+
+  triggerImpactBoom(volume = 0.42) {
+    if (!this.ctx || !this.musicGain) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(34, now + 0.65);
+
+    gain.gain.setValueAtTime(volume, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+
+    osc.connect(gain);
+    gain.connect(this.musicGain);
+
+    osc.start(now);
+    osc.stop(now + 0.95);
+  }
+
+  dispose() {
+    if (this.ctx) {
+      this.ctx.close().catch(() => {});
+      this.ctx = null;
+    }
+  }
+}
+
+/**
+ * Construye el guion hablado personalizado por escena para locución estratégica.
+ */
+export function buildSceneVoiceScript(scene, { nombreImo, nombreEnrolado, ciudad }) {
+  const imo = nombreImo?.trim() || 'Creador Cuántico';
+  const enrolado = nombreEnrolado?.trim() || 'tu enrolado';
+  const sede = ciudad?.trim() || 'tu sede';
+
+  switch (scene) {
+    case 1:
+      return `${imo}, tu visión se hizo realidad. Confiaste en ${enrolado} antes de que el mundo lo viera.`;
+    case 2:
+      return `Este fin de semana en ${sede}, cruza su umbral más poderoso en Capítulo Dos.`;
+    case 3:
+      return `En los Vuelos de C2, nada reemplaza tu mirada en sala. Tú encendiste su fuego.`;
+    case 4:
+      return `Estás convocado a sala. Tu presencia física es el regalo más sagrado para ${enrolado}.`;
+    case 5:
+      return `Nos vemos en sala. Leones con Leones. Gracias, ${imo}.`;
+    default:
+      return '';
+  }
+}
+
+export function speakSpanishLine(text, { onStart, onEnd } = {}) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window) || !text) return;
+  try {
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices() || [];
+    const esVoice = voices.find(v => /es-(PE|EC|CO|MX|419|ES)/i.test(v.lang)) || voices.find(v => /^es/i.test(v.lang));
+    if (esVoice) utter.voice = esVoice;
+    utter.lang = esVoice?.lang || 'es-PE';
+    utter.rate = 0.96;
+    utter.pitch = 0.94;
+    utter.onstart = () => onStart?.();
+    utter.onend = () => onEnd?.();
+    utter.onerror = () => onEnd?.();
+    window.speechSynthesis.speak(utter);
+  } catch {
+    onEnd?.();
+  }
+}
+
+export function stopSpanishSpeech() {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch {}
+  }
+}
+
+```
+
+---
+
 ## Archivo: src/utils/trainerCoherence.js
 
 ```js
@@ -160695,8 +161035,15 @@ import { useTheme } from '../context/ThemeContext';
 import { useUI } from '../context/UIContext';
 import {
   ArrowLeft, Play, Pause, RotateCcw, Download, Share2,
-  Sparkles, Video, Volume2, VolumeX, Eye, Flame, Check, Copy, ExternalLink
+  Sparkles, Video, Volume2, VolumeX, Eye, Flame, Check, Copy, ExternalLink, Mic, MicOff
 } from 'lucide-react';
+import {
+  ReelSoundtrackEngine,
+  getSceneForTime,
+  buildSceneVoiceScript,
+  speakSpanishLine,
+  stopSpanishSpeech
+} from '../utils/reelSoundtrackEngine.js';
 
 const SEDES_VUELOS = [
   { id: 'lim', ciudad: 'Lima', pais: '🇵🇪', fechaC2: 'Viernes 20 y Sábado 21 de Noviembre', lugar: 'Hotel José Antonio Deluxe' },
@@ -160739,15 +161086,24 @@ export default function VideoC2ImoReel() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [currentTime, setCurrentTime] = useState(0); // 0 a 23 segundos
   const [isMuted, setIsMuted] = useState(false);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [enrolmentStyle, setEnrolmentStyle] = useState('epico'); // 'epico' | 'emotivo'
   const [isRecording, setIsRecording] = useState(false);
   const [recordingProgress, setRecordingProgress] = useState(0);
   const [vistaTab, setVistaTab] = useState('moderno'); // 'moderno' | 'original'
 
   const canvasRef = useRef(null);
-  const audioRef = useRef(null);
+  const soundEngineRef = useRef(null);
+  const lastSpokenSceneRef = useRef(-1);
+  const currentTimeRef = useRef(0);
   const animationFrameRef = useRef(null);
   const startTimeRef = useRef(null);
   const particlesRef = useRef([]);
+
+  if (!soundEngineRef.current && typeof window !== 'undefined') {
+    soundEngineRef.current = new ReelSoundtrackEngine();
+  }
 
   const currentSedeObj = SEDES_VUELOS.find(s => s.id === sedeId) || SEDES_VUELOS[0];
   const DURATION = 23.0; // 23 segundos exactos
@@ -160770,19 +161126,59 @@ export default function VideoC2ImoReel() {
     particlesRef.current = particles;
   }, []);
 
-  // Control de audio
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.muted = isMuted;
-      if (isPlaying) {
-        audioRef.current.play().catch(() => {});
-      } else {
-        audioRef.current.pause();
-      }
+  // Control de motor de audio cinemático + locución personalizada
+  const unlockAndPlayAudio = async () => {
+    const engine = soundEngineRef.current;
+    if (!engine) return false;
+    const ok = await engine.resume();
+    if (ok) {
+      setAudioUnlocked(true);
+      engine.setMuted(isMuted);
+      engine.setPlaying(isPlaying);
     }
-  }, [isPlaying, isMuted]);
+    return ok;
+  };
 
-  // Motor de animación en Canvas 1080x1920
+  useEffect(() => {
+    const engine = soundEngineRef.current;
+    if (!engine) return undefined;
+    engine.setMuted(isMuted);
+    engine.setPlaying(isPlaying && vistaTab === 'moderno');
+    if (!isPlaying || isMuted || !voiceEnabled) {
+      stopSpanishSpeech();
+      engine.setDucking(false);
+    }
+    return undefined;
+  }, [isPlaying, isMuted, vistaTab, voiceEnabled]);
+
+  useEffect(() => {
+    return () => {
+      stopSpanishSpeech();
+      soundEngineRef.current?.dispose();
+    };
+  }, []);
+
+  // Sincronía de locución estratégica por escena cuando voiceEnabled está activo
+  useEffect(() => {
+    if (!voiceEnabled || !isPlaying || isMuted || vistaTab !== 'moderno' || isRecording) {
+      return;
+    }
+    const scene = getSceneForTime(currentTime);
+    if (scene !== lastSpokenSceneRef.current) {
+      lastSpokenSceneRef.current = scene;
+      const script = buildSceneVoiceScript(scene, {
+        nombreImo,
+        nombreEnrolado,
+        ciudad: currentSedeObj.ciudad
+      });
+      speakSpanishLine(script, {
+        onStart: () => soundEngineRef.current?.setDucking(true),
+        onEnd: () => soundEngineRef.current?.setDucking(false)
+      });
+    }
+  }, [currentTime, voiceEnabled, isPlaying, isMuted, vistaTab, isRecording, nombreImo, nombreEnrolado, currentSedeObj.ciudad]);
+
+  // Motor de animación en Canvas 1080x1920 + tick de audio
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -160797,49 +161193,86 @@ export default function VideoC2ImoReel() {
 
       if (isPlaying && !isRecording) {
         setCurrentTime(prev => {
-          const next = prev + delta;
-          if (next >= DURATION) {
-            return 0; // Loop continuo
-          }
+          const next = prev + delta >= DURATION ? 0 : prev + delta;
+          currentTimeRef.current = next;
+          soundEngineRef.current?.tick(next, enrolmentStyle);
           return next;
         });
       }
 
-      drawFrame(ctx, currentTime);
+      drawFrame(ctx, currentTimeRef.current || currentTime);
       animationFrameRef.current = requestAnimationFrame(render);
     };
 
     animationFrameRef.current = requestAnimationFrame(render);
     return () => cancelAnimationFrame(animationFrameRef.current);
-  }, [isPlaying, currentTime, isRecording, sedeId, nombreImo, nombreEnrolado]);
+  }, [isPlaying, currentTime, isRecording, sedeId, nombreImo, nombreEnrolado, enrolmentStyle]);
+
+  const easeOutCubic = (x) => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
+
+  const drawGlassPill = (ctx, x, y, w, h, radius, fill, stroke) => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(x - w / 2, y - h / 2, w, h, radius);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    ctx.restore();
+  };
 
   // Función de renderizado cinemático
   const drawFrame = (ctx, t) => {
     ctx.clearRect(0, 0, 1080, 1920);
+    const audioEnergy = soundEngineRef.current?.getEnergy() || 0;
+    const isEpico = enrolmentStyle === 'epico';
 
     // 1. FONDO CÓSMICO PROFUNDO CON GRADIENTE DINÁMICO
-    const bgPulse = Math.sin(t * 1.5) * 0.08;
-    const grad = ctx.createRadialGradient(540, 960, 100, 540, 960, 1100);
-    grad.addColorStop(0, `rgba(20, 32, 65, ${0.95 + bgPulse})`);
-    grad.addColorStop(0.45, `rgba(10, 16, 35, ${0.98 + bgPulse})`);
+    const bgPulse = Math.sin(t * 1.5) * 0.06 + audioEnergy * 0.14;
+    const grad = ctx.createRadialGradient(540, 920, 80, 540, 920, 1150);
+    grad.addColorStop(0, isEpico
+      ? `rgba(30, 41, 82, ${0.96 + bgPulse})`
+      : `rgba(22, 36, 72, ${0.95 + bgPulse})`);
+    grad.addColorStop(0.45, `rgba(9, 15, 34, ${0.98 + bgPulse * 0.5})`);
     grad.addColorStop(0.85, '#040711');
     grad.addColorStop(1, '#000206');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 1080, 1920);
 
-    // 2. NEBULOSA ENERGÉTICA DORADA / CIAN
-    const nebX = 540 + Math.cos(t * 0.8) * 60;
-    const nebY = 820 + Math.sin(t * 0.6) * 40;
-    const nebGrad = ctx.createRadialGradient(nebX, nebY, 40, nebX, nebY, 420);
-    nebGrad.addColorStop(0, 'rgba(245, 158, 11, 0.18)');
-    nebGrad.addColorStop(0.5, 'rgba(14, 165, 233, 0.12)');
+    // 2. NEBULOSA ENERGÉTICA DORADA / CIAN REACTIVA AL AUDIO
+    const nebX = 540 + Math.cos(t * 0.8) * 70;
+    const nebY = 820 + Math.sin(t * 0.6) * 50;
+    const nebGrad = ctx.createRadialGradient(nebX, nebY, 40, nebX, nebY, 460 + audioEnergy * 160);
+    nebGrad.addColorStop(0, isEpico ? `rgba(245, 158, 11, ${0.22 + audioEnergy * 0.18})` : `rgba(56, 189, 248, ${0.2 + audioEnergy * 0.14})`);
+    nebGrad.addColorStop(0.5, isEpico ? 'rgba(14, 165, 233, 0.14)' : 'rgba(245, 158, 11, 0.14)');
     nebGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = nebGrad;
     ctx.fillRect(0, 0, 1080, 1920);
 
+    // 2B. ANILLOS CUÁNTICOS ROTATORIOS (HALO DE ENROLAMIENTO)
+    ctx.save();
+    ctx.translate(540, 820);
+    ctx.rotate(t * 0.18);
+    ctx.strokeStyle = `rgba(245, 158, 11, ${0.14 + audioEnergy * 0.25})`;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([18, 22]);
+    ctx.beginPath();
+    ctx.arc(0, 0, 340 + audioEnergy * 35, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.rotate(-t * 0.34);
+    ctx.strokeStyle = `rgba(56, 189, 248, ${0.12 + audioEnergy * 0.2})`;
+    ctx.setLineDash([10, 28]);
+    ctx.beginPath();
+    ctx.arc(0, 0, 420 + audioEnergy * 25, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+
     // 3. PARTÍCULAS Y CHISPAS FLOTANTES (60 FPS)
     particlesRef.current.forEach(p => {
-      p.y += p.speedY;
+      p.y += p.speedY * (1 + audioEnergy * 1.4);
       p.x += p.speedX;
       if (p.y < 0) p.y = 1920;
       if (p.x < 0) p.x = 1080;
@@ -160847,12 +161280,12 @@ export default function VideoC2ImoReel() {
 
       const alpha = p.opacity + Math.sin(t * 5 + p.x) * 0.2;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, p.radius * (1 + audioEnergy * 0.4), 0, Math.PI * 2);
       ctx.fillStyle = p.isSpark
         ? `rgba(255, 193, 7, ${Math.max(0.1, alpha)})`
         : `rgba(255, 255, 255, ${Math.max(0.1, alpha * 0.8)})`;
       ctx.shadowColor = p.isSpark ? 'rgba(255, 193, 7, 0.8)' : 'rgba(255, 255, 255, 0.5)';
-      ctx.shadowBlur = p.isSpark ? 10 : 4;
+      ctx.shadowBlur = p.isSpark ? 12 : 4;
       ctx.fill();
     });
     ctx.shadowBlur = 0;
@@ -160870,15 +161303,26 @@ export default function VideoC2ImoReel() {
     ctx.fillText('Poder sin límites', 540, 160);
     ctx.restore();
 
-    // 5. BARRA DE PROGRESO DE STORIES (TOP)
-    const progressW = (t / DURATION) * 960;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
-    ctx.fillRect(60, 50, 960, 6);
-    ctx.fillStyle = '#f59e0b';
-    ctx.shadowColor = 'rgba(245, 158, 11, 0.8)';
-    ctx.shadowBlur = 8;
-    ctx.fillRect(60, 50, progressW, 6);
-    ctx.shadowBlur = 0;
+    // 5. BARRA DE PROGRESO SEGMENTADA DE STORIES (5 ESCENAS)
+    const sceneBounds = [0, 4.5, 9.0, 14.0, 18.5, 23.0];
+    const segGap = 12;
+    const totalW = 960;
+    const segW = (totalW - segGap * 4) / 5;
+    for (let s = 0; s < 5; s += 1) {
+      const sx = 60 + s * (segW + segGap);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+      ctx.fillRect(sx, 50, segW, 6);
+      const start = sceneBounds[s];
+      const end = sceneBounds[s + 1];
+      const pct = Math.max(0, Math.min(1, (t - start) / (end - start)));
+      if (pct > 0) {
+        ctx.fillStyle = '#f59e0b';
+        ctx.shadowColor = 'rgba(245, 158, 11, 0.85)';
+        ctx.shadowBlur = 8;
+        ctx.fillRect(sx, 50, segW * pct, 6);
+        ctx.shadowBlur = 0;
+      }
+    }
 
     // 6. CONTROL SECUENCIAL DE ESCENAS
     if (t < 4.5) {
@@ -160892,6 +161336,24 @@ export default function VideoC2ImoReel() {
     } else {
       renderEscena5(ctx, t - 18.5);
     }
+
+    // 6B. VISUALIZADOR DE AUDIO REACTIVO EN TIEMPO REAL
+    const bars = soundEngineRef.current?.getSpectrumBars(18) || new Array(18).fill(0.12);
+    ctx.save();
+    const barW = 10;
+    const barGap = 12;
+    const totalBarsW = bars.length * (barW + barGap) - barGap;
+    const startBarX = 540 - totalBarsW / 2;
+    bars.forEach((level, idx) => {
+      const bh = 10 + level * 46;
+      const bx = startBarX + idx * (barW + barGap);
+      const by = 1755 - bh / 2;
+      ctx.fillStyle = idx % 2 === 0 ? 'rgba(245, 158, 11, 0.85)' : 'rgba(56, 189, 248, 0.85)';
+      ctx.beginPath();
+      ctx.roundRect(bx, by, barW, bh, 5);
+      ctx.fill();
+    });
+    ctx.restore();
 
     // 7. FOOTER COMÚN: HASHTAG Y SEDE
     ctx.save();
@@ -160913,59 +161375,58 @@ export default function VideoC2ImoReel() {
 
   // ESCENA 1: EL LLAMADO DEL CREADOR CUÁNTICO
   const renderEscena1 = (ctx, t) => {
-    const scale = Math.min(1, t * 1.5);
-    const alpha = Math.min(1, t * 2);
+    const enter = easeOutCubic(t / 0.85);
+    const yOffset = (1 - enter) * 40;
 
     ctx.save();
-    ctx.globalAlpha = alpha;
+    ctx.globalAlpha = enter;
 
-    // Badge superior
-    ctx.font = '700 20px "Inter", sans-serif';
+    drawGlassPill(ctx, 540, 470 + yOffset, 640, 62, 31, 'rgba(56, 189, 248, 0.14)', 'rgba(56, 189, 248, 0.55)');
+    ctx.font = '800 21px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '3px';
     ctx.fillStyle = '#38bdf8';
     ctx.textAlign = 'center';
-    ctx.fillText('⚡ MENSAJE URGENTE PARA EL IMO ⚡', 540, 580);
+    ctx.fillText('⚡ MENSAJE PERSONALIZADO PARA TI ⚡', 540, 478 + yOffset);
 
-    // Saludo Personalizado
     const imoGreeting = nombreImo ? `¡${nombreImo.toUpperCase()}!` : '¡CREADOR CUÁNTICO!';
-    ctx.font = '900 68px "Montserrat", sans-serif';
+    ctx.font = '900 74px "Montserrat", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '2px';
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
-    ctx.shadowBlur = 20;
-    ctx.fillText(imoGreeting, 540, 700);
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.65)';
+    ctx.shadowBlur = 22;
+    ctx.fillText(imoGreeting, 540, 620 + yOffset);
 
-    // Subtítulo Impactante
-    ctx.font = '800 48px "Montserrat", sans-serif';
+    ctx.font = '800 44px "Montserrat", sans-serif';
     ctx.fillStyle = '#f59e0b';
-    ctx.shadowColor = 'rgba(245, 158, 11, 0.7)';
+    ctx.shadowColor = 'rgba(245, 158, 11, 0.75)';
     ctx.shadowBlur = 24;
-    ctx.fillText('TU VISIÓN SE HIZO REALIDAD', 540, 810);
+    ctx.fillText(enrolmentStyle === 'epico' ? 'TU DECISIÓN CREÓ UN MILAGRO' : 'TU VISIÓN SE HIZO REALIDAD', 540, 720 + yOffset);
 
-    // Párrafo emotivo
-    ctx.font = '500 32px "Inter", sans-serif';
+    const enroladoLabel = nombreEnrolado ? nombreEnrolado.toUpperCase() : 'TU ENROLADO EN C2';
+    drawGlassPill(ctx, 540, 865 + yOffset, 760, 110, 22, 'rgba(245, 158, 11, 0.12)', 'rgba(245, 158, 11, 0.5)');
+    ctx.shadowBlur = 0;
+    ctx.font = '700 22px "Inter", sans-serif';
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillText(`IMO: ${nombreImo ? nombreImo.toUpperCase() : 'TÚ'}  ━━⚡━━  ${enroladoLabel}`, 540, 855 + yOffset);
+    ctx.font = '500 24px "Inter", sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.fillText('Confiaste antes de que el mundo lo viera.', 540, 895 + yOffset);
+
+    ctx.font = '500 31px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
-    ctx.shadowBlur = 0;
-    const enroladoText = nombreEnrolado ? `a ${nombreEnrolado}` : 'a alguien muy importante en tu vida';
-    ctx.fillText(`Enrolaste ${enroladoText}`, 540, 930);
-    ctx.fillText('y hoy su transformación está en marcha.', 540, 980);
-
-    // Línea de fuego decorativa
-    ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(340, 1050);
-    ctx.lineTo(740, 1050);
-    ctx.stroke();
+    ctx.fillText('Hoy su transformación ya está en marcha', 540, 1020 + yOffset);
+    ctx.fillText('y el cierre de su vuelo te necesita en sala.', 540, 1070 + yOffset);
 
     ctx.restore();
   };
 
   // ESCENA 2: EL SIGUIENTE NIVEL — CAPÍTULO DOS
   const renderEscena2 = (ctx, t) => {
+    const enter = easeOutCubic(t / 0.8);
     const pulse = Math.sin(t * 4) * 6;
     ctx.save();
+    ctx.globalAlpha = enter;
 
     ctx.font = '700 22px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '4px';
@@ -160973,15 +161434,13 @@ export default function VideoC2ImoReel() {
     ctx.textAlign = 'center';
     ctx.fillText('ESTE FIN DE SEMANA CRUZA EL UMBRAL', 540, 560);
 
-    // Contorno FUEGO
     ctx.font = '900 150px "Montserrat", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '18px';
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
     ctx.lineWidth = 2;
     ctx.strokeText('FUEGO', 540, 780);
 
-    // Título CAPÍTULO DOS
-    ctx.font = '900 82px "Montserrat", sans-serif';
+    ctx.font = '900 84px "Montserrat", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '8px';
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(245, 158, 11, 0.9)';
@@ -160993,7 +161452,6 @@ export default function VideoC2ImoReel() {
     ctx.shadowBlur = 15;
     ctx.fillText('PODER SIN LÍMITES', 540, 860);
 
-    // Descripción
     ctx.font = '500 32px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
@@ -161001,104 +161459,113 @@ export default function VideoC2ImoReel() {
     ctx.fillText('El entrenamiento donde se rompen', 540, 970);
     ctx.fillText('todos los patrones del pasado.', 540, 1020);
 
-    // Fecha de sede
-    ctx.font = '700 30px "Inter", sans-serif';
+    drawGlassPill(ctx, 540, 1130, 760, 76, 18, 'rgba(56, 189, 248, 0.12)', 'rgba(56, 189, 248, 0.45)');
+    ctx.font = '700 28px "Inter", sans-serif';
     ctx.fillStyle = '#38bdf8';
-    ctx.fillText(`📅 ${currentSedeObj.fechaC2}`, 540, 1120);
+    ctx.fillText(`📅 ${currentSedeObj.fechaC2}`, 540, 1140);
 
     ctx.restore();
   };
 
   // ESCENA 3: LA DINÁMICA DE VUELOS
   const renderEscena3 = (ctx, t) => {
+    const enter = easeOutCubic(t / 0.8);
     ctx.save();
+    ctx.globalAlpha = enter;
 
     ctx.font = '700 22px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '4px';
     ctx.fillStyle = '#38bdf8';
     ctx.textAlign = 'center';
-    ctx.fillText('EL MOMENTO CUMBRE DE SU PROCESO', 540, 550);
+    ctx.fillText('EL MOMENTO CUMBRE DE SU PROCESO', 540, 540);
 
     ctx.font = '800 46px "Montserrat", sans-serif';
     ctx.fillStyle = '#ffffff';
-    ctx.fillText('TÚ ENCENDISTE SU FUEGO', 540, 650);
+    ctx.fillText('TÚ ENCENDISTE SU FUEGO', 540, 640);
 
-    // Titulo VUELOS con Glow Cósmico
     ctx.font = '900 96px "Montserrat", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '12px';
     ctx.fillStyle = '#f59e0b';
     ctx.shadowColor = 'rgba(245, 158, 11, 0.95)';
     ctx.shadowBlur = 35;
-    ctx.fillText('VUELOS C2', 540, 780);
+    ctx.fillText('VUELOS C2', 540, 770);
 
-    ctx.font = '800 38px "Montserrat", sans-serif';
+    ctx.font = '800 36px "Montserrat", sans-serif';
     ctx.fillStyle = '#ffffff';
     ctx.shadowBlur = 15;
-    ctx.fillText('Y TÚ SERÁS QUIEN LO LLEVE EN ESE VUELO', 540, 870);
+    ctx.fillText('NADA REEMPLAZA TU MIRADA EN SALA', 540, 865);
 
-    // Texto de fondo espiritual / transformacional
+    const person = nombreEnrolado ? nombreEnrolado : 'tu enrolado';
     ctx.font = '500 31px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.shadowBlur = 0;
-    ctx.fillText('Tu amor, tu creencia y tu respaldo', 540, 980);
-    ctx.fillText('lo sostendrán en el momento más sublime.', 540, 1030);
+    ctx.fillText(`Cuando ${person} abra los ojos y te vea ahí,`, 540, 975);
+    ctx.fillText('sabrá que su respaldo es real e inquebrantable.', 540, 1025);
 
     ctx.restore();
   };
 
   // ESCENA 4: LA CONVOCATORIA EN SALA
   const renderEscena4 = (ctx, t) => {
+    const enter = easeOutCubic(t / 0.7);
     const pulse = Math.sin(t * 6) * 4;
     ctx.save();
+    ctx.globalAlpha = enter;
 
-    ctx.font = '700 22px "Inter", sans-serif';
+    drawGlassPill(ctx, 540, 515, 560, 56, 28, 'rgba(245, 158, 11, 0.18)', 'rgba(245, 158, 11, 0.7)');
+    ctx.font = '800 22px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '4px';
-    ctx.fillStyle = '#f59e0b';
+    ctx.fillStyle = '#fbbf24';
     ctx.textAlign = 'center';
-    ctx.fillText('CONVOCATORIA OBLIGATORIA', 540, 540);
+    ctx.fillText('CONVOCATORIA OFICIAL VIP', 540, 523);
 
     ctx.font = '900 70px "Montserrat", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '3px';
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
     ctx.shadowBlur = 20;
-    ctx.fillText('¡ESTÁS CONVOCADO', 540, 660);
-    ctx.fillText('A SALA!', 540, 740);
+    ctx.fillText('¡ESTÁS CONVOCADO', 540, 645);
+    ctx.fillText('A SALA!', 540, 725);
 
     ctx.font = '800 38px "Montserrat", sans-serif';
     ctx.fillStyle = '#38bdf8';
     ctx.shadowColor = 'rgba(56, 189, 248, 0.8)';
     ctx.shadowBlur = 20 + pulse;
-    ctx.fillText('NO DEJES QUE TE LO CUENTEN', 540, 840);
+    ctx.fillText(enrolmentStyle === 'epico' ? 'SÉ EL VIENTO BAJO SUS ALAS' : 'NO DEJES QUE TE LO CUENTEN', 540, 825);
 
-    ctx.font = '500 32px "Inter", sans-serif';
+    ctx.font = '500 31px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
     ctx.shadowBlur = 0;
-    ctx.fillText('Tu presencia física en la sala', 540, 950);
-    ctx.fillText('es el regalo más sagrado para tu enrolado.', 540, 1000);
+    ctx.fillText('Tu presencia física en la sala es', 540, 925);
+    ctx.fillText('el regalo más sagrado para tu enrolado.', 540, 975);
 
-    // Lugar de Sede
-    ctx.font = '700 30px "Inter", sans-serif';
+    // Tarjeta VIP Sede + Lugar + Fecha
+    drawGlassPill(ctx, 540, 1125, 820, 130, 24, 'rgba(15, 23, 42, 0.78)', 'rgba(245, 158, 11, 0.65)');
+    ctx.font = '800 30px "Inter", sans-serif';
     ctx.fillStyle = '#f59e0b';
-    ctx.fillText(`📍 ${currentSedeObj.lugar}`, 540, 1100);
+    ctx.fillText(`📍 ${currentSedeObj.lugar}`, 540, 1110);
+    ctx.font = '600 24px "Inter", sans-serif';
+    ctx.fillStyle = '#e2e8f0';
+    ctx.fillText(`📅 ${currentSedeObj.fechaC2}`, 540, 1158);
 
     ctx.restore();
   };
 
   // ESCENA 5: CLÍMAX — LEONES CON LEONES
   const renderEscena5 = (ctx, t) => {
+    const enter = easeOutCubic(t / 0.75);
     ctx.save();
+    ctx.globalAlpha = enter;
 
     ctx.font = '800 26px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '6px';
     ctx.fillStyle = '#38bdf8';
     ctx.textAlign = 'center';
-    ctx.fillText('¡NOS VEMOS ESTE FIN DE SEMANA!', 540, 550);
+    ctx.fillText('¡NOS VEMOS EN SALA!', 540, 550);
 
-    // Titulo Legendario LEONES CON LEONES
-    ctx.font = '900 92px "Montserrat", sans-serif';
+    ctx.font = '900 94px "Montserrat", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '10px';
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(245, 158, 11, 0.95)';
@@ -161109,25 +161576,24 @@ export default function VideoC2ImoReel() {
     ctx.fillStyle = '#f59e0b';
     ctx.fillText('— CON —', 540, 780);
 
-    ctx.font = '900 92px "Montserrat", sans-serif';
+    ctx.font = '900 94px "Montserrat", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '10px';
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(245, 158, 11, 0.95)';
     ctx.shadowBlur = 40;
     ctx.fillText('LEONES', 540, 890);
 
-    // Frase final de gratitud
     ctx.font = '600 32px "Inter", sans-serif';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
     ctx.shadowBlur = 0;
-    ctx.fillText('Gracias por ser ese IMO', 540, 1010);
-    ctx.fillText('que todos anhelamos tener.', 540, 1060);
+    ctx.fillText(`Gracias${nombreImo ? `, ${nombreImo}` : ''}, por ser ese IMO`, 540, 1010);
+    ctx.fillText('que transforma vidas con su ejemplo.', 540, 1060);
 
     ctx.restore();
   };
 
-  // GRABAR Y DESCARGAR VIDEO HD (1080x1920) CON MediaRecorder
+  // GRABAR Y DESCARGAR VIDEO HD (1080x1920) CON AUDIO CINEMÁTICO INTEGRADO
   const handleDownloadVideo = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -161138,19 +161604,29 @@ export default function VideoC2ImoReel() {
     }
 
     try {
+      await unlockAndPlayAudio();
       setIsRecording(true);
       setIsPlaying(false);
       setCurrentTime(0);
-      showToast?.('Preparando grabación en Alta Definición 1080x1920 (23s)...', 'info');
+      currentTimeRef.current = 0;
+      soundEngineRef.current?.setPlaying(true);
+      showToast?.('Grabando Reel HD 1080×1920 con banda sonora cinemática (23s)...', 'info');
 
-      const stream = canvas.captureStream(60);
+      const canvasStream = canvas.captureStream(60);
+      const audioTrack = soundEngineRef.current?.getAudioStreamTrack();
+      const combinedStream = audioTrack
+        ? new MediaStream([...canvasStream.getVideoTracks(), audioTrack])
+        : canvasStream;
+
       const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')
         ? 'video/mp4;codecs=avc1'
+        : MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+        ? 'video/webm;codecs=vp9,opus'
         : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
         ? 'video/webm;codecs=vp9'
         : 'video/webm';
 
-      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8000000 });
+      const recorder = new MediaRecorder(combinedStream, { mimeType, videoBitsPerSecond: 8000000 });
       const chunks = [];
 
       recorder.ondataavailable = e => {
@@ -161168,22 +161644,24 @@ export default function VideoC2ImoReel() {
         URL.revokeObjectURL(url);
         setIsRecording(false);
         setIsPlaying(true);
-        showToast?.('¡Video descargado exitosamente listo para WhatsApp y Stories!', 'success');
+        showToast?.('¡Reel HD con audio cinemático descargado listo para WhatsApp y Stories!', 'success');
       };
 
       recorder.start();
 
       const ctx = canvas.getContext('2d');
-      const totalFrames = Math.floor(DURATION * 60);
-      let frame = 0;
+      const startMs = performance.now();
 
-      const recordStep = () => {
-        const t = frame / 60;
+      const recordStep = (nowMs) => {
+        const elapsedSec = (nowMs - startMs) / 1000;
+        const t = Math.min(DURATION, elapsedSec);
+        currentTimeRef.current = t;
+        soundEngineRef.current?.tick(t, enrolmentStyle);
         drawFrame(ctx, t);
-        setRecordingProgress(Math.round((frame / totalFrames) * 100));
-        frame++;
+        setCurrentTime(t);
+        setRecordingProgress(Math.min(100, Math.round((t / DURATION) * 100)));
 
-        if (frame <= totalFrames) {
+        if (elapsedSec < DURATION) {
           requestAnimationFrame(recordStep);
         } else {
           recorder.stop();
@@ -161251,9 +161729,6 @@ export default function VideoC2ImoReel() {
       fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       padding: '1.5rem 2rem 4rem 2rem'
     }}>
-      {/* Audio ambiental */}
-      <audio ref={audioRef} loop src="/lion-roar.mp3" preload="auto" />
-
       <div style={{ maxWidth: '1440px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
 
         {/* HEADER COCKPIT */}
@@ -161466,6 +161941,96 @@ export default function VideoC2ImoReel() {
                   Lugar de Convocatoria: {currentSedeObj.lugar}
                 </div>
               </div>
+
+              {/* TONO ESTRATÉGICO + BANDA SONORA & LOCUCIÓN IA */}
+              <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.6rem', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => setEnrolmentStyle('epico')}
+                    style={{
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '10px',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: enrolmentStyle === 'epico' ? 'none' : `1px solid ${themeStyles.cardBorder}`,
+                      background: enrolmentStyle === 'epico' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'transparent',
+                      color: enrolmentStyle === 'epico' ? '#000' : themeStyles.textTitle
+                    }}
+                  >
+                    🔥 Épico & Urgente
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEnrolmentStyle('emotivo')}
+                    style={{
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '10px',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: enrolmentStyle === 'emotivo' ? 'none' : `1px solid ${themeStyles.cardBorder}`,
+                      background: enrolmentStyle === 'emotivo' ? 'linear-gradient(135deg, #38bdf8, #0284c7)' : 'transparent',
+                      color: enrolmentStyle === 'emotivo' ? '#000' : themeStyles.textTitle
+                    }}
+                  >
+                    ✨ Sagrado & Emotivo
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await unlockAndPlayAudio();
+                      if (isMuted) setIsMuted(false);
+                      showToast?.('🎵 Banda sonora cinemática activada', 'success');
+                    }}
+                    style={{
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '10px',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: `1px solid ${audioUnlocked && !isMuted ? '#22c55e' : 'rgba(245,158,11,0.5)'}`,
+                      background: audioUnlocked && !isMuted ? 'rgba(34,197,94,0.16)' : 'rgba(245,158,11,0.16)',
+                      color: audioUnlocked && !isMuted ? '#4ade80' : '#fbbf24',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem'
+                    }}
+                  >
+                    {audioUnlocked && !isMuted ? <Volume2 size={14} /> : <VolumeX size={14} />}
+                    {audioUnlocked && !isMuted ? 'Audio Cinemático Activo' : 'Activar Sonido Épico'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await unlockAndPlayAudio();
+                      lastSpokenSceneRef.current = -1;
+                      setVoiceEnabled(prev => !prev);
+                    }}
+                    style={{
+                      padding: '0.45rem 0.85rem',
+                      borderRadius: '10px',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: `1px solid ${voiceEnabled ? '#38bdf8' : themeStyles.cardBorder}`,
+                      background: voiceEnabled ? 'rgba(56,189,248,0.18)' : 'transparent',
+                      color: voiceEnabled ? '#38bdf8' : themeStyles.textTitle,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem'
+                    }}
+                  >
+                    {voiceEnabled ? <Mic size={14} /> : <MicOff size={14} />}
+                    {voiceEnabled ? 'Voz Personalizada ON' : 'Voz Personalizada OFF'}
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* CARD 2: MENSAJE OFICIAL PARA WHATSAPP */}
@@ -161641,7 +162206,11 @@ Tú encendiste su fuego; ahora te toca ser el viento bajo sus alas en el momento
                       display: 'flex', gap: '0.4rem'
                     }}>
                       <button
-                        onClick={() => setIsMuted(prev => !prev)}
+                        onClick={async () => {
+                          await unlockAndPlayAudio();
+                          setIsMuted(prev => !prev);
+                        }}
+                        title={isMuted ? 'Activar banda sonora cinemática' : 'Silenciar'}
                         style={{
                           width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,0,0,0.6)',
                           border: '1px solid rgba(255,255,255,0.3)', color: '#ffffff', cursor: 'pointer',
@@ -161651,7 +162220,11 @@ Tú encendiste su fuego; ahora te toca ser el viento bajo sus alas en el momento
                         {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
                       </button>
                       <button
-                        onClick={() => setIsPlaying(prev => !prev)}
+                        onClick={async () => {
+                          await unlockAndPlayAudio();
+                          setIsPlaying(prev => !prev);
+                        }}
+                        title={isPlaying ? 'Pausar' : 'Reproducir'}
                         style={{
                           width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(245, 158, 11, 0.85)',
                           border: 'none', color: '#000000', cursor: 'pointer',
