@@ -3304,7 +3304,7 @@ export default function Home() {
 
                     if (selectedTrainingTypes.length > 0) {
                       displayEvents = displayEvents.filter(ev =>
-                        matchesSelectedTrainingTypes(ev.nombre || ev.name || '', selectedTrainingTypes)
+                        matchesSelectedTrainingTypes(ev.nombre || ev.name || ev.titulo || ev.title || ev.tipo || '', selectedTrainingTypes)
                       );
                     }
 

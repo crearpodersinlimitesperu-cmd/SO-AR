@@ -7,10 +7,13 @@ export const TRAINING_FILTER_TYPES = [
   { id: 'C1', label: 'Capítulo 1' },
   { id: 'C2', label: 'Capítulo 2' },
   { id: 'MJ', label: 'Maestría del Juego' },
+  { id: 'VIAJE', label: 'El Viaje' },
   { id: 'CAMINATA', label: 'Caminata sobre Fuego' },
   { id: 'TANQUE', label: 'Tanque' },
-  { id: 'CONFIANZA', label: 'Noche de Confianza' },
-  { id: 'VIAJE', label: 'Viajes / Retiros' },
+  { id: 'CONFIANZA', label: 'Caída de Confianza' },
+  { id: 'ROMPIMIENTO', label: 'Rompimiento de Barreras' },
+  { id: 'IMPACTO', label: 'Impactos' },
+  { id: 'REVISION', label: 'Revisión de FI' },
   { id: 'OTROS', label: 'Otros Especiales' }
 ];
 
@@ -28,26 +31,34 @@ export function matchesTrainingType(eventName, typeId) {
       return name.includes('CAPITULO DOS') || /\bCAPITULO\s*2\b/.test(name) || /\bC2\b/.test(name);
     case 'MJ':
       return name.includes('MAESTRIA') || /\bMJ\b/.test(name);
+    case 'VIAJE':
+      return name.includes('VIAJE');
     case 'CAMINATA':
       return name.includes('CAMINATA') || name.includes('FIREWALK') || name.includes('FUEGO');
     case 'TANQUE':
       return name.includes('TANQUE');
     case 'CONFIANZA':
       return name.includes('CONFIANZA');
-    case 'VIAJE':
-      return name.includes('VIAJE') || name.includes('RETIRO');
+    case 'ROMPIMIENTO':
+      return name.includes('ROMPIMIENTO');
+    case 'IMPACTO':
+      return name.includes('IMPACTO');
+    case 'REVISION':
+      return name.includes('REVISION');
     case 'OTROS':
       return !name.includes('CAPITULO') &&
         !/\bC[12]\b/.test(name) &&
         !name.includes('MAESTRIA') &&
         !/\bMJ\b/.test(name) &&
         !name.includes('VIAJE') &&
-        !name.includes('RETIRO') &&
         !name.includes('CAMINATA') &&
         !name.includes('FIREWALK') &&
         !name.includes('FUEGO') &&
         !name.includes('TANQUE') &&
-        !name.includes('CONFIANZA');
+        !name.includes('CONFIANZA') &&
+        !name.includes('ROMPIMIENTO') &&
+        !name.includes('IMPACTO') &&
+        !name.includes('REVISION');
     default:
       return true;
   }

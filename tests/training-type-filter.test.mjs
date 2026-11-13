@@ -7,55 +7,61 @@ import {
   formatSelectedTrainingLabel,
 } from '../src/utils/trainingTypeFilter.js';
 
-test('TRAINING_FILTER_TYPES incluye opciones individuales para cada entrenamiento', () => {
+test('TRAINING_FILTER_TYPES incluye opciones individuales reales (incluyendo El Viaje)', () => {
   const ids = TRAINING_FILTER_TYPES.map((item) => item.id);
   assert.deepEqual(ids, [
     'C1',
     'C2',
     'MJ',
+    'VIAJE',
     'CAMINATA',
     'TANQUE',
     'CONFIANZA',
-    'VIAJE',
+    'ROMPIMIENTO',
+    'IMPACTO',
+    'REVISION',
     'OTROS',
   ]);
+  const viaje = TRAINING_FILTER_TYPES.find((item) => item.id === 'VIAJE');
+  assert.equal(viaje?.label, 'El Viaje');
 });
 
 test('matchesSelectedTrainingTypes con array vacio retorna true para todos', () => {
-  assert.equal(matchesSelectedTrainingTypes('Tanque', []), true);
-  assert.equal(matchesSelectedTrainingTypes('Caminata sobre Fuego', []), true);
-  assert.equal(matchesSelectedTrainingTypes('Capítulo 1', []), true);
+  assert.equal(matchesSelectedTrainingTypes('TANQUE', []), true);
+  assert.equal(matchesSelectedTrainingTypes('CAMINATA SOBRE FUEGO', []), true);
+  assert.equal(matchesSelectedTrainingTypes('EL VIAJE', []), true);
 });
 
-test('matchesSelectedTrainingTypes filtra cada entrenamiento de manera individual', () => {
-  assert.equal(matchesSelectedTrainingTypes('Tanque Lima', ['TANQUE']), true);
-  assert.equal(matchesSelectedTrainingTypes('Caminata sobre Fuego', ['TANQUE']), false);
+test('matchesSelectedTrainingTypes filtra cada entrenamiento real de manera individual', () => {
+  assert.equal(matchesSelectedTrainingTypes('TANQUE', ['TANQUE']), true);
+  assert.equal(matchesSelectedTrainingTypes('CAMINATA SOBRE FUEGO', ['TANQUE']), false);
 
-  assert.equal(matchesSelectedTrainingTypes('Caminata sobre Fuego', ['CAMINATA']), true);
-  assert.equal(matchesSelectedTrainingTypes('Firewalk VIP', ['CAMINATA']), true);
-  assert.equal(matchesSelectedTrainingTypes('Tanque Lima', ['CAMINATA']), false);
+  assert.equal(matchesSelectedTrainingTypes('CAMINATA SOBRE FUEGO', ['CAMINATA']), true);
+  assert.equal(matchesSelectedTrainingTypes('TANQUE', ['CAMINATA']), false);
 
-  assert.equal(matchesSelectedTrainingTypes('Noche de Confianza', ['CONFIANZA']), true);
-  assert.equal(matchesSelectedTrainingTypes('Tanque', ['CONFIANZA']), false);
+  assert.equal(matchesSelectedTrainingTypes('EL VIAJE', ['VIAJE']), true);
+  assert.equal(matchesSelectedTrainingTypes('CAIDA DE CONFIANZA', ['CONFIANZA']), true);
+  assert.equal(matchesSelectedTrainingTypes('ROMPIMIENTO B.', ['ROMPIMIENTO']), true);
+  assert.equal(matchesSelectedTrainingTypes('IMPACTO CREACION', ['IMPACTO']), true);
+  assert.equal(matchesSelectedTrainingTypes('REVISION DE FI', ['REVISION']), true);
 
-  assert.equal(matchesSelectedTrainingTypes('Capitulo 1', ['C1']), true);
-  assert.equal(matchesSelectedTrainingTypes('Capítulo 2', ['C2']), true);
-  assert.equal(matchesSelectedTrainingTypes('Maestria del Juego 34', ['MJ']), true);
-  assert.equal(matchesSelectedTrainingTypes('Retiro Internacional Cusco', ['VIAJE']), true);
+  assert.equal(matchesSelectedTrainingTypes('CAPITULO UNO', ['C1']), true);
+  assert.equal(matchesSelectedTrainingTypes('CAPITULO DOS', ['C2']), true);
+  assert.equal(matchesSelectedTrainingTypes('MAESTRIA DEL JUEGO', ['MJ']), true);
 });
 
 test('matchesSelectedTrainingTypes permite seleccionar varios entrenamientos al tiempo (ej. Tanque y Caminata)', () => {
   const selected = ['TANQUE', 'CAMINATA'];
-  assert.equal(matchesSelectedTrainingTypes('Tanque', selected), true);
-  assert.equal(matchesSelectedTrainingTypes('Caminata sobre Fuego', selected), true);
-  assert.equal(matchesSelectedTrainingTypes('Noche de Confianza', selected), false);
-  assert.equal(matchesSelectedTrainingTypes('Capítulo 1', selected), false);
+  assert.equal(matchesSelectedTrainingTypes('TANQUE', selected), true);
+  assert.equal(matchesSelectedTrainingTypes('CAMINATA SOBRE FUEGO', selected), true);
+  assert.equal(matchesSelectedTrainingTypes('EL VIAJE', selected), false);
+  assert.equal(matchesSelectedTrainingTypes('CAPITULO UNO', selected), false);
 });
 
 test('matchesTrainingType distingue OTROS solo cuando no cae en categorias principales', () => {
   assert.equal(matchesTrainingType('Taller Especial de Liderazgo', 'OTROS'), true);
-  assert.equal(matchesTrainingType('Tanque', 'OTROS'), false);
-  assert.equal(matchesTrainingType('Caminata sobre Fuego', 'OTROS'), false);
+  assert.equal(matchesTrainingType('TANQUE', 'OTROS'), false);
+  assert.equal(matchesTrainingType('EL VIAJE', 'OTROS'), false);
 });
 
 test('formatSelectedTrainingLabel resume correctamente 0, 1, 2 y 3+ selecciones', () => {
@@ -66,7 +72,7 @@ test('formatSelectedTrainingLabel resume correctamente 0, 1, 2 y 3+ selecciones'
     'Tanque + Caminata sobre Fuego',
   );
   assert.equal(
-    formatSelectedTrainingLabel(['C1', 'C2', 'MJ']),
-    'Capítulo 1 +2 más',
+    formatSelectedTrainingLabel(['VIAJE', 'TANQUE', 'CAMINATA']),
+    'El Viaje +2 más',
   );
 });
