@@ -363,8 +363,9 @@ export function buildMaestriaNodusCross({
     };
   });
 
-  // 2. Construir Padrón Vivo de Nodus Maestría (personas en Maestría, Managers, C2 pagados o ya firmados)
-  const nodusPadronCross = [];
+  // 2. Construir Padrón Vivo de Nodus Maestría deduplicado por persona (1 fila por persona única)
+  const rawPadronEntries = [];
+  const nodusPadronByPerson = new Map();
   for (const entry of allNodusEntries) {
     const matchInfo = findContractForNodusPerson(
       {
@@ -387,22 +388,51 @@ export function buildMaestriaNodusCross({
     else if (isSigned && !entry.maestriaNodus) estadoOperativo = 'FALTA_CHECKIN_NODUS';
     else if (!isSigned && entry.maestriaNodus) estadoOperativo = 'FALTA_FIRMA_CONTRATO';
 
-    nodusPadronCross.push({
+    const enrichedEntry = {
       ...entry,
       isSigned,
       contractMatchBy: matchInfo?.matchBy || null,
       signature: matchInfo?.contract || null,
       coherenciaPrevia: evaluatePriorCoherence(entry),
       estadoOperativo
-    });
+    };
+    rawPadronEntries.push(enrichedEntry);
+
+    const personKey =
+      (entry.docNorm && entry.docNorm.length >= 5 ? `doc:${entry.docNorm}` : '') ||
+      (entry.nodusId != null ? `id:${entry.nodusId}` : '') ||
+      (entry.emailNorm && entry.emailNorm.includes('@') ? `mail:${entry.emailNorm}` : '') ||
+      `name:${normalizeNodusText(entry.nombre)}`;
+
+    const existingPerson = nodusPadronByPerson.get(personKey);
+    if (!existingPerson) {
+      nodusPadronByPerson.set(personKey, enrichedEntry);
+    } else {
+      const preferNew = enrichedEntry.maestriaNodus && !existingPerson.maestriaNodus;
+      const merged = preferNew ? { ...enrichedEntry } : { ...existingPerson };
+      merged.maestriaNodus = Boolean(existingPerson.maestriaNodus || enrichedEntry.maestriaNodus);
+      merged.isSigned = Boolean(existingPerson.isSigned || enrichedEntry.isSigned);
+      merged.signature = existingPerson.signature || enrichedEntry.signature;
+      merged.contractMatchBy = existingPerson.contractMatchBy || enrichedEntry.contractMatchBy;
+      merged.asistioC1 = Boolean(existingPerson.asistioC1 || enrichedEntry.asistioC1);
+      merged.pagadoC1 = Boolean(existingPerson.pagadoC1 || enrichedEntry.pagadoC1);
+      merged.pagadoC2 = Boolean(existingPerson.pagadoC2 || enrichedEntry.pagadoC2);
+      merged.asistioC2 = Boolean(existingPerson.asistioC2 || enrichedEntry.asistioC2);
+      if (merged.isSigned && merged.maestriaNodus) merged.estadoOperativo = 'COMPLETO';
+      else if (merged.isSigned && !merged.maestriaNodus) merged.estadoOperativo = 'FALTA_CHECKIN_NODUS';
+      else if (!merged.isSigned && merged.maestriaNodus) merged.estadoOperativo = 'FALTA_FIRMA_CONTRATO';
+      merged.coherenciaPrevia = evaluatePriorCoherence(merged);
+      nodusPadronByPerson.set(personKey, merged);
+    }
   }
+  const nodusPadronCross = Array.from(nodusPadronByPerson.values());
 
   // 3. Resumen por Equipo + FDS vigente
   const teamSummaries = activeTeams.map((eq) => {
     const teamNum = extractTeamNumber(eq.nombre);
     const fdsVigente = String(eq.etapa_vigente || '').toUpperCase().trim();
     const checkinInfo = getLimaMaestriaCheckinInfo(eq.nombre);
-    const teamNodus = nodusPadronCross.filter((p) => p.equipoId === eq.id);
+    const teamNodus = rawPadronEntries.filter((p) => p.equipoId === eq.id);
     const teamSigned = enrichedContracts.filter((c) => {
       if (c.nodusCross.nodusTeamId != null) return c.nodusCross.nodusTeamId === eq.id;
       return teamNum && extractTeamNumber(c.equipo || c.cohorte || c.equipoCohorte) === teamNum;
@@ -450,14 +480,18 @@ export function buildMaestriaNodusCross({
     };
   });
 
-  const isSignedManager = (c) =>
-    String(c.nodusCross?.nodusRole || c.rol || c.rolActividad || '').toLowerCase().includes('manager');
+  const getContractRoleNorm = (c) =>
+    normalizeNodusText(c.rol || c.rolActividad || c.nodusCross?.nodusRole || '');
+  const isSignedManager = (c) => getContractRoleNorm(c).includes('manager');
+  const isSignedCapitan = (c) => getContractRoleNorm(c).includes('capitan');
   const allCompletos = enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'COMPLETO');
   const totalCompletosMgr = allCompletos.filter(isSignedManager).length;
-  const totalCompletosPart = allCompletos.length - totalCompletosMgr;
+  const totalCompletosCapitan = allCompletos.filter((c) => !isSignedManager(c) && isSignedCapitan(c)).length;
+  const totalCompletosPart = allCompletos.length - totalCompletosMgr - totalCompletosCapitan;
   const allFaltaCheckin = enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS');
   const totalFaltaCheckinMgr = allFaltaCheckin.filter(isSignedManager).length;
-  const totalFaltaCheckinPart = allFaltaCheckin.length - totalFaltaCheckinMgr;
+  const totalFaltaCheckinCapitan = allFaltaCheckin.filter((c) => !isSignedManager(c) && isSignedCapitan(c)).length;
+  const totalFaltaCheckinPart = allFaltaCheckin.length - totalFaltaCheckinMgr - totalFaltaCheckinCapitan;
   const allFaltaFirma = nodusPadronCross.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO');
   const totalFaltaFirmaMgr = allFaltaFirma.filter((p) => p.tipoPersona === 'manager').length;
   const totalFaltaFirmaPart = allFaltaFirma.length - totalFaltaFirmaMgr;
@@ -471,9 +505,11 @@ export function buildMaestriaNodusCross({
     totalCompletos: allCompletos.length,
     totalCompletosPart,
     totalCompletosMgr,
+    totalCompletosCapitan,
     totalFaltaCheckinNodus: allFaltaCheckin.length,
     totalFaltaCheckinPart,
     totalFaltaCheckinMgr,
+    totalFaltaCheckinCapitan,
     totalFaltaFirmaContrato: allFaltaFirma.length,
     totalFaltaFirmaPart,
     totalFaltaFirmaMgr,

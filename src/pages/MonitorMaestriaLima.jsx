@@ -972,7 +972,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✅ Completo (Firma + Nodus)</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#6ee7b7', marginTop: '0.15rem' }}>{stats.totalCompletos}</div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                {stats.totalCompletosPart || 0} Part. · {stats.totalCompletosMgr || 0} Mgr.
+                {stats.totalCompletosPart || 0} Part. · {stats.totalCompletosMgr || 0} Mgr.{stats.totalCompletosCapitan > 0 ? ` · ${stats.totalCompletosCapitan} Capitán` : ''}
               </div>
             </div>
             <div
@@ -990,7 +990,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Falta Check-in Nodus</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>{stats.totalFaltaCheckinNodus}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                {stats.totalFaltaCheckinPart || 0} Part. · {stats.totalFaltaCheckinMgr || 0} Mgr.
+                {stats.totalFaltaCheckinPart || 0} Part. · {stats.totalFaltaCheckinMgr || 0} Mgr.{stats.totalFaltaCheckinCapitan > 0 ? ` · ${stats.totalFaltaCheckinCapitan} Capitán` : ''}
               </div>
             </div>
             <div
