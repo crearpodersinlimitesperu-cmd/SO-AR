@@ -372,14 +372,6 @@ export function buildParticipantPaymentTraceability({
     MJ: stagesSet.has('MJ') || mjPaid === true
   };
 
-  // Si ya está en Maestría en Nodus, tiene C1+C2 cubiertos y registra 2+ pagos mayores (p.ej. C2 + MJ sin etiqueta MJ) o 3+ pagos con abonos sin clasificar, cubre MJ.
-  if (!stageSummary.MJ && nodusCross?.maestriaNodus && stageSummary.C1 && stageSummary.C2) {
-    const majorPaymentsCount = deduped.filter((p) => p.monto !== null && p.monto >= 1000).length;
-    if (majorPaymentsCount >= 2 || (deduped.length >= 3 && stagesSet.has('OTRO'))) {
-      stageSummary.MJ = true;
-    }
-  }
-
   const hasUnclassifiedPayments = deduped.some(
     (p) => !['C1', 'C2', 'MJ'].includes(p.etapa) && (!Array.isArray(p.etapas) || p.etapas.length === 0)
   );

@@ -210,16 +210,16 @@ test('normalizeNodusPaymentRow extracts SUNAT invoice numbers (F001-1324 / B001-
   assert.equal(fromSerieNumero.numeroFactura, 'B001-4737');
 });
 
-test('active Maestria participant with C1+C2 and 3 trainings paid (e.g. 720 + 1875 + 1695) marks MJ true', () => {
+test('does NOT invent MJ true when all Nodus payments are explicitly tagged c2', () => {
   const contrato = { numeroDocumento: '45729876', nombre: 'Zorayda Alvarez' };
   const nodusCross = { maestriaNodus: true, pagadoC1: true, pagadoC2: true };
   const allPagos = [
-    { id_factura: 22771, comprobante: '282271', fecha: '2026-08-10', identificacion: '45729876', concepto: 'c1', monto: 720 },
-    { id_factura: 23463, comprobante: '043620', fecha: '2026-09-20', identificacion: '45729876', concepto: 'c2', monto: 1875 },
-    { id_factura: 28455, comprobante: '00221019', fecha: '2026-10-28', identificacion: '45729876', concepto: 'c2', monto: 1695 }
+    { id_factura: 22771, fecha: '2026-08-10', identificacion: '45729876', concepto: 'c1', monto: 720 },
+    { id_factura: 23463, fecha: '2026-09-20', identificacion: '45729876', concepto: 'c2', monto: 1875 },
+    { id_factura: 28455, fecha: '2026-10-28', identificacion: '45729876', concepto: 'c2', monto: 1695 }
   ];
 
   const trace = buildParticipantPaymentTraceability({ contrato, nodusCross, allPagos });
-  assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: true });
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: false });
   assert.equal(trace.totalByCurrency.PEN, 4290);
 });
