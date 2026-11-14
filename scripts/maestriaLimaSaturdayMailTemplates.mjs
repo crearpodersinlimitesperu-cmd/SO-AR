@@ -19,8 +19,8 @@ const DEFAULT_CONFIG = {
   familyCulqiUrl: 'https://express.culqi.com/pago/U7K3CBISZX',
   paypalEmail: 'facturacion.cartera@crearpsl.com',
   paypalHolder: 'QUANTUM COACHING TECHNOLOGY BSV CIA LTDA.',
-  joyceWhatsappUrl: '',
-  dianaWhatsappUrl: '',
+  joyceWhatsappUrl: 'https://wa.me/51933599903?text=Hola%20Joyce%2C%20te%20escribo%20desde%20Maestr%C3%ADa%20Lima%20por%20una%20inscripci%C3%B3n%20al%20Cap%C3%ADtulo%20Uno.',
+  dianaWhatsappUrl: 'https://wa.me/51912379744?text=Hola%20Diana%2C%20te%20escribo%20desde%20Maestr%C3%ADa%20Lima%20por%20una%20inscripci%C3%B3n%20al%20Cap%C3%ADtulo%20Uno.',
 };
 
 function escapeHtml(value) {
