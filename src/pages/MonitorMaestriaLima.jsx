@@ -1605,8 +1605,59 @@ export default function MonitorMaestriaLima() {
                             { key: 'C2', active: trace.stageSummary.C2 },
                             { key: 'MJ', active: trace.stageSummary.MJ }
                           ];
+                          const roleText = normalizeStr(item.rol || item.rolActividad || item.nodusCross?.nodusRole || '');
+                          const isNonPayingStaff = /manager|capitan|staff|entrenador|oficina/.test(roleText);
+                          const hasAnyPayment = trace.payments.length > 0 ||
+                            trace.stageSummary.C1 ||
+                            trace.stageSummary.C2 ||
+                            trace.stageSummary.MJ ||
+                            Boolean(item.nodusCross?.pagadoC1) ||
+                            Boolean(item.nodusCross?.pagadoC2);
+                          const missingStages = stageBadges.filter((sb) => !sb.active).map((sb) => sb.key);
                           return (
                             <div style={{ marginTop: '0.35rem', paddingTop: '0.45rem', borderTop: '1px dashed rgba(148, 163, 184, 0.22)' }}>
+                              {!nodusLoading && !isNonPayingStaff && !hasAnyPayment && (
+                                <div
+                                  role="alert"
+                                  style={{
+                                    marginBottom: '0.45rem',
+                                    padding: '0.45rem 0.7rem',
+                                    borderRadius: '8px',
+                                    background: 'rgba(239, 68, 68, 0.16)',
+                                    border: '1px solid rgba(248, 113, 113, 0.55)',
+                                    color: '#fecaca',
+                                    fontSize: '0.76rem',
+                                    fontWeight: 800,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.45rem'
+                                  }}
+                                >
+                                  <span>🚨 ALERTA CONTABLE:</span>
+                                  <span>Este participante NO registra ningún pago en Nodus (ni C1, C2 o MJ).</span>
+                                </div>
+                              )}
+                              {!nodusLoading && !isNonPayingStaff && hasAnyPayment && missingStages.length > 0 && (
+                                <div
+                                  role="alert"
+                                  style={{
+                                    marginBottom: '0.45rem',
+                                    padding: '0.38rem 0.65rem',
+                                    borderRadius: '7px',
+                                    background: 'rgba(245, 158, 11, 0.14)',
+                                    border: '1px solid rgba(251, 191, 36, 0.45)',
+                                    color: '#fde68a',
+                                    fontSize: '0.73rem',
+                                    fontWeight: 700,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem'
+                                  }}
+                                >
+                                  <span>⚠️ Alerta de Pago:</span>
+                                  <span>Falta registro de pago en Nodus para {missingStages.join(' · ')}.</span>
+                                </div>
+                              )}
                               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.4rem' }}>
                                   <span style={{ color: '#64748b', fontWeight: 700 }}>💳 Pagos Nodus (C1 → MJ):</span>
@@ -1945,6 +1996,28 @@ export default function MonitorMaestriaLima() {
                                 : `⚠ ${item.coherenciaPrevia.issues.join(' · ')}`}
                             </span>
                           )}
+                          {!nodusLoading && item.tipoPersona !== 'manager' && (() => {
+                            const pTrace = buildParticipantPaymentTraceability({
+                              contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+                              nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
+                              allPagos: nodusPagosLima
+                            });
+                            const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
+                            if (hasPay) return null;
+                            return (
+                              <span style={{
+                                background: 'rgba(239, 68, 68, 0.22)',
+                                color: '#fca5a5',
+                                border: '1px solid rgba(248, 113, 113, 0.55)',
+                                fontSize: '0.65rem',
+                                fontWeight: 900,
+                                padding: '0.15rem 0.45rem',
+                                borderRadius: '4px'
+                              }}>
+                                🚨 SIN PAGO EN NODUS
+                              </span>
+                            );
+                          })()}
                         </div>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>
