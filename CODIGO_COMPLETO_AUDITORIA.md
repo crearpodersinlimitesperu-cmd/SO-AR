@@ -142480,6 +142480,27 @@ import { buildMaestriaNodusCross, selectActiveLimaMaestriaTeams } from '../utils
 
 const NODUS_WORKER_BASE = 'https://so-ar-copiloto.jose-sanchez-e01.workers.dev';
 
+/**
+ * Determina si un participante con asistencia en Maestría (Nodus) carece de pago registrado para MJ.
+ * Excluye Managers/Staff y evita falsos positivos cuando existen pagos sin etiqueta de etapa.
+ */
+function isParticipantMissingMaestriaPayment(item, allPagos) {
+  if (!item?.maestriaNodus || item?.tipoPersona !== 'participante') return false;
+  const pTrace = buildParticipantPaymentTraceability({
+    contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+    nodusCross: {
+      nodusDoc: item.identificacion,
+      nodusRecord: item.nodusRecord,
+      pagadoC1: item.pagadoC1,
+      pagadoC2: item.pagadoC2
+    },
+    allPagos
+  });
+  if (pTrace.stageSummary.MJ) return false;
+  if (pTrace.hasUnclassifiedPayments) return false;
+  return true;
+}
+
 export default function MonitorMaestriaLima() {
   const navigate = useNavigate();
   const [signedContracts, setSignedContracts] = useState([]);
@@ -142827,16 +142848,9 @@ export default function MonitorMaestriaLima() {
     const totalEntrenadores = signedContracts.filter((c) => normalizeStr(c.rol || c.rolActividad || '').includes('entrenador')).length;
     const totalOtrosRestantes = Math.max(0, totalRegistradosFirestore - totalParticipantes - totalManagers - totalCapitanes - totalStaff - totalEntrenadores);
     const totalNodusParticipantes = Math.max(0, (summary.totalNodusMaestria || 0) - (summary.totalNodusManagers || 0));
-    const totalNodusSinPago = nodusPadronCross.filter((item) => {
-      if (!item.maestriaNodus || item.tipoPersona !== 'participante') return false;
-      const pTrace = buildParticipantPaymentTraceability({
-        contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
-        nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
-        allPagos: nodusPagosLima
-      });
-      const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
-      return !hasPay;
-    }).length;
+    const totalNodusSinPago = nodusPadronCross.filter((item) =>
+      isParticipantMissingMaestriaPayment(item, nodusPagosLima)
+    ).length;
 
     return {
       totalPadron,
@@ -142903,14 +142917,7 @@ export default function MonitorMaestriaLima() {
       } else if (padronStatusFilter === 'CON_OBSERVACION_PREVIA') {
         if (!item.maestriaNodus || !item.coherenciaPrevia || item.coherenciaPrevia.isCoherent) return false;
       } else if (padronStatusFilter === 'SIN_PAGO_EN_NODUS') {
-        if (!item.maestriaNodus || item.tipoPersona !== 'participante') return false;
-        const pTrace = buildParticipantPaymentTraceability({
-          contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
-          nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
-          allPagos: nodusPagosLima
-        });
-        const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
-        if (hasPay) return false;
+        if (!isParticipantMissingMaestriaPayment(item, nodusPagosLima)) return false;
       } else if (padronStatusFilter !== 'TODOS' && item.estadoOperativo !== padronStatusFilter) {
         return false;
       }
@@ -143481,7 +143488,7 @@ export default function MonitorMaestriaLima() {
                 setPadronStatusFilter('SIN_PAGO_EN_NODUS');
                 scrollToResults();
               }}
-              title="Clic para auditar participantes con asistencia en Nodus y sin ningún pago registrado"
+              title="Clic para auditar participantes con asistencia en Maestría y sin pago de Maestría (MJ) en Nodus"
               style={{
                 background: stats.totalNodusSinPago > 0 ? 'rgba(239, 68, 68, 0.18)' : 'rgba(16, 185, 129, 0.10)',
                 padding: '0.75rem 1rem',
@@ -143491,13 +143498,15 @@ export default function MonitorMaestriaLima() {
               }}
             >
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: stats.totalNodusSinPago > 0 ? '#fca5a5' : '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {stats.totalNodusSinPago > 0 ? '🚨 Nodus Asist. · Sin Pago' : '✅ Nodus · Sin Pago'}
+                {stats.totalNodusSinPago > 0 ? '🚨 Asist. MJ · Sin Pago MJ' : '✅ Pagos Maestría · OK'}
               </span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: stats.totalNodusSinPago > 0 ? '#f87171' : '#34d399', marginTop: '0.15rem' }}>
                 {nodusLoading ? '...' : stats.totalNodusSinPago}
               </div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                {stats.totalNodusSinPago > 0 ? 'Participantes c/asistencia y sin pago' : '0 participantes sin pago en Nodus'}
+                {stats.totalNodusSinPago > 0
+                  ? 'Participantes en Nodus sin pago MJ'
+                  : 'Sin participantes pendientes de pago MJ'}
               </div>
             </div>
           </div>
@@ -144397,7 +144406,7 @@ export default function MonitorMaestriaLima() {
                   { id: 'COMPLETO', label: '✅ Completo (Firma + Nodus)' },
                   { id: 'FALTA_CHECKIN_NODUS', label: '⚠️ Firmó · Falta Check-in Nodus' },
                   { id: 'FALTA_FIRMA_CONTRATO', label: '🚨 En Nodus · Falta Firma Contrato' },
-                  { id: 'SIN_PAGO_EN_NODUS', label: `🚨 Nodus Asist. · Sin Pago (${stats.totalNodusSinPago || 0})` },
+                  { id: 'SIN_PAGO_EN_NODUS', label: `🚨 Sin Pago MJ (${stats.totalNodusSinPago || 0})` },
                   { id: 'CON_OBSERVACION_PREVIA', label: `⚠️ Obs. C1/C2/Pagos (${stats.totalNodusConObservacion || 0})` },
                   { id: 'PENDIENTE_AMBOS', label: '⏳ Pendiente Ambos' }
                 ].map((s) => {
@@ -144493,15 +144502,7 @@ export default function MonitorMaestriaLima() {
                                 : `⚠ ${item.coherenciaPrevia.issues.join(' · ')}`}
                             </span>
                           )}
-                          {!nodusLoading && item.tipoPersona !== 'manager' && (() => {
-                            const pTrace = buildParticipantPaymentTraceability({
-                              contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
-                              nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
-                              allPagos: nodusPagosLima
-                            });
-                            const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
-                            if (hasPay) return null;
-                            return (
+                          {!nodusLoading && isParticipantMissingMaestriaPayment(item, nodusPagosLima) && (
                               <span style={{
                                 background: 'rgba(239, 68, 68, 0.22)',
                                 color: '#fca5a5',
@@ -144511,10 +144512,9 @@ export default function MonitorMaestriaLima() {
                                 padding: '0.15rem 0.45rem',
                                 borderRadius: '4px'
                               }}>
-                                🚨 SIN PAGO EN NODUS
+                                🚨 SIN PAGO MJ EN NODUS
                               </span>
-                            );
-                          })()}
+                          )}
                         </div>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>
