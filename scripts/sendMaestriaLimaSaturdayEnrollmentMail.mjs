@@ -99,20 +99,22 @@ function normalizePeruPhone(raw) {
 }
 
 async function resolveDirectoryContacts(db) {
-  const [usersSnap, profilesSnap] = await Promise.all([
+  const [qtSnap, usersSnap, profilesSnap] = await Promise.all([
+    db.collection('qt_directory').get(),
     db.collection('users').get(),
     db.collection('user_profiles').get(),
   ]);
   const allDocs = [
+    ...qtSnap.docs.map((d) => d.data()),
     ...usersSnap.docs.map((d) => d.data()),
     ...profilesSnap.docs.map((d) => d.data()),
   ];
 
   const findPhone = (patterns) => {
     for (const u of allDocs) {
-      const hay = normalizeStr(`${u.name || ''} ${u.displayName || ''} ${u.email || ''}`);
+      const hay = normalizeStr(`${u.nombre || ''} ${u.name || ''} ${u.displayName || ''} ${u.email || ''}`);
       if (patterns.some((p) => hay.includes(p))) {
-        const phone = normalizePeruPhone(u.whatsapp || u.telefono || u.phone || u.celular);
+        const phone = normalizePeruPhone(u.whatsapp || u.telefono || u.phone || u.celular || u.whatsappUrl);
         if (phone) return phone;
       }
     }

@@ -19,8 +19,8 @@ const DEFAULT_CONFIG = {
   familyCulqiUrl: 'https://express.culqi.com/pago/U7K3CBISZX',
   paypalEmail: 'facturacion.cartera@crearpsl.com',
   paypalHolder: 'QUANTUM COACHING TECHNOLOGY BSV CIA LTDA.',
-  joyceWhatsappUrl: 'https://wa.me/51XXXXXXXXX?text=Hola%20Joyce%2C%20te%20escribo%20desde%20Maestr%C3%ADa%20Lima%20por%20una%20inscripci%C3%B3n%20al%20Cap%C3%ADtulo%20Uno.',
-  dianaWhatsappUrl: 'https://wa.me/51YYYYYYYYY?text=Hola%20Diana%2C%20te%20escribo%20desde%20Maestr%C3%ADa%20Lima%20por%20una%20inscripci%C3%B3n%20al%20Cap%C3%ADtulo%20Uno.',
+  joyceWhatsappUrl: '',
+  dianaWhatsappUrl: '',
 };
 
 function escapeHtml(value) {
@@ -146,6 +146,11 @@ function renderBcpCard(cfg) {
 }
 
 function renderWhatsappSupportCard(cfg) {
+  const hasJoyce = Boolean(cfg.joyceWhatsappUrl);
+  const hasDiana = Boolean(cfg.dianaWhatsappUrl);
+  if (!hasJoyce && !hasDiana) {
+    return '';
+  }
   return `
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0B1C19;border:1px solid #14532D;border-radius:14px;margin-bottom:16px;">
     <tr>
@@ -157,17 +162,17 @@ function renderWhatsappSupportCard(cfg) {
           ¿Tienes dudas o ya realizaste tu transferencia BCP / PayPal? Envía tu constancia directo por WhatsApp a nuestro equipo en Lima:
         </p>
         <div style="text-align:center;font-size:0;">
-          <div class="stack-box" style="display:inline-block;width:48%;max-width:260px;vertical-align:top;">
+          ${hasJoyce ? `<div class="stack-box" style="display:inline-block;width:48%;max-width:260px;vertical-align:top;">
             <a href="${cfg.joyceWhatsappUrl}" class="cta-full" style="display:block;padding:12px 14px;border-radius:10px;background-color:#16A34A;color:#FFFFFF;font-size:13.5px;font-weight:800;text-align:center;">
               💬 WhatsApp Joyce
             </a>
-          </div>
-          <div class="stack-spacer" style="display:inline-block;width:4%;height:1px;"></div>
-          <div class="stack-box" style="display:inline-block;width:48%;max-width:260px;vertical-align:top;">
+          </div>` : ''}
+          ${hasJoyce && hasDiana ? `<div class="stack-spacer" style="display:inline-block;width:4%;height:1px;"></div>` : ''}
+          ${hasDiana ? `<div class="stack-box" style="display:inline-block;width:48%;max-width:260px;vertical-align:top;">
             <a href="${cfg.dianaWhatsappUrl}" class="cta-full" style="display:block;padding:12px 14px;border-radius:10px;background-color:#15803D;border:1px solid #22C55E;color:#FFFFFF;font-size:13.5px;font-weight:800;text-align:center;">
               💬 WhatsApp Diana
             </a>
-          </div>
+          </div>` : ''}
         </div>
       </td>
     </tr>
