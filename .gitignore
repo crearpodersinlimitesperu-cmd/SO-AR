@@ -59,6 +59,9 @@ reconciliacion_managers_no_encontrados.csv
 !.dev.vars.example
 !.env.example
 
+# Capacitor iOS synced web bundle (regenerado con npm run ios:sync)
+ios/App/App/public/
+
 # Carpetas grandes que nunca debieron trackearse en git (reconciliacion 31/08/2026)
 venv/
 backup/pre-repair-2026-08-21-15-08/

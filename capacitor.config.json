@@ -1,0 +1,9 @@
+{
+  "appId": "net.crearpsl.causaos",
+  "appName": "Causa OS",
+  "webDir": "dist",
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#050811"
+  }
+}

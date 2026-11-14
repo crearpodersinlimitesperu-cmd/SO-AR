@@ -20,6 +20,8 @@
     "test:nodus-reports": "node --test scripts/tests/nodus-c1-report.test.mjs tests/nodus-report-model.test.mjs tests/nodus-report-publisher.test.mjs",
     "test:nodus-json": "node --test scripts/tests/nodus-api-client.test.mjs scripts/tests/nodus-api-audit.test.mjs cloudflare-worker/src/nodusJsonModel.test.js",
     "preview": "vite preview",
+    "ios:sync": "npm run build && npx cap sync ios",
+    "ios:open": "npx cap open ios",
     "sync:qt": "node scripts/qtSyncDaemon.js",
     "mailer": "node scripts/mailerDaemon.js",
     "bootstrap": "node scripts/bootstrapSync.js",
@@ -42,6 +44,8 @@
     "report:daily": "node scripts/generarRegistroDiarioGoogleDocs.mjs"
   },
   "dependencies": {
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/ios": "^8.6.2",
     "@google/generative-ai": "^0.24.1",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
@@ -65,6 +69,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.2",
     "@firebase/rules-unit-testing": "^5.0.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
