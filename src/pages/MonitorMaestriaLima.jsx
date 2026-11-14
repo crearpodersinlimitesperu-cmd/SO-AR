@@ -446,6 +446,8 @@ export default function MonitorMaestriaLima() {
       if (padronRoleFilter !== 'TODOS' && item.rolLabel !== padronRoleFilter) return false;
       if (padronStatusFilter === 'EN_NODUS_MAESTRIA') {
         if (!item.maestriaNodus) return false;
+      } else if (padronStatusFilter === 'CON_OBSERVACION_PREVIA') {
+        if (!item.maestriaNodus || !item.coherenciaPrevia || item.coherenciaPrevia.isCoherent) return false;
       } else if (padronStatusFilter !== 'TODOS' && item.estadoOperativo !== padronStatusFilter) {
         return false;
       }
@@ -928,6 +930,12 @@ export default function MonitorMaestriaLima() {
               <div style={{ fontSize: '0.66rem', color: '#38bdf8', marginTop: '0.1rem' }}>
                 {stats.totalCompletos} c/firma + {stats.totalFaltaFirmaContrato} s/firma
               </div>
+              {!nodusLoading && (
+                <div style={{ fontSize: '0.65rem', color: stats.totalNodusConObservacion > 0 ? '#fbbf24' : '#34d399', marginTop: '0.12rem', fontWeight: 700 }}>
+                  ✓ {stats.totalNodusCoherentes || 0} coherentes (C1/C2 + Pagos)
+                  {stats.totalNodusConObservacion > 0 ? ` · ⚠ ${stats.totalNodusConObservacion} obs.` : ''}
+                </div>
+              )}
             </div>
             <div
               onClick={() => {
@@ -1842,6 +1850,7 @@ export default function MonitorMaestriaLima() {
                   { id: 'COMPLETO', label: '✅ Completo (Firma + Nodus)' },
                   { id: 'FALTA_CHECKIN_NODUS', label: '⚠️ Firmó · Falta Check-in Nodus' },
                   { id: 'FALTA_FIRMA_CONTRATO', label: '🚨 En Nodus · Falta Firma Contrato' },
+                  { id: 'CON_OBSERVACION_PREVIA', label: `⚠️ Obs. C1/C2/Pagos (${stats.totalNodusConObservacion || 0})` },
                   { id: 'PENDIENTE_AMBOS', label: '⏳ Pendiente Ambos' }
                 ].map((s) => {
                   const active = padronStatusFilter === s.id;
@@ -1921,6 +1930,21 @@ export default function MonitorMaestriaLima() {
                           <span style={{ background: 'rgba(245, 158, 11, 0.14)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)', fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
                             {item.rolLabel} {item.coordinador ? `· Coord: ${item.coordinador}` : ''}
                           </span>
+                          {item.coherenciaPrevia && (
+                            <span style={{
+                              background: item.coherenciaPrevia.isCoherent ? 'rgba(16, 185, 129, 0.14)' : 'rgba(245, 158, 11, 0.18)',
+                              color: item.coherenciaPrevia.isCoherent ? '#34d399' : '#fbbf24',
+                              border: `1px solid ${item.coherenciaPrevia.isCoherent ? 'rgba(16, 185, 129, 0.35)' : 'rgba(245, 158, 11, 0.45)'}`,
+                              fontSize: '0.65rem',
+                              fontWeight: 800,
+                              padding: '0.15rem 0.45rem',
+                              borderRadius: '4px'
+                            }}>
+                              {item.coherenciaPrevia.isCoherent
+                                ? (item.coherenciaPrevia.status === 'MANAGER' ? '✓ Manager · Staff' : '✓ C1/C2 + Pagos OK')
+                                : `⚠ ${item.coherenciaPrevia.issues.join(' · ')}`}
+                            </span>
+                          )}
                         </div>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>

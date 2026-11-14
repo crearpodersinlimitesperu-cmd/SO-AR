@@ -96,6 +96,37 @@ function findContractForNodusPerson(person, signedContracts) {
   return byName ? { contract: byName, matchBy: 'NOMBRE' } : null;
 }
 
+export function evaluatePriorCoherence(entry) {
+  if (!entry) return { status: 'UNKNOWN', isCoherent: false, issues: ['Sin datos Nodus'] };
+  if (entry.tipoPersona === 'manager') {
+    return { status: 'MANAGER', isCoherent: true, label: 'Manager · Staff', issues: [] };
+  }
+  const etapas = Array.isArray(entry.etapas) ? entry.etapas : [];
+  const c1Etapa = etapas.find((e) => /^(C1|CAP\s*1|CAPITULO\s*1)$/i.test(String(e?.etapa || '').trim()));
+  const c2Etapa = etapas.find((e) => /^(C2|CAP\s*2|CAPITULO\s*2)$/i.test(String(e?.etapa || '').trim()));
+
+  const hasC1Asistencia = Boolean(entry.asistioC1 || c1Etapa?.asistio);
+  const hasC1Pago = Boolean(entry.pagadoC1 || c1Etapa?.pagado);
+  const hasC2Pago = Boolean(entry.pagadoC2 || c2Etapa?.pagado || c2Etapa?.asistio || entry.asistioC2);
+  const isDesertor = Boolean(entry.desertorC1 || c1Etapa?.desertor || c2Etapa?.desertor);
+
+  const issues = [];
+  if (isDesertor) issues.push('Desertor en entrenamiento previo');
+  if (!hasC1Asistencia) issues.push('Sin asistencia C1');
+  if (!hasC1Pago && !hasC1Asistencia) issues.push('Sin pago C1');
+  if (!hasC2Pago) issues.push('Sin pago/asistencia C2');
+
+  return {
+    status: issues.length === 0 ? 'OK' : 'OBS',
+    isCoherent: issues.length === 0,
+    hasC1Asistencia,
+    hasC1Pago,
+    hasC2Pago,
+    isDesertor,
+    issues
+  };
+}
+
 export function buildMaestriaNodusCross({
   signedContracts = [],
   nodusEquipos = [],
@@ -122,8 +153,10 @@ export function buildMaestriaNodusCross({
       const emailNorm = normalizeNodusEmail(p.email);
       const nameNorm = normalizeNodusText(fullName);
       const maestriaNodus = Boolean(p.capitulo2?.maestria);
+      const pagadoC1 = Boolean(p.capitulo1?.pagado);
       const pagadoC2 = Boolean(p.capitulo2?.pagado);
       const asistioC1 = Boolean(p.capitulo1?.asistio);
+      const asistioC2 = Boolean(p.capitulo2?.asistio);
       const desertorC1 = Boolean(p.capitulo1?.desertor);
 
       const entry = {
@@ -144,11 +177,14 @@ export function buildMaestriaNodusCross({
         sede: eq.sede || 'LIMA CICLO 1',
         fdsVigente,
         asistioC1,
+        pagadoC1,
         desertorC1,
         pagadoC2,
+        asistioC2,
         maestriaNodus,
         checkinUrl: checkinInfo?.url || null,
         etapas: [],
+        nodusRecord: p,
         exhaustiveLookup: false
       };
 
@@ -201,6 +237,7 @@ export function buildMaestriaNodusCross({
     const existing = byDoc.get(docNorm);
     if (existing) {
       existing.etapas = etapas.length > 0 ? etapas : existing.etapas;
+      existing.nodusRecord = p;
       existing.exhaustiveLookup = true;
       existing.maestriaNodus = hasExactEtapasForActiveTeam ? maestriaFlag : (existing.maestriaNodus || maestriaFlag);
       continue;
@@ -231,11 +268,14 @@ export function buildMaestriaNodusCross({
       sede: p.sede?.nombre || matchedActiveTeam?.sede || 'LIMA CICLO 1',
       fdsVigente: String(resolvedFds).toUpperCase().trim(),
       asistioC1: typeof p.capitulo1 === 'boolean' ? p.capitulo1 : Boolean(p.capitulo1?.asistio),
+      pagadoC1: Boolean(p.capitulo1?.pagado),
       desertorC1: Boolean(p.capitulo1?.desertor),
       pagadoC2: typeof p.capitulo2 === 'boolean' ? p.capitulo2 : Boolean(p.capitulo2?.pagado),
+      asistioC2: Boolean(p.capitulo2?.asistio),
       maestriaNodus: maestriaFlag,
       checkinUrl: checkinInfo?.url || null,
       etapas,
+      nodusRecord: p,
       exhaustiveLookup: true
     };
 
@@ -307,11 +347,15 @@ export function buildMaestriaNodusCross({
         nodusRole: matched?.rolLabel || null,
         coordinador: matched?.coordinador || null,
         asistioC1: Boolean(matched?.asistioC1),
+        pagadoC1: Boolean(matched?.pagadoC1),
         desertorC1: Boolean(matched?.desertorC1),
         pagadoC2: Boolean(matched?.pagadoC2),
+        asistioC2: Boolean(matched?.asistioC2),
         maestriaNodus: Boolean(matched?.maestriaNodus),
         checkinUrl: matched?.checkinUrl || fallbackCheckin?.url || null,
         etapas: matched?.etapas || [],
+        nodusRecord: matched?.nodusRecord || null,
+        coherenciaPrevia: matched ? evaluatePriorCoherence(matched) : null,
         exhaustiveLookup: Boolean(matched?.exhaustiveLookup),
         estadoCruce
       }
@@ -347,6 +391,7 @@ export function buildMaestriaNodusCross({
       isSigned,
       contractMatchBy: matchInfo?.matchBy || null,
       signature: matchInfo?.contract || null,
+      coherenciaPrevia: evaluatePriorCoherence(entry),
       estadoOperativo
     });
   }
@@ -420,6 +465,8 @@ export function buildMaestriaNodusCross({
     totalNodusPadron: nodusPadronCross.length,
     totalNodusMaestria: nodusPadronCross.filter((p) => p.maestriaNodus).length,
     totalNodusManagers: nodusPadronCross.filter((p) => p.tipoPersona === 'manager' && p.maestriaNodus).length,
+    totalNodusCoherentes: nodusPadronCross.filter((p) => p.maestriaNodus && p.coherenciaPrevia?.isCoherent).length,
+    totalNodusConObservacion: nodusPadronCross.filter((p) => p.maestriaNodus && p.coherenciaPrevia && !p.coherenciaPrevia.isCoherent).length,
     totalCompletos: allCompletos.length,
     totalCompletosPart,
     totalCompletosMgr,
