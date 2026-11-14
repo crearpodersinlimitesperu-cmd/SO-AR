@@ -143407,24 +143407,29 @@ export default function MonitorMaestriaLima() {
           </div>
         </div>
         {isExpanded && trace.payments.length > 0 && (
-          <div style={{ marginTop: '0.55rem', overflowX: 'auto', borderRadius: '8px', border: '1px solid #1e293b', background: 'rgba(2, 6, 23, 0.72)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
-              <thead>
-                <tr style={{ background: 'rgba(30, 41, 59, 0.65)', color: '#94a3b8', textAlign: 'left' }}>
-                  <th style={{ padding: '0.45rem 0.6rem' }}>Fecha</th>
-                  <th style={{ padding: '0.45rem 0.6rem' }}>Etapa</th>
-                  <th style={{ padding: '0.45rem 0.6rem' }}>Concepto / Equipo</th>
-                  <th style={{ padding: '0.45rem 0.6rem' }}>Modo de Pago</th>
-                  <th style={{ padding: '0.45rem 0.6rem' }}>Factura / Comprobante / Ref.</th>
-                  <th style={{ padding: '0.45rem 0.6rem', textAlign: 'right' }}>Monto</th>
-                  <th style={{ padding: '0.45rem 0.6rem' }}>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trace.payments.map((p, pIdx) => (
-                  <tr key={p.idFactura || `${rowKey}-p-${pIdx}`} style={{ borderTop: '1px solid rgba(30, 41, 59, 0.8)' }}>
-                    <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1', whiteSpace: 'nowrap' }}>{p.fecha || '—'}</td>
-                    <td style={{ padding: '0.42rem 0.6rem' }}>
+          <div style={{ marginTop: '0.55rem', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            {trace.payments.map((p, pIdx) => {
+              const stageLabel = Array.isArray(p.etapas) && p.etapas.length > 0 ? p.etapas.join(' + ') : p.etapa;
+              const facturaLabel = p.numeroFactura
+                ? `Factura ${/^[A-Z]\d+-\d+/i.test(p.numeroFactura) ? p.numeroFactura : `#${p.numeroFactura}`}`
+                : (p.idFactura ? `ID #${p.idFactura}` : '—');
+              return (
+                <div
+                  key={p.idFactura || `${rowKey}-p-${pIdx}`}
+                  style={{
+                    borderRadius: '8px',
+                    border: '1px solid #1e293b',
+                    background: 'rgba(2, 6, 23, 0.78)',
+                    padding: '0.55rem 0.7rem',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                    gap: '0.45rem 0.75rem',
+                    alignItems: 'center',
+                    fontSize: '0.74rem'
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                       <span style={{
                         padding: '0.1rem 0.4rem',
                         borderRadius: '4px',
@@ -143433,32 +143438,37 @@ export default function MonitorMaestriaLima() {
                         background: p.etapa === 'MJ' ? 'rgba(245, 158, 11, 0.18)' : p.etapa === 'C2' ? 'rgba(56, 189, 248, 0.18)' : 'rgba(16, 185, 129, 0.18)',
                         color: p.etapa === 'MJ' ? '#fbbf24' : p.etapa === 'C2' ? '#38bdf8' : '#34d399'
                       }}>
-                        {Array.isArray(p.etapas) && p.etapas.length > 0 ? p.etapas.join(' + ') : p.etapa}
+                        {stageLabel}
                       </span>
-                    </td>
-                    <td style={{ padding: '0.42rem 0.6rem', color: '#e2e8f0' }}>
-                      <div>{p.concepto}</div>
-                      {p.equipo && <div style={{ color: '#94a3b8', fontSize: '0.69rem' }}>{p.equipo}</div>}
-                    </td>
-                    <td style={{ padding: '0.42rem 0.6rem', color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</td>
-                    <td style={{ padding: '0.42rem 0.6rem', color: '#94a3b8' }}>
-                      <span style={{ color: '#e2e8f0', fontWeight: 700 }}>
-                        {p.numeroFactura
-                          ? `Factura ${/^[A-Z]\d+-\d+/i.test(p.numeroFactura) ? p.numeroFactura : `#${p.numeroFactura}`}`
-                          : (p.idFactura ? `#${p.idFactura}` : '—')}
-                      </span>
+                      <span style={{ color: '#cbd5e1', fontFamily: 'monospace', fontSize: '0.71rem' }}>{p.fecha || '—'}</span>
+                    </div>
+                    <div style={{ color: '#e2e8f0', fontWeight: 700, marginTop: '0.2rem' }}>{p.concepto}</div>
+                    {p.equipo && <div style={{ color: '#94a3b8', fontSize: '0.69rem' }}>{p.equipo}</div>}
+                  </div>
+                  <div>
+                    <div style={{ color: '#94a3b8', fontSize: '0.67rem', textTransform: 'uppercase', fontWeight: 700 }}>Facturación / Ref.</div>
+                    <div style={{ color: '#f8fafc', fontWeight: 800 }}>
+                      {facturaLabel}
                       {p.idFactura && p.numeroFactura && p.idFactura !== p.numeroFactura ? ` (ID ${p.idFactura})` : ''}
-                      {p.referencia && p.referencia !== p.numeroFactura ? ` · Ref: ${p.referencia}` : ''}
-                      {p.registradoPor ? ` · ${p.registradoPor}` : ''}
-                    </td>
-                    <td style={{ padding: '0.42rem 0.6rem', textAlign: 'right', color: '#34d399', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                    </div>
+                    {p.referencia && p.referencia !== p.numeroFactura && (
+                      <div style={{ color: '#38bdf8', fontSize: '0.7rem', fontWeight: 700 }}>Ref: {p.referencia}</div>
+                    )}
+                    {p.registradoPor && <div style={{ color: '#94a3b8', fontSize: '0.68rem' }}>Reg: {p.registradoPor}</div>}
+                  </div>
+                  <div>
+                    <div style={{ color: '#94a3b8', fontSize: '0.67rem', textTransform: 'uppercase', fontWeight: 700 }}>Modo de Pago</div>
+                    <div style={{ color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ color: '#34d399', fontWeight: 900, fontSize: '0.86rem' }}>
                       {formatCurrencyAmount(p.monto, p.moneda)}
-                    </td>
-                    <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1' }}>{p.estado}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                    <div style={{ color: '#cbd5e1', fontSize: '0.7rem', fontWeight: 700 }}>{p.estado}</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
