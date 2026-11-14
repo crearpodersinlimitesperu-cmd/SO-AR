@@ -88336,7 +88336,7 @@ export function inferPaymentStages(rawStage, rawConcept = '', rawTeam = '', rawN
     stages.push('C2');
   }
   if (
-    /\b(mj|maestria|pfd|sfd|tfd|primer\s*fin|1er\s*fin|segundo\s*fin|2do\s*fin|tercer\s*fin|3er\s*fin|caminata|taller)\b/.test(hay)
+    /\b(mj\d*|maestria\d*|pfd\d*|sfd\d*|tfd\d*|fds\s*\d*|c3|cap\s*3|capitulo\s*3|tercer\s*capitulo|primer\s*fin|1er\s*fin|segundo\s*fin|2do\s*fin|tercer\s*fin|3er\s*fin|caminata|taller)\b/.test(hay)
   ) {
     stages.push('MJ');
   }
