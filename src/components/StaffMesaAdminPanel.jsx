@@ -1,4 +1,5 @@
 import { Fragment, useState, useEffect, useMemo } from 'react';
+import { isLimaOnlyScopedUser } from '../config/permissions';
 import { initializeApp, getApps } from 'firebase/app';
 import {
   getFirestore,
@@ -131,9 +132,10 @@ export default function StaffMesaAdminPanel({ currentUser }) {
   const [records, setRecords] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const limaOnly = isLimaOnlyScopedUser(currentUser);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
-  const [sedeFilter, setSedeFilter] = useState('todas');
+  const [sedeFilter, setSedeFilter] = useState(limaOnly ? 'Lima' : 'todas');
   const [puestoFilter, setPuestoFilter] = useState('todos');
   const [conexionFilter, setConexionFilter] = useState('todas');
   const [sortBy, setSortBy] = useState('ultima_conexion');
@@ -359,7 +361,8 @@ export default function StaffMesaAdminPanel({ currentUser }) {
         validityEvaluation: validity,
       };
     });
-  }, [autorizados, encuestas, sesiones, records, logs]);
+    return limaOnly ? list.filter((u) => String(u.sede || '').toLowerCase().includes('lima')) : list;
+  }, [autorizados, encuestas, sesiones, records, logs, limaOnly]);
 
   const puestoOptions = useMemo(() => {
     const set = new Set();
@@ -961,8 +964,9 @@ export default function StaffMesaAdminPanel({ currentUser }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <Building2 size={16} color="#f59e0b" />
             <select
-              value={sedeFilter}
-              onChange={(e) => setSedeFilter(e.target.value)}
+              value={limaOnly ? 'Lima' : sedeFilter}
+              onChange={(e) => { if (!limaOnly) setSedeFilter(e.target.value); }}
+              disabled={limaOnly}
               style={{
                 background: 'rgba(15, 23, 42, 0.9)',
                 border: '1px solid rgba(245, 158, 11, 0.3)',
@@ -973,12 +977,18 @@ export default function StaffMesaAdminPanel({ currentUser }) {
                 outline: 'none',
               }}
             >
-              <option value="todas">Todas las Sedes (6 oficiales)</option>
-              {OFFICIAL_SEDES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
+              {limaOnly ? (
+                <option value="Lima">Lima (Solo Sede)</option>
+              ) : (
+                <>
+                  <option value="todas">Todas las Sedes (6 oficiales)</option>
+                  {OFFICIAL_SEDES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
           </div>
 

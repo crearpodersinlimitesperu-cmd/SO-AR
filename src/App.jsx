@@ -413,7 +413,7 @@ function App() {
           } />
 
           <Route path="/superadmin" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'coord_jr', 'coordinador', 'coordinacion', 'coordinadora', 'coordinador_general', 'superadmin', 'consolidado', 'director_maestria', 'talento_humano', 'rrhh']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'coord_jr', 'coordinador', 'coordinacion', 'coordinadora', 'coordinador_general', 'finanzas', 'contabilidad', 'contador', 'facturacion', 'superadmin', 'consolidado', 'director_maestria', 'talento_humano', 'rrhh']} requireSuperAdmin={false}>
               <SuperAdminPanel />
             </RoleRoute>
           } />

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { isLimaOnlyScopedUser } from '../config/permissions';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getFirestore,
@@ -120,9 +121,10 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
   const [records, setRecords] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const limaOnly = isLimaOnlyScopedUser(currentUser);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [sedeFilter, setSedeFilter] = useState('ALL');
+  const [sedeFilter, setSedeFilter] = useState(limaOnly ? 'Lima' : 'ALL');
   const [expandedRow, setExpandedRow] = useState(null);
   const [bulkEmails, setBulkEmails] = useState('');
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -304,7 +306,7 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
       item.securityAlerts.push(l);
     });
 
-    return Array.from(byEmail.values()).map((item) => ({
+    const rows = Array.from(byEmail.values()).map((item) => ({
       ...item,
       nombre: formatHumanName(item.nombre, item.email),
     })).sort((a, b) => {
@@ -312,7 +314,13 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
       const bTime = b.lastSeenIso || b.lastLoginIso || '';
       return bTime.localeCompare(aTime);
     });
-  }, [autorizados, encuestas, sesiones, records, logs]);
+    return limaOnly ? rows.filter((item) => String(item.sede || '').toLowerCase().includes('lima')) : rows;
+  }, [autorizados, encuestas, sesiones, records, logs, limaOnly]);
+
+  const visibleLogs = useMemo(() => {
+    if (!limaOnly) return logs;
+    return logs.filter((log) => String(log.sede || '').toLowerCase().includes('lima'));
+  }, [logs, limaOnly]);
 
   const filteredRows = useMemo(() => {
     return unifiedRows.filter((r) => {
@@ -690,8 +698,9 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <Building2 size={15} color="var(--text-muted)" />
           <select
-            value={sedeFilter}
-            onChange={(e) => setSedeFilter(e.target.value)}
+            value={limaOnly ? 'Lima' : sedeFilter}
+            onChange={(e) => { if (!limaOnly) setSedeFilter(e.target.value); }}
+            disabled={limaOnly}
             style={{
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid var(--border-subtle)',
@@ -702,10 +711,16 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
               outline: 'none',
             }}
           >
-            <option value="ALL" style={{ background: '#0f172a' }}>Todas las Sedes</option>
-            {OFFICIAL_SEDES.map(s => (
-              <option key={s} value={s} style={{ background: '#0f172a' }}>{s}</option>
-            ))}
+            {limaOnly ? (
+              <option value="Lima" style={{ background: '#0f172a' }}>Lima (Solo Sede)</option>
+            ) : (
+              <>
+                <option value="ALL" style={{ background: '#0f172a' }}>Todas las Sedes</option>
+                {OFFICIAL_SEDES.map(s => (
+                  <option key={s} value={s} style={{ background: '#0f172a' }}>{s}</option>
+                ))}
+              </>
+            )}
           </select>
         </div>
 
@@ -941,13 +956,13 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
         <h3 style={{ marginTop: 0, marginBottom: '0.8rem', color: '#38bdf8', fontSize: '1.05rem', fontWeight: 800 }}>
           🕒 Bitácora en Tiempo Real C1: Conexiones, Avances y Bloqueos de Captura/Impresión
         </h3>
-        {logs.length === 0 ? (
+        {visibleLogs.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Aún no hay eventos registrados en la bitácora C1. Aparecerán en cuanto un Aliado inicie sesión o interactúe con la guía C1.
           </p>
         ) : (
           <div style={{ maxHeight: '340px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-            {logs.map((log) => {
+            {visibleLogs.map((log) => {
               const isAlert = String(log.action || '').includes('BLOQUEADO') || String(log.action || '').includes('DENEGADO');
               return (
                 <div

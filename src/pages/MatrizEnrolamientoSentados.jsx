@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { isLimaOnlyScopedUser } from '../config/permissions';
 import { 
   Building2, Users, Trophy, UserCheck, ArrowLeft, Filter, Search, 
   TrendingUp, Layers, CheckCircle2, Clock, AlertCircle, RefreshCw 
@@ -7,9 +9,11 @@ import {
 
 export default function MatrizEnrolamientoSentados() {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const limaOnly = isLimaOnlyScopedUser(currentUser);
 
   // Estados de Filtros
-  const [selectedSede, setSelectedSede] = useState('TODAS');
+  const [selectedSede, setSelectedSede] = useState(limaOnly ? 'Lima' : 'TODAS');
   const [selectedEquipo, setSelectedEquipo] = useState('TODOS');
   const [selectedEntrenador, setSelectedEntrenador] = useState('TODOS');
   const [searchTerm, setSearchTerm] = useState('');
@@ -141,7 +145,8 @@ export default function MatrizEnrolamientoSentados() {
   // Filtrado dinámico
   const datosFiltrados = useMemo(() => {
     return matrizDatos.filter(item => {
-      const matchSede = selectedSede === 'TODAS' || item.sede.toUpperCase() === selectedSede.toUpperCase();
+      const effectiveSede = limaOnly ? 'Lima' : selectedSede;
+      const matchSede = effectiveSede === 'TODAS' || item.sede.toUpperCase() === effectiveSede.toUpperCase();
       const matchEquipo = selectedEquipo === 'TODOS' || item.equipo.toUpperCase().includes(selectedEquipo.toUpperCase());
       const matchEntrenador = selectedEntrenador === 'TODOS' || item.entrenador.toUpperCase().includes(selectedEntrenador.toUpperCase());
       const matchSearch = searchTerm === '' || 
@@ -152,7 +157,7 @@ export default function MatrizEnrolamientoSentados() {
 
       return matchSede && matchEquipo && matchEntrenador && matchSearch;
     });
-  }, [matrizDatos, selectedSede, selectedEquipo, selectedEntrenador, searchTerm]);
+  }, [matrizDatos, selectedSede, selectedEquipo, selectedEntrenador, searchTerm, limaOnly]);
 
   // Cálculos consolidados
   const totales = useMemo(() => {
@@ -281,15 +286,22 @@ export default function MatrizEnrolamientoSentados() {
             <Filter size={16} style={{ color: '#64748b' }} />
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Sede:</span>
             <select 
-              value={selectedSede} 
-              onChange={(e) => setSelectedSede(e.target.value)}
-              style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '0.4rem 0.75rem', fontSize: '0.85rem', background: '#fff', cursor: 'pointer' }}
+              value={limaOnly ? 'Lima' : selectedSede} 
+              onChange={(e) => { if (!limaOnly) setSelectedSede(e.target.value); }}
+              disabled={limaOnly}
+              style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '0.4rem 0.75rem', fontSize: '0.85rem', background: '#fff', cursor: limaOnly ? 'not-allowed' : 'pointer' }}
             >
-              <option value="TODAS">Todas las Sedes</option>
-              <option value="Lima">Lima</option>
-              <option value="Guayaquil">Guayaquil</option>
-              <option value="Quito">Quito</option>
-              <option value="Cuenca">Cuenca</option>
+              {limaOnly ? (
+                <option value="Lima">Lima (Solo Sede)</option>
+              ) : (
+                <>
+                  <option value="TODAS">Todas las Sedes</option>
+                  <option value="Lima">Lima</option>
+                  <option value="Guayaquil">Guayaquil</option>
+                  <option value="Quito">Quito</option>
+                  <option value="Cuenca">Cuenca</option>
+                </>
+              )}
             </select>
           </div>
 

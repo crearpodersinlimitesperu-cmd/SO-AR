@@ -1090,6 +1090,20 @@ export const canAccessMonitorContratoLima = (currentUser) => {
   ].includes(r));
 };
 
+export const isLimaOnlyScopedUser = (currentUser) => {
+  if (!currentUser || isUserInactive(currentUser)) return false;
+  if (!currentUser.isSimulated && (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email))) return false;
+  if (!currentUser.isSimulated && (isGlobalObserver(currentUser) || isDataAdmin(currentUser))) return false;
+  const userRoles = collectUserRoles(currentUser);
+  if (userRoles.some(r => ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'observador', 'consolidado', 'coord_maestria_global'].includes(r))) {
+    return false;
+  }
+  const emailNorm = String(currentUser.email || '').toLowerCase().trim();
+  if (emailNorm === 'contabilidad.lima@crearpsl.net') return true;
+  const sedeNorm = String(currentUser.sede || '').toLowerCase().trim();
+  return sedeNorm.includes('lima');
+};
+
 export const canAccessAliadosStaff = (currentUser) => {
   if (!currentUser || isUserInactive(currentUser)) return false;
   if (!currentUser.isSimulated && (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email))) return true;
@@ -1098,6 +1112,8 @@ export const canAccessAliadosStaff = (currentUser) => {
   if (userRoles.some(r => ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(r))) {
     return true;
   }
+  const emailNorm = String(currentUser.email || '').toLowerCase().trim();
+  if (emailNorm === 'contabilidad.lima@crearpsl.net') return true;
   const sedeNorm = String(currentUser.sede || '').toLowerCase().trim();
   const isLimaOrGlobal = !sedeNorm || sedeNorm.includes('lima') || sedeNorm === 'global';
   if (!isLimaOrGlobal) return false;
