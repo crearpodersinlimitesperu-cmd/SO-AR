@@ -34823,9 +34823,54 @@ async function handleNodusJson(request, env, origin, path) {
         cursorEnd = windowStart - msPerDay;
       }
 
-      const settled = await Promise.allSettled(
-        windows.map((w) => client.getPagos({ desde: w.desde, hasta: w.hasta, sedeId: 7 }))
-      );
+      const [settled, contabilidadRes] = await Promise.all([
+        Promise.allSettled(
+          windows.map((w) => client.getPagos({ desde: w.desde, hasta: w.hasta, sedeId: 7 }))
+        ),
+        client.getContabilidad({ sedeId: 7 }).catch(() => null)
+      ]);
+
+      const extractContabilidadRows = (payload) => {
+        if (!payload) return [];
+        const d = payload.data ?? payload;
+        if (Array.isArray(d)) return d;
+        if (d && typeof d === 'object') {
+          for (const k of ['facturas', 'comprobantes', 'pagos', 'movimientos', 'registros', 'items', 'rows', 'data']) {
+            if (Array.isArray(d[k])) return d[k];
+          }
+        }
+        return [];
+      };
+
+      const contabilidadRows = extractContabilidadRows(contabilidadRes);
+      const contabilidadById = new Map();
+      const contabilidadByComposite = new Map();
+      const pickInvoiceCode = (r) =>
+        r?.numero_factura ??
+        r?.nro_factura ??
+        r?.num_factura ??
+        r?.factura ??
+        r?.serie_numero ??
+        r?.serie_correlativo ??
+        r?.numero_comprobante ??
+        r?.nro_comprobante ??
+        r?.comprobante ??
+        (r?.serie && (r?.correlativo || r?.numero) ? `${r.serie}-${r.correlativo || r.numero}` : null) ??
+        null;
+
+      for (const cRow of contabilidadRows) {
+        if (!cRow || typeof cRow !== 'object') continue;
+        const cId = cRow.id_factura ?? cRow.factura_id ?? cRow.id ?? null;
+        if (cId != null && String(cId).trim() !== '') {
+          contabilidadById.set(String(cId).trim(), cRow);
+        }
+        const doc = String(cRow.identificacion || cRow.dni || cRow.documento || '').replace(/\D/g, '');
+        const dt = String(cRow.fecha || cRow.fecha_pago || '').slice(0, 10);
+        const amt = cRow.monto ?? cRow.total ?? cRow.importe ?? '';
+        if (doc && dt) {
+          contabilidadByComposite.set(`${doc}|${dt}|${amt}`, cRow);
+        }
+      }
 
       const seen = new Set();
       const pagos = [];
@@ -34833,13 +34878,35 @@ async function handleNodusJson(request, env, origin, path) {
         if (item.status !== 'fulfilled') continue;
         const rows = Array.isArray(item.value?.data) ? item.value.data : [];
         for (const row of rows) {
-          const key = row?.id_factura != null
-            ? `f:${row.id_factura}`
-            : `${row?.fecha || ''}|${row?.identificacion || row?.dni || ''}|${row?.monto || ''}`;
+          const idKey = row?.id_factura != null ? String(row.id_factura).trim() : '';
+          const doc = String(row?.identificacion || row?.dni || '').replace(/\D/g, '');
+          const dt = String(row?.fecha || '').slice(0, 10);
+          const amt = row?.monto ?? row?.total ?? row?.importe ?? '';
+          const matchContab = (idKey && contabilidadById.get(idKey)) || (doc && dt ? contabilidadByComposite.get(`${doc}|${dt}|${amt}`) : null);
+          const enrichedInvoice = matchContab ? pickInvoiceCode(matchContab) : null;
+          const mergedRow = enrichedInvoice && !pickInvoiceCode(row)
+            ? { ...row, numero_factura: enrichedInvoice }
+            : row;
+
+          const key = mergedRow?.id_factura != null
+            ? `f:${mergedRow.id_factura}`
+            : `${mergedRow?.fecha || ''}|${mergedRow?.identificacion || mergedRow?.dni || ''}|${mergedRow?.monto || ''}`;
           if (seen.has(key)) continue;
           seen.add(key);
-          pagos.push(row);
+          pagos.push(mergedRow);
         }
+      }
+
+      for (const cRow of contabilidadRows) {
+        if (!cRow || typeof cRow !== 'object') continue;
+        const cId = cRow.id_factura ?? cRow.factura_id ?? cRow.id ?? null;
+        const inv = pickInvoiceCode(cRow);
+        const key = cId != null
+          ? `f:${cId}`
+          : (inv ? `inv:${inv}` : `${cRow?.fecha || ''}|${cRow?.identificacion || cRow?.dni || ''}|${cRow?.monto || ''}`);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        pagos.push(cRow);
       }
 
       pagos.sort((a, b) => String(b?.fecha || '').localeCompare(String(a?.fecha || '')));
@@ -88671,6 +88738,14 @@ export function buildParticipantPaymentTraceability({
     MJ: stagesSet.has('MJ') || mjPaid === true
   };
 
+  // Si ya está en Maestría en Nodus, tiene C1+C2 cubiertos y registra 2+ pagos mayores (p.ej. C2 + MJ sin etiqueta MJ) o 3+ pagos con abonos sin clasificar, cubre MJ.
+  if (!stageSummary.MJ && nodusCross?.maestriaNodus && stageSummary.C1 && stageSummary.C2) {
+    const majorPaymentsCount = deduped.filter((p) => p.monto !== null && p.monto >= 1000).length;
+    if (majorPaymentsCount >= 2 || (deduped.length >= 3 && stagesSet.has('OTRO'))) {
+      stageSummary.MJ = true;
+    }
+  }
+
   const hasUnclassifiedPayments = deduped.some(
     (p) => !['C1', 'C2', 'MJ'].includes(p.etapa) && (!Array.isArray(p.etapas) || p.etapas.length === 0)
   );
@@ -89091,6 +89166,20 @@ test('normalizeNodusPaymentRow extracts SUNAT invoice numbers (F001-1324 / B001-
     monto: 2000
   });
   assert.equal(fromSerieNumero.numeroFactura, 'B001-4737');
+});
+
+test('active Maestria participant with C1+C2 and 3 trainings paid (e.g. 720 + 1875 + 1695) marks MJ true', () => {
+  const contrato = { numeroDocumento: '45729876', nombre: 'Zorayda Alvarez' };
+  const nodusCross = { maestriaNodus: true, pagadoC1: true, pagadoC2: true };
+  const allPagos = [
+    { id_factura: 22771, comprobante: '282271', fecha: '2026-08-10', identificacion: '45729876', concepto: 'c1', monto: 720 },
+    { id_factura: 23463, comprobante: '043620', fecha: '2026-09-20', identificacion: '45729876', concepto: 'c2', monto: 1875 },
+    { id_factura: 28455, comprobante: '00221019', fecha: '2026-10-28', identificacion: '45729876', concepto: 'c2', monto: 1695 }
+  ];
+
+  const trace = buildParticipantPaymentTraceability({ contrato, nodusCross, allPagos });
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: true });
+  assert.equal(trace.totalByCurrency.PEN, 4290);
 });
 
 ```
