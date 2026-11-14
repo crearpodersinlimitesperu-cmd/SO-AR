@@ -37,8 +37,10 @@ export default function Login() {
     }
 
     try {
-      await loginWithGoogle({ participant: isParticipantLogin });
-      navigate(from);
+      const user = await loginWithGoogle({ participant: isParticipantLogin });
+      if (user) {
+        navigate(from);
+      }
     } catch (error) {
       console.error("Error al iniciar sesión", error);
       setIsLoading(false);

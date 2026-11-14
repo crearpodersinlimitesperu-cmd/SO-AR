@@ -3,8 +3,9 @@
   "appName": "Causa OS",
   "webDir": "dist",
   "server": {
-    "url": "https://centro-operativo-cpsl.web.app",
+    "url": "https://centro-operativo-cpsl.firebaseapp.com",
     "allowNavigation": [
+      "centro-operativo-cpsl.firebaseapp.com",
       "centro-operativo-cpsl.web.app",
       "*.firebaseapp.com",
       "*.google.com",
