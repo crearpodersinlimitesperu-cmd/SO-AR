@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
-import { signInWithPopup, reauthenticateWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult, reauthenticateWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, or, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail, usersData as allUsersList } from '../data/usersData';
@@ -586,6 +586,10 @@ export function AuthProvider({ children }) {
 
     try {
       if (participantFlow) sessionStorage.setItem(PARTICIPANT_FLAG, '1');
+      if (typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.()) {
+        await signInWithRedirect(auth, provider);
+        return;
+      }
       const result = await signInWithPopup(auth, provider);
 
       // Extract Google Access Token for API calls
@@ -763,6 +767,14 @@ export function AuthProvider({ children }) {
   };
 
   useEffect(() => {
+    getRedirectResult(auth)
+      .then((res) => {
+        const cred = res ? GoogleAuthProvider.credentialFromResult(res) : null;
+        if (cred?.accessToken) {
+          sessionStorage.setItem('googleAccessToken', cred.accessToken);
+        }
+      })
+      .catch(() => {});
     const startupTrace = createAuthStartupTrace();
     let sessionVersion = 0;
     let disposed = false;
