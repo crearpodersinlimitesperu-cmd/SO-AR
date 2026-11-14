@@ -764,9 +764,54 @@ async function handleNodusJson(request, env, origin, path) {
         cursorEnd = windowStart - msPerDay;
       }
 
-      const settled = await Promise.allSettled(
-        windows.map((w) => client.getPagos({ desde: w.desde, hasta: w.hasta, sedeId: 7 }))
-      );
+      const [settled, contabilidadRes] = await Promise.all([
+        Promise.allSettled(
+          windows.map((w) => client.getPagos({ desde: w.desde, hasta: w.hasta, sedeId: 7 }))
+        ),
+        client.getContabilidad({ sedeId: 7 }).catch(() => null)
+      ]);
+
+      const extractContabilidadRows = (payload) => {
+        if (!payload) return [];
+        const d = payload.data ?? payload;
+        if (Array.isArray(d)) return d;
+        if (d && typeof d === 'object') {
+          for (const k of ['facturas', 'comprobantes', 'pagos', 'movimientos', 'registros', 'items', 'rows', 'data']) {
+            if (Array.isArray(d[k])) return d[k];
+          }
+        }
+        return [];
+      };
+
+      const contabilidadRows = extractContabilidadRows(contabilidadRes);
+      const contabilidadById = new Map();
+      const contabilidadByComposite = new Map();
+      const pickInvoiceCode = (r) =>
+        r?.numero_factura ??
+        r?.nro_factura ??
+        r?.num_factura ??
+        r?.factura ??
+        r?.serie_numero ??
+        r?.serie_correlativo ??
+        r?.numero_comprobante ??
+        r?.nro_comprobante ??
+        r?.comprobante ??
+        (r?.serie && (r?.correlativo || r?.numero) ? `${r.serie}-${r.correlativo || r.numero}` : null) ??
+        null;
+
+      for (const cRow of contabilidadRows) {
+        if (!cRow || typeof cRow !== 'object') continue;
+        const cId = cRow.id_factura ?? cRow.factura_id ?? cRow.id ?? null;
+        if (cId != null && String(cId).trim() !== '') {
+          contabilidadById.set(String(cId).trim(), cRow);
+        }
+        const doc = String(cRow.identificacion || cRow.dni || cRow.documento || '').replace(/\D/g, '');
+        const dt = String(cRow.fecha || cRow.fecha_pago || '').slice(0, 10);
+        const amt = cRow.monto ?? cRow.total ?? cRow.importe ?? '';
+        if (doc && dt) {
+          contabilidadByComposite.set(`${doc}|${dt}|${amt}`, cRow);
+        }
+      }
 
       const seen = new Set();
       const pagos = [];
@@ -774,13 +819,35 @@ async function handleNodusJson(request, env, origin, path) {
         if (item.status !== 'fulfilled') continue;
         const rows = Array.isArray(item.value?.data) ? item.value.data : [];
         for (const row of rows) {
-          const key = row?.id_factura != null
-            ? `f:${row.id_factura}`
-            : `${row?.fecha || ''}|${row?.identificacion || row?.dni || ''}|${row?.monto || ''}`;
+          const idKey = row?.id_factura != null ? String(row.id_factura).trim() : '';
+          const doc = String(row?.identificacion || row?.dni || '').replace(/\D/g, '');
+          const dt = String(row?.fecha || '').slice(0, 10);
+          const amt = row?.monto ?? row?.total ?? row?.importe ?? '';
+          const matchContab = (idKey && contabilidadById.get(idKey)) || (doc && dt ? contabilidadByComposite.get(`${doc}|${dt}|${amt}`) : null);
+          const enrichedInvoice = matchContab ? pickInvoiceCode(matchContab) : null;
+          const mergedRow = enrichedInvoice && !pickInvoiceCode(row)
+            ? { ...row, numero_factura: enrichedInvoice }
+            : row;
+
+          const key = mergedRow?.id_factura != null
+            ? `f:${mergedRow.id_factura}`
+            : `${mergedRow?.fecha || ''}|${mergedRow?.identificacion || mergedRow?.dni || ''}|${mergedRow?.monto || ''}`;
           if (seen.has(key)) continue;
           seen.add(key);
-          pagos.push(row);
+          pagos.push(mergedRow);
         }
+      }
+
+      for (const cRow of contabilidadRows) {
+        if (!cRow || typeof cRow !== 'object') continue;
+        const cId = cRow.id_factura ?? cRow.factura_id ?? cRow.id ?? null;
+        const inv = pickInvoiceCode(cRow);
+        const key = cId != null
+          ? `f:${cId}`
+          : (inv ? `inv:${inv}` : `${cRow?.fecha || ''}|${cRow?.identificacion || cRow?.dni || ''}|${cRow?.monto || ''}`);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        pagos.push(cRow);
       }
 
       pagos.sort((a, b) => String(b?.fecha || '').localeCompare(String(a?.fecha || '')));
