@@ -187,3 +187,23 @@ test('underscore-separated Nodus concepts like c2_maestria match both C2 and MJ'
   assert.equal(trace.hasUnclassifiedPayments, false);
   assert.deepEqual(trace.payments[1].etapas, ['C2', 'MJ']);
 });
+
+test('normalizeNodusPaymentRow extracts SUNAT invoice numbers (F001-1324 / B001-4737) from comprobante or serie+correlativo', () => {
+  const fromComprobante = normalizeNodusPaymentRow({
+    id_factura: 30050,
+    comprobante: 'F001-1324',
+    fecha: '2026-11-06',
+    monto: 2000
+  });
+  assert.equal(fromComprobante.numeroFactura, 'F001-1324');
+  assert.equal(fromComprobante.idFactura, '30050');
+
+  const fromSerieNumero = normalizeNodusPaymentRow({
+    id_factura: 30051,
+    serie: 'B001',
+    correlativo: '4737',
+    fecha: '2026-11-06',
+    monto: 2000
+  });
+  assert.equal(fromSerieNumero.numeroFactura, 'B001-4737');
+});

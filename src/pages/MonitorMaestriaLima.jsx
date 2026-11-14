@@ -1739,7 +1739,7 @@ export default function MonitorMaestriaLima() {
                                     <span style={{ color: '#fbbf24', fontWeight: 800 }}>
                                       {trace.payments.length} {trace.payments.length === 1 ? 'pago' : 'pagos'}
                                       {totalFormatted ? ` · Total ${totalFormatted}` : ''}
-                                      {trace.invoiceNumbers.length > 0 ? ` · Facturas: ${trace.invoiceNumbers.map((inv) => `#${inv}`).join(', ')}` : ''}
+                                      {trace.invoiceNumbers.length > 0 ? ` · Facturas: ${trace.invoiceNumbers.map((inv) => (/^[A-Z]\d+-\d+/i.test(inv) ? inv : `#${inv}`)).join(', ')}` : ''}
                                       {trace.paymentModes.length > 0 ? ` · Modo: ${trace.paymentModes.join(', ')}` : ''}
                                     </span>
                                   ) : (
@@ -1804,10 +1804,12 @@ export default function MonitorMaestriaLima() {
                                           <td style={{ padding: '0.42rem 0.6rem', color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</td>
                                           <td style={{ padding: '0.42rem 0.6rem', color: '#94a3b8' }}>
                                             <span style={{ color: '#e2e8f0', fontWeight: 700 }}>
-                                              {p.numeroFactura ? `Factura #${p.numeroFactura}` : (p.idFactura ? `#${p.idFactura}` : '—')}
+                                              {p.numeroFactura
+                                                ? `Factura ${/^[A-Z]\d+-\d+/i.test(p.numeroFactura) ? p.numeroFactura : `#${p.numeroFactura}`}`
+                                                : (p.idFactura ? `#${p.idFactura}` : '—')}
                                             </span>
                                             {p.idFactura && p.numeroFactura && p.idFactura !== p.numeroFactura ? ` (ID ${p.idFactura})` : ''}
-                                            {p.referencia ? ` · Ref: ${p.referencia}` : ''}
+                                            {p.referencia && p.referencia !== p.numeroFactura ? ` · Ref: ${p.referencia}` : ''}
                                             {p.registradoPor ? ` · ${p.registradoPor}` : ''}
                                           </td>
                                           <td style={{ padding: '0.42rem 0.6rem', textAlign: 'right', color: '#34d399', fontWeight: 800, whiteSpace: 'nowrap' }}>

@@ -88358,12 +88358,24 @@ export function normalizeNodusPaymentRow(row, fallbackStage = '') {
 
   const idFacturaRaw = row.id_factura ?? row.factura_id ?? row.id ?? row.codigo ?? '';
   const idFactura = idFacturaRaw !== '' && idFacturaRaw !== null ? String(idFacturaRaw).trim() : '';
+  const seriePart = String(row.serie || row.serie_factura || row.serie_comprobante || '').trim();
+  const numeroPart = String(row.correlativo || row.numero_correlativo || row.numero || '').trim();
+  const combinedSerieNumero = seriePart && numeroPart ? `${seriePart}-${numeroPart}` : '';
   const numeroFacturaRaw =
     row.numero_factura ??
     row.nro_factura ??
     row.num_factura ??
     row.factura ??
     row.serie_numero ??
+    row.serie_correlativo ??
+    row.numero_comprobante ??
+    row.nro_comprobante ??
+    row.comprobante ??
+    row.codigo_factura ??
+    row.documento_factura ??
+    row.boleta ??
+    row.folio ??
+    (combinedSerieNumero || null) ??
     idFactura;
   const numeroFactura = numeroFacturaRaw !== '' && numeroFacturaRaw !== null ? String(numeroFacturaRaw).trim() : '';
 
@@ -89059,6 +89071,26 @@ test('underscore-separated Nodus concepts like c2_maestria match both C2 and MJ'
   assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: true });
   assert.equal(trace.hasUnclassifiedPayments, false);
   assert.deepEqual(trace.payments[1].etapas, ['C2', 'MJ']);
+});
+
+test('normalizeNodusPaymentRow extracts SUNAT invoice numbers (F001-1324 / B001-4737) from comprobante or serie+correlativo', () => {
+  const fromComprobante = normalizeNodusPaymentRow({
+    id_factura: 30050,
+    comprobante: 'F001-1324',
+    fecha: '2026-11-06',
+    monto: 2000
+  });
+  assert.equal(fromComprobante.numeroFactura, 'F001-1324');
+  assert.equal(fromComprobante.idFactura, '30050');
+
+  const fromSerieNumero = normalizeNodusPaymentRow({
+    id_factura: 30051,
+    serie: 'B001',
+    correlativo: '4737',
+    fecha: '2026-11-06',
+    monto: 2000
+  });
+  assert.equal(fromSerieNumero.numeroFactura, 'B001-4737');
 });
 
 ```
@@ -144182,7 +144214,7 @@ export default function MonitorMaestriaLima() {
                                     <span style={{ color: '#fbbf24', fontWeight: 800 }}>
                                       {trace.payments.length} {trace.payments.length === 1 ? 'pago' : 'pagos'}
                                       {totalFormatted ? ` · Total ${totalFormatted}` : ''}
-                                      {trace.invoiceNumbers.length > 0 ? ` · Facturas: ${trace.invoiceNumbers.map((inv) => `#${inv}`).join(', ')}` : ''}
+                                      {trace.invoiceNumbers.length > 0 ? ` · Facturas: ${trace.invoiceNumbers.map((inv) => (/^[A-Z]\d+-\d+/i.test(inv) ? inv : `#${inv}`)).join(', ')}` : ''}
                                       {trace.paymentModes.length > 0 ? ` · Modo: ${trace.paymentModes.join(', ')}` : ''}
                                     </span>
                                   ) : (
@@ -144247,10 +144279,12 @@ export default function MonitorMaestriaLima() {
                                           <td style={{ padding: '0.42rem 0.6rem', color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</td>
                                           <td style={{ padding: '0.42rem 0.6rem', color: '#94a3b8' }}>
                                             <span style={{ color: '#e2e8f0', fontWeight: 700 }}>
-                                              {p.numeroFactura ? `Factura #${p.numeroFactura}` : (p.idFactura ? `#${p.idFactura}` : '—')}
+                                              {p.numeroFactura
+                                                ? `Factura ${/^[A-Z]\d+-\d+/i.test(p.numeroFactura) ? p.numeroFactura : `#${p.numeroFactura}`}`
+                                                : (p.idFactura ? `#${p.idFactura}` : '—')}
                                             </span>
                                             {p.idFactura && p.numeroFactura && p.idFactura !== p.numeroFactura ? ` (ID ${p.idFactura})` : ''}
-                                            {p.referencia ? ` · Ref: ${p.referencia}` : ''}
+                                            {p.referencia && p.referencia !== p.numeroFactura ? ` · Ref: ${p.referencia}` : ''}
                                             {p.registradoPor ? ` · ${p.registradoPor}` : ''}
                                           </td>
                                           <td style={{ padding: '0.42rem 0.6rem', textAlign: 'right', color: '#34d399', fontWeight: 800, whiteSpace: 'nowrap' }}>
