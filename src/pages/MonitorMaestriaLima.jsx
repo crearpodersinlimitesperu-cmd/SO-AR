@@ -384,6 +384,16 @@ export default function MonitorMaestriaLima() {
     const totalEntrenadores = signedContracts.filter((c) => normalizeStr(c.rol || c.rolActividad || '').includes('entrenador')).length;
     const totalOtrosRestantes = Math.max(0, totalRegistradosFirestore - totalParticipantes - totalManagers - totalCapitanes - totalStaff - totalEntrenadores);
     const totalNodusParticipantes = Math.max(0, (summary.totalNodusMaestria || 0) - (summary.totalNodusManagers || 0));
+    const totalNodusSinPago = nodusPadronCross.filter((item) => {
+      if (!item.maestriaNodus || item.tipoPersona !== 'participante') return false;
+      const pTrace = buildParticipantPaymentTraceability({
+        contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+        nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
+        allPagos: nodusPagosLima
+      });
+      const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
+      return !hasPay;
+    }).length;
 
     return {
       totalPadron,
@@ -398,9 +408,10 @@ export default function MonitorMaestriaLima() {
       totalEntrenadores,
       totalOtrosRestantes,
       totalNodusParticipantes,
+      totalNodusSinPago,
       ...summary
     };
-  }, [nodusCrossResult, signedContracts]);
+  }, [nodusCrossResult, signedContracts, nodusPagosLima]);
 
   // Filtrado Tab 1 (Registros y Auditoría Forense + Cruce Nodus)
   const filteredRegistros = useMemo(() => {
@@ -448,6 +459,15 @@ export default function MonitorMaestriaLima() {
         if (!item.maestriaNodus) return false;
       } else if (padronStatusFilter === 'CON_OBSERVACION_PREVIA') {
         if (!item.maestriaNodus || !item.coherenciaPrevia || item.coherenciaPrevia.isCoherent) return false;
+      } else if (padronStatusFilter === 'SIN_PAGO_EN_NODUS') {
+        if (!item.maestriaNodus || item.tipoPersona !== 'participante') return false;
+        const pTrace = buildParticipantPaymentTraceability({
+          contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+          nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
+          allPagos: nodusPagosLima
+        });
+        const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
+        if (hasPay) return false;
       } else if (padronStatusFilter !== 'TODOS' && item.estadoOperativo !== padronStatusFilter) {
         return false;
       }
@@ -1007,6 +1027,34 @@ export default function MonitorMaestriaLima() {
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.totalFaltaFirmaContrato}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
                 {stats.totalFaltaFirmaPart || 0} Part. · {stats.totalFaltaFirmaMgr || 0} Mgr.
+              </div>
+            </div>
+            <div
+              onClick={() => {
+                setActiveTab('PADRON');
+                setPadronTeamFilter('TODOS');
+                setPadronRoleFilter('TODOS');
+                setPadronSearch('');
+                setPadronStatusFilter('SIN_PAGO_EN_NODUS');
+                scrollToResults();
+              }}
+              title="Clic para auditar participantes con asistencia en Nodus y sin ningún pago registrado"
+              style={{
+                background: stats.totalNodusSinPago > 0 ? 'rgba(239, 68, 68, 0.18)' : 'rgba(16, 185, 129, 0.10)',
+                padding: '0.75rem 1rem',
+                borderRadius: '10px',
+                border: stats.totalNodusSinPago > 0 ? '1px solid rgba(248, 113, 113, 0.55)' : '1px solid rgba(16, 185, 129, 0.35)',
+                cursor: 'pointer'
+              }}
+            >
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: stats.totalNodusSinPago > 0 ? '#fca5a5' : '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {stats.totalNodusSinPago > 0 ? '🚨 Nodus Asist. · Sin Pago' : '✅ Nodus Asist. · Pagos OK'}
+              </span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: stats.totalNodusSinPago > 0 ? '#f87171' : '#34d399', marginTop: '0.15rem' }}>
+                {nodusLoading ? '...' : stats.totalNodusSinPago}
+              </div>
+              <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
+                {stats.totalNodusSinPago > 0 ? 'Participantes c/asistencia y sin pago' : 'Participantes con pago verificado'}
               </div>
             </div>
           </div>
@@ -1684,6 +1732,7 @@ export default function MonitorMaestriaLima() {
                                     <span style={{ color: '#fbbf24', fontWeight: 800 }}>
                                       {trace.payments.length} {trace.payments.length === 1 ? 'pago' : 'pagos'}
                                       {totalFormatted ? ` · Total ${totalFormatted}` : ''}
+                                      {trace.invoiceNumbers.length > 0 ? ` · Facturas: ${trace.invoiceNumbers.map((inv) => `#${inv}`).join(', ')}` : ''}
                                       {trace.paymentModes.length > 0 ? ` · Modo: ${trace.paymentModes.join(', ')}` : ''}
                                     </span>
                                   ) : (
@@ -1747,7 +1796,10 @@ export default function MonitorMaestriaLima() {
                                           </td>
                                           <td style={{ padding: '0.42rem 0.6rem', color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</td>
                                           <td style={{ padding: '0.42rem 0.6rem', color: '#94a3b8' }}>
-                                            {p.idFactura ? `#${p.idFactura}` : '—'}
+                                            <span style={{ color: '#e2e8f0', fontWeight: 700 }}>
+                                              {p.numeroFactura ? `Factura #${p.numeroFactura}` : (p.idFactura ? `#${p.idFactura}` : '—')}
+                                            </span>
+                                            {p.idFactura && p.numeroFactura && p.idFactura !== p.numeroFactura ? ` (ID ${p.idFactura})` : ''}
                                             {p.referencia ? ` · Ref: ${p.referencia}` : ''}
                                             {p.registradoPor ? ` · ${p.registradoPor}` : ''}
                                           </td>
@@ -1904,6 +1956,7 @@ export default function MonitorMaestriaLima() {
                   { id: 'COMPLETO', label: '✅ Completo (Firma + Nodus)' },
                   { id: 'FALTA_CHECKIN_NODUS', label: '⚠️ Firmó · Falta Check-in Nodus' },
                   { id: 'FALTA_FIRMA_CONTRATO', label: '🚨 En Nodus · Falta Firma Contrato' },
+                  { id: 'SIN_PAGO_EN_NODUS', label: `🚨 Nodus Asist. · Sin Pago (${stats.totalNodusSinPago || 0})` },
                   { id: 'CON_OBSERVACION_PREVIA', label: `⚠️ Obs. C1/C2/Pagos (${stats.totalNodusConObservacion || 0})` },
                   { id: 'PENDIENTE_AMBOS', label: '⏳ Pendiente Ambos' }
                 ].map((s) => {

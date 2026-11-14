@@ -41,6 +41,14 @@ export function normalizeNodusPaymentRow(row, fallbackStage = '') {
 
   const idFacturaRaw = row.id_factura ?? row.factura_id ?? row.id ?? row.codigo ?? '';
   const idFactura = idFacturaRaw !== '' && idFacturaRaw !== null ? String(idFacturaRaw).trim() : '';
+  const numeroFacturaRaw =
+    row.numero_factura ??
+    row.nro_factura ??
+    row.num_factura ??
+    row.factura ??
+    row.serie_numero ??
+    idFactura;
+  const numeroFactura = numeroFacturaRaw !== '' && numeroFacturaRaw !== null ? String(numeroFacturaRaw).trim() : '';
 
   const fecha = String(
     row.fecha ||
@@ -130,6 +138,7 @@ export function normalizeNodusPaymentRow(row, fallbackStage = '') {
 
   return {
     idFactura,
+    numeroFactura,
     fecha,
     etapa,
     concepto,
@@ -281,6 +290,7 @@ export function buildParticipantPaymentTraceability({
   const totalByCurrency = {};
   const modesSet = new Set();
   const stagesSet = new Set();
+  const invoicesSet = new Set();
 
   for (const p of deduped) {
     if (p.monto !== null) {
@@ -288,6 +298,8 @@ export function buildParticipantPaymentTraceability({
     }
     if (p.modoPago) modesSet.add(p.modoPago);
     if (p.etapa) stagesSet.add(p.etapa);
+    const inv = p.numeroFactura || p.idFactura;
+    if (inv) invoicesSet.add(inv);
   }
 
   const stageSummary = {
@@ -300,6 +312,7 @@ export function buildParticipantPaymentTraceability({
     payments: deduped,
     totalByCurrency,
     paymentModes: Array.from(modesSet),
+    invoiceNumbers: Array.from(invoicesSet),
     stagesPresent: ['C1', 'C2', 'MJ', 'OTRO'].filter((s) => stagesSet.has(s)),
     stageSummary
   };
