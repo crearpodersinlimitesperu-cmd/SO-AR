@@ -1589,6 +1589,11 @@ export default function MonitorMaestriaLima() {
                           )}
                         </div>
                         {(() => {
+                          const roleText = normalizeStr(item.rol || item.rolActividad || item.nodusCross?.nodusRole || '');
+                          const isNonPayingStaff = /manager|capitan|staff|entrenador|oficina|coordinador|gerente/.test(roleText);
+                          const isParticipante = !isNonPayingStaff && (roleText === '' || roleText.includes('participante'));
+                          if (!isParticipante) return null;
+
                           const trace = buildParticipantPaymentTraceability({
                             contrato: item,
                             nodusCross: item.nodusCross,
@@ -1605,8 +1610,6 @@ export default function MonitorMaestriaLima() {
                             { key: 'C2', active: trace.stageSummary.C2 },
                             { key: 'MJ', active: trace.stageSummary.MJ }
                           ];
-                          const roleText = normalizeStr(item.rol || item.rolActividad || item.nodusCross?.nodusRole || '');
-                          const isNonPayingStaff = /manager|capitan|staff|entrenador|oficina/.test(roleText);
                           const hasAnyPayment = trace.payments.length > 0 ||
                             trace.stageSummary.C1 ||
                             trace.stageSummary.C2 ||

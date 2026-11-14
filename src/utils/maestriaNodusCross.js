@@ -98,7 +98,8 @@ function findContractForNodusPerson(person, signedContracts) {
 
 export function evaluatePriorCoherence(entry) {
   if (!entry) return { status: 'UNKNOWN', isCoherent: false, issues: ['Sin datos Nodus'] };
-  if (entry.tipoPersona === 'manager') {
+  const tipo = String(entry.tipoPersona || '').toLowerCase().trim();
+  if (tipo && tipo !== 'participante') {
     return { status: 'MANAGER', isCoherent: true, label: 'Manager · Staff', issues: [] };
   }
   const etapas = Array.isArray(entry.etapas) ? entry.etapas : [];
