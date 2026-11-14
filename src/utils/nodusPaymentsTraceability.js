@@ -19,8 +19,14 @@ export const normalizeDocForPayments = (val) =>
     .toUpperCase()
     .trim();
 
+const normalizeStageHaystack = (rawStage, rawConcept = '', rawTeam = '', rawNotes = '') =>
+  normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`)
+    .replace(/[_/+\-.,:;|]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
 export function inferPaymentStages(rawStage, rawConcept = '', rawTeam = '', rawNotes = '') {
-  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`);
+  const hay = normalizeStageHaystack(rawStage, rawConcept, rawTeam, rawNotes);
   if (!hay) return [];
   const stages = [];
   if (/\b(c1|cap\s*1|capitulo\s*1|primer\s*capitulo|basico|intro)\b/.test(hay)) {
@@ -42,7 +48,7 @@ export function inferPaymentStage(rawStage, rawConcept = '', rawTeam = '', rawNo
   if (stages.includes('MJ')) return 'MJ';
   if (stages.includes('C2')) return 'C2';
   if (stages.includes('C1')) return 'C1';
-  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`);
+  const hay = normalizeStageHaystack(rawStage, rawConcept, rawTeam, rawNotes);
   if (!hay) return 'OTRO';
   return String(rawStage || '').trim().toUpperCase() || 'OTRO';
 }

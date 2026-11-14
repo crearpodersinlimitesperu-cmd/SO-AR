@@ -1785,7 +1785,7 @@ export default function MonitorMaestriaLima() {
                                               background: p.etapa === 'MJ' ? 'rgba(245, 158, 11, 0.18)' : p.etapa === 'C2' ? 'rgba(56, 189, 248, 0.18)' : 'rgba(16, 185, 129, 0.18)',
                                               color: p.etapa === 'MJ' ? '#fbbf24' : p.etapa === 'C2' ? '#38bdf8' : '#34d399'
                                             }}>
-                                              {p.etapa}
+                                              {Array.isArray(p.etapas) && p.etapas.length > 0 ? p.etapas.join(' + ') : p.etapa}
                                             </span>
                                           </td>
                                           <td style={{ padding: '0.42rem 0.6rem', color: '#e2e8f0' }}>

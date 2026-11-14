@@ -88319,8 +88319,14 @@ export const normalizeDocForPayments = (val) =>
     .toUpperCase()
     .trim();
 
+const normalizeStageHaystack = (rawStage, rawConcept = '', rawTeam = '', rawNotes = '') =>
+  normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`)
+    .replace(/[_/+\-.,:;|]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
 export function inferPaymentStages(rawStage, rawConcept = '', rawTeam = '', rawNotes = '') {
-  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`);
+  const hay = normalizeStageHaystack(rawStage, rawConcept, rawTeam, rawNotes);
   if (!hay) return [];
   const stages = [];
   if (/\b(c1|cap\s*1|capitulo\s*1|primer\s*capitulo|basico|intro)\b/.test(hay)) {
@@ -88342,7 +88348,7 @@ export function inferPaymentStage(rawStage, rawConcept = '', rawTeam = '', rawNo
   if (stages.includes('MJ')) return 'MJ';
   if (stages.includes('C2')) return 'C2';
   if (stages.includes('C1')) return 'C1';
-  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`);
+  const hay = normalizeStageHaystack(rawStage, rawConcept, rawTeam, rawNotes);
   if (!hay) return 'OTRO';
   return String(rawStage || '').trim().toUpperCase() || 'OTRO';
 }
@@ -89018,6 +89024,41 @@ test('unclassified /api/pagos rows set hasUnclassifiedPayments and respect nodus
   assert.equal(trace.hasUnclassifiedPayments, true);
   assert.equal(trace.allPaymentsUnclassified, true);
   assert.deepEqual(trace.invoiceNumbers, ['27154', '30050']);
+});
+
+test('underscore-separated Nodus concepts like c2_maestria match both C2 and MJ', () => {
+  const contrato = { numeroDocumento: '22334455', nombre: 'Maria Lopez' };
+  const allPagos = [
+    {
+      id_factura: 27154,
+      fecha: '2026-09-04 16:37:34',
+      identificacion: '22334455',
+      concepto: 'c1',
+      metodo_pago: 'TC(DATAFAST)',
+      monto: 785
+    },
+    {
+      id_factura: 30050,
+      fecha: '2026-11-03 09:37:24',
+      identificacion: '22334455',
+      concepto: 'c2_maestria',
+      metodo_pago: 'TRANSFERENCIA AHORROS',
+      monto: 1000
+    },
+    {
+      id_factura: 30154,
+      fecha: '2026-11-07 12:24:16',
+      identificacion: '22334455',
+      concepto: 'c2_maestria',
+      metodo_pago: 'EFECTIVO',
+      monto: 1000
+    }
+  ];
+
+  const trace = buildParticipantPaymentTraceability({ contrato, nodusCross: {}, allPagos });
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: true });
+  assert.equal(trace.hasUnclassifiedPayments, false);
+  assert.deepEqual(trace.payments[1].etapas, ['C2', 'MJ']);
 });
 
 ```
@@ -144187,7 +144228,7 @@ export default function MonitorMaestriaLima() {
                                               background: p.etapa === 'MJ' ? 'rgba(245, 158, 11, 0.18)' : p.etapa === 'C2' ? 'rgba(56, 189, 248, 0.18)' : 'rgba(16, 185, 129, 0.18)',
                                               color: p.etapa === 'MJ' ? '#fbbf24' : p.etapa === 'C2' ? '#38bdf8' : '#34d399'
                                             }}>
-                                              {p.etapa}
+                                              {Array.isArray(p.etapas) && p.etapas.length > 0 ? p.etapas.join(' + ') : p.etapa}
                                             </span>
                                           </td>
                                           <td style={{ padding: '0.42rem 0.6rem', color: '#e2e8f0' }}>

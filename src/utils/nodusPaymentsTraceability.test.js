@@ -152,3 +152,38 @@ test('unclassified /api/pagos rows set hasUnclassifiedPayments and respect nodus
   assert.equal(trace.allPaymentsUnclassified, true);
   assert.deepEqual(trace.invoiceNumbers, ['27154', '30050']);
 });
+
+test('underscore-separated Nodus concepts like c2_maestria match both C2 and MJ', () => {
+  const contrato = { numeroDocumento: '22334455', nombre: 'Maria Lopez' };
+  const allPagos = [
+    {
+      id_factura: 27154,
+      fecha: '2026-09-04 16:37:34',
+      identificacion: '22334455',
+      concepto: 'c1',
+      metodo_pago: 'TC(DATAFAST)',
+      monto: 785
+    },
+    {
+      id_factura: 30050,
+      fecha: '2026-11-03 09:37:24',
+      identificacion: '22334455',
+      concepto: 'c2_maestria',
+      metodo_pago: 'TRANSFERENCIA AHORROS',
+      monto: 1000
+    },
+    {
+      id_factura: 30154,
+      fecha: '2026-11-07 12:24:16',
+      identificacion: '22334455',
+      concepto: 'c2_maestria',
+      metodo_pago: 'EFECTIVO',
+      monto: 1000
+    }
+  ];
+
+  const trace = buildParticipantPaymentTraceability({ contrato, nodusCross: {}, allPagos });
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: true });
+  assert.equal(trace.hasUnclassifiedPayments, false);
+  assert.deepEqual(trace.payments[1].etapas, ['C2', 'MJ']);
+});
