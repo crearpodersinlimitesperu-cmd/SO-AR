@@ -2,6 +2,15 @@
   "appId": "net.crearpsl.causaos",
   "appName": "Causa OS",
   "webDir": "dist",
+  "server": {
+    "url": "https://centro-operativo-cpsl.web.app",
+    "allowNavigation": [
+      "centro-operativo-cpsl.web.app",
+      "*.firebaseapp.com",
+      "*.google.com",
+      "*.crearpslglobal.com"
+    ]
+  },
   "ios": {
     "contentInset": "automatic",
     "backgroundColor": "#050811"
