@@ -170,12 +170,39 @@ async function fetchNodusMaestriaData(dnis) {
       : Promise.resolve(null),
   ]);
 
-  const mjData = mjResp.ok ? await mjResp.json() : {};
-  const batchData = batchResp && batchResp.ok ? await batchResp.json() : {};
+  const mjData = mjResp.ok ? await mjResp.json() : null;
+  if (!mjResp.ok) {
+    throw new Error(`Fallo crítico consultando Nodus maestria-lima (${mjResp.status}): abortando para no enviar sin cruce.`);
+  }
+  if (dnis.length > 0 && (!batchResp || !batchResp.ok)) {
+    throw new Error(`Fallo crítico consultando Nodus participantes-batch (${batchResp?.status || 'network'}): abortando para no enviar sin cruce.`);
+  }
+  const batchData = batchResp ? await batchResp.json() : {};
   return { mjData, batchByDoc: batchData?.participantes || batchData?.data || {} };
 }
 
-function classifyContractAndNodus(contract, nodusRecord) {
+function resolveRoleCategory(rawRole) {
+  const r = normalizeStr(rawRole);
+  if (!r) return 'unknown';
+  if (/(entrenador|staff|oficina|coordinador|gerente|director)/.test(r)) return 'staff';
+  if (r.includes('manager')) return 'manager';
+  if (r.includes('capitan')) return 'capitan';
+  if (r.includes('participante') || r.includes('enrolado')) return 'participante';
+  return 'unknown';
+}
+
+export function classifyContractAndNodus(contract, nodusRecord, activeMaestriaTeamNumber = null) {
+  if (!nodusRecord) {
+    return { action: 'exclude', reason: 'SIN_REGISTRO_ACTIVO_NODUS' };
+  }
+
+  if (activeMaestriaTeamNumber) {
+    const contractTeam = extractTeamNumber(contract.equipo || contract.equipoCohorte || contract.cohorte);
+    if (contractTeam && contractTeam !== activeMaestriaTeamNumber) {
+      return { action: 'exclude', reason: `OTRO_EQUIPO_CONTRATO (Eq.${contractTeam} != Eq.${activeMaestriaTeamNumber})` };
+    }
+  }
+
   const statusText = normalizeStr(
     `${contract.estado || ''} ${contract.status || ''} ${nodusRecord?.estado || ''} ${nodusRecord?.situacion || ''} ${nodusRecord?.estatus || ''}`
   );
@@ -183,26 +210,42 @@ function classifyContractAndNodus(contract, nodusRecord) {
     return { action: 'exclude', reason: 'DESERTOR_O_BAJA' };
   }
 
-  const roleRaw = String(contract.rol || contract.rolActividad || nodusRecord?.rol || '').trim();
-  const roleNorm = normalizeStr(roleRaw);
-  if (/(entrenador|staff|oficina|coordinador|gerente|director)/.test(roleNorm)) {
-    return { action: 'exclude', reason: `STAFF_INTERNO (${roleRaw})` };
+  // Verificar asistencia actual en Nodus
+  const asistText = normalizeStr(
+    `${nodusRecord.asistenciaMJ || ''} ${nodusRecord.asistencia || ''} ${nodusRecord.estadoMJ || ''}`
+  );
+  if (asistText.includes('no asist') || asistText.includes('ausente') || asistText.includes('inasist')) {
+    return { action: 'exclude', reason: 'SIN_ASISTENCIA_NODUS' };
   }
 
-  // Verificar asistencia en Nodus si existe registro cruzado
-  if (nodusRecord) {
-    const asistText = normalizeStr(
-      `${nodusRecord.asistenciaMJ || ''} ${nodusRecord.asistencia || ''} ${nodusRecord.estadoMJ || ''}`
-    );
-    if (asistText.includes('no asist') || asistText.includes('ausente') || asistText.includes('inasist')) {
-      return { action: 'exclude', reason: 'SIN_ASISTENCIA_NODUS' };
-    }
+  const contractRoleRaw = String(contract.rol || contract.rolActividad || '').trim();
+  const nodusRoleRaw = String(nodusRecord.rol || nodusRecord.rolMJ || nodusRecord.tipo || '').trim();
+  const contractCat = resolveRoleCategory(contractRoleRaw);
+  const nodusCat = resolveRoleCategory(nodusRoleRaw);
+
+  if (contractCat === 'staff' || nodusCat === 'staff') {
+    return { action: 'exclude', reason: `STAFF_INTERNO (${contractRoleRaw || nodusRoleRaw})` };
   }
 
-  if (roleNorm.includes('manager')) {
+  // Si ambas fuentes tienen rol explícito y pertenecen a segmentos distintos (líder vs participante), excluir por conflicto
+  const contractIsLeader = contractCat === 'manager' || contractCat === 'capitan';
+  const nodusIsLeader = nodusCat === 'manager' || nodusCat === 'capitan';
+  if (
+    contractCat !== 'unknown' &&
+    nodusCat !== 'unknown' &&
+    contractIsLeader !== nodusIsLeader
+  ) {
+    return {
+      action: 'exclude',
+      reason: `CONFLICTO_ROL (Contrato:${contractRoleRaw} vs Nodus:${nodusRoleRaw})`,
+    };
+  }
+
+  const finalCat = contractCat !== 'unknown' ? contractCat : nodusCat;
+  if (finalCat === 'manager') {
     return { action: 'send', segment: 'leader', roleLabel: 'Manager' };
   }
-  if (roleNorm.includes('capitan')) {
+  if (finalCat === 'capitan') {
     return { action: 'send', segment: 'leader', roleLabel: 'Capitán' };
   }
   return { action: 'send', segment: 'participant', roleLabel: 'Participante' };
@@ -238,6 +281,10 @@ async function run() {
   const participants = [];
   const excluded = [];
 
+  const activeMaestriaTeamNumber = cycleInfo.activeMaestria
+    ? extractTeamNumber(cycleInfo.activeMaestria.name || cycleInfo.activeMaestria.id)
+    : null;
+
   for (const c of contracts) {
     const email = normalizeStr(c.email || c.correo);
     const name = String(c.nombreCompleto || c.nombre || c.participante || '').trim();
@@ -259,7 +306,7 @@ async function run() {
     }
 
     const nodusRecord = dni ? batchByDoc[dni] || null : null;
-    const decision = classifyContractAndNodus(c, nodusRecord);
+    const decision = classifyContractAndNodus(c, nodusRecord, activeMaestriaTeamNumber);
     if (decision.action === 'exclude') {
       excluded.push({ name, email, reason: decision.reason });
       continue;
@@ -337,7 +384,9 @@ async function run() {
   console.log(`\n✅ Envío completado: ${sentCount} correos enviados desde ${gmailUser}.`);
 }
 
-run().catch((err) => {
-  console.error('❌ Error en sendMaestriaLimaSaturdayEnrollmentMail:', err);
-  process.exit(1);
-});
+if (import.meta.url === `file://${process.argv[1]}`) {
+  run().catch((err) => {
+    console.error('❌ Error en sendMaestriaLimaSaturdayEnrollmentMail:', err);
+    process.exit(1);
+  });
+}
