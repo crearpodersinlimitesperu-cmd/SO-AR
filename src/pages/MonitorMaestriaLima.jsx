@@ -1048,13 +1048,13 @@ export default function MonitorMaestriaLima() {
               }}
             >
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: stats.totalNodusSinPago > 0 ? '#fca5a5' : '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {stats.totalNodusSinPago > 0 ? '🚨 Nodus Asist. · Sin Pago' : '✅ Nodus Asist. · Pagos OK'}
+                {stats.totalNodusSinPago > 0 ? '🚨 Nodus Asist. · Sin Pago' : '✅ Nodus · Sin Pago'}
               </span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: stats.totalNodusSinPago > 0 ? '#f87171' : '#34d399', marginTop: '0.15rem' }}>
                 {nodusLoading ? '...' : stats.totalNodusSinPago}
               </div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                {stats.totalNodusSinPago > 0 ? 'Participantes c/asistencia y sin pago' : 'Participantes con pago verificado'}
+                {stats.totalNodusSinPago > 0 ? 'Participantes c/asistencia y sin pago' : '0 participantes sin pago en Nodus'}
               </div>
             </div>
           </div>
