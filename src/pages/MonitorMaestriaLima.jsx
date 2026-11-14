@@ -231,7 +231,7 @@ export default function MonitorMaestriaLima() {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${idToken}`
           },
-          body: JSON.stringify({ daysBack: 270 })
+          body: JSON.stringify({ daysBack: 365 })
         }).catch(() => null)
       ]);
       const data = await resp.json().catch(() => ({}));
@@ -692,6 +692,186 @@ export default function MonitorMaestriaLima() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const renderParticipantPaymentsPanel = ({ contrato, nodusCross, roleHint = '', rowKey }) => {
+    const roleText = normalizeStr(roleHint);
+    const isNonPayingStaff = /manager|capitan|staff|entrenador|oficina|coordinador|gerente/.test(roleText);
+    const isParticipante = !isNonPayingStaff && (roleText === '' || roleText.includes('participante'));
+    if (!isParticipante) return null;
+
+    const trace = buildParticipantPaymentTraceability({
+      contrato,
+      nodusCross,
+      allPagos: nodusPagosLima
+    });
+    const isExpanded = Boolean(expandedPaymentsByDoc[rowKey]);
+    const currencyEntries = Object.entries(trace.totalByCurrency);
+    const totalFormatted = currencyEntries.length > 0
+      ? currencyEntries.map(([curr, val]) => formatCurrencyAmount(val, curr)).join(' + ')
+      : null;
+    const stageBadges = [
+      { key: 'C1', active: trace.stageSummary.C1 || Boolean(nodusCross?.pagadoC1) },
+      { key: 'C2', active: trace.stageSummary.C2 || Boolean(nodusCross?.pagadoC2) },
+      { key: 'MJ', active: trace.stageSummary.MJ }
+    ];
+    const hasAnyPayment = trace.payments.length > 0 || stageBadges.some((sb) => sb.active);
+    const missingStages = trace.hasUnclassifiedPayments
+      ? []
+      : stageBadges.filter((sb) => !sb.active).map((sb) => sb.key);
+
+    return (
+      <div style={{ marginTop: '0.35rem', paddingTop: '0.45rem', borderTop: '1px dashed rgba(148, 163, 184, 0.22)', width: '100%' }}>
+        {!nodusLoading && !hasAnyPayment && (
+          <div
+            role="alert"
+            style={{
+              marginBottom: '0.45rem',
+              padding: '0.45rem 0.7rem',
+              borderRadius: '8px',
+              background: 'rgba(239, 68, 68, 0.16)',
+              border: '1px solid rgba(248, 113, 113, 0.55)',
+              color: '#fecaca',
+              fontSize: '0.76rem',
+              fontWeight: 800,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem'
+            }}
+          >
+            <span>🚨 ALERTA CONTABLE:</span>
+            <span>Este participante NO registra ningún pago en Nodus (ni C1, C2 o MJ).</span>
+          </div>
+        )}
+        {!nodusLoading && hasAnyPayment && missingStages.length > 0 && (
+          <div
+            role="alert"
+            style={{
+              marginBottom: '0.45rem',
+              padding: '0.38rem 0.65rem',
+              borderRadius: '7px',
+              background: 'rgba(245, 158, 11, 0.14)',
+              border: '1px solid rgba(251, 191, 36, 0.45)',
+              color: '#fde68a',
+              fontSize: '0.73rem',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem'
+            }}
+          >
+            <span>⚠️ Alerta de Pago:</span>
+            <span>Falta registro de pago en Nodus para {missingStages.join(' · ')}.</span>
+          </div>
+        )}
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.4rem' }}>
+            <span style={{ color: '#64748b', fontWeight: 700, fontSize: '0.75rem' }}>💳 Pagos Nodus (C1 → MJ):</span>
+            {stageBadges.map((sb) => (
+              <span
+                key={sb.key}
+                style={{
+                  padding: '0.12rem 0.42rem',
+                  borderRadius: '5px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  background: sb.active ? 'rgba(16, 185, 129, 0.16)' : 'rgba(100, 116, 139, 0.14)',
+                  color: sb.active ? '#34d399' : '#94a3b8',
+                  border: `1px solid ${sb.active ? 'rgba(16, 185, 129, 0.35)' : 'rgba(100, 116, 139, 0.28)'}`
+                }}
+              >
+                {sb.key} {sb.active ? '✓' : '—'}
+              </span>
+            ))}
+            {trace.payments.length > 0 ? (
+              <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.75rem' }}>
+                {trace.payments.length} {trace.payments.length === 1 ? 'pago' : 'pagos'}
+                {totalFormatted ? ` · Total ${totalFormatted}` : ''}
+                {trace.invoiceNumbers.length > 0 ? ` · Facturas: ${trace.invoiceNumbers.map((inv) => (/^[A-Z]\d+-\d+/i.test(inv) ? inv : `#${inv}`)).join(', ')}` : ''}
+                {trace.paymentModes.length > 0 ? ` · Modo: ${trace.paymentModes.join(', ')}` : ''}
+              </span>
+            ) : (
+              <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+                {nodusLoading ? 'Consultando pagos en Nodus...' : 'Sin movimientos en ventana Nodus (365 días)'}
+              </span>
+            )}
+          </div>
+          {trace.payments.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setExpandedPaymentsByDoc((prev) => ({ ...prev, [rowKey]: !prev[rowKey] }))}
+              style={{
+                background: 'rgba(56, 189, 248, 0.12)',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                color: '#38bdf8',
+                borderRadius: '6px',
+                padding: '0.2rem 0.55rem',
+                fontSize: '0.73rem',
+                fontWeight: 800,
+                cursor: 'pointer'
+              }}
+            >
+              {isExpanded ? 'Ocultar trazabilidad contable ▴' : 'Ver trazabilidad contable (C1 → MJ) ▾'}
+            </button>
+          )}
+        </div>
+        {isExpanded && trace.payments.length > 0 && (
+          <div style={{ marginTop: '0.55rem', overflowX: 'auto', borderRadius: '8px', border: '1px solid #1e293b', background: 'rgba(2, 6, 23, 0.72)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+              <thead>
+                <tr style={{ background: 'rgba(30, 41, 59, 0.65)', color: '#94a3b8', textAlign: 'left' }}>
+                  <th style={{ padding: '0.45rem 0.6rem' }}>Fecha</th>
+                  <th style={{ padding: '0.45rem 0.6rem' }}>Etapa</th>
+                  <th style={{ padding: '0.45rem 0.6rem' }}>Concepto / Equipo</th>
+                  <th style={{ padding: '0.45rem 0.6rem' }}>Modo de Pago</th>
+                  <th style={{ padding: '0.45rem 0.6rem' }}>Factura / Comprobante / Ref.</th>
+                  <th style={{ padding: '0.45rem 0.6rem', textAlign: 'right' }}>Monto</th>
+                  <th style={{ padding: '0.45rem 0.6rem' }}>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trace.payments.map((p, pIdx) => (
+                  <tr key={p.idFactura || `${rowKey}-p-${pIdx}`} style={{ borderTop: '1px solid rgba(30, 41, 59, 0.8)' }}>
+                    <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1', whiteSpace: 'nowrap' }}>{p.fecha || '—'}</td>
+                    <td style={{ padding: '0.42rem 0.6rem' }}>
+                      <span style={{
+                        padding: '0.1rem 0.4rem',
+                        borderRadius: '4px',
+                        fontWeight: 800,
+                        fontSize: '0.68rem',
+                        background: p.etapa === 'MJ' ? 'rgba(245, 158, 11, 0.18)' : p.etapa === 'C2' ? 'rgba(56, 189, 248, 0.18)' : 'rgba(16, 185, 129, 0.18)',
+                        color: p.etapa === 'MJ' ? '#fbbf24' : p.etapa === 'C2' ? '#38bdf8' : '#34d399'
+                      }}>
+                        {Array.isArray(p.etapas) && p.etapas.length > 0 ? p.etapas.join(' + ') : p.etapa}
+                      </span>
+                    </td>
+                    <td style={{ padding: '0.42rem 0.6rem', color: '#e2e8f0' }}>
+                      <div>{p.concepto}</div>
+                      {p.equipo && <div style={{ color: '#94a3b8', fontSize: '0.69rem' }}>{p.equipo}</div>}
+                    </td>
+                    <td style={{ padding: '0.42rem 0.6rem', color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</td>
+                    <td style={{ padding: '0.42rem 0.6rem', color: '#94a3b8' }}>
+                      <span style={{ color: '#e2e8f0', fontWeight: 700 }}>
+                        {p.numeroFactura
+                          ? `Factura ${/^[A-Z]\d+-\d+/i.test(p.numeroFactura) ? p.numeroFactura : `#${p.numeroFactura}`}`
+                          : (p.idFactura ? `#${p.idFactura}` : '—')}
+                      </span>
+                      {p.idFactura && p.numeroFactura && p.idFactura !== p.numeroFactura ? ` (ID ${p.idFactura})` : ''}
+                      {p.referencia && p.referencia !== p.numeroFactura ? ` · Ref: ${p.referencia}` : ''}
+                      {p.registradoPor ? ` · ${p.registradoPor}` : ''}
+                    </td>
+                    <td style={{ padding: '0.42rem 0.6rem', textAlign: 'right', color: '#34d399', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                      {formatCurrencyAmount(p.monto, p.moneda)}
+                    </td>
+                    <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1' }}>{p.estado}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -1645,186 +1825,12 @@ export default function MonitorMaestriaLima() {
                             </>
                           )}
                         </div>
-                        {(() => {
-                          const roleText = normalizeStr(item.rol || item.rolActividad || item.nodusCross?.nodusRole || '');
-                          const isNonPayingStaff = /manager|capitan|staff|entrenador|oficina|coordinador|gerente/.test(roleText);
-                          const isParticipante = !isNonPayingStaff && (roleText === '' || roleText.includes('participante'));
-                          if (!isParticipante) return null;
-
-                          const trace = buildParticipantPaymentTraceability({
-                            contrato: item,
-                            nodusCross: item.nodusCross,
-                            allPagos: nodusPagosLima
-                          });
-                          const rowKey = item.id || docNum || item.email;
-                          const isExpanded = Boolean(expandedPaymentsByDoc[rowKey]);
-                          const currencyEntries = Object.entries(trace.totalByCurrency);
-                          const totalFormatted = currencyEntries.length > 0
-                            ? currencyEntries.map(([curr, val]) => formatCurrencyAmount(val, curr)).join(' + ')
-                            : null;
-                          const stageBadges = [
-                            { key: 'C1', active: trace.stageSummary.C1 || Boolean(item.nodusCross?.pagadoC1) },
-                            { key: 'C2', active: trace.stageSummary.C2 || Boolean(item.nodusCross?.pagadoC2) },
-                            { key: 'MJ', active: trace.stageSummary.MJ }
-                          ];
-                          const hasAnyPayment = trace.payments.length > 0 ||
-                            stageBadges.some((sb) => sb.active);
-                          const missingStages = trace.hasUnclassifiedPayments
-                            ? []
-                            : stageBadges.filter((sb) => !sb.active).map((sb) => sb.key);
-                          return (
-                            <div style={{ marginTop: '0.35rem', paddingTop: '0.45rem', borderTop: '1px dashed rgba(148, 163, 184, 0.22)' }}>
-                              {!nodusLoading && !isNonPayingStaff && !hasAnyPayment && (
-                                <div
-                                  role="alert"
-                                  style={{
-                                    marginBottom: '0.45rem',
-                                    padding: '0.45rem 0.7rem',
-                                    borderRadius: '8px',
-                                    background: 'rgba(239, 68, 68, 0.16)',
-                                    border: '1px solid rgba(248, 113, 113, 0.55)',
-                                    color: '#fecaca',
-                                    fontSize: '0.76rem',
-                                    fontWeight: 800,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.45rem'
-                                  }}
-                                >
-                                  <span>🚨 ALERTA CONTABLE:</span>
-                                  <span>Este participante NO registra ningún pago en Nodus (ni C1, C2 o MJ).</span>
-                                </div>
-                              )}
-                              {!nodusLoading && !isNonPayingStaff && hasAnyPayment && missingStages.length > 0 && (
-                                <div
-                                  role="alert"
-                                  style={{
-                                    marginBottom: '0.45rem',
-                                    padding: '0.38rem 0.65rem',
-                                    borderRadius: '7px',
-                                    background: 'rgba(245, 158, 11, 0.14)',
-                                    border: '1px solid rgba(251, 191, 36, 0.45)',
-                                    color: '#fde68a',
-                                    fontSize: '0.73rem',
-                                    fontWeight: 700,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.4rem'
-                                  }}
-                                >
-                                  <span>⚠️ Alerta de Pago:</span>
-                                  <span>Falta registro de pago en Nodus para {missingStages.join(' · ')}.</span>
-                                </div>
-                              )}
-                              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.4rem' }}>
-                                  <span style={{ color: '#64748b', fontWeight: 700 }}>💳 Pagos Nodus (C1 → MJ):</span>
-                                  {stageBadges.map((sb) => (
-                                    <span
-                                      key={sb.key}
-                                      style={{
-                                        padding: '0.12rem 0.42rem',
-                                        borderRadius: '5px',
-                                        fontSize: '0.7rem',
-                                        fontWeight: 800,
-                                        background: sb.active ? 'rgba(16, 185, 129, 0.16)' : 'rgba(100, 116, 139, 0.14)',
-                                        color: sb.active ? '#34d399' : '#94a3b8',
-                                        border: `1px solid ${sb.active ? 'rgba(16, 185, 129, 0.35)' : 'rgba(100, 116, 139, 0.28)'}`
-                                      }}
-                                    >
-                                      {sb.key} {sb.active ? '✓' : '—'}
-                                    </span>
-                                  ))}
-                                  {trace.payments.length > 0 ? (
-                                    <span style={{ color: '#fbbf24', fontWeight: 800 }}>
-                                      {trace.payments.length} {trace.payments.length === 1 ? 'pago' : 'pagos'}
-                                      {totalFormatted ? ` · Total ${totalFormatted}` : ''}
-                                      {trace.invoiceNumbers.length > 0 ? ` · Facturas: ${trace.invoiceNumbers.map((inv) => (/^[A-Z]\d+-\d+/i.test(inv) ? inv : `#${inv}`)).join(', ')}` : ''}
-                                      {trace.paymentModes.length > 0 ? ` · Modo: ${trace.paymentModes.join(', ')}` : ''}
-                                    </span>
-                                  ) : (
-                                    <span style={{ color: '#94a3b8' }}>
-                                      {nodusLoading ? 'Consultando pagos en Nodus...' : 'Sin movimientos en ventana Nodus (270 días)'}
-                                    </span>
-                                  )}
-                                </div>
-                                {trace.payments.length > 0 && (
-                                  <button
-                                    type="button"
-                                    onClick={() => setExpandedPaymentsByDoc((prev) => ({ ...prev, [rowKey]: !prev[rowKey] }))}
-                                    style={{
-                                      background: 'rgba(56, 189, 248, 0.12)',
-                                      border: '1px solid rgba(56, 189, 248, 0.35)',
-                                      color: '#38bdf8',
-                                      borderRadius: '6px',
-                                      padding: '0.2rem 0.55rem',
-                                      fontSize: '0.73rem',
-                                      fontWeight: 800,
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    {isExpanded ? 'Ocultar trazabilidad contable ▴' : 'Ver trazabilidad contable (C1 → MJ) ▾'}
-                                  </button>
-                                )}
-                              </div>
-                              {isExpanded && trace.payments.length > 0 && (
-                                <div style={{ marginTop: '0.55rem', overflowX: 'auto', borderRadius: '8px', border: '1px solid #1e293b', background: 'rgba(2, 6, 23, 0.72)' }}>
-                                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
-                                    <thead>
-                                      <tr style={{ background: 'rgba(30, 41, 59, 0.65)', color: '#94a3b8', textAlign: 'left' }}>
-                                        <th style={{ padding: '0.45rem 0.6rem' }}>Fecha</th>
-                                        <th style={{ padding: '0.45rem 0.6rem' }}>Etapa</th>
-                                        <th style={{ padding: '0.45rem 0.6rem' }}>Concepto / Equipo</th>
-                                        <th style={{ padding: '0.45rem 0.6rem' }}>Modo de Pago</th>
-                                        <th style={{ padding: '0.45rem 0.6rem' }}>Factura / Comprobante / Ref.</th>
-                                        <th style={{ padding: '0.45rem 0.6rem', textAlign: 'right' }}>Monto</th>
-                                        <th style={{ padding: '0.45rem 0.6rem' }}>Estado</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {trace.payments.map((p, pIdx) => (
-                                        <tr key={p.idFactura || `${rowKey}-p-${pIdx}`} style={{ borderTop: '1px solid rgba(30, 41, 59, 0.8)' }}>
-                                          <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1', whiteSpace: 'nowrap' }}>{p.fecha || '—'}</td>
-                                          <td style={{ padding: '0.42rem 0.6rem' }}>
-                                            <span style={{
-                                              padding: '0.1rem 0.4rem',
-                                              borderRadius: '4px',
-                                              fontWeight: 800,
-                                              fontSize: '0.68rem',
-                                              background: p.etapa === 'MJ' ? 'rgba(245, 158, 11, 0.18)' : p.etapa === 'C2' ? 'rgba(56, 189, 248, 0.18)' : 'rgba(16, 185, 129, 0.18)',
-                                              color: p.etapa === 'MJ' ? '#fbbf24' : p.etapa === 'C2' ? '#38bdf8' : '#34d399'
-                                            }}>
-                                              {Array.isArray(p.etapas) && p.etapas.length > 0 ? p.etapas.join(' + ') : p.etapa}
-                                            </span>
-                                          </td>
-                                          <td style={{ padding: '0.42rem 0.6rem', color: '#e2e8f0' }}>
-                                            <div>{p.concepto}</div>
-                                            {p.equipo && <div style={{ color: '#94a3b8', fontSize: '0.69rem' }}>{p.equipo}</div>}
-                                          </td>
-                                          <td style={{ padding: '0.42rem 0.6rem', color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</td>
-                                          <td style={{ padding: '0.42rem 0.6rem', color: '#94a3b8' }}>
-                                            <span style={{ color: '#e2e8f0', fontWeight: 700 }}>
-                                              {p.numeroFactura
-                                                ? `Factura ${/^[A-Z]\d+-\d+/i.test(p.numeroFactura) ? p.numeroFactura : `#${p.numeroFactura}`}`
-                                                : (p.idFactura ? `#${p.idFactura}` : '—')}
-                                            </span>
-                                            {p.idFactura && p.numeroFactura && p.idFactura !== p.numeroFactura ? ` (ID ${p.idFactura})` : ''}
-                                            {p.referencia && p.referencia !== p.numeroFactura ? ` · Ref: ${p.referencia}` : ''}
-                                            {p.registradoPor ? ` · ${p.registradoPor}` : ''}
-                                          </td>
-                                          <td style={{ padding: '0.42rem 0.6rem', textAlign: 'right', color: '#34d399', fontWeight: 800, whiteSpace: 'nowrap' }}>
-                                            {formatCurrencyAmount(p.monto, p.moneda)}
-                                          </td>
-                                          <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1' }}>{p.estado}</td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })()}
+                        {renderParticipantPaymentsPanel({
+                          contrato: item,
+                          nodusCross: item.nodusCross,
+                          roleHint: item.rol || item.rolActividad || item.nodusCross?.nodusRole || '',
+                          rowKey: item.id || docNum || item.email
+                        })}
                       </div>
                     </div>
                   );
@@ -2146,6 +2152,18 @@ export default function MonitorMaestriaLima() {
                           <Trash2 size={14} /> {deletingId === sig.id ? 'Eliminando...' : 'Eliminar'}
                         </button>
                       </div>
+                      {renderParticipantPaymentsPanel({
+                        contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+                        nodusCross: {
+                          maestriaNodus: item.maestriaNodus,
+                          nodusDoc: item.identificacion,
+                          nodusRecord: item.nodusRecord,
+                          pagadoC1: item.pagadoC1,
+                          pagadoC2: item.pagadoC2
+                        },
+                        roleHint: item.tipoPersona || item.rolLabel || '',
+                        rowKey: `padron-${item.equipoId}-${item.nodusId || item.identificacion || sig.id}`
+                      })}
                     </div>
                   );
                 } else {
@@ -2215,6 +2233,18 @@ export default function MonitorMaestriaLima() {
                       >
                         <PhoneCall size={14} /> Enviar Link por WhatsApp
                       </a>
+                      {renderParticipantPaymentsPanel({
+                        contrato: { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+                        nodusCross: {
+                          maestriaNodus: item.maestriaNodus,
+                          nodusDoc: item.identificacion,
+                          nodusRecord: item.nodusRecord,
+                          pagadoC1: item.pagadoC1,
+                          pagadoC2: item.pagadoC2
+                        },
+                        roleHint: item.tipoPersona || item.rolLabel || '',
+                        rowKey: `padron-unsigned-${item.equipoId}-${item.nodusId || item.identificacion || item.nombre}`
+                      })}
                     </div>
                   );
                 }
