@@ -1,0 +1,54 @@
+name: 📧 Maestría Lima Saturday Enrollment Mail (09:00 Lima)
+
+on:
+  schedule:
+    # Sábados a las 09:00 AM hora Lima (UTC-5 => 14:00 UTC)
+    - cron: '0 14 * * 6'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Ejecutar en modo simulación (sin enviar correos)'
+        required: true
+        type: boolean
+        default: true
+      force:
+        description: 'Forzar ejecución aunque hoy no sea sábado de Maestría'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  send-maestria-lima-mail:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci --ignore-scripts --include=optional
+
+      - name: 🚀 Ejecutar auditoría / envío Maestría Lima
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          LIMA_GMAIL_USER: ${{ secrets.LIMA_GMAIL_USER }}
+          LIMA_GMAIL_PASS: ${{ secrets.LIMA_GMAIL_PASS }}
+        run: |
+          FLAGS="--send"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            FLAGS="--dry-run"
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force }}" = "true" ]; then
+            FLAGS="$FLAGS --force"
+          fi
+          node scripts/sendMaestriaLimaSaturdayEnrollmentMail.mjs $FLAGS
