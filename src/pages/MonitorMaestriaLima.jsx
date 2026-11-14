@@ -796,24 +796,48 @@ export default function MonitorMaestriaLima() {
               </span>
             )}
           </div>
-          {trace.payments.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setExpandedPaymentsByDoc((prev) => ({ ...prev, [rowKey]: !prev[rowKey] }))}
-              style={{
-                background: 'rgba(56, 189, 248, 0.12)',
-                border: '1px solid rgba(56, 189, 248, 0.35)',
-                color: '#38bdf8',
-                borderRadius: '6px',
-                padding: '0.2rem 0.55rem',
-                fontSize: '0.73rem',
-                fontWeight: 800,
-                cursor: 'pointer'
-              }}
-            >
-              {isExpanded ? 'Ocultar trazabilidad contable ▴' : 'Ver trazabilidad contable (C1 → MJ) ▾'}
-            </button>
-          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+            {(nodusCross?.nodusRecord?.id || trace.payments.find((p) => p.participanteId)?.participanteId) && (
+              <a
+                href={`https://imo.crearpslglobal.com/facturas/participante/${nodusCross?.nodusRecord?.id || trace.payments.find((p) => p.participanteId)?.participanteId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  color: '#34d399',
+                  borderRadius: '6px',
+                  padding: '0.2rem 0.55rem',
+                  fontSize: '0.73rem',
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem'
+                }}
+              >
+                🧾 Facturas Nodus (F001/B001) <ExternalLink size={12} />
+              </a>
+            )}
+            {trace.payments.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setExpandedPaymentsByDoc((prev) => ({ ...prev, [rowKey]: !prev[rowKey] }))}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  color: '#38bdf8',
+                  borderRadius: '6px',
+                  padding: '0.2rem 0.55rem',
+                  fontSize: '0.73rem',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                {isExpanded ? 'Ocultar trazabilidad contable ▴' : 'Ver trazabilidad contable (C1 → MJ) ▾'}
+              </button>
+            )}
+          </div>
         </div>
         {isExpanded && trace.payments.length > 0 && (
           <div style={{ marginTop: '0.55rem', overflowX: 'auto', borderRadius: '8px', border: '1px solid #1e293b', background: 'rgba(2, 6, 23, 0.72)' }}>

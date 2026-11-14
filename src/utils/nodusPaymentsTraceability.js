@@ -56,22 +56,23 @@ export function inferPaymentStage(rawStage, rawConcept = '', rawTeam = '', rawNo
 export function normalizeNodusPaymentRow(row, fallbackStage = '') {
   if (!row || typeof row !== 'object') return null;
 
-  const idFacturaRaw = row.id_factura ?? row.factura_id ?? row.id ?? row.codigo ?? '';
+  const idFacturaRaw = row.id_factura ?? row.factura_id ?? row.id ?? '';
   const idFactura = idFacturaRaw !== '' && idFacturaRaw !== null ? String(idFacturaRaw).trim() : '';
   const seriePart = String(row.serie || row.serie_factura || row.serie_comprobante || '').trim();
   const numeroPart = String(row.correlativo || row.numero_correlativo || row.numero || '').trim();
   const combinedSerieNumero = seriePart && numeroPart ? `${seriePart}-${numeroPart}` : '';
+  const codigoFacturaCandidate = typeof row.codigo === 'string' && /^[FB]\d+-\d+/i.test(row.codigo.trim())
+    ? row.codigo.trim()
+    : null;
   const numeroFacturaRaw =
     row.numero_factura ??
     row.nro_factura ??
     row.num_factura ??
     row.factura ??
+    row.codigo_factura ??
+    codigoFacturaCandidate ??
     row.serie_numero ??
     row.serie_correlativo ??
-    row.numero_comprobante ??
-    row.nro_comprobante ??
-    row.comprobante ??
-    row.codigo_factura ??
     row.documento_factura ??
     row.boleta ??
     row.folio ??

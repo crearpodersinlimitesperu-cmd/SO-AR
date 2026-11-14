@@ -188,15 +188,17 @@ test('underscore-separated Nodus concepts like c2_maestria match both C2 and MJ'
   assert.deepEqual(trace.payments[1].etapas, ['C2', 'MJ']);
 });
 
-test('normalizeNodusPaymentRow extracts SUNAT invoice numbers (F001-1324 / B001-4737) from comprobante or serie+correlativo', () => {
-  const fromComprobante = normalizeNodusPaymentRow({
+test('normalizeNodusPaymentRow extracts SUNAT invoice numbers (F001-1324 / B001-4737) without confusing bank comprobante refs', () => {
+  const fromCodigo = normalizeNodusPaymentRow({
     id_factura: 30050,
-    comprobante: 'F001-1324',
+    codigo: 'F001-1324',
+    comprobante: '007327',
     fecha: '2026-11-06',
     monto: 2000
   });
-  assert.equal(fromComprobante.numeroFactura, 'F001-1324');
-  assert.equal(fromComprobante.idFactura, '30050');
+  assert.equal(fromCodigo.numeroFactura, 'F001-1324');
+  assert.equal(fromCodigo.referencia, '007327');
+  assert.equal(fromCodigo.idFactura, '30050');
 
   const fromSerieNumero = normalizeNodusPaymentRow({
     id_factura: 30051,
