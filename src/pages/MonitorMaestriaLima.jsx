@@ -28,6 +28,10 @@ import toast from 'react-hot-toast';
 import { db, auth } from '../services/firebase';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
+import {
+  buildParticipantPaymentTraceability,
+  formatCurrencyAmount
+} from '../utils/nodusPaymentsTraceability';
 import { deduplicateSignedContracts } from '../utils/limaContractUniqueness';
 import { buildMaestriaNodusCross, selectActiveLimaMaestriaTeams } from '../utils/maestriaNodusCross';
 
@@ -55,6 +59,8 @@ export default function MonitorMaestriaLima() {
   const [nodusEquipos, setNodusEquipos] = useState([]);
   const [nodusRosterByTeam, setNodusRosterByTeam] = useState({});
   const [nodusByDni, setNodusByDni] = useState({});
+  const [nodusPagosLima, setNodusPagosLima] = useState([]);
+  const [expandedPaymentsByDoc, setExpandedPaymentsByDoc] = useState({});
   const [searchingDniNodus, setSearchingDniNodus] = useState(false);
   const [nodusLoading, setNodusLoading] = useState(true);
   const [nodusError, setNodusError] = useState(null);
@@ -189,17 +195,33 @@ export default function MonitorMaestriaLima() {
         remainingBatches.push(dnis.slice(i, i + 30));
       }
 
-      const resp = await fetch(`${NODUS_WORKER_BASE}/nodus-json/maestria-lima`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ dnis: firstBatch })
-      });
+      const [resp, pagosResp] = await Promise.all([
+        fetch(`${NODUS_WORKER_BASE}/nodus-json/maestria-lima`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ dnis: firstBatch })
+        }),
+        fetch(`${NODUS_WORKER_BASE}/nodus-json/pagos-lima`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ daysBack: 270 })
+        }).catch(() => null)
+      ]);
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok || !data?.ok) {
         throw new Error(data?.message || data?.error || `HTTP ${resp.status} consultando Nodus`);
+      }
+      if (pagosResp && pagosResp.ok) {
+        const pagosData = await pagosResp.json().catch(() => ({}));
+        if (pagosData?.ok && Array.isArray(pagosData.pagos)) {
+          setNodusPagosLima(pagosData.pagos);
+        }
       }
       firstBatch.forEach((d) => fetchedDnisRef.current.add(d));
 
@@ -1558,6 +1580,128 @@ export default function MonitorMaestriaLima() {
                             </>
                           )}
                         </div>
+                        {(() => {
+                          const trace = buildParticipantPaymentTraceability({
+                            contrato: item,
+                            nodusCross: item.nodusCross,
+                            allPagos: nodusPagosLima
+                          });
+                          const rowKey = item.id || docNum || item.email;
+                          const isExpanded = Boolean(expandedPaymentsByDoc[rowKey]);
+                          const currencyEntries = Object.entries(trace.totalByCurrency);
+                          const totalFormatted = currencyEntries.length > 0
+                            ? currencyEntries.map(([curr, val]) => formatCurrencyAmount(val, curr)).join(' + ')
+                            : null;
+                          const stageBadges = [
+                            { key: 'C1', active: trace.stageSummary.C1 },
+                            { key: 'C2', active: trace.stageSummary.C2 },
+                            { key: 'MJ', active: trace.stageSummary.MJ }
+                          ];
+                          return (
+                            <div style={{ marginTop: '0.35rem', paddingTop: '0.45rem', borderTop: '1px dashed rgba(148, 163, 184, 0.22)' }}>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.4rem' }}>
+                                  <span style={{ color: '#64748b', fontWeight: 700 }}>💳 Pagos Nodus (C1 → MJ):</span>
+                                  {stageBadges.map((sb) => (
+                                    <span
+                                      key={sb.key}
+                                      style={{
+                                        padding: '0.12rem 0.42rem',
+                                        borderRadius: '5px',
+                                        fontSize: '0.7rem',
+                                        fontWeight: 800,
+                                        background: sb.active ? 'rgba(16, 185, 129, 0.16)' : 'rgba(100, 116, 139, 0.14)',
+                                        color: sb.active ? '#34d399' : '#94a3b8',
+                                        border: `1px solid ${sb.active ? 'rgba(16, 185, 129, 0.35)' : 'rgba(100, 116, 139, 0.28)'}`
+                                      }}
+                                    >
+                                      {sb.key} {sb.active ? '✓' : '—'}
+                                    </span>
+                                  ))}
+                                  {trace.payments.length > 0 ? (
+                                    <span style={{ color: '#fbbf24', fontWeight: 800 }}>
+                                      {trace.payments.length} {trace.payments.length === 1 ? 'pago' : 'pagos'}
+                                      {totalFormatted ? ` · Total ${totalFormatted}` : ''}
+                                      {trace.paymentModes.length > 0 ? ` · Modo: ${trace.paymentModes.join(', ')}` : ''}
+                                    </span>
+                                  ) : (
+                                    <span style={{ color: '#94a3b8' }}>
+                                      {nodusLoading ? 'Consultando pagos en Nodus...' : 'Sin movimientos en ventana Nodus (270 días)'}
+                                    </span>
+                                  )}
+                                </div>
+                                {trace.payments.length > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setExpandedPaymentsByDoc((prev) => ({ ...prev, [rowKey]: !prev[rowKey] }))}
+                                    style={{
+                                      background: 'rgba(56, 189, 248, 0.12)',
+                                      border: '1px solid rgba(56, 189, 248, 0.35)',
+                                      color: '#38bdf8',
+                                      borderRadius: '6px',
+                                      padding: '0.2rem 0.55rem',
+                                      fontSize: '0.73rem',
+                                      fontWeight: 800,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {isExpanded ? 'Ocultar trazabilidad contable ▴' : 'Ver trazabilidad contable (C1 → MJ) ▾'}
+                                  </button>
+                                )}
+                              </div>
+                              {isExpanded && trace.payments.length > 0 && (
+                                <div style={{ marginTop: '0.55rem', overflowX: 'auto', borderRadius: '8px', border: '1px solid #1e293b', background: 'rgba(2, 6, 23, 0.72)' }}>
+                                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+                                    <thead>
+                                      <tr style={{ background: 'rgba(30, 41, 59, 0.65)', color: '#94a3b8', textAlign: 'left' }}>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Fecha</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Etapa</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Concepto / Equipo</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Modo de Pago</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Factura / Comprobante / Ref.</th>
+                                        <th style={{ padding: '0.45rem 0.6rem', textAlign: 'right' }}>Monto</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Estado</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {trace.payments.map((p, pIdx) => (
+                                        <tr key={p.idFactura || `${rowKey}-p-${pIdx}`} style={{ borderTop: '1px solid rgba(30, 41, 59, 0.8)' }}>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1', whiteSpace: 'nowrap' }}>{p.fecha || '—'}</td>
+                                          <td style={{ padding: '0.42rem 0.6rem' }}>
+                                            <span style={{
+                                              padding: '0.1rem 0.4rem',
+                                              borderRadius: '4px',
+                                              fontWeight: 800,
+                                              fontSize: '0.68rem',
+                                              background: p.etapa === 'MJ' ? 'rgba(245, 158, 11, 0.18)' : p.etapa === 'C2' ? 'rgba(56, 189, 248, 0.18)' : 'rgba(16, 185, 129, 0.18)',
+                                              color: p.etapa === 'MJ' ? '#fbbf24' : p.etapa === 'C2' ? '#38bdf8' : '#34d399'
+                                            }}>
+                                              {p.etapa}
+                                            </span>
+                                          </td>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#e2e8f0' }}>
+                                            <div>{p.concepto}</div>
+                                            {p.equipo && <div style={{ color: '#94a3b8', fontSize: '0.69rem' }}>{p.equipo}</div>}
+                                          </td>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</td>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#94a3b8' }}>
+                                            {p.idFactura ? `#${p.idFactura}` : '—'}
+                                            {p.referencia ? ` · Ref: ${p.referencia}` : ''}
+                                            {p.registradoPor ? ` · ${p.registradoPor}` : ''}
+                                          </td>
+                                          <td style={{ padding: '0.42rem 0.6rem', textAlign: 'right', color: '#34d399', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                                            {formatCurrencyAmount(p.monto, p.moneda)}
+                                          </td>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1' }}>{p.estado}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   );

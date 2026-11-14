@@ -738,6 +738,62 @@ async function handleNodusJson(request, env, origin, path) {
       }, 200, origin);
     }
 
+    if (path === '/nodus-json/pagos-lima') {
+      if (scope.type === 'sede') {
+        const hasLima = visibleSedes.some((s) => Number(s.id) === 7 || String(s.nombre || '').toLowerCase().includes('lima'));
+        if (!hasLima) {
+          return json({ error: 'permission-denied', message: 'Tu cuenta no tiene acceso a la sede Lima en Nodus.' }, 403, origin);
+        }
+      }
+      const body = await request.json().catch(() => ({}));
+      const rawDays = Number(body?.daysBack);
+      const daysBack = Number.isFinite(rawDays) ? Math.min(365, Math.max(30, Math.round(rawDays))) : 270;
+
+      const msPerDay = 86_400_000;
+      const nowMs = Date.now();
+      const fmtDate = (ms) => new Date(ms).toISOString().slice(0, 10);
+      const windows = [];
+      let cursorEnd = nowMs;
+      const minStart = nowMs - daysBack * msPerDay;
+      while (cursorEnd >= minStart) {
+        const windowStart = Math.max(minStart, cursorEnd - 89 * msPerDay);
+        windows.push({
+          desde: fmtDate(windowStart),
+          hasta: fmtDate(cursorEnd)
+        });
+        cursorEnd = windowStart - msPerDay;
+      }
+
+      const settled = await Promise.allSettled(
+        windows.map((w) => client.getPagos({ desde: w.desde, hasta: w.hasta, sedeId: 7 }))
+      );
+
+      const seen = new Set();
+      const pagos = [];
+      for (const item of settled) {
+        if (item.status !== 'fulfilled') continue;
+        const rows = Array.isArray(item.value?.data) ? item.value.data : [];
+        for (const row of rows) {
+          const key = row?.id_factura != null
+            ? `f:${row.id_factura}`
+            : `${row?.fecha || ''}|${row?.identificacion || row?.dni || ''}|${row?.monto || ''}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          pagos.push(row);
+        }
+      }
+
+      pagos.sort((a, b) => String(b?.fecha || '').localeCompare(String(a?.fecha || '')));
+
+      return json({
+        ok: true,
+        retrievedAt: new Date().toISOString(),
+        windows,
+        total: pagos.length,
+        pagos
+      }, 200, origin);
+    }
+
     let body;
     try {
       body = await request.json();
@@ -1626,7 +1682,8 @@ export default {
       url.pathname === '/nodus-json/team-metrics' ||
       url.pathname === '/nodus-json/maestria-lima' ||
       url.pathname === '/nodus-json/participante' ||
-      url.pathname === '/nodus-json/participantes-batch'
+      url.pathname === '/nodus-json/participantes-batch' ||
+      url.pathname === '/nodus-json/pagos-lima'
     ) {
       return handleNodusJson(request, env, origin, url.pathname);
     }
