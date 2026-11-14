@@ -97,3 +97,58 @@ test('normalizeNodusPaymentRow preserves missing amount without inventing zeros'
   assert.equal(row.monto, null);
   assert.equal(row.modoPago, 'Efectivo');
 });
+
+test('combo payments and Nodus alternate stage fields populate stageSummary accurately', () => {
+  const contrato = { numeroDocumento: '45729876', nombre: 'Zorayda Alvarez' };
+  const nodusCross = { pagadoC1: true, pagadoC2: false };
+  const allPagos = [
+    {
+      id_factura: 22771,
+      fecha: '2026-09-01',
+      identificacion: '45729876',
+      curso: 'Cap 1',
+      metodo_pago: 'TC(DATAFAST)',
+      monto: 790
+    },
+    {
+      id_factura: 23463,
+      fecha: '2026-10-01',
+      identificacion: '45729876',
+      entrenamiento: 'Capítulo 2 y Maestría (2do fin)',
+      metodo_pago: 'TRANSFERENCIA AHORROS',
+      monto: 3500
+    }
+  ];
+
+  const trace = buildParticipantPaymentTraceability({ contrato, nodusCross, allPagos });
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: true });
+  assert.equal(trace.hasUnclassifiedPayments, false);
+  assert.equal(trace.allPaymentsUnclassified, false);
+});
+
+test('unclassified /api/pagos rows set hasUnclassifiedPayments and respect nodusCross pagadoC1/C2', () => {
+  const contrato = { numeroDocumento: '11223344', nombre: 'Juan Perez' };
+  const nodusCross = { pagadoC1: true, pagadoC2: false };
+  const allPagos = [
+    {
+      id_factura: 27154,
+      fecha: '2026-09-10',
+      identificacion: '11223344',
+      metodo_pago: 'TC(DATAFAST)',
+      monto: 785
+    },
+    {
+      id_factura: 30050,
+      fecha: '2026-10-10',
+      identificacion: '11223344',
+      metodo_pago: 'EFECTIVO',
+      monto: 2000
+    }
+  ];
+
+  const trace = buildParticipantPaymentTraceability({ contrato, nodusCross, allPagos });
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: false, MJ: false });
+  assert.equal(trace.hasUnclassifiedPayments, true);
+  assert.equal(trace.allPaymentsUnclassified, true);
+  assert.deepEqual(trace.invoiceNumbers, ['27154', '30050']);
+});

@@ -19,20 +19,31 @@ export const normalizeDocForPayments = (val) =>
     .toUpperCase()
     .trim();
 
-export function inferPaymentStage(rawStage, rawConcept = '', rawTeam = '') {
-  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''}`);
-  if (!hay) return 'OTRO';
-  if (
-    /\b(mj|maestria|pfd|sfd|tfd|primer fin|segundo fin|tercer fin|caminata)\b/.test(hay)
-  ) {
-    return 'MJ';
+export function inferPaymentStages(rawStage, rawConcept = '', rawTeam = '', rawNotes = '') {
+  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`);
+  if (!hay) return [];
+  const stages = [];
+  if (/\b(c1|cap\s*1|capitulo\s*1|primer\s*capitulo|basico|intro)\b/.test(hay)) {
+    stages.push('C1');
   }
   if (/\b(c2|cap\s*2|capitulo\s*2|segundo\s*capitulo|avanzado)\b/.test(hay)) {
-    return 'C2';
+    stages.push('C2');
   }
-  if (/\b(c1|cap\s*1|capitulo\s*1|primer\s*capitulo|basico|intro)\b/.test(hay)) {
-    return 'C1';
+  if (
+    /\b(mj|maestria|pfd|sfd|tfd|primer\s*fin|1er\s*fin|segundo\s*fin|2do\s*fin|tercer\s*fin|3er\s*fin|caminata|taller)\b/.test(hay)
+  ) {
+    stages.push('MJ');
   }
+  return stages;
+}
+
+export function inferPaymentStage(rawStage, rawConcept = '', rawTeam = '', rawNotes = '') {
+  const stages = inferPaymentStages(rawStage, rawConcept, rawTeam, rawNotes);
+  if (stages.includes('MJ')) return 'MJ';
+  if (stages.includes('C2')) return 'C2';
+  if (stages.includes('C1')) return 'C1';
+  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`);
+  if (!hay) return 'OTRO';
   return String(rawStage || '').trim().toUpperCase() || 'OTRO';
 }
 
@@ -63,13 +74,40 @@ export function normalizeNodusPaymentRow(row, fallbackStage = '') {
     row.descripcion ||
     row.detalle ||
     row.producto ||
+    row.nombre_producto ||
     row.plan ||
+    row.entrenamiento ||
+    row.tipo_entrenamiento ||
+    row.nombre_entrenamiento ||
+    row.curso ||
+    row.modulo ||
+    row.taller ||
     row.etapa ||
     row.capitulo ||
+    row.observacion ||
+    row.observaciones ||
+    row.notas ||
+    row.glosa ||
     'Pago Nodus'
   ).trim();
 
-  const rawStage = row.etapa || row.capitulo || row.programa || row.nivel || fallbackStage || '';
+  const rawStage =
+    row.etapa ||
+    row.capitulo ||
+    row.programa ||
+    row.nivel ||
+    row.entrenamiento ||
+    row.tipo_entrenamiento ||
+    row.nombre_entrenamiento ||
+    row.curso ||
+    row.modulo ||
+    row.taller ||
+    row.categoria ||
+    row.servicio ||
+    row.tipo_servicio ||
+    row.tipo ||
+    fallbackStage ||
+    '';
   const equipo = String(
     row.equipo?.nombre ||
     row.equipo_nombre ||
@@ -77,7 +115,9 @@ export function normalizeNodusPaymentRow(row, fallbackStage = '') {
     (row.id_equipo ? `Equipo ${row.id_equipo}` : '')
   ).trim();
 
-  const etapa = inferPaymentStage(rawStage, concepto, equipo);
+  const rawNotes = String(row.observacion || row.observaciones || row.notas || row.glosa || '').trim();
+  const etapas = inferPaymentStages(rawStage, concepto, equipo, rawNotes);
+  const etapa = inferPaymentStage(rawStage, concepto, equipo, rawNotes);
 
   const modoPago = String(
     row.metodo_pago ||
@@ -141,6 +181,7 @@ export function normalizeNodusPaymentRow(row, fallbackStage = '') {
     numeroFactura,
     fecha,
     etapa,
+    etapas,
     concepto,
     modoPago,
     referencia,
@@ -297,16 +338,26 @@ export function buildParticipantPaymentTraceability({
       totalByCurrency[p.moneda] = (totalByCurrency[p.moneda] || 0) + p.monto;
     }
     if (p.modoPago) modesSet.add(p.modoPago);
-    if (p.etapa) stagesSet.add(p.etapa);
+    if (Array.isArray(p.etapas) && p.etapas.length > 0) {
+      p.etapas.forEach((st) => stagesSet.add(st));
+    } else if (p.etapa) {
+      stagesSet.add(p.etapa);
+    }
     const inv = p.numeroFactura || p.idFactura;
     if (inv) invoicesSet.add(inv);
   }
 
   const stageSummary = {
-    C1: stagesSet.has('C1') || c1Paid === true,
-    C2: stagesSet.has('C2') || c2Paid === true,
+    C1: stagesSet.has('C1') || c1Paid === true || Boolean(nodusCross?.pagadoC1),
+    C2: stagesSet.has('C2') || c2Paid === true || Boolean(nodusCross?.pagadoC2),
     MJ: stagesSet.has('MJ') || mjPaid === true
   };
+
+  const hasUnclassifiedPayments = deduped.some(
+    (p) => !['C1', 'C2', 'MJ'].includes(p.etapa) && (!Array.isArray(p.etapas) || p.etapas.length === 0)
+  );
+  const allPaymentsUnclassified =
+    deduped.length > 0 && !stagesSet.has('C1') && !stagesSet.has('C2') && !stagesSet.has('MJ');
 
   return {
     payments: deduped,
@@ -314,6 +365,8 @@ export function buildParticipantPaymentTraceability({
     paymentModes: Array.from(modesSet),
     invoiceNumbers: Array.from(invoicesSet),
     stagesPresent: ['C1', 'C2', 'MJ', 'OTRO'].filter((s) => stagesSet.has(s)),
-    stageSummary
+    stageSummary,
+    hasUnclassifiedPayments,
+    allPaymentsUnclassified
   };
 }

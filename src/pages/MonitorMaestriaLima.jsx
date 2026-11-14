@@ -1654,17 +1654,15 @@ export default function MonitorMaestriaLima() {
                             ? currencyEntries.map(([curr, val]) => formatCurrencyAmount(val, curr)).join(' + ')
                             : null;
                           const stageBadges = [
-                            { key: 'C1', active: trace.stageSummary.C1 },
-                            { key: 'C2', active: trace.stageSummary.C2 },
+                            { key: 'C1', active: trace.stageSummary.C1 || Boolean(item.nodusCross?.pagadoC1) },
+                            { key: 'C2', active: trace.stageSummary.C2 || Boolean(item.nodusCross?.pagadoC2) },
                             { key: 'MJ', active: trace.stageSummary.MJ }
                           ];
                           const hasAnyPayment = trace.payments.length > 0 ||
-                            trace.stageSummary.C1 ||
-                            trace.stageSummary.C2 ||
-                            trace.stageSummary.MJ ||
-                            Boolean(item.nodusCross?.pagadoC1) ||
-                            Boolean(item.nodusCross?.pagadoC2);
-                          const missingStages = stageBadges.filter((sb) => !sb.active).map((sb) => sb.key);
+                            stageBadges.some((sb) => sb.active);
+                          const missingStages = trace.hasUnclassifiedPayments
+                            ? []
+                            : stageBadges.filter((sb) => !sb.active).map((sb) => sb.key);
                           return (
                             <div style={{ marginTop: '0.35rem', paddingTop: '0.45rem', borderTop: '1px dashed rgba(148, 163, 184, 0.22)' }}>
                               {!nodusLoading && !isNonPayingStaff && !hasAnyPayment && (

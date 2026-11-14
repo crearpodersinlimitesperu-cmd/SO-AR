@@ -34797,6 +34797,62 @@ async function handleNodusJson(request, env, origin, path) {
       }, 200, origin);
     }
 
+    if (path === '/nodus-json/pagos-lima') {
+      if (scope.type === 'sede') {
+        const hasLima = visibleSedes.some((s) => Number(s.id) === 7 || String(s.nombre || '').toLowerCase().includes('lima'));
+        if (!hasLima) {
+          return json({ error: 'permission-denied', message: 'Tu cuenta no tiene acceso a la sede Lima en Nodus.' }, 403, origin);
+        }
+      }
+      const body = await request.json().catch(() => ({}));
+      const rawDays = Number(body?.daysBack);
+      const daysBack = Number.isFinite(rawDays) ? Math.min(365, Math.max(30, Math.round(rawDays))) : 270;
+
+      const msPerDay = 86_400_000;
+      const nowMs = Date.now();
+      const fmtDate = (ms) => new Date(ms).toISOString().slice(0, 10);
+      const windows = [];
+      let cursorEnd = nowMs;
+      const minStart = nowMs - daysBack * msPerDay;
+      while (cursorEnd >= minStart) {
+        const windowStart = Math.max(minStart, cursorEnd - 89 * msPerDay);
+        windows.push({
+          desde: fmtDate(windowStart),
+          hasta: fmtDate(cursorEnd)
+        });
+        cursorEnd = windowStart - msPerDay;
+      }
+
+      const settled = await Promise.allSettled(
+        windows.map((w) => client.getPagos({ desde: w.desde, hasta: w.hasta, sedeId: 7 }))
+      );
+
+      const seen = new Set();
+      const pagos = [];
+      for (const item of settled) {
+        if (item.status !== 'fulfilled') continue;
+        const rows = Array.isArray(item.value?.data) ? item.value.data : [];
+        for (const row of rows) {
+          const key = row?.id_factura != null
+            ? `f:${row.id_factura}`
+            : `${row?.fecha || ''}|${row?.identificacion || row?.dni || ''}|${row?.monto || ''}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          pagos.push(row);
+        }
+      }
+
+      pagos.sort((a, b) => String(b?.fecha || '').localeCompare(String(a?.fecha || '')));
+
+      return json({
+        ok: true,
+        retrievedAt: new Date().toISOString(),
+        windows,
+        total: pagos.length,
+        pagos
+      }, 200, origin);
+    }
+
     let body;
     try {
       body = await request.json();
@@ -35685,7 +35741,8 @@ export default {
       url.pathname === '/nodus-json/team-metrics' ||
       url.pathname === '/nodus-json/maestria-lima' ||
       url.pathname === '/nodus-json/participante' ||
-      url.pathname === '/nodus-json/participantes-batch'
+      url.pathname === '/nodus-json/participantes-batch' ||
+      url.pathname === '/nodus-json/pagos-lima'
     ) {
       return handleNodusJson(request, env, origin, url.pathname);
     }
@@ -77460,7 +77517,7 @@ function App() {
           } />
 
           <Route path="/superadmin" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado', 'director_maestria', 'talento_humano', 'rrhh']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'coord_jr', 'coordinador', 'coordinacion', 'coordinadora', 'coordinador_general', 'finanzas', 'contabilidad', 'contador', 'facturacion', 'superadmin', 'consolidado', 'director_maestria', 'talento_humano', 'rrhh']} requireSuperAdmin={false}>
               <SuperAdminPanel />
             </RoleRoute>
           } />
@@ -82681,6 +82738,40 @@ export const canAccessMonitorContratoLima = (currentUser) => {
     'gerente', 'coordinador_mj', 'coord_maestria', 'coord_c1', 'coord_c2',
     'coordinador_c1c2', 'coord_jr', 'coordinacion', 'contabilidad', 'contador',
     'finanzas', 'facturacion', 'legal', 'juridico', 'oficina'
+  ].includes(r));
+};
+
+export const isLimaOnlyScopedUser = (currentUser) => {
+  if (!currentUser || isUserInactive(currentUser)) return false;
+  if (!currentUser.isSimulated && (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email))) return false;
+  if (!currentUser.isSimulated && (isGlobalObserver(currentUser) || isDataAdmin(currentUser))) return false;
+  const userRoles = collectUserRoles(currentUser);
+  if (userRoles.some(r => ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'observador', 'consolidado', 'coord_maestria_global'].includes(r))) {
+    return false;
+  }
+  const emailNorm = String(currentUser.email || '').toLowerCase().trim();
+  if (emailNorm === 'contabilidad.lima@crearpsl.net') return true;
+  const sedeNorm = String(currentUser.sede || '').toLowerCase().trim();
+  return sedeNorm.includes('lima');
+};
+
+export const canAccessAliadosStaff = (currentUser) => {
+  if (!currentUser || isUserInactive(currentUser)) return false;
+  if (!currentUser.isSimulated && (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email))) return true;
+  if (!currentUser.isSimulated && isGlobalObserver(currentUser)) return true;
+  const userRoles = collectUserRoles(currentUser);
+  if (userRoles.some(r => ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(r))) {
+    return true;
+  }
+  const emailNorm = String(currentUser.email || '').toLowerCase().trim();
+  if (emailNorm === 'contabilidad.lima@crearpsl.net') return true;
+  const sedeNorm = String(currentUser.sede || '').toLowerCase().trim();
+  const isLimaOrGlobal = !sedeNorm || sedeNorm.includes('lima') || sedeNorm === 'global';
+  if (!isLimaOrGlobal) return false;
+  return userRoles.some(r => [
+    'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj',
+    'coord_jr', 'coordinador', 'coordinacion', 'coordinadora', 'coordinador_general',
+    'director_maestria'
   ].includes(r));
 };
 
@@ -88204,6 +88295,386 @@ export function getLimaMaestriaCheckinInfo(equipoText) {
 
 ---
 
+## Archivo: src/utils/nodusPaymentsTraceability.js
+
+```js
+/**
+ * Trazabilidad Contable de Pagos Nodus (C1 -> C2 -> Maestría)
+ * Normaliza, cruza y ordena el historial de pagos desde /api/pagos y /api/participante
+ * sin inventar montos ni estados cuando Nodus aún no devuelve registros.
+ */
+
+const normalizeText = (val) =>
+  String(val || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+
+export const normalizeDocForPayments = (val) =>
+  String(val || '')
+    .replace(/^(dni|ce|pasaporte|doc|ruc)[:\s-]*/i, '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toUpperCase()
+    .trim();
+
+export function inferPaymentStages(rawStage, rawConcept = '', rawTeam = '', rawNotes = '') {
+  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`);
+  if (!hay) return [];
+  const stages = [];
+  if (/\b(c1|cap\s*1|capitulo\s*1|primer\s*capitulo|basico|intro)\b/.test(hay)) {
+    stages.push('C1');
+  }
+  if (/\b(c2|cap\s*2|capitulo\s*2|segundo\s*capitulo|avanzado)\b/.test(hay)) {
+    stages.push('C2');
+  }
+  if (
+    /\b(mj|maestria|pfd|sfd|tfd|primer\s*fin|1er\s*fin|segundo\s*fin|2do\s*fin|tercer\s*fin|3er\s*fin|caminata|taller)\b/.test(hay)
+  ) {
+    stages.push('MJ');
+  }
+  return stages;
+}
+
+export function inferPaymentStage(rawStage, rawConcept = '', rawTeam = '', rawNotes = '') {
+  const stages = inferPaymentStages(rawStage, rawConcept, rawTeam, rawNotes);
+  if (stages.includes('MJ')) return 'MJ';
+  if (stages.includes('C2')) return 'C2';
+  if (stages.includes('C1')) return 'C1';
+  const hay = normalizeText(`${rawStage || ''} ${rawConcept || ''} ${rawTeam || ''} ${rawNotes || ''}`);
+  if (!hay) return 'OTRO';
+  return String(rawStage || '').trim().toUpperCase() || 'OTRO';
+}
+
+export function normalizeNodusPaymentRow(row, fallbackStage = '') {
+  if (!row || typeof row !== 'object') return null;
+
+  const idFacturaRaw = row.id_factura ?? row.factura_id ?? row.id ?? row.codigo ?? '';
+  const idFactura = idFacturaRaw !== '' && idFacturaRaw !== null ? String(idFacturaRaw).trim() : '';
+  const numeroFacturaRaw =
+    row.numero_factura ??
+    row.nro_factura ??
+    row.num_factura ??
+    row.factura ??
+    row.serie_numero ??
+    idFactura;
+  const numeroFactura = numeroFacturaRaw !== '' && numeroFacturaRaw !== null ? String(numeroFacturaRaw).trim() : '';
+
+  const fecha = String(
+    row.fecha ||
+    row.fecha_pago ||
+    row.fecha_registro ||
+    row.created_at ||
+    ''
+  ).trim();
+
+  const concepto = String(
+    row.concepto ||
+    row.descripcion ||
+    row.detalle ||
+    row.producto ||
+    row.nombre_producto ||
+    row.plan ||
+    row.entrenamiento ||
+    row.tipo_entrenamiento ||
+    row.nombre_entrenamiento ||
+    row.curso ||
+    row.modulo ||
+    row.taller ||
+    row.etapa ||
+    row.capitulo ||
+    row.observacion ||
+    row.observaciones ||
+    row.notas ||
+    row.glosa ||
+    'Pago Nodus'
+  ).trim();
+
+  const rawStage =
+    row.etapa ||
+    row.capitulo ||
+    row.programa ||
+    row.nivel ||
+    row.entrenamiento ||
+    row.tipo_entrenamiento ||
+    row.nombre_entrenamiento ||
+    row.curso ||
+    row.modulo ||
+    row.taller ||
+    row.categoria ||
+    row.servicio ||
+    row.tipo_servicio ||
+    row.tipo ||
+    fallbackStage ||
+    '';
+  const equipo = String(
+    row.equipo?.nombre ||
+    row.equipo_nombre ||
+    (typeof row.equipo === 'string' ? row.equipo : '') ||
+    (row.id_equipo ? `Equipo ${row.id_equipo}` : '')
+  ).trim();
+
+  const rawNotes = String(row.observacion || row.observaciones || row.notas || row.glosa || '').trim();
+  const etapas = inferPaymentStages(rawStage, concepto, equipo, rawNotes);
+  const etapa = inferPaymentStage(rawStage, concepto, equipo, rawNotes);
+
+  const modoPago = String(
+    row.metodo_pago ||
+    row.modo_pago ||
+    row.forma_pago ||
+    row.medio_pago ||
+    row.tipo_pago ||
+    row.canal_pago ||
+    row.pasarela ||
+    row.metodo ||
+    ''
+  ).trim();
+
+  const referencia = String(
+    row.referencia ||
+    row.nro_operacion ||
+    row.numero_operacion ||
+    row.comprobante ||
+    row.nro_comprobante ||
+    row.voucher ||
+    row.codigo_autorizacion ||
+    row.operacion ||
+    ''
+  ).trim();
+
+  const montoRaw = row.monto ?? row.valor ?? row.importe ?? row.total ?? row.monto_pagado ?? null;
+  const montoNum = montoRaw !== null && montoRaw !== '' && Number.isFinite(Number(String(montoRaw).replace(/,/g, '')))
+    ? Number(String(montoRaw).replace(/,/g, ''))
+    : null;
+
+  const moneda = String(row.moneda || row.currency || 'PEN').toUpperCase().trim() || 'PEN';
+  const estado = String(row.estado || row.status || row.estado_pago || 'Confirmado').trim();
+  const registradoPor = String(
+    row.usuario_registro ||
+    row.cajero ||
+    row.registrado_por ||
+    row.coordinador ||
+    ''
+  ).trim();
+
+  const identificacion = normalizeDocForPayments(
+    row.identificacion ||
+    row.dni ||
+    row.documento ||
+    row.nro_documento ||
+    row.participante?.identificacion ||
+    ''
+  );
+
+  const participanteId = row.id_participante ?? row.participante_id ?? row.participante?.id ?? null;
+  const email = normalizeText(row.email || row.correo || row.participante?.email || '');
+  const participanteNombre = normalizeText(
+    row.participante_nombre ||
+    row.nombre_participante ||
+    row.nombre ||
+    (row.participante ? `${row.participante.nombres || ''} ${row.participante.apellidos || ''}` : '')
+  );
+
+  return {
+    idFactura,
+    numeroFactura,
+    fecha,
+    etapa,
+    etapas,
+    concepto,
+    modoPago,
+    referencia,
+    monto: montoNum,
+    moneda,
+    estado,
+    equipo,
+    registradoPor,
+    identificacion,
+    participanteId: participanteId != null ? String(participanteId).trim() : '',
+    email,
+    participanteNombre,
+    raw: row
+  };
+}
+
+export function formatCurrencyAmount(amount, currency = 'PEN') {
+  if (!Number.isFinite(Number(amount))) return '—';
+  const curr = String(currency || 'PEN').toUpperCase();
+  const prefix = curr === 'USD' ? 'US$' : 'S/';
+  return `${prefix} ${Number(amount).toLocaleString('es-PE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`;
+}
+
+export function extractParticipantNodusStageStatus(nodusRecord) {
+  if (!nodusRecord || typeof nodusRecord !== 'object') {
+    return { c1Paid: null, c2Paid: null, mjPaid: null, embeddedPayments: [] };
+  }
+
+  const embeddedPayments = [];
+  const pushArray = (arr, fallbackStage) => {
+    if (!Array.isArray(arr)) return;
+    for (const row of arr) {
+      const norm = normalizeNodusPaymentRow(row, fallbackStage);
+      if (norm) embeddedPayments.push(norm);
+    }
+  };
+
+  pushArray(nodusRecord.pagos, '');
+  pushArray(nodusRecord.abonos, 'ABONO');
+  pushArray(nodusRecord.facturas, '');
+  pushArray(nodusRecord.historial_pagos, '');
+  if (Array.isArray(nodusRecord.etapas)) {
+    for (const et of nodusRecord.etapas) {
+      const stageGuess = inferPaymentStage(et?.etapa || et?.nombre || et?.codigo || '');
+      pushArray(et?.pagos, stageGuess);
+      pushArray(et?.abonos, stageGuess);
+    }
+  }
+
+  const c1Paid = nodusRecord.capitulo1 && typeof nodusRecord.capitulo1 === 'object'
+    ? Boolean(nodusRecord.capitulo1.pagado || nodusRecord.capitulo1.asistio)
+    : null;
+  const c2Paid = nodusRecord.capitulo2 && typeof nodusRecord.capitulo2 === 'object'
+    ? Boolean(nodusRecord.capitulo2.pagado || nodusRecord.capitulo2.asistio)
+    : null;
+  const mjPaid = nodusRecord.maestria && typeof nodusRecord.maestria === 'object'
+    ? Boolean(nodusRecord.maestria.pagado || nodusRecord.maestria.asistio)
+    : null;
+
+  return { c1Paid, c2Paid, mjPaid, embeddedPayments };
+}
+
+export function buildParticipantPaymentTraceability({
+  contrato = {},
+  nodusCross = {},
+  allPagos = []
+} = {}) {
+  const nodusRecord = nodusCross?.nodusRecord || null;
+  const candidateDocs = new Set(
+    [
+      contrato.numeroDocumento,
+      contrato.doc,
+      nodusCross?.nodusDoc,
+      nodusRecord?.identificacion,
+      nodusRecord?.dni
+    ]
+      .map(normalizeDocForPayments)
+      .filter((d) => d.length >= 5)
+  );
+
+  const candidateIds = new Set(
+    [
+      nodusRecord?.id,
+      nodusRecord?.id_participante,
+      nodusCross?.rosterEntry?.id,
+      nodusCross?.rosterEntry?.id_participante
+    ]
+      .filter((v) => v !== undefined && v !== null && String(v).trim() !== '')
+      .map((v) => String(v).trim())
+  );
+
+  const candidateEmails = new Set(
+    [contrato.email, nodusRecord?.email, nodusCross?.rosterEntry?.email]
+      .map(normalizeText)
+      .filter((e) => e.includes('@'))
+  );
+
+  const candidateNames = new Set(
+    [
+      contrato.nombre,
+      nodusRecord ? `${nodusRecord.nombres || ''} ${nodusRecord.apellidos || ''}` : '',
+      nodusCross?.rosterEntry ? `${nodusCross.rosterEntry.nombres || ''} ${nodusCross.rosterEntry.apellidos || ''}` : ''
+    ]
+      .map(normalizeText)
+      .filter((n) => n.split(' ').length >= 2)
+  );
+
+  const { c1Paid, c2Paid, mjPaid, embeddedPayments } = extractParticipantNodusStageStatus(nodusRecord);
+
+  const matchedNormalized = [...embeddedPayments];
+  const normalizedApiRows = (Array.isArray(allPagos) ? allPagos : [])
+    .map((row) => normalizeNodusPaymentRow(row))
+    .filter(Boolean);
+
+  for (const p of normalizedApiRows) {
+    const byDoc = p.identificacion && candidateDocs.has(p.identificacion);
+    const byId = p.participanteId && candidateIds.has(p.participanteId);
+    const byEmail = p.email && candidateEmails.has(p.email);
+    const byName = !p.identificacion && !p.participanteId && !p.email && p.participanteNombre && candidateNames.has(p.participanteNombre);
+    if (byDoc || byId || byEmail || byName) {
+      matchedNormalized.push(p);
+    }
+  }
+
+  const deduped = [];
+  const seen = new Set();
+  for (const p of matchedNormalized) {
+    const key = p.idFactura
+      ? `f:${p.idFactura}`
+      : `${p.fecha}|${p.monto ?? ''}|${p.modoPago}|${p.concepto}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(p);
+  }
+
+  const stageOrder = { C1: 1, C2: 2, MJ: 3, OTRO: 4 };
+  deduped.sort((a, b) => {
+    const da = String(a.fecha || '');
+    const db = String(b.fecha || '');
+    if (da && db && da !== db) return da.localeCompare(db);
+    return (stageOrder[a.etapa] || 9) - (stageOrder[b.etapa] || 9);
+  });
+
+  const totalByCurrency = {};
+  const modesSet = new Set();
+  const stagesSet = new Set();
+  const invoicesSet = new Set();
+
+  for (const p of deduped) {
+    if (p.monto !== null) {
+      totalByCurrency[p.moneda] = (totalByCurrency[p.moneda] || 0) + p.monto;
+    }
+    if (p.modoPago) modesSet.add(p.modoPago);
+    if (Array.isArray(p.etapas) && p.etapas.length > 0) {
+      p.etapas.forEach((st) => stagesSet.add(st));
+    } else if (p.etapa) {
+      stagesSet.add(p.etapa);
+    }
+    const inv = p.numeroFactura || p.idFactura;
+    if (inv) invoicesSet.add(inv);
+  }
+
+  const stageSummary = {
+    C1: stagesSet.has('C1') || c1Paid === true || Boolean(nodusCross?.pagadoC1),
+    C2: stagesSet.has('C2') || c2Paid === true || Boolean(nodusCross?.pagadoC2),
+    MJ: stagesSet.has('MJ') || mjPaid === true
+  };
+
+  const hasUnclassifiedPayments = deduped.some(
+    (p) => !['C1', 'C2', 'MJ'].includes(p.etapa) && (!Array.isArray(p.etapas) || p.etapas.length === 0)
+  );
+  const allPaymentsUnclassified =
+    deduped.length > 0 && !stagesSet.has('C1') && !stagesSet.has('C2') && !stagesSet.has('MJ');
+
+  return {
+    payments: deduped,
+    totalByCurrency,
+    paymentModes: Array.from(modesSet),
+    invoiceNumbers: Array.from(invoicesSet),
+    stagesPresent: ['C1', 'C2', 'MJ', 'OTRO'].filter((s) => stagesSet.has(s)),
+    stageSummary,
+    hasUnclassifiedPayments,
+    allPaymentsUnclassified
+  };
+}
+
+```
+
+---
+
 ## Archivo: src/utils/flightMonitor.test.js
 
 ```js
@@ -88385,6 +88856,168 @@ test('monitor has explicit loading/error/retry and does not block on assignment 
   assert.match(source, /role="alert"/);
   assert.match(source, /Reintentar asignaciones/);
   assert.match(source, /: trackerError \?/);
+});
+
+```
+
+---
+
+## Archivo: src/utils/nodusPaymentsTraceability.test.js
+
+```js
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  inferPaymentStage,
+  normalizeNodusPaymentRow,
+  buildParticipantPaymentTraceability
+} from './nodusPaymentsTraceability.js';
+
+test('inferPaymentStage classifies C1, C2 and Maestría (PFD/SFD/TFD/MJ)', () => {
+  assert.equal(inferPaymentStage('Capítulo 1', 'Inscripción C1'), 'C1');
+  assert.equal(inferPaymentStage('', 'Pago Segundo Capítulo C2'), 'C2');
+  assert.equal(inferPaymentStage('SFD', 'Maestría del Juego Equipo 31'), 'MJ');
+  assert.equal(inferPaymentStage('MJ', 'Caminata sobre fuego'), 'MJ');
+});
+
+test('buildParticipantPaymentTraceability merges C1->MJ payments from /api/pagos and nodusRecord', () => {
+  const contrato = {
+    nombre: 'Zorayda Susana Alvarez Neyra',
+    numeroDocumento: '45729876',
+    email: 'zoraed@gmail.com'
+  };
+
+  const nodusCross = {
+    nodusDoc: '45729876',
+    nodusRecord: {
+      id: 9081,
+      identificacion: '45729876',
+      capitulo1: { asistio: true, pagado: true },
+      capitulo2: { asistio: true, pagado: true },
+      pagos: [
+        {
+          id_factura: 1001,
+          fecha: '2026-06-10 10:15:00',
+          etapa: 'C1',
+          concepto: 'Capítulo 1',
+          metodo_pago: 'Yape',
+          monto: 650,
+          moneda: 'PEN',
+          referencia: 'YP-8821'
+        }
+      ]
+    }
+  };
+
+  const allPagos = [
+    // Duplicate id_factura 1001 from /api/pagos should deduplicate cleanly
+    {
+      id_factura: 1001,
+      fecha: '2026-06-10 10:15:00',
+      identificacion: '45729876',
+      etapa: 'C1',
+      metodo_pago: 'Yape',
+      monto: 650
+    },
+    {
+      id_factura: 1045,
+      fecha: '2026-08-05 14:20:00',
+      identificacion: '45729876',
+      concepto: 'Capítulo 2 - Equipo 31',
+      modo_pago: 'Transferencia BCP',
+      nro_operacion: 'OP-99310',
+      monto: 900,
+      moneda: 'PEN'
+    },
+    {
+      id_factura: 1199,
+      fecha: '2026-10-12 18:00:00',
+      id_participante: 9081,
+      concepto: 'Maestría SFD',
+      forma_pago: 'Tarjeta Visa',
+      comprobante: 'B001-442',
+      monto: 1200,
+      moneda: 'PEN'
+    },
+    // Different participant should NOT match
+    {
+      id_factura: 1200,
+      fecha: '2026-10-13 09:00:00',
+      identificacion: '99999999',
+      concepto: 'Maestría SFD',
+      metodo_pago: 'Efectivo',
+      monto: 500
+    }
+  ];
+
+  const trace = buildParticipantPaymentTraceability({ contrato, nodusCross, allPagos });
+
+  assert.equal(trace.payments.length, 3);
+  assert.deepEqual(trace.payments.map((p) => p.etapa), ['C1', 'C2', 'MJ']);
+  assert.deepEqual(trace.payments.map((p) => p.modoPago), ['Yape', 'Transferencia BCP', 'Tarjeta Visa']);
+  assert.equal(trace.totalByCurrency.PEN, 2750);
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: true });
+});
+
+test('normalizeNodusPaymentRow preserves missing amount without inventing zeros', () => {
+  const row = normalizeNodusPaymentRow({ id_factura: 55, fecha: '2026-11-01', metodo_pago: 'Efectivo' });
+  assert.equal(row.monto, null);
+  assert.equal(row.modoPago, 'Efectivo');
+});
+
+test('combo payments and Nodus alternate stage fields populate stageSummary accurately', () => {
+  const contrato = { numeroDocumento: '45729876', nombre: 'Zorayda Alvarez' };
+  const nodusCross = { pagadoC1: true, pagadoC2: false };
+  const allPagos = [
+    {
+      id_factura: 22771,
+      fecha: '2026-09-01',
+      identificacion: '45729876',
+      curso: 'Cap 1',
+      metodo_pago: 'TC(DATAFAST)',
+      monto: 790
+    },
+    {
+      id_factura: 23463,
+      fecha: '2026-10-01',
+      identificacion: '45729876',
+      entrenamiento: 'Capítulo 2 y Maestría (2do fin)',
+      metodo_pago: 'TRANSFERENCIA AHORROS',
+      monto: 3500
+    }
+  ];
+
+  const trace = buildParticipantPaymentTraceability({ contrato, nodusCross, allPagos });
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: true, MJ: true });
+  assert.equal(trace.hasUnclassifiedPayments, false);
+  assert.equal(trace.allPaymentsUnclassified, false);
+});
+
+test('unclassified /api/pagos rows set hasUnclassifiedPayments and respect nodusCross pagadoC1/C2', () => {
+  const contrato = { numeroDocumento: '11223344', nombre: 'Juan Perez' };
+  const nodusCross = { pagadoC1: true, pagadoC2: false };
+  const allPagos = [
+    {
+      id_factura: 27154,
+      fecha: '2026-09-10',
+      identificacion: '11223344',
+      metodo_pago: 'TC(DATAFAST)',
+      monto: 785
+    },
+    {
+      id_factura: 30050,
+      fecha: '2026-10-10',
+      identificacion: '11223344',
+      metodo_pago: 'EFECTIVO',
+      monto: 2000
+    }
+  ];
+
+  const trace = buildParticipantPaymentTraceability({ contrato, nodusCross, allPagos });
+  assert.deepEqual(trace.stageSummary, { C1: true, C2: false, MJ: false });
+  assert.equal(trace.hasUnclassifiedPayments, true);
+  assert.equal(trace.allPaymentsUnclassified, true);
+  assert.deepEqual(trace.invoiceNumbers, ['27154', '30050']);
 });
 
 ```
@@ -91312,6 +91945,38 @@ function findContractForNodusPerson(person, signedContracts) {
   return byName ? { contract: byName, matchBy: 'NOMBRE' } : null;
 }
 
+export function evaluatePriorCoherence(entry) {
+  if (!entry) return { status: 'UNKNOWN', isCoherent: false, issues: ['Sin datos Nodus'] };
+  const tipo = String(entry.tipoPersona || '').toLowerCase().trim();
+  if (tipo && tipo !== 'participante') {
+    return { status: 'MANAGER', isCoherent: true, label: 'Manager · Staff', issues: [] };
+  }
+  const etapas = Array.isArray(entry.etapas) ? entry.etapas : [];
+  const c1Etapa = etapas.find((e) => /^(C1|CAP\s*1|CAPITULO\s*1)$/i.test(String(e?.etapa || '').trim()));
+  const c2Etapa = etapas.find((e) => /^(C2|CAP\s*2|CAPITULO\s*2)$/i.test(String(e?.etapa || '').trim()));
+
+  const hasC1Asistencia = Boolean(entry.asistioC1 || c1Etapa?.asistio);
+  const hasC1Pago = Boolean(entry.pagadoC1 || c1Etapa?.pagado);
+  const hasC2Pago = Boolean(entry.pagadoC2 || c2Etapa?.pagado || c2Etapa?.asistio || entry.asistioC2);
+  const isDesertor = Boolean(entry.desertorC1 || c1Etapa?.desertor || c2Etapa?.desertor);
+
+  const issues = [];
+  if (isDesertor) issues.push('Desertor en entrenamiento previo');
+  if (!hasC1Asistencia) issues.push('Sin asistencia C1');
+  if (!hasC1Pago && !hasC1Asistencia) issues.push('Sin pago C1');
+  if (!hasC2Pago) issues.push('Sin pago/asistencia C2');
+
+  return {
+    status: issues.length === 0 ? 'OK' : 'OBS',
+    isCoherent: issues.length === 0,
+    hasC1Asistencia,
+    hasC1Pago,
+    hasC2Pago,
+    isDesertor,
+    issues
+  };
+}
+
 export function buildMaestriaNodusCross({
   signedContracts = [],
   nodusEquipos = [],
@@ -91338,8 +92003,10 @@ export function buildMaestriaNodusCross({
       const emailNorm = normalizeNodusEmail(p.email);
       const nameNorm = normalizeNodusText(fullName);
       const maestriaNodus = Boolean(p.capitulo2?.maestria);
+      const pagadoC1 = Boolean(p.capitulo1?.pagado);
       const pagadoC2 = Boolean(p.capitulo2?.pagado);
       const asistioC1 = Boolean(p.capitulo1?.asistio);
+      const asistioC2 = Boolean(p.capitulo2?.asistio);
       const desertorC1 = Boolean(p.capitulo1?.desertor);
 
       const entry = {
@@ -91360,11 +92027,14 @@ export function buildMaestriaNodusCross({
         sede: eq.sede || 'LIMA CICLO 1',
         fdsVigente,
         asistioC1,
+        pagadoC1,
         desertorC1,
         pagadoC2,
+        asistioC2,
         maestriaNodus,
         checkinUrl: checkinInfo?.url || null,
         etapas: [],
+        nodusRecord: p,
         exhaustiveLookup: false
       };
 
@@ -91417,6 +92087,7 @@ export function buildMaestriaNodusCross({
     const existing = byDoc.get(docNorm);
     if (existing) {
       existing.etapas = etapas.length > 0 ? etapas : existing.etapas;
+      existing.nodusRecord = p;
       existing.exhaustiveLookup = true;
       existing.maestriaNodus = hasExactEtapasForActiveTeam ? maestriaFlag : (existing.maestriaNodus || maestriaFlag);
       continue;
@@ -91447,11 +92118,14 @@ export function buildMaestriaNodusCross({
       sede: p.sede?.nombre || matchedActiveTeam?.sede || 'LIMA CICLO 1',
       fdsVigente: String(resolvedFds).toUpperCase().trim(),
       asistioC1: typeof p.capitulo1 === 'boolean' ? p.capitulo1 : Boolean(p.capitulo1?.asistio),
+      pagadoC1: Boolean(p.capitulo1?.pagado),
       desertorC1: Boolean(p.capitulo1?.desertor),
       pagadoC2: typeof p.capitulo2 === 'boolean' ? p.capitulo2 : Boolean(p.capitulo2?.pagado),
+      asistioC2: Boolean(p.capitulo2?.asistio),
       maestriaNodus: maestriaFlag,
       checkinUrl: checkinInfo?.url || null,
       etapas,
+      nodusRecord: p,
       exhaustiveLookup: true
     };
 
@@ -91523,19 +92197,24 @@ export function buildMaestriaNodusCross({
         nodusRole: matched?.rolLabel || null,
         coordinador: matched?.coordinador || null,
         asistioC1: Boolean(matched?.asistioC1),
+        pagadoC1: Boolean(matched?.pagadoC1),
         desertorC1: Boolean(matched?.desertorC1),
         pagadoC2: Boolean(matched?.pagadoC2),
+        asistioC2: Boolean(matched?.asistioC2),
         maestriaNodus: Boolean(matched?.maestriaNodus),
         checkinUrl: matched?.checkinUrl || fallbackCheckin?.url || null,
         etapas: matched?.etapas || [],
+        nodusRecord: matched?.nodusRecord || null,
+        coherenciaPrevia: matched ? evaluatePriorCoherence(matched) : null,
         exhaustiveLookup: Boolean(matched?.exhaustiveLookup),
         estadoCruce
       }
     };
   });
 
-  // 2. Construir Padrón Vivo de Nodus Maestría (personas en Maestría, Managers, C2 pagados o ya firmados)
-  const nodusPadronCross = [];
+  // 2. Construir Padrón Vivo de Nodus Maestría deduplicado por persona (1 fila por persona única)
+  const rawPadronEntries = [];
+  const nodusPadronByPerson = new Map();
   for (const entry of allNodusEntries) {
     const matchInfo = findContractForNodusPerson(
       {
@@ -91558,21 +92237,51 @@ export function buildMaestriaNodusCross({
     else if (isSigned && !entry.maestriaNodus) estadoOperativo = 'FALTA_CHECKIN_NODUS';
     else if (!isSigned && entry.maestriaNodus) estadoOperativo = 'FALTA_FIRMA_CONTRATO';
 
-    nodusPadronCross.push({
+    const enrichedEntry = {
       ...entry,
       isSigned,
       contractMatchBy: matchInfo?.matchBy || null,
       signature: matchInfo?.contract || null,
+      coherenciaPrevia: evaluatePriorCoherence(entry),
       estadoOperativo
-    });
+    };
+    rawPadronEntries.push(enrichedEntry);
+
+    const personKey =
+      (entry.docNorm && entry.docNorm.length >= 5 ? `doc:${entry.docNorm}` : '') ||
+      (entry.nodusId != null ? `id:${entry.nodusId}` : '') ||
+      (entry.emailNorm && entry.emailNorm.includes('@') ? `mail:${entry.emailNorm}` : '') ||
+      `name:${normalizeNodusText(entry.nombre)}`;
+
+    const existingPerson = nodusPadronByPerson.get(personKey);
+    if (!existingPerson) {
+      nodusPadronByPerson.set(personKey, enrichedEntry);
+    } else {
+      const preferNew = enrichedEntry.maestriaNodus && !existingPerson.maestriaNodus;
+      const merged = preferNew ? { ...enrichedEntry } : { ...existingPerson };
+      merged.maestriaNodus = Boolean(existingPerson.maestriaNodus || enrichedEntry.maestriaNodus);
+      merged.isSigned = Boolean(existingPerson.isSigned || enrichedEntry.isSigned);
+      merged.signature = existingPerson.signature || enrichedEntry.signature;
+      merged.contractMatchBy = existingPerson.contractMatchBy || enrichedEntry.contractMatchBy;
+      merged.asistioC1 = Boolean(existingPerson.asistioC1 || enrichedEntry.asistioC1);
+      merged.pagadoC1 = Boolean(existingPerson.pagadoC1 || enrichedEntry.pagadoC1);
+      merged.pagadoC2 = Boolean(existingPerson.pagadoC2 || enrichedEntry.pagadoC2);
+      merged.asistioC2 = Boolean(existingPerson.asistioC2 || enrichedEntry.asistioC2);
+      if (merged.isSigned && merged.maestriaNodus) merged.estadoOperativo = 'COMPLETO';
+      else if (merged.isSigned && !merged.maestriaNodus) merged.estadoOperativo = 'FALTA_CHECKIN_NODUS';
+      else if (!merged.isSigned && merged.maestriaNodus) merged.estadoOperativo = 'FALTA_FIRMA_CONTRATO';
+      merged.coherenciaPrevia = evaluatePriorCoherence(merged);
+      nodusPadronByPerson.set(personKey, merged);
+    }
   }
+  const nodusPadronCross = Array.from(nodusPadronByPerson.values());
 
   // 3. Resumen por Equipo + FDS vigente
   const teamSummaries = activeTeams.map((eq) => {
     const teamNum = extractTeamNumber(eq.nombre);
     const fdsVigente = String(eq.etapa_vigente || '').toUpperCase().trim();
     const checkinInfo = getLimaMaestriaCheckinInfo(eq.nombre);
-    const teamNodus = nodusPadronCross.filter((p) => p.equipoId === eq.id);
+    const teamNodus = rawPadronEntries.filter((p) => p.equipoId === eq.id);
     const teamSigned = enrichedContracts.filter((c) => {
       if (c.nodusCross.nodusTeamId != null) return c.nodusCross.nodusTeamId === eq.id;
       return teamNum && extractTeamNumber(c.equipo || c.cohorte || c.equipoCohorte) === teamNum;
@@ -91620,14 +92329,18 @@ export function buildMaestriaNodusCross({
     };
   });
 
-  const isSignedManager = (c) =>
-    String(c.nodusCross?.nodusRole || c.rol || c.rolActividad || '').toLowerCase().includes('manager');
+  const getContractRoleNorm = (c) =>
+    normalizeNodusText(c.rol || c.rolActividad || c.nodusCross?.nodusRole || '');
+  const isSignedManager = (c) => getContractRoleNorm(c).includes('manager');
+  const isSignedCapitan = (c) => getContractRoleNorm(c).includes('capitan');
   const allCompletos = enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'COMPLETO');
   const totalCompletosMgr = allCompletos.filter(isSignedManager).length;
-  const totalCompletosPart = allCompletos.length - totalCompletosMgr;
+  const totalCompletosCapitan = allCompletos.filter((c) => !isSignedManager(c) && isSignedCapitan(c)).length;
+  const totalCompletosPart = allCompletos.length - totalCompletosMgr - totalCompletosCapitan;
   const allFaltaCheckin = enrichedContracts.filter((c) => c.nodusCross.estadoCruce === 'FALTA_CHECKIN_NODUS');
   const totalFaltaCheckinMgr = allFaltaCheckin.filter(isSignedManager).length;
-  const totalFaltaCheckinPart = allFaltaCheckin.length - totalFaltaCheckinMgr;
+  const totalFaltaCheckinCapitan = allFaltaCheckin.filter((c) => !isSignedManager(c) && isSignedCapitan(c)).length;
+  const totalFaltaCheckinPart = allFaltaCheckin.length - totalFaltaCheckinMgr - totalFaltaCheckinCapitan;
   const allFaltaFirma = nodusPadronCross.filter((p) => p.estadoOperativo === 'FALTA_FIRMA_CONTRATO');
   const totalFaltaFirmaMgr = allFaltaFirma.filter((p) => p.tipoPersona === 'manager').length;
   const totalFaltaFirmaPart = allFaltaFirma.length - totalFaltaFirmaMgr;
@@ -91636,12 +92349,16 @@ export function buildMaestriaNodusCross({
     totalNodusPadron: nodusPadronCross.length,
     totalNodusMaestria: nodusPadronCross.filter((p) => p.maestriaNodus).length,
     totalNodusManagers: nodusPadronCross.filter((p) => p.tipoPersona === 'manager' && p.maestriaNodus).length,
+    totalNodusCoherentes: nodusPadronCross.filter((p) => p.maestriaNodus && p.coherenciaPrevia?.isCoherent).length,
+    totalNodusConObservacion: nodusPadronCross.filter((p) => p.maestriaNodus && p.coherenciaPrevia && !p.coherenciaPrevia.isCoherent).length,
     totalCompletos: allCompletos.length,
     totalCompletosPart,
     totalCompletosMgr,
+    totalCompletosCapitan,
     totalFaltaCheckinNodus: allFaltaCheckin.length,
     totalFaltaCheckinPart,
     totalFaltaCheckinMgr,
+    totalFaltaCheckinCapitan,
     totalFaltaFirmaContrato: allFaltaFirma.length,
     totalFaltaFirmaPart,
     totalFaltaFirmaMgr,
@@ -104096,6 +104813,7 @@ export default function HelpModal({ isOpen, onClose }) {
 
 ```javascript
 import { useState, useEffect, useMemo } from 'react';
+import { isLimaOnlyScopedUser } from '../config/permissions';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getFirestore,
@@ -104225,9 +104943,10 @@ export default function AliadosC2AdminPanel({ currentUser }) {
   const [records, setRecords] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const limaOnly = isLimaOnlyScopedUser(currentUser);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL'); // ALL, ONLINE, AUTHORIZED, DENIED, ALERTS
-  const [sedeFilter, setSedeFilter] = useState('ALL');
+  const [sedeFilter, setSedeFilter] = useState(limaOnly ? 'Lima' : 'ALL');
   const [expandedRow, setExpandedRow] = useState(null);
   const [bulkEmails, setBulkEmails] = useState('');
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -104413,7 +105132,7 @@ export default function AliadosC2AdminPanel({ currentUser }) {
       item.securityAlerts.push(l);
     });
 
-    return Array.from(byEmail.values()).map((item) => ({
+    const rows = Array.from(byEmail.values()).map((item) => ({
       ...item,
       nombre: formatHumanName(item.nombre, item.email),
     })).sort((a, b) => {
@@ -104421,7 +105140,13 @@ export default function AliadosC2AdminPanel({ currentUser }) {
       const bTime = b.lastSeenIso || b.lastLoginIso || '';
       return bTime.localeCompare(aTime);
     });
-  }, [autorizados, encuestas, sesiones, records, logs]);
+    return limaOnly ? rows.filter((item) => String(item.sede || '').toLowerCase().includes('lima')) : rows;
+  }, [autorizados, encuestas, sesiones, records, logs, limaOnly]);
+
+  const visibleLogs = useMemo(() => {
+    if (!limaOnly) return logs;
+    return logs.filter((log) => String(log.sede || '').toLowerCase().includes('lima'));
+  }, [logs, limaOnly]);
 
   const filteredRows = useMemo(() => {
     return unifiedRows.filter((r) => {
@@ -104941,8 +105666,9 @@ export default function AliadosC2AdminPanel({ currentUser }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <Building2 size={16} color="var(--crear-gold)" />
           <select
-            value={sedeFilter}
-            onChange={(e) => setSedeFilter(e.target.value)}
+            value={limaOnly ? 'Lima' : sedeFilter}
+            onChange={(e) => { if (!limaOnly) setSedeFilter(e.target.value); }}
+            disabled={limaOnly}
             style={{
               background: 'rgba(0,0,0,0.25)',
               border: '1px solid var(--border-subtle)',
@@ -104953,10 +105679,16 @@ export default function AliadosC2AdminPanel({ currentUser }) {
               outline: 'none',
             }}
           >
-            <option value="ALL" style={{ background: '#0f172a' }}>Todas las Sedes</option>
-            {OFFICIAL_SEDES.map(s => (
-              <option key={s} value={s} style={{ background: '#0f172a' }}>{s}</option>
-            ))}
+            {limaOnly ? (
+              <option value="Lima" style={{ background: '#0f172a' }}>Lima (Solo Sede)</option>
+            ) : (
+              <>
+                <option value="ALL" style={{ background: '#0f172a' }}>Todas las Sedes</option>
+                {OFFICIAL_SEDES.map(s => (
+                  <option key={s} value={s} style={{ background: '#0f172a' }}>{s}</option>
+                ))}
+              </>
+            )}
           </select>
         </div>
 
@@ -105334,13 +106066,13 @@ export default function AliadosC2AdminPanel({ currentUser }) {
         <h3 style={{ marginTop: 0, marginBottom: '0.8rem', color: 'var(--crear-gold)', fontSize: '1.05rem' }}>
           🕒 Bitácora en Tiempo Real: Conexiones, Avances y Bloqueos de Captura/Impresión
         </h3>
-        {logs.length === 0 ? (
+        {visibleLogs.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Aún no hay eventos registrados en la bitácora. Aparecerán en cuanto un Aliado inicie sesión o interactúe con la guía.
           </p>
         ) : (
           <div style={{ maxHeight: '340px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-            {logs.map((log) => {
+            {visibleLogs.map((log) => {
               const isAlert = String(log.action || '').includes('BLOQUEADO') || String(log.action || '').includes('DENEGADO');
               return (
                 <div
@@ -110050,6 +110782,7 @@ export default function FuturosImposiblesView({
 
 ```javascript
 import { useState, useEffect, useMemo } from 'react';
+import { isLimaOnlyScopedUser } from '../config/permissions';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getFirestore,
@@ -110171,9 +110904,10 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
   const [records, setRecords] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const limaOnly = isLimaOnlyScopedUser(currentUser);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
-  const [sedeFilter, setSedeFilter] = useState('ALL');
+  const [sedeFilter, setSedeFilter] = useState(limaOnly ? 'Lima' : 'ALL');
   const [expandedRow, setExpandedRow] = useState(null);
   const [bulkEmails, setBulkEmails] = useState('');
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -110355,7 +111089,7 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
       item.securityAlerts.push(l);
     });
 
-    return Array.from(byEmail.values()).map((item) => ({
+    const rows = Array.from(byEmail.values()).map((item) => ({
       ...item,
       nombre: formatHumanName(item.nombre, item.email),
     })).sort((a, b) => {
@@ -110363,7 +111097,13 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
       const bTime = b.lastSeenIso || b.lastLoginIso || '';
       return bTime.localeCompare(aTime);
     });
-  }, [autorizados, encuestas, sesiones, records, logs]);
+    return limaOnly ? rows.filter((item) => String(item.sede || '').toLowerCase().includes('lima')) : rows;
+  }, [autorizados, encuestas, sesiones, records, logs, limaOnly]);
+
+  const visibleLogs = useMemo(() => {
+    if (!limaOnly) return logs;
+    return logs.filter((log) => String(log.sede || '').toLowerCase().includes('lima'));
+  }, [logs, limaOnly]);
 
   const filteredRows = useMemo(() => {
     return unifiedRows.filter((r) => {
@@ -110741,8 +111481,9 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <Building2 size={15} color="var(--text-muted)" />
           <select
-            value={sedeFilter}
-            onChange={(e) => setSedeFilter(e.target.value)}
+            value={limaOnly ? 'Lima' : sedeFilter}
+            onChange={(e) => { if (!limaOnly) setSedeFilter(e.target.value); }}
+            disabled={limaOnly}
             style={{
               background: 'rgba(255,255,255,0.06)',
               border: '1px solid var(--border-subtle)',
@@ -110753,10 +111494,16 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
               outline: 'none',
             }}
           >
-            <option value="ALL" style={{ background: '#0f172a' }}>Todas las Sedes</option>
-            {OFFICIAL_SEDES.map(s => (
-              <option key={s} value={s} style={{ background: '#0f172a' }}>{s}</option>
-            ))}
+            {limaOnly ? (
+              <option value="Lima" style={{ background: '#0f172a' }}>Lima (Solo Sede)</option>
+            ) : (
+              <>
+                <option value="ALL" style={{ background: '#0f172a' }}>Todas las Sedes</option>
+                {OFFICIAL_SEDES.map(s => (
+                  <option key={s} value={s} style={{ background: '#0f172a' }}>{s}</option>
+                ))}
+              </>
+            )}
           </select>
         </div>
 
@@ -110992,13 +111739,13 @@ export default function AliadosC1AdminPanel({ currentUser, onToggleGuideView }) 
         <h3 style={{ marginTop: 0, marginBottom: '0.8rem', color: '#38bdf8', fontSize: '1.05rem', fontWeight: 800 }}>
           🕒 Bitácora en Tiempo Real C1: Conexiones, Avances y Bloqueos de Captura/Impresión
         </h3>
-        {logs.length === 0 ? (
+        {visibleLogs.length === 0 ? (
           <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
             Aún no hay eventos registrados en la bitácora C1. Aparecerán en cuanto un Aliado inicie sesión o interactúe con la guía C1.
           </p>
         ) : (
           <div style={{ maxHeight: '340px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-            {logs.map((log) => {
+            {visibleLogs.map((log) => {
               const isAlert = String(log.action || '').includes('BLOQUEADO') || String(log.action || '').includes('DENEGADO');
               return (
                 <div
@@ -129853,6 +130600,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
 
 ```javascript
 import { Fragment, useState, useEffect, useMemo } from 'react';
+import { isLimaOnlyScopedUser } from '../config/permissions';
 import { initializeApp, getApps } from 'firebase/app';
 import {
   getFirestore,
@@ -129985,9 +130733,10 @@ export default function StaffMesaAdminPanel({ currentUser }) {
   const [records, setRecords] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const limaOnly = isLimaOnlyScopedUser(currentUser);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
-  const [sedeFilter, setSedeFilter] = useState('todas');
+  const [sedeFilter, setSedeFilter] = useState(limaOnly ? 'Lima' : 'todas');
   const [puestoFilter, setPuestoFilter] = useState('todos');
   const [conexionFilter, setConexionFilter] = useState('todas');
   const [sortBy, setSortBy] = useState('ultima_conexion');
@@ -130213,7 +130962,8 @@ export default function StaffMesaAdminPanel({ currentUser }) {
         validityEvaluation: validity,
       };
     });
-  }, [autorizados, encuestas, sesiones, records, logs]);
+    return limaOnly ? list.filter((u) => String(u.sede || '').toLowerCase().includes('lima')) : list;
+  }, [autorizados, encuestas, sesiones, records, logs, limaOnly]);
 
   const puestoOptions = useMemo(() => {
     const set = new Set();
@@ -130815,8 +131565,9 @@ export default function StaffMesaAdminPanel({ currentUser }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <Building2 size={16} color="#f59e0b" />
             <select
-              value={sedeFilter}
-              onChange={(e) => setSedeFilter(e.target.value)}
+              value={limaOnly ? 'Lima' : sedeFilter}
+              onChange={(e) => { if (!limaOnly) setSedeFilter(e.target.value); }}
+              disabled={limaOnly}
               style={{
                 background: 'rgba(15, 23, 42, 0.9)',
                 border: '1px solid rgba(245, 158, 11, 0.3)',
@@ -130827,12 +131578,18 @@ export default function StaffMesaAdminPanel({ currentUser }) {
                 outline: 'none',
               }}
             >
-              <option value="todas">Todas las Sedes (6 oficiales)</option>
-              {OFFICIAL_SEDES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
+              {limaOnly ? (
+                <option value="Lima">Lima (Solo Sede)</option>
+              ) : (
+                <>
+                  <option value="todas">Todas las Sedes (6 oficiales)</option>
+                  {OFFICIAL_SEDES.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
           </div>
 
@@ -141673,6 +142430,10 @@ import toast from 'react-hot-toast';
 import { db, auth } from '../services/firebase';
 import { generateMaestriaPassCanvas, sendMaestriaConfirmationEmail } from '../utils/maestriaPass';
 import { downloadMaestriaContractPdf } from '../utils/contractPdfGenerator';
+import {
+  buildParticipantPaymentTraceability,
+  formatCurrencyAmount
+} from '../utils/nodusPaymentsTraceability';
 import { deduplicateSignedContracts } from '../utils/limaContractUniqueness';
 import { buildMaestriaNodusCross, selectActiveLimaMaestriaTeams } from '../utils/maestriaNodusCross';
 
@@ -141700,6 +142461,8 @@ export default function MonitorMaestriaLima() {
   const [nodusEquipos, setNodusEquipos] = useState([]);
   const [nodusRosterByTeam, setNodusRosterByTeam] = useState({});
   const [nodusByDni, setNodusByDni] = useState({});
+  const [nodusPagosLima, setNodusPagosLima] = useState([]);
+  const [expandedPaymentsByDoc, setExpandedPaymentsByDoc] = useState({});
   const [searchingDniNodus, setSearchingDniNodus] = useState(false);
   const [nodusLoading, setNodusLoading] = useState(true);
   const [nodusError, setNodusError] = useState(null);
@@ -141834,17 +142597,33 @@ export default function MonitorMaestriaLima() {
         remainingBatches.push(dnis.slice(i, i + 30));
       }
 
-      const resp = await fetch(`${NODUS_WORKER_BASE}/nodus-json/maestria-lima`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`
-        },
-        body: JSON.stringify({ dnis: firstBatch })
-      });
+      const [resp, pagosResp] = await Promise.all([
+        fetch(`${NODUS_WORKER_BASE}/nodus-json/maestria-lima`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ dnis: firstBatch })
+        }),
+        fetch(`${NODUS_WORKER_BASE}/nodus-json/pagos-lima`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`
+          },
+          body: JSON.stringify({ daysBack: 270 })
+        }).catch(() => null)
+      ]);
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok || !data?.ok) {
         throw new Error(data?.message || data?.error || `HTTP ${resp.status} consultando Nodus`);
+      }
+      if (pagosResp && pagosResp.ok) {
+        const pagosData = await pagosResp.json().catch(() => ({}));
+        if (pagosData?.ok && Array.isArray(pagosData.pagos)) {
+          setNodusPagosLima(pagosData.pagos);
+        }
       }
       firstBatch.forEach((d) => fetchedDnisRef.current.add(d));
 
@@ -142007,6 +142786,16 @@ export default function MonitorMaestriaLima() {
     const totalEntrenadores = signedContracts.filter((c) => normalizeStr(c.rol || c.rolActividad || '').includes('entrenador')).length;
     const totalOtrosRestantes = Math.max(0, totalRegistradosFirestore - totalParticipantes - totalManagers - totalCapitanes - totalStaff - totalEntrenadores);
     const totalNodusParticipantes = Math.max(0, (summary.totalNodusMaestria || 0) - (summary.totalNodusManagers || 0));
+    const totalNodusSinPago = nodusPadronCross.filter((item) => {
+      if (!item.maestriaNodus || item.tipoPersona !== 'participante') return false;
+      const pTrace = buildParticipantPaymentTraceability({
+        contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+        nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
+        allPagos: nodusPagosLima
+      });
+      const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
+      return !hasPay;
+    }).length;
 
     return {
       totalPadron,
@@ -142021,9 +142810,10 @@ export default function MonitorMaestriaLima() {
       totalEntrenadores,
       totalOtrosRestantes,
       totalNodusParticipantes,
+      totalNodusSinPago,
       ...summary
     };
-  }, [nodusCrossResult, signedContracts]);
+  }, [nodusCrossResult, signedContracts, nodusPagosLima]);
 
   // Filtrado Tab 1 (Registros y Auditoría Forense + Cruce Nodus)
   const filteredRegistros = useMemo(() => {
@@ -142069,6 +142859,17 @@ export default function MonitorMaestriaLima() {
       if (padronRoleFilter !== 'TODOS' && item.rolLabel !== padronRoleFilter) return false;
       if (padronStatusFilter === 'EN_NODUS_MAESTRIA') {
         if (!item.maestriaNodus) return false;
+      } else if (padronStatusFilter === 'CON_OBSERVACION_PREVIA') {
+        if (!item.maestriaNodus || !item.coherenciaPrevia || item.coherenciaPrevia.isCoherent) return false;
+      } else if (padronStatusFilter === 'SIN_PAGO_EN_NODUS') {
+        if (!item.maestriaNodus || item.tipoPersona !== 'participante') return false;
+        const pTrace = buildParticipantPaymentTraceability({
+          contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+          nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
+          allPagos: nodusPagosLima
+        });
+        const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
+        if (hasPay) return false;
       } else if (padronStatusFilter !== 'TODOS' && item.estadoOperativo !== padronStatusFilter) {
         return false;
       }
@@ -142551,6 +143352,12 @@ export default function MonitorMaestriaLima() {
               <div style={{ fontSize: '0.66rem', color: '#38bdf8', marginTop: '0.1rem' }}>
                 {stats.totalCompletos} c/firma + {stats.totalFaltaFirmaContrato} s/firma
               </div>
+              {!nodusLoading && (
+                <div style={{ fontSize: '0.65rem', color: stats.totalNodusConObservacion > 0 ? '#fbbf24' : '#34d399', marginTop: '0.12rem', fontWeight: 700 }}>
+                  ✓ {stats.totalNodusCoherentes || 0} coherentes (C1/C2 + Pagos)
+                  {stats.totalNodusConObservacion > 0 ? ` · ⚠ ${stats.totalNodusConObservacion} obs.` : ''}
+                </div>
+              )}
             </div>
             <div
               onClick={() => {
@@ -142567,7 +143374,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>✅ Completo (Firma + Nodus)</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#6ee7b7', marginTop: '0.15rem' }}>{stats.totalCompletos}</div>
               <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.15rem' }}>
-                {stats.totalCompletosPart || 0} Part. · {stats.totalCompletosMgr || 0} Mgr.
+                {stats.totalCompletosPart || 0} Part. · {stats.totalCompletosMgr || 0} Mgr.{stats.totalCompletosCapitan > 0 ? ` · ${stats.totalCompletosCapitan} Capitán` : ''}
               </div>
             </div>
             <div
@@ -142585,7 +143392,7 @@ export default function MonitorMaestriaLima() {
               <span style={{ fontSize: '0.68rem', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.05em' }}>⚠️ Falta Check-in Nodus</span>
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fbbf24', marginTop: '0.15rem' }}>{stats.totalFaltaCheckinNodus}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
-                {stats.totalFaltaCheckinPart || 0} Part. · {stats.totalFaltaCheckinMgr || 0} Mgr.
+                {stats.totalFaltaCheckinPart || 0} Part. · {stats.totalFaltaCheckinMgr || 0} Mgr.{stats.totalFaltaCheckinCapitan > 0 ? ` · ${stats.totalFaltaCheckinCapitan} Capitán` : ''}
               </div>
             </div>
             <div
@@ -142622,6 +143429,34 @@ export default function MonitorMaestriaLima() {
               <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#fb7185', marginTop: '0.15rem' }}>{stats.totalFaltaFirmaContrato}</div>
               <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
                 {stats.totalFaltaFirmaPart || 0} Part. · {stats.totalFaltaFirmaMgr || 0} Mgr.
+              </div>
+            </div>
+            <div
+              onClick={() => {
+                setActiveTab('PADRON');
+                setPadronTeamFilter('TODOS');
+                setPadronRoleFilter('TODOS');
+                setPadronSearch('');
+                setPadronStatusFilter('SIN_PAGO_EN_NODUS');
+                scrollToResults();
+              }}
+              title="Clic para auditar participantes con asistencia en Nodus y sin ningún pago registrado"
+              style={{
+                background: stats.totalNodusSinPago > 0 ? 'rgba(239, 68, 68, 0.18)' : 'rgba(16, 185, 129, 0.10)',
+                padding: '0.75rem 1rem',
+                borderRadius: '10px',
+                border: stats.totalNodusSinPago > 0 ? '1px solid rgba(248, 113, 113, 0.55)' : '1px solid rgba(16, 185, 129, 0.35)',
+                cursor: 'pointer'
+              }}
+            >
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, color: stats.totalNodusSinPago > 0 ? '#fca5a5' : '#6ee7b7', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {stats.totalNodusSinPago > 0 ? '🚨 Nodus Asist. · Sin Pago' : '✅ Nodus · Sin Pago'}
+              </span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 900, color: stats.totalNodusSinPago > 0 ? '#f87171' : '#34d399', marginTop: '0.15rem' }}>
+                {nodusLoading ? '...' : stats.totalNodusSinPago}
+              </div>
+              <div style={{ fontSize: '0.7rem', color: '#cbd5e1', marginTop: '0.15rem' }}>
+                {stats.totalNodusSinPago > 0 ? 'Participantes c/asistencia y sin pago' : '0 participantes sin pago en Nodus'}
               </div>
             </div>
           </div>
@@ -143203,6 +144038,184 @@ export default function MonitorMaestriaLima() {
                             </>
                           )}
                         </div>
+                        {(() => {
+                          const roleText = normalizeStr(item.rol || item.rolActividad || item.nodusCross?.nodusRole || '');
+                          const isNonPayingStaff = /manager|capitan|staff|entrenador|oficina|coordinador|gerente/.test(roleText);
+                          const isParticipante = !isNonPayingStaff && (roleText === '' || roleText.includes('participante'));
+                          if (!isParticipante) return null;
+
+                          const trace = buildParticipantPaymentTraceability({
+                            contrato: item,
+                            nodusCross: item.nodusCross,
+                            allPagos: nodusPagosLima
+                          });
+                          const rowKey = item.id || docNum || item.email;
+                          const isExpanded = Boolean(expandedPaymentsByDoc[rowKey]);
+                          const currencyEntries = Object.entries(trace.totalByCurrency);
+                          const totalFormatted = currencyEntries.length > 0
+                            ? currencyEntries.map(([curr, val]) => formatCurrencyAmount(val, curr)).join(' + ')
+                            : null;
+                          const stageBadges = [
+                            { key: 'C1', active: trace.stageSummary.C1 || Boolean(item.nodusCross?.pagadoC1) },
+                            { key: 'C2', active: trace.stageSummary.C2 || Boolean(item.nodusCross?.pagadoC2) },
+                            { key: 'MJ', active: trace.stageSummary.MJ }
+                          ];
+                          const hasAnyPayment = trace.payments.length > 0 ||
+                            stageBadges.some((sb) => sb.active);
+                          const missingStages = trace.hasUnclassifiedPayments
+                            ? []
+                            : stageBadges.filter((sb) => !sb.active).map((sb) => sb.key);
+                          return (
+                            <div style={{ marginTop: '0.35rem', paddingTop: '0.45rem', borderTop: '1px dashed rgba(148, 163, 184, 0.22)' }}>
+                              {!nodusLoading && !isNonPayingStaff && !hasAnyPayment && (
+                                <div
+                                  role="alert"
+                                  style={{
+                                    marginBottom: '0.45rem',
+                                    padding: '0.45rem 0.7rem',
+                                    borderRadius: '8px',
+                                    background: 'rgba(239, 68, 68, 0.16)',
+                                    border: '1px solid rgba(248, 113, 113, 0.55)',
+                                    color: '#fecaca',
+                                    fontSize: '0.76rem',
+                                    fontWeight: 800,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.45rem'
+                                  }}
+                                >
+                                  <span>🚨 ALERTA CONTABLE:</span>
+                                  <span>Este participante NO registra ningún pago en Nodus (ni C1, C2 o MJ).</span>
+                                </div>
+                              )}
+                              {!nodusLoading && !isNonPayingStaff && hasAnyPayment && missingStages.length > 0 && (
+                                <div
+                                  role="alert"
+                                  style={{
+                                    marginBottom: '0.45rem',
+                                    padding: '0.38rem 0.65rem',
+                                    borderRadius: '7px',
+                                    background: 'rgba(245, 158, 11, 0.14)',
+                                    border: '1px solid rgba(251, 191, 36, 0.45)',
+                                    color: '#fde68a',
+                                    fontSize: '0.73rem',
+                                    fontWeight: 700,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem'
+                                  }}
+                                >
+                                  <span>⚠️ Alerta de Pago:</span>
+                                  <span>Falta registro de pago en Nodus para {missingStages.join(' · ')}.</span>
+                                </div>
+                              )}
+                              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.4rem' }}>
+                                  <span style={{ color: '#64748b', fontWeight: 700 }}>💳 Pagos Nodus (C1 → MJ):</span>
+                                  {stageBadges.map((sb) => (
+                                    <span
+                                      key={sb.key}
+                                      style={{
+                                        padding: '0.12rem 0.42rem',
+                                        borderRadius: '5px',
+                                        fontSize: '0.7rem',
+                                        fontWeight: 800,
+                                        background: sb.active ? 'rgba(16, 185, 129, 0.16)' : 'rgba(100, 116, 139, 0.14)',
+                                        color: sb.active ? '#34d399' : '#94a3b8',
+                                        border: `1px solid ${sb.active ? 'rgba(16, 185, 129, 0.35)' : 'rgba(100, 116, 139, 0.28)'}`
+                                      }}
+                                    >
+                                      {sb.key} {sb.active ? '✓' : '—'}
+                                    </span>
+                                  ))}
+                                  {trace.payments.length > 0 ? (
+                                    <span style={{ color: '#fbbf24', fontWeight: 800 }}>
+                                      {trace.payments.length} {trace.payments.length === 1 ? 'pago' : 'pagos'}
+                                      {totalFormatted ? ` · Total ${totalFormatted}` : ''}
+                                      {trace.invoiceNumbers.length > 0 ? ` · Facturas: ${trace.invoiceNumbers.map((inv) => `#${inv}`).join(', ')}` : ''}
+                                      {trace.paymentModes.length > 0 ? ` · Modo: ${trace.paymentModes.join(', ')}` : ''}
+                                    </span>
+                                  ) : (
+                                    <span style={{ color: '#94a3b8' }}>
+                                      {nodusLoading ? 'Consultando pagos en Nodus...' : 'Sin movimientos en ventana Nodus (270 días)'}
+                                    </span>
+                                  )}
+                                </div>
+                                {trace.payments.length > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setExpandedPaymentsByDoc((prev) => ({ ...prev, [rowKey]: !prev[rowKey] }))}
+                                    style={{
+                                      background: 'rgba(56, 189, 248, 0.12)',
+                                      border: '1px solid rgba(56, 189, 248, 0.35)',
+                                      color: '#38bdf8',
+                                      borderRadius: '6px',
+                                      padding: '0.2rem 0.55rem',
+                                      fontSize: '0.73rem',
+                                      fontWeight: 800,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {isExpanded ? 'Ocultar trazabilidad contable ▴' : 'Ver trazabilidad contable (C1 → MJ) ▾'}
+                                  </button>
+                                )}
+                              </div>
+                              {isExpanded && trace.payments.length > 0 && (
+                                <div style={{ marginTop: '0.55rem', overflowX: 'auto', borderRadius: '8px', border: '1px solid #1e293b', background: 'rgba(2, 6, 23, 0.72)' }}>
+                                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem' }}>
+                                    <thead>
+                                      <tr style={{ background: 'rgba(30, 41, 59, 0.65)', color: '#94a3b8', textAlign: 'left' }}>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Fecha</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Etapa</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Concepto / Equipo</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Modo de Pago</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Factura / Comprobante / Ref.</th>
+                                        <th style={{ padding: '0.45rem 0.6rem', textAlign: 'right' }}>Monto</th>
+                                        <th style={{ padding: '0.45rem 0.6rem' }}>Estado</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {trace.payments.map((p, pIdx) => (
+                                        <tr key={p.idFactura || `${rowKey}-p-${pIdx}`} style={{ borderTop: '1px solid rgba(30, 41, 59, 0.8)' }}>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1', whiteSpace: 'nowrap' }}>{p.fecha || '—'}</td>
+                                          <td style={{ padding: '0.42rem 0.6rem' }}>
+                                            <span style={{
+                                              padding: '0.1rem 0.4rem',
+                                              borderRadius: '4px',
+                                              fontWeight: 800,
+                                              fontSize: '0.68rem',
+                                              background: p.etapa === 'MJ' ? 'rgba(245, 158, 11, 0.18)' : p.etapa === 'C2' ? 'rgba(56, 189, 248, 0.18)' : 'rgba(16, 185, 129, 0.18)',
+                                              color: p.etapa === 'MJ' ? '#fbbf24' : p.etapa === 'C2' ? '#38bdf8' : '#34d399'
+                                            }}>
+                                              {p.etapa}
+                                            </span>
+                                          </td>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#e2e8f0' }}>
+                                            <div>{p.concepto}</div>
+                                            {p.equipo && <div style={{ color: '#94a3b8', fontSize: '0.69rem' }}>{p.equipo}</div>}
+                                          </td>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#f8fafc', fontWeight: 700 }}>{p.modoPago || 'No especificado'}</td>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#94a3b8' }}>
+                                            <span style={{ color: '#e2e8f0', fontWeight: 700 }}>
+                                              {p.numeroFactura ? `Factura #${p.numeroFactura}` : (p.idFactura ? `#${p.idFactura}` : '—')}
+                                            </span>
+                                            {p.idFactura && p.numeroFactura && p.idFactura !== p.numeroFactura ? ` (ID ${p.idFactura})` : ''}
+                                            {p.referencia ? ` · Ref: ${p.referencia}` : ''}
+                                            {p.registradoPor ? ` · ${p.registradoPor}` : ''}
+                                          </td>
+                                          <td style={{ padding: '0.42rem 0.6rem', textAlign: 'right', color: '#34d399', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                                            {formatCurrencyAmount(p.monto, p.moneda)}
+                                          </td>
+                                          <td style={{ padding: '0.42rem 0.6rem', color: '#cbd5e1' }}>{p.estado}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   );
@@ -143343,6 +144356,8 @@ export default function MonitorMaestriaLima() {
                   { id: 'COMPLETO', label: '✅ Completo (Firma + Nodus)' },
                   { id: 'FALTA_CHECKIN_NODUS', label: '⚠️ Firmó · Falta Check-in Nodus' },
                   { id: 'FALTA_FIRMA_CONTRATO', label: '🚨 En Nodus · Falta Firma Contrato' },
+                  { id: 'SIN_PAGO_EN_NODUS', label: `🚨 Nodus Asist. · Sin Pago (${stats.totalNodusSinPago || 0})` },
+                  { id: 'CON_OBSERVACION_PREVIA', label: `⚠️ Obs. C1/C2/Pagos (${stats.totalNodusConObservacion || 0})` },
                   { id: 'PENDIENTE_AMBOS', label: '⏳ Pendiente Ambos' }
                 ].map((s) => {
                   const active = padronStatusFilter === s.id;
@@ -143422,6 +144437,43 @@ export default function MonitorMaestriaLima() {
                           <span style={{ background: 'rgba(245, 158, 11, 0.14)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)', fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '4px' }}>
                             {item.rolLabel} {item.coordinador ? `· Coord: ${item.coordinador}` : ''}
                           </span>
+                          {item.coherenciaPrevia && (
+                            <span style={{
+                              background: item.coherenciaPrevia.isCoherent ? 'rgba(16, 185, 129, 0.14)' : 'rgba(245, 158, 11, 0.18)',
+                              color: item.coherenciaPrevia.isCoherent ? '#34d399' : '#fbbf24',
+                              border: `1px solid ${item.coherenciaPrevia.isCoherent ? 'rgba(16, 185, 129, 0.35)' : 'rgba(245, 158, 11, 0.45)'}`,
+                              fontSize: '0.65rem',
+                              fontWeight: 800,
+                              padding: '0.15rem 0.45rem',
+                              borderRadius: '4px'
+                            }}>
+                              {item.coherenciaPrevia.isCoherent
+                                ? (item.coherenciaPrevia.status === 'MANAGER' ? '✓ Manager · Staff' : '✓ C1/C2 + Pagos OK')
+                                : `⚠ ${item.coherenciaPrevia.issues.join(' · ')}`}
+                            </span>
+                          )}
+                          {!nodusLoading && item.tipoPersona !== 'manager' && (() => {
+                            const pTrace = buildParticipantPaymentTraceability({
+                              contrato: item.signature || { nombre: item.nombre, numeroDocumento: item.identificacion, email: item.email },
+                              nodusCross: { nodusDoc: item.identificacion, nodusRecord: item.nodusRecord },
+                              allPagos: nodusPagosLima
+                            });
+                            const hasPay = pTrace.payments.length > 0 || pTrace.stageSummary.C1 || pTrace.stageSummary.C2 || pTrace.stageSummary.MJ || item.pagadoC1 || item.pagadoC2;
+                            if (hasPay) return null;
+                            return (
+                              <span style={{
+                                background: 'rgba(239, 68, 68, 0.22)',
+                                color: '#fca5a5',
+                                border: '1px solid rgba(248, 113, 113, 0.55)',
+                                fontSize: '0.65rem',
+                                fontWeight: 900,
+                                padding: '0.15rem 0.45rem',
+                                borderRadius: '4px'
+                              }}>
+                                🚨 SIN PAGO EN NODUS
+                              </span>
+                            );
+                          })()}
                         </div>
                         <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 900, color: '#fff' }}>{item.nombre}</h3>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginTop: '0.35rem', fontSize: '0.75rem', color: '#94a3b8', flexWrap: 'wrap' }}>
@@ -174135,7 +175187,7 @@ import { useUI } from '../context/UIContext';
 import { doc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, limit, getDocs, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
-import { canViewInactiveUsers, isElizabethEscobar } from '../config/permissions';
+import { canViewInactiveUsers, isElizabethEscobar, canAccessAliadosStaff } from '../config/permissions';
 import { isInactiveTrainer } from '../data/managersData';
 import { isUserInactive as isInactiveUserRecord } from '../utils/userNormalizer.js';
 import { getAllCompanyUsers } from '../services/userService';
@@ -175489,7 +176541,7 @@ export default function SuperAdminPanel() {
   const { tasks } = useChecklist();
   const { currentStage } = useCycles();
   const canAccessGlobal = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'talento_humano' || (currentUser?.roles || []).includes('talento_humano') || isElizabethEscobar(currentUser);
-  const canAccessAliadosStaff = currentUser?.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(currentUser?.appRole);
+  const hasAliadosStaffAccess = canAccessAliadosStaff(currentUser);
   const initialTabParam = searchParams.get('tab') || searchParams.get('view');
   const [activeView, setActiveView] = useState(initialTabParam || (canAccessGlobal ? 'global' : 'sede'));
 
@@ -175914,13 +176966,13 @@ export default function SuperAdminPanel() {
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
               <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
             )}
-            {canAccessAliadosStaff && (
+            {hasAliadosStaffAccess && (
               <button style={tabStyle('aliados_c1')} onClick={() => setActiveView('aliados_c1')}>📘 Aliados C1 (Guía & Accesos)</button>
             )}
-            {canAccessAliadosStaff && (
+            {hasAliadosStaffAccess && (
               <button style={tabStyle('aliados_c2')} onClick={() => setActiveView('aliados_c2')}>🛡️ Aliados C2 (Guía & Accesos)</button>
             )}
-            {canAccessAliadosStaff && (
+            {hasAliadosStaffAccess && (
               <button style={tabStyle('staff_mesa')} onClick={() => setActiveView('staff_mesa')}>📋 Staff de Mesa (Guía & Accesos)</button>
             )}
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
@@ -175972,13 +177024,13 @@ export default function SuperAdminPanel() {
           {activeView === 'sugerencias' && (
             <SuggestionsView />
           )}
-          {activeView === 'aliados_c1' && (
+          {activeView === 'aliados_c1' && hasAliadosStaffAccess && (
             <AliadosC1AdminPanel currentUser={currentUser} onToggleGuideView={() => navigate('/guia-aliados-c1')} />
           )}
-          {activeView === 'aliados_c2' && (
+          {activeView === 'aliados_c2' && hasAliadosStaffAccess && (
             <AliadosC2AdminPanel currentUser={currentUser} />
           )}
-          {activeView === 'staff_mesa' && (
+          {activeView === 'staff_mesa' && hasAliadosStaffAccess && (
             <StaffMesaAdminPanel currentUser={currentUser} />
           )}
           {activeView === 'contraste_nodus' && (
@@ -180807,6 +181859,8 @@ export default function ComunicadosOperativos() {
 ```javascript
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { isLimaOnlyScopedUser } from '../config/permissions';
 import { 
   Building2, Users, Trophy, UserCheck, ArrowLeft, Filter, Search, 
   TrendingUp, Layers, CheckCircle2, Clock, AlertCircle, RefreshCw 
@@ -180814,9 +181868,11 @@ import {
 
 export default function MatrizEnrolamientoSentados() {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const limaOnly = isLimaOnlyScopedUser(currentUser);
 
   // Estados de Filtros
-  const [selectedSede, setSelectedSede] = useState('TODAS');
+  const [selectedSede, setSelectedSede] = useState(limaOnly ? 'Lima' : 'TODAS');
   const [selectedEquipo, setSelectedEquipo] = useState('TODOS');
   const [selectedEntrenador, setSelectedEntrenador] = useState('TODOS');
   const [searchTerm, setSearchTerm] = useState('');
@@ -180948,7 +182004,8 @@ export default function MatrizEnrolamientoSentados() {
   // Filtrado dinámico
   const datosFiltrados = useMemo(() => {
     return matrizDatos.filter(item => {
-      const matchSede = selectedSede === 'TODAS' || item.sede.toUpperCase() === selectedSede.toUpperCase();
+      const effectiveSede = limaOnly ? 'Lima' : selectedSede;
+      const matchSede = effectiveSede === 'TODAS' || item.sede.toUpperCase() === effectiveSede.toUpperCase();
       const matchEquipo = selectedEquipo === 'TODOS' || item.equipo.toUpperCase().includes(selectedEquipo.toUpperCase());
       const matchEntrenador = selectedEntrenador === 'TODOS' || item.entrenador.toUpperCase().includes(selectedEntrenador.toUpperCase());
       const matchSearch = searchTerm === '' || 
@@ -180959,7 +182016,7 @@ export default function MatrizEnrolamientoSentados() {
 
       return matchSede && matchEquipo && matchEntrenador && matchSearch;
     });
-  }, [matrizDatos, selectedSede, selectedEquipo, selectedEntrenador, searchTerm]);
+  }, [matrizDatos, selectedSede, selectedEquipo, selectedEntrenador, searchTerm, limaOnly]);
 
   // Cálculos consolidados
   const totales = useMemo(() => {
@@ -181088,15 +182145,22 @@ export default function MatrizEnrolamientoSentados() {
             <Filter size={16} style={{ color: '#64748b' }} />
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569' }}>Sede:</span>
             <select 
-              value={selectedSede} 
-              onChange={(e) => setSelectedSede(e.target.value)}
-              style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '0.4rem 0.75rem', fontSize: '0.85rem', background: '#fff', cursor: 'pointer' }}
+              value={limaOnly ? 'Lima' : selectedSede} 
+              onChange={(e) => { if (!limaOnly) setSelectedSede(e.target.value); }}
+              disabled={limaOnly}
+              style={{ border: '1px solid #cbd5e1', borderRadius: '6px', padding: '0.4rem 0.75rem', fontSize: '0.85rem', background: '#fff', cursor: limaOnly ? 'not-allowed' : 'pointer' }}
             >
-              <option value="TODAS">Todas las Sedes</option>
-              <option value="Lima">Lima</option>
-              <option value="Guayaquil">Guayaquil</option>
-              <option value="Quito">Quito</option>
-              <option value="Cuenca">Cuenca</option>
+              {limaOnly ? (
+                <option value="Lima">Lima (Solo Sede)</option>
+              ) : (
+                <>
+                  <option value="TODAS">Todas las Sedes</option>
+                  <option value="Lima">Lima</option>
+                  <option value="Guayaquil">Guayaquil</option>
+                  <option value="Quito">Quito</option>
+                  <option value="Cuenca">Cuenca</option>
+                </>
+              )}
             </select>
           </div>
 
@@ -187944,7 +189008,7 @@ import {
   canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
   canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo,
   canUseAsignadorEntrenadores, isDataAdmin, isElizabethEscobar, isGlobalObserver,
-  canAccessMonitorContratoLima, PORTFOLIO_FI_REVIEW_EMAILS
+  canAccessMonitorContratoLima, canAccessAliadosStaff, PORTFOLIO_FI_REVIEW_EMAILS
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -188205,7 +189269,8 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Guía, accesos, bitácora y control operativo de Aliados C1.',
     keywords: ['aliados', 'aliados c1', 'c1', 'guia', 'accesos', 'registro'],
     route: '/superadmin?tab=aliados_c1',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+    roles: null,
+    visible: canAccessAliadosStaff
   },
   {
     id: 'opt-aliados-c2',
@@ -188216,7 +189281,8 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Guía, accesos, vigencia y control operativo de Aliados C2.',
     keywords: ['aliados', 'aliados c2', 'c2', 'guia', 'accesos', 'vigencia'],
     route: '/superadmin?tab=aliados_c2',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+    roles: null,
+    visible: canAccessAliadosStaff
   },
   {
     id: 'opt-staff-mesa',
@@ -188227,7 +189293,8 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Guía, accesos, cantidad de conexiones, última conexión, checklist y alertas de Staff de Mesa.',
     keywords: ['staff', 'staff de mesa', 'mesa', 'conexiones', 'ultima conexion', 'guia', 'accesos', 'checklist', 'escudo'],
     route: '/superadmin?tab=staff_mesa',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'superadmin']
+    roles: null,
+    visible: canAccessAliadosStaff
   },
   {
     id: 'opt-monitor-maestria-lima',
@@ -190524,7 +191591,7 @@ export default function Home() {
               🌐 Centro de Mando
             </ModuleHelpButton>
           )}
-          {(currentUser?.isSuperAdmin || hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'superadmin'])) && (
+          {canAccessAliadosStaff(currentUser) && (
             <>
               <ModuleHelpButton helpKey="aliadosC1" onClick={() => navigate('/superadmin?tab=aliados_c1')} className="home-module-card" style={{ borderColor: 'rgba(56, 189, 248, 0.45)', background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.14) 0%, rgba(15, 23, 42, 0.35) 100%)' }}>
                 📘 Aliados C1 (Guía & Accesos)
